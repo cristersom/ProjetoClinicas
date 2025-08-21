@@ -1,0 +1,13 @@
+Homepage → Tela inicial (com acesso paciente/admin)
+
+Login/Conta → Login só para administrador / Sessão anônima para paciente
+
+Filmes/Séries → Narrativas e Questionários gamificados
+
+Thumb/Título/Descrição/Categoria → Cena da narrativa (texto, imagem, vídeo, escolha)
+
+Views/Data de Criação → Progresso do paciente / registros de sessão
+
+Episódios → Blocos de narrativa + perguntas associadas
+
+Barra de Pesquisa → Dashboard/Admin com filtros para relatórios
