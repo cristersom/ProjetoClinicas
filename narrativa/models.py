@@ -5,6 +5,7 @@ from django.utils import timezone
 LISTA_CATEGORIAS = (
     ("BOASVINDAS", "Boas vindas"),
     ("TRATAMENTO", "Tratamento"),
+    ("ACOMPANHAMENTO", "Acompanhamento"),
     ("REVISÃO", "Revisão"),
     ("ENCERRAMENTO", "Encerramento"),
     ("OUTROS", "Outros"),
@@ -19,3 +20,12 @@ class Narrativa(models.Model):
 
     def __str__(self):
         return self.titulo
+
+# Criar episódios
+class Cena(models.Model):
+    narrativa = models. ForeignKey("Narrativa", related_name="cenas", on_delete=models. CASCADE)
+    titulo = models. CharField(max_length=100)
+    video = models. URLField()
+
+    def __str__(self):
+        return self.narrativa.titulo + " - " + self.titulo

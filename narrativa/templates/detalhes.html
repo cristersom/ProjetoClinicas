@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block titulo %}
+    Detalhes da Narrativa
+{% endblock %}
+
+{% block content %}
+    <div class="py-10">
+    <h1>Essa é o detalhe da narrativa: {{ object.titulo }}</h1>
+    <p>{{ object }}</p>
+    <p>{{ object.descricao }}</p>
+    <img src="{{ object.thumb.url }}">
+
+    <h2>Cenas</h2>
+    {% for cena in object.cenas.all %}
+        <a href="{{ cena.video }}">
+            <p>Cena {{ forloop.counter }}: {{ cena.titulo }}</p>
+        </a>
+    {% endfor %}
+    <div class="py-10">
+    <h2>Relacionados</h2>
+    {% for cena in relacionados %}
+        <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+            {{ narrativa.titulo}}
+        </a>
+    {% endfor %}
+    </div>
+    </div>
+{% endblock %}
