@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 LISTA_CATEGORIAS = (
@@ -29,3 +30,6 @@ class Cena(models.Model):
 
     def __str__(self):
         return self.narrativa.titulo + " - " + self.titulo
+
+class Usuario(AbstractUser):
+    narrativas_vistas = models.ManyToManyField("Narrativa")

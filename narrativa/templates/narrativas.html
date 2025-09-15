@@ -1,18 +1,200 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block titulo %}
-HomeFilmes Hashflix
+Narrativas
+{% endblock %}
 
+{% block head %}
+<style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* ISSO CRIA AS 'PÁGINAS' DO CARROSSEL - NECESSÁRIO */
+    .wrapper {
+      display: grid;
+      grid-template-columns: 100% 100%; /* Ajuste se tiver mais de 2 seções */
+      overflow: hidden;
+    }
+
+    /* O EFEITO DE HOVER PARA OS ITENS - NECESSÁRIO */
+    .item:hover {
+      transform: scale(1.2);
+      z-index: 10;
+      transition: 250ms all;
+    }
+
+    /* O ESTILO DAS SETAS - NECESSÁRIO */
+   /* REGRA FINAL E ÚNICA PARA AS SETAS */
+.arrow__btn {
+  display: flex;
+  align-items: center;
+  color: #fff;
+  text-decoration: none;
+  font-size: 4em;
+  z-index: 1;
+  padding: 0 20px;
+}
+
+    .wrapper section a.arrow__btn:nth-of-type(1) {
+      left: 0;
+     /* background: linear-gradient(-90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);*/
+    }
+
+    .wrapper section a.arrow__btn:nth-of-type(2) {
+      right: 0;
+     /* background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);*/
+    }
+
+    /* REMOVER SETAS EM TELAS PEQUENAS - OPCIONAL */
+    @media only screen and (max-width: 600px) {
+      a.arrow__btn {
+        display: none;
+      }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="py-10">
-<h1>Essa é a nossa HomeFilmes</h1>
-    {% for narrativa in object_list %}
-    <hr>
-    <a href="{% url 'narrativa:detalhes' narrativa.pk %}"><p>{{ narrativa }}</p></a>
-    <p>{{ narrativa.descricao }}</p>
-    <img src="{{ narrativa.thumb.url }}">
-    {% endfor %}
+
+<main class='bg-primary_black min-h-screen w-full'>
+<section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
+    <div>
+        <h2 class="text-6xl font-semibold  my-4">
+            {{ narrativa_destaque.titulo }}
+        </h2>
+        <p class=" w-11/12 md:w-5/12 font-medium my-4">
+            {{ narrativa_destaque.descricao }}
+        </p>
+        <div class="flex my-4">
+            <a href="{% url 'narrativa:detalhes' narrativa_destaque.pk %}">
+                <button class="flex items-center bg-black py-2 px-5 rounded-md" style='color:white;'>
+                    <ion-icon name="play" class="text-2xl"></ion-icon>
+                    <span class="ml-3 font-medium " >
+                        Play
+                    </span>
+                </button>
+            </a>
+        </div>
+    </div>
+</section>
+
+
+<section class='bg-primary_black flex justify-center py-10'>
+    <div class="p-8 w-10/12 relative" >
+        <h2 class="text-gray-200 text-2xl font-medium">
+            Novo
+        </h2>
+        <div class="wrapper">
+          <section id="section1" class="flex flex-nowrap items-center justify-center space-x-8">
+            <a href="#section2" class="arrow__btn text-6xl page">‹</a>
+            {% for narrativa in lista_narrativas_recentes %}
+            {% if forloop.counter < 5 %}
+                <div class="item h-64 w-1/4 m-4">
+                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                    </a>
+                </div>
+            {% endif %}
+            {% endfor %}
+                <a href="#section2" class="arrow__btn text-6xl">›</a>
+          </section>
+            {% if lista_narrativas_recentes|length > 4 %}
+              <section id="section2" class="flex flex-nowrap items-center justify-center">
+                <a href="#section1" class="arrow__btn text-6xl">‹</a>
+                    {% for narrativa in lista_narrativas_recentes %}
+                    {% if forloop.counter > 4 %}
+                        <div class="item h-64 w-1/4 m-4">
+                            <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endfor %}
+                <a href="#section1" class="arrow__btn text-6xl">›</a>
+              </section>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<section class='bg-primary_black flex justify-center py-10'>
+    <div class="p-8 w-10/12 relative" >
+        <h2 class="text-gray-200 text-2xl font-medium">
+            Em alta
+        </h2>
+        <div class="wrapper">
+          <section id="section1emalta" class="flex flex-nowrap items-center justify-center space-x-8">
+            <a href="#section2emaltaemalta" class="arrow__btn text-6xl page">‹</a>
+            {% for narrativa in lista_narrativas_emalta %}
+            {% if forloop.counter < 5 %}
+                <div class="item h-64 w-1/4 m-4">
+                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                    </a>
+                </div>
+            {% endif %}
+            {% endfor %}
+                <a href="#section2emaltaemalta" class="arrow__btn text-6xl">›</a>
+          </section>
+            {% if lista_narrativas_emalta|length > 4 %}
+              <section id="section2emaltaemalta" class="flex flex-nowrap items-center justify-center">
+                <a href="#section1emalta" class="arrow__btn text-6xl">‹</a>
+                    {% for narrativa in lista_narrativas_emalta %}
+                    {% if forloop.counter > 4 %}
+                        <div class="item h-64 w-1/4 m-4">
+                            <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endfor %}
+                <a href="#section1emalta" class="arrow__btn text-6xl">›</a>
+              </section>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class='bg-primary_black flex justify-center py-10'>
+<div class="p-8 w-10/12 relative" >
+    <h2 class="text-gray-200 text-2xl font-medium">
+       Narrativas vistas
+    </h2>
+    <div class="wrapper">
+      <section id="section1vistos" class="flex flex-nowrap items-center justify-center space-x-8">
+        <a href="#section2vistosemalta" class="arrow__btn text-6xl page">‹</a>
+        {% for narrativa in  request.user.narrativas_vistas.all  %}
+        {% if forloop.counter < 5 %}
+            <div class="item h-64 w-1/4 m-4">
+                <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                    <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                </a>
+            </div>
+        {% endif %}
+        {% endfor %}
+            <a href="#section2vistosemalta" class="arrow__btn text-6xl">›</a>
+      </section>
+        {% if request.user.narrativas_vistas.all|length > 4 %}
+          <section id="section2vistosemalta" class="flex flex-nowrap items-center justify-center">
+            <a href="#section1vistos" class="arrow__btn text-6xl">‹</a>
+                {% for narrativa in  request.user.narrativas_vistas.all  %}
+                {% if forloop.counter > 4 %}
+                    <div class="item h-64 w-1/4 m-4">
+                        <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
+                            <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                        </a>
+                    </div>
+                {% endif %}
+                {% endfor %}
+            <a href="#section1vistos" class="arrow__btn text-6xl">›</a>
+          </section>
+        {% endif %}
+    </div>
 </div>
+</section>
+
+
+</main>
+
 {% endblock %}
