@@ -22,11 +22,15 @@ class Narrativa(models.Model):
     def __str__(self):
         return self.titulo
 
-# Criar episódios
+# Criar  Cenas
+
+# Criar Cenas interativas (MODIFICADO)
 class Cena(models.Model):
-    narrativa = models. ForeignKey("Narrativa", related_name="cenas", on_delete=models. CASCADE)
-    titulo = models. CharField(max_length=100)
-    video = models. URLField()
+    narrativa = models.ForeignKey("Narrativa", related_name="cenas", on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100, help_text="Título interno para identificar a cena (ex: 'Cena de Boas Vindas')")
+    conteudo_textual = models.TextField(blank=True, null=True, help_text="Texto principal que aparecerá na cena.")
+    imagem = models.ImageField(upload_to='imagem_cenas', blank=True, null=True, help_text="Imagem de apoio para a cena.")
+    video = models.URLField(blank=True, null=True, help_text="Link do vídeo para a cena (opcional).")
 
     def __str__(self):
         return self.narrativa.titulo + " - " + self.titulo

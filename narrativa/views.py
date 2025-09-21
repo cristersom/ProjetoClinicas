@@ -59,8 +59,14 @@ class Pesquisa(LoginRequiredMixin, ListView):
         else:
             return None
 
-class Perfil(LoginRequiredMixin, TemplateView):
+class Perfil(LoginRequiredMixin, UpdateView):
     template_name = "perfil.html"
+    model = Usuario
+    fields = ['first_name', 'last_name', 'email']
+
+    def get_success_url(self):
+        return reverse('narrativa:narrativas')
+
 
 
 class Criarconta(FormView):
