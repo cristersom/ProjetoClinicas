@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% block title %} Detalhes do Relatório {% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Relatório do Questionário: "{{ questionario.titulo }}"</h1>
+
+  {% for session_key, respostas in dados_do_relatorio.items %}
+  <div class="module">
+    <h2>Respostas do Paciente (Sessão: {{ session_key|slice:":8" }}...)</h2>
+    <div class="results">
+        <table id="result_list">
+            <thead>
+              <tr>
+                <th class="sortable column-pergunta">
+                  <div class="text"><a>Pergunta</a></div>
+                </th>
+                <th class="sortable column-resposta">
+                  <div class="text"><a>Resposta</a></div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for resposta in respostas %}
+                <tr class="{% cycle 'row1' 'row2' %}">
+                    <td class="field-pergunta">{{ resposta.pergunta.texto_pergunta }}</td>
+                    <td class="field-resposta"><strong>{{ resposta.texto_resposta }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if not dados_do_relatorio %}
+    <p>Ainda não há respostas para este questionário.</p>
+  {% endif %}
+
+</div>
+{% endblock %}

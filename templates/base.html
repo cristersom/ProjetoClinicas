@@ -12,7 +12,9 @@
     {% endblock %}
 </head>
 <body class="bg-blue-600 text-black-100 font-primary">
-    {% include 'navbar.html' %}
+    {% block navbar %}
+        {% include 'navbar.html' %}
+    {% endblock %}
     {% block content %}
     {% endblock %}
     <script>
