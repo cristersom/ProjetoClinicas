@@ -1,20 +1,13 @@
-"""
-Django settings for gameflix project.
-"""
-
 from pathlib import Path
 import os
 import dj_database_url
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-zm*--r$@&xjk&6_$xb=*=i79^ux806x^@-_)zz&5*)(6wl_0p%')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -26,8 +19,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'import_export',
-    'cloudinary_storage',  # <-- MUDANÇA: Para uploads
-    'cloudinary',          # <-- MUDANÇA: Para uploads
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
@@ -63,14 +56,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# Database
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
     )
 }
 
-# Password validation
 AUTH_USER_MODEL = "narrativa.usuario"
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -79,36 +70,34 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# --- CONFIGURAÇÃO DE ARQUIVOS (CORRIGIDA) ---
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# <-- MUDANÇA: Configuração do Cloudinary para os uploads -->
-MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+MEDIA_URL = '/media/' # URL para acessar os uploads
 
-# <-- MUDANÇA: Configuração do Whitenoise para arquivos estáticos -->
+# A linha 'DEFAULT_FILE_STORAGE' foi removida e a lógica foi movida para 'STORAGES'
 STORAGES = {
+    # Armazenamento para uploads (mídia) - aponta para o Cloudinary
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    # Armazenamento para arquivos estáticos (CSS, JS) - aponta para o Whitenoise
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
-# <-- MUDANÇA: Configurações do Cloudinary (lidas do ambiente) -->
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGIN_URL = 'narrativa:login'
-
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
