@@ -11,16 +11,27 @@ class PatientAccessMiddleware:
         if request.user.is_authenticated:
             return self.get_response(request)
 
-        # Regra 2: Se o usuário (anônimo) está tentando acessar a área de admin, deixe-o passar.
-        # É aqui que fica a página de login do admin.
-        if request.path.startswith('/admin/'):
+        # Regra 2: Lista de URLs EXATAS que um usuário anônimo PODE acessar.
+        # Adicionamos as URLs de login e criar conta a esta lista.
+        try:
+            allowed_paths = [
+                reverse('narrativa:login'),
+                reverse('narrativa:criarconta'),
+                reverse('narrativa:homepage'),
+            ]
+        except Exception:
+            # Fallback para caso as URLs não estejam prontas no início
+            allowed_paths = ['/login/', '/criarconta/', '/']
+
+        # Se o caminho for um dos permitidos, deixe o usuário passar.
+        if request.path in allowed_paths:
             return self.get_response(request)
 
-        # Regra 3: Se o usuário anônimo está tentando acessar uma página de paciente, deixe-o passar.
-        allowed_prefixes = ['/paciente/', '/media/', '/static/']
+        # Regra 3: Lista de ÁREAS que um usuário anônimo PODE acessar.
+        # Se o caminho começar com um desses prefixos, deixe o usuário passar.
+        allowed_prefixes = ['/paciente/', '/media/', '/static/', '/admin/']
         if any(request.path.startswith(prefix) for prefix in allowed_prefixes):
             return self.get_response(request)
 
-        # Regra 4: Para QUALQUER OUTRA PÁGINA (como a homepage '/', a lista de narrativas do admin, etc.),
-        # redirecione o usuário anônimo para o catálogo de paciente.
+        # Regra 4: Para TODO O RESTO, redirecione o usuário anônimo.
         return redirect('narrativa:paciente_narrativas')
