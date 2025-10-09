@@ -10,44 +10,25 @@ Narrativas
     html {
       scroll-behavior: smooth;
     }
-
-    /* ISSO CRIA AS 'PÁGINAS' DO CARROSSEL - NECESSÁRIO */
     .wrapper {
       display: grid;
-      grid-template-columns: 100% 100%; /* Ajuste se tiver mais de 2 seções */
+      grid-template-columns: 100% 100%;
       overflow: hidden;
     }
-
-    /* O EFEITO DE HOVER PARA OS ITENS - NECESSÁRIO */
     .item:hover {
       transform: scale(1.2);
       z-index: 10;
       transition: 250ms all;
     }
-
-    /* O ESTILO DAS SETAS - NECESSÁRIO */
-   /* REGRA FINAL E ÚNICA PARA AS SETAS */
-.arrow__btn {
-  display: flex;
-  align-items: center;
-  color: #fff;
-  text-decoration: none;
-  font-size: 4em;
-  z-index: 1;
-  padding: 0 20px;
-}
-
-    .wrapper section a.arrow__btn:nth-of-type(1) {
-      left: 0;
-     /* background: linear-gradient(-90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);*/
+    .arrow__btn {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      font-size: 4em;
+      z-index: 1;
+      padding: 0 20px;
     }
-
-    .wrapper section a.arrow__btn:nth-of-type(2) {
-      right: 0;
-     /* background: linear-gradient(90deg, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%);*/
-    }
-
-    /* REMOVER SETAS EM TELAS PEQUENAS - OPCIONAL */
     @media only screen and (max-width: 600px) {
       a.arrow__btn {
         display: none;
@@ -61,13 +42,13 @@ Narrativas
 <main class='bg-primary_black min-h-screen w-full'>
 <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
     <div>
-        <h2 class="text-6xl font-semibold  my-4">
+        <h2 class="text-6xl font-semibold text-white my-4">
             {{ narrativa_destaque.titulo }}
         </h2>
-        <p class=" w-11/12 md:w-5/12 font-medium my-4">
+        <p class=" w-11/12 md:w-5/12 font-medium text-white my-4">
             {{ narrativa_destaque.descricao }}
         </p>
-        <div class="flex my-4">
+        <div class="flex my-4 space-x-4">
             <a href="{% url 'narrativa:detalhes' narrativa_destaque.pk %}">
                 <button class="flex items-center bg-black py-2 px-5 rounded-md" style='color:white;'>
                     <ion-icon name="play" class="text-2xl"></ion-icon>
@@ -76,6 +57,26 @@ Narrativas
                     </span>
                 </button>
             </a>
+            <button
+                id="copy-button"
+                onclick="copyLinkToClipboard()"
+                class="flex items-center bg-gray-300 hover:bg-gray-400 py-2 px-5 rounded-md"
+                style='color:black;'>
+                <ion-icon name="clipboard-outline" class="text-2xl"></ion-icon>
+                <span id="copy-button-text" class="ml-3 font-medium">
+                    Copiar Link
+                </span>
+            </button>
+            <button
+                id="share-button"
+                onclick="shareLink()"
+                class="flex items-center bg-blue-500 hover:bg-blue-600 py-2 px-5 rounded-md text-white"
+                style="display: none;">
+                <ion-icon name="share-social-outline" class="text-2xl"></ion-icon>
+                <span class="ml-3 font-medium">
+                    Encaminhar
+                </span>
+            </button>
         </div>
     </div>
 </section>
@@ -125,7 +126,7 @@ Narrativas
         </h2>
         <div class="wrapper">
           <section id="section1emalta" class="flex flex-nowrap items-center justify-center space-x-8">
-            <a href="#section2emaltaemalta" class="arrow__btn text-6xl page">‹</a>
+            <a href="#section2emalta" class="arrow__btn text-6xl page">‹</a>
             {% for narrativa in lista_narrativas_emalta %}
             {% if forloop.counter < 5 %}
                 <div class="item h-64 w-1/4 m-4">
@@ -135,10 +136,10 @@ Narrativas
                 </div>
             {% endif %}
             {% endfor %}
-                <a href="#section2emaltaemalta" class="arrow__btn text-6xl">›</a>
+                <a href="#section2emalta" class="arrow__btn text-6xl">›</a>
           </section>
             {% if lista_narrativas_emalta|length > 4 %}
-              <section id="section2emaltaemalta" class="flex flex-nowrap items-center justify-center">
+              <section id="section2emalta" class="flex flex-nowrap items-center justify-center">
                 <a href="#section1emalta" class="arrow__btn text-6xl">‹</a>
                     {% for narrativa in lista_narrativas_emalta %}
                     {% if forloop.counter > 4 %}
@@ -163,7 +164,7 @@ Narrativas
     </h2>
     <div class="wrapper">
       <section id="section1vistos" class="flex flex-nowrap items-center justify-center space-x-8">
-        <a href="#section2vistosemalta" class="arrow__btn text-6xl page">‹</a>
+        <a href="#section2vistos" class="arrow__btn text-6xl page">‹</a>
         {% for narrativa in  request.user.narrativas_vistas.all  %}
         {% if forloop.counter < 5 %}
             <div class="item h-64 w-1/4 m-4">
@@ -173,10 +174,10 @@ Narrativas
             </div>
         {% endif %}
         {% endfor %}
-            <a href="#section2vistosemalta" class="arrow__btn text-6xl">›</a>
+            <a href="#section2vistos" class="arrow__btn text-6xl">›</a>
       </section>
         {% if request.user.narrativas_vistas.all|length > 4 %}
-          <section id="section2vistosemalta" class="flex flex-nowrap items-center justify-center">
+          <section id="section2vistos" class="flex flex-nowrap items-center justify-center">
             <a href="#section1vistos" class="arrow__btn text-6xl">‹</a>
                 {% for narrativa in  request.user.narrativas_vistas.all  %}
                 {% if forloop.counter > 4 %}
@@ -196,5 +197,37 @@ Narrativas
 
 
 </main>
+
+<script>
+    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:selecionar_perfil' %}";
+
+    function copyLinkToClipboard() {
+        navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
+            const buttonText = document.getElementById('copy-button-text');
+            buttonText.innerText = 'Copiado!';
+            setTimeout(function() {
+                buttonText.innerText = 'Copiar Link';
+            }, 2000);
+        }, function(err) {
+            console.error('Erro ao copiar o link: ', err);
+        });
+    }
+
+    function shareLink() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Convite para Jornada Interativa',
+                text: 'Olá! Gostaria de te convidar para iniciar uma jornada interativa.',
+                url: linkParaCompartilhar
+            });
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (navigator.share) {
+            document.getElementById('share-button').style.display = 'flex';
+        }
+    });
+</script>
 
 {% endblock %}

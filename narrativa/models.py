@@ -18,7 +18,6 @@ class Narrativa(models.Model):
     categoria = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
-    # --- NOVO: Campo para definir qual cena inicia a narrativa ---
     cena_inicial = models.ForeignKey(
         'Cena',
         on_delete=models.SET_NULL,
@@ -30,9 +29,6 @@ class Narrativa(models.Model):
     def __str__(self):
         return self.titulo
 
-# Criar  Cenas
-
-# Criar Cenas interativas (MODIFICADO)
 class Cena(models.Model):
     narrativa = models.ForeignKey("Narrativa", related_name="cenas", on_delete=models.CASCADE)
     titulo = models.CharField(max_length=100, help_text="Título interno para identificar a cena (ex: 'Cena de Boas Vindas')")
@@ -43,7 +39,6 @@ class Cena(models.Model):
     def __str__(self):
         return self.narrativa.titulo + " - " + self.titulo
 
-# --- NOVO: A classe que cria a interatividade ---
 class Escolha(models.Model):
     cena_origem = models.ForeignKey(Cena, related_name="escolhas", on_delete=models.CASCADE)
     texto_da_opcao = models.CharField(max_length=255)
@@ -58,9 +53,8 @@ class Escolha(models.Model):
     def __str__(self):
         destino = self.cena_destino.titulo if self.cena_destino else 'Fim da Jornada'
         return f"Opção em '{self.cena_origem.titulo}': levar para '{destino}'"
-# --- NOVO: Classes para o sistema de Questionários ---
+
 class Questionario(models.Model):
-    # Um questionário pode ser associado a uma cena para aparecer no momento certo.
     cena_associada = models.ForeignKey(
         'Cena',
         related_name="questionarios",
@@ -79,12 +73,11 @@ class Pergunta(models.Model):
         ("TEXTO", "Texto Livre"),
         ("UNICA_ESCOLHA", "Múltipla Escolha (apenas uma resposta)"),
         ("MULTIPLA_ESCOLHA", "Múltipla Escolha (várias respostas)"),
-        ("ESCALA_5", "Escala de Satisfação (1 a 5)"), # Para avaliar algo com estrelas, por exemplo
+        ("ESCALA_5", "Escala de Satisfação (1 a 5)"),
     )
     questionario = models.ForeignKey(Questionario, related_name="perguntas", on_delete=models.CASCADE)
     texto_pergunta = models.CharField(max_length=500)
     tipo_resposta = models.CharField(max_length=20, choices=TIPOS_RESPOSTA)
-    # Para perguntas de múltipla escolha ou escala, as opções podem ser listadas aqui, separadas por vírgula.
     opcoes_resposta = models.TextField(
         blank=True,
         null=True,
@@ -94,10 +87,8 @@ class Pergunta(models.Model):
     def __str__(self):
         return f"{self.questionario.titulo} - {self.texto_pergunta}"
 
-# --- NOVO: Adicione este modelo ao final do arquivo ---
 class Resposta(models.Model):
     pergunta = models.ForeignKey(Pergunta, related_name="respostas", on_delete=models.CASCADE)
-    # Usamos a session key para agrupar respostas de um mesmo paciente anônimo
     session_key = models.CharField(max_length=40, help_text="ID da sessão do paciente anônimo")
     texto_resposta = models.TextField()
     data_resposta = models.DateTimeField(default=timezone.now)
@@ -105,12 +96,19 @@ class Resposta(models.Model):
     def __str__(self):
         return f"Resposta para '{self.pergunta.texto_pergunta}' (Sessão: {self.session_key[:6]}...)"
 
-# --- Fim do novo modelo ---
+class Perfil(models.Model):
+    nome = models.CharField(max_length=100, unique=True, help_text="Ex: Casal Hétero, Casal Homossexual, Gestante, etc.")
 
-# --- Pequeno ajuste na classe Usuario para consistência (se você já fez, ignore) ---
-# Se a sua classe Usuario já tiver o blank=True no many-to-many, não precisa mudar.
+    def __str__(self):
+        return self.nome
+
+class SessaoPaciente(models.Model):
+    session_key = models.CharField(max_length=40, unique=True)
+    perfil = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Sessão {self.session_key[:8]}... | Perfil: {self.perfil.nome if self.perfil else 'Não definido'}"
+
 class Usuario(AbstractUser):
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
-    # Mantive os outros campos que você tinha na sua classe Usuario se existirem.
-    # Ex: email = models.EmailField(unique=True)
-    # ...

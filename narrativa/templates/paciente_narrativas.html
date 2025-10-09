@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+    {% endblock %}
+
+{% load static %}
+
+{% block titulo %}
+Nossas Jornadas
+{% endblock %}
+
+{% block head %}
+<style>
+    html {
+      scroll-behavior: smooth;
+    }
+    .wrapper {
+      display: grid;
+      grid-template-columns: 100% 100%;
+      overflow: hidden;
+    }
+    .item:hover {
+      transform: scale(1.2);
+      z-index: 10;
+      transition: 250ms all;
+    }
+    .arrow__btn {
+      display: flex;
+      align-items: center;
+      color: #fff;
+      text-decoration: none;
+      font-size: 4em;
+      z-index: 1;
+      padding: 0 20px;
+    }
+    @media only screen and (max-width: 600px) {
+      a.arrow__btn {
+        display: none;
+      }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class='bg-primary_black min-h-screen w-full'>
+
+<section class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay relative bg-no-repeat flex justify-center items-center bg-cover" style="background-image: url('{% static 'images/background.png' %}');">
+    <div class="z-10 h-full py-32 md:py-0 text-gray-100 text-center flex items-center flex-col justify-center w-full">
+        <h1 class="font-semibold text-4xl md:text-5xl w-10/12 md:w-3/4 text-center">
+            Conheça nossas jornadas interativas
+        </h1>
+        <h3 class="text-xl md:text-xl py-5">
+            Selecione uma narrativa abaixo para começar.
+        </h3>
+    </div>
+</section>
+
+<section class='bg-primary_black flex justify-center py-10'>
+    <div class="p-8 w-10/12 relative" >
+        <h2 class="text-gray-200 text-2xl font-medium">
+            Novas Jornadas
+        </h2>
+        <div class="wrapper">
+          <section id="section1" class="flex flex-nowrap items-center justify-center space-x-8">
+            <a href="#section2" class="arrow__btn text-6xl page">‹</a>
+            {% for narrativa in lista_narrativas_recentes %}
+            {% if forloop.counter < 5 %}
+                <div class="item h-64 w-1/4 m-4">
+                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
+                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                    </a>
+                </div>
+            {% endif %}
+            {% endfor %}
+                <a href="#section2" class="arrow__btn text-6xl">›</a>
+          </section>
+            {% if lista_narrativas_recentes|length > 4 %}
+              <section id="section2" class="flex flex-nowrap items-center justify-center">
+                <a href="#section1" class="arrow__btn text-6xl">‹</a>
+                    {% for narrativa in lista_narrativas_recentes %}
+                    {% if forloop.counter > 4 %}
+                        <div class="item h-64 w-1/4 m-4">
+                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
+                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endfor %}
+                <a href="#section1" class="arrow__btn text-6xl">›</a>
+              </section>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class='bg-primary_black flex justify-center py-10'>
+    <div class="p-8 w-10/12 relative" >
+        <h2 class="text-gray-200 text-2xl font-medium">
+            Jornadas Populares
+        </h2>
+        <div class="wrapper">
+          <section id="section1emalta" class="flex flex-nowrap items-center justify-center space-x-8">
+            <a href="#section2emalta" class="arrow__btn text-6xl page">‹</a>
+            {% for narrativa in lista_narrativas_emalta %}
+            {% if forloop.counter < 5 %}
+                <div class="item h-64 w-1/4 m-4">
+                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
+                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                    </a>
+                </div>
+            {% endif %}
+            {% endfor %}
+                <a href="#section2emalta" class="arrow__btn text-6xl">›</a>
+          </section>
+            {% if lista_narrativas_emalta|length > 4 %}
+              <section id="section2emalta" class="flex flex-nowrap items-center justify-center">
+                <a href="#section1emalta" class="arrow__btn text-6xl">‹</a>
+                    {% for narrativa in lista_narrativas_emalta %}
+                    {% if forloop.counter > 4 %}
+                        <div class="item h-64 w-1/4 m-4">
+                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
+                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% endfor %}
+                <a href="#section1emalta" class="arrow__btn text-6xl">›</a>
+              </section>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+</main>
+{% endblock %}
