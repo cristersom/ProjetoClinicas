@@ -1,13 +1,51 @@
 {% extends 'base.html' %}
-{% load narrativa_extras %}
 
 {% block navbar %}
     {% endblock %}
 
 {% load static %}
+{% load narrativa_extras %} {# Carrega nossos filtros customizados 'split' e 'strip' #}
 
 {% block titulo %}
     Responder Questionário
+{% endblock %}
+
+{% block head %}
+{# --- NOVO: CSS para o sistema de estrelas --- #}
+<style>
+    .star-rating {
+      display: flex;
+      flex-direction: row-reverse; /* Truque para o CSS funcionar corretamente */
+      justify-content: center;
+      gap: 0.25rem;
+    }
+
+    .star-rating input[type="radio"] {
+      display: none; /* Esconde os botões de rádio originais */
+    }
+
+    .star-rating label {
+      cursor: pointer;
+      font-size: 2.5rem; /* Tamanho das estrelas */
+      color: #4a5568; /* Cor da estrela vazia (cinza) */
+      transition: color 0.2s ease-in-out;
+    }
+
+    /* Pinta de amarelo as estrelas ao passar o mouse */
+    .star-rating:hover label {
+      color: #fbbf24;
+    }
+
+    /* Deixa as estrelas posteriores cinzas novamente */
+    .star-rating label:hover ~ label {
+      color: #4a5568;
+    }
+
+    /* Pinta de amarelo as estrelas selecionadas */
+    .star-rating input[type="radio"]:checked ~ label {
+      color: #fbbf24;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
@@ -23,20 +61,18 @@
             {% for pergunta in questionario.perguntas.all %}
             <div class="mb-5 p-4 border border-gray-700 rounded-md">
                 <p class="text-lg font-semibold mb-3">{{ forloop.counter }}. {{ pergunta.texto_pergunta }}</p>
-                
+
                 {% if pergunta.tipo_resposta == "TEXTO" %}
                     <textarea name="pergunta_{{ pergunta.id }}" rows="3" class="w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-gray-100"></textarea>
-                
+
+                {# --- MUDANÇA APLICADA AQUI: Estrutura para as estrelas --- #}
                 {% elif pergunta.tipo_resposta == "ESCALA_5" %}
-                    <div class="flex justify-around items-center">
-                        <span>Insatisfeito</span>
-                        {% for i in "12345" %}
-                        <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_{{ i }}" value="{{ i }}">
-                            <label class="form-check-label" for="escala_{{ pergunta.id }}_{{ i }}">{{ i }}</label>
-                        </div>
-                        {% endfor %}
-                        <span>Satisfeito</span>
+                    <div class="star-rating">
+                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_5" value="5"><label for="escala_{{ pergunta.id }}_5"><ion-icon name="star"></ion-icon></label>
+                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_4" value="4"><label for="escala_{{ pergunta.id }}_4"><ion-icon name="star"></ion-icon></label>
+                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_3" value="3"><label for="escala_{{ pergunta.id }}_3"><ion-icon name="star"></ion-icon></label>
+                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_2" value="2"><label for="escala_{{ pergunta.id }}_2"><ion-icon name="star"></ion-icon></label>
+                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_1" value="1"><label for="escala_{{ pergunta.id }}_1"><ion-icon name="star"></ion-icon></label>
                     </div>
 
                 {% elif pergunta.tipo_resposta == "UNICA_ESCOLHA" %}
