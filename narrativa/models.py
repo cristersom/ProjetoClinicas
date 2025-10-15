@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
 LISTA_CATEGORIAS = (
     ("BOASVINDAS", "Boas vindas"),
     ("TRATAMENTO", "Tratamento"),
@@ -11,6 +10,7 @@ LISTA_CATEGORIAS = (
     ("ENCERRAMENTO", "Encerramento"),
     ("OUTROS", "Outros"),
 )
+
 class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
@@ -96,19 +96,14 @@ class Resposta(models.Model):
     def __str__(self):
         return f"Resposta para '{self.pergunta.texto_pergunta}' (Sessão: {self.session_key[:6]}...)"
 
-class Perfil(models.Model):
-    nome = models.CharField(max_length=100, unique=True, help_text="Ex: Casal Hétero, Casal Homossexual, Gestante, etc.")
-
-    def __str__(self):
-        return self.nome
-
 class SessaoPaciente(models.Model):
     session_key = models.CharField(max_length=40, unique=True)
-    perfil = models.ForeignKey(Perfil, on_delete=models.SET_NULL, null=True, blank=True)
+    narrativa_perfil = models.ForeignKey(Narrativa, on_delete=models.SET_NULL, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Sessão {self.session_key[:8]}... | Perfil: {self.perfil.nome if self.perfil else 'Não definido'}"
+        perfil = self.narrativa_perfil.titulo if self.narrativa_perfil else 'Não definido'
+        return f"Sessão {self.session_key[:8]}... | Perfil: {perfil}"
 
 class Usuario(AbstractUser):
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)

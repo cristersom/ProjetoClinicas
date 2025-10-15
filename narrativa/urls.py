@@ -2,7 +2,7 @@ from django.urls import path, reverse_lazy
 from .views import (
     Narrativas, Homepage, Detalhes, Pesquisa, PerfilView, Criarconta,
     iniciar_jornada_paciente, exibir_cena_paciente, responder_questionario,
-    PacienteNarrativas, PacienteDetalhes, selecionar_perfil, salvar_perfil
+    PacienteNarrativas, PacienteDetalhes
 )
 from django.contrib.auth import views as auth_view
 
@@ -13,8 +13,6 @@ urlpatterns = [
 
     # URLs específicas do paciente
     path('paciente/narrativas/', PacienteNarrativas.as_view(), name='paciente_narrativas'),
-    path('paciente/selecionar-perfil/', selecionar_perfil, name='selecionar_perfil'),
-    path('paciente/salvar-perfil/<int:perfil_id>/', salvar_perfil, name='salvar_perfil'),
     path('paciente/narrativa/<int:pk>/', PacienteDetalhes.as_view(), name='paciente_detalhes'),
     path('paciente/iniciar/<int:narrativa_id>/', iniciar_jornada_paciente, name='iniciar_jornada_paciente'),
     path('paciente/cena/<int:cena_id>/', exibir_cena_paciente, name='exibir_cena_paciente'),

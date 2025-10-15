@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
-from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, Perfil, SessaoPaciente
+from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente
 from .forms import CriarContaForm, FormHomepage
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 class Homepage(FormView):
     template_name = "homepage.html"
@@ -23,9 +24,11 @@ class Homepage(FormView):
         else:
             return reverse('narrativa:criarconta')
 
+
 class Narrativas(LoginRequiredMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
+
 
 class Detalhes(LoginRequiredMixin, DetailView):
     template_name = "detalhes.html"
@@ -45,9 +48,11 @@ class Detalhes(LoginRequiredMixin, DetailView):
         context["relacionados"] = relacionados
         return context
 
+
 class Pesquisa(LoginRequiredMixin, ListView):
     template_name = "pesquisa.html"
     model = Narrativa
+
     def get_queryset(self):
         termo_pesquisa = self.request.GET.get('query')
         if termo_pesquisa:
@@ -56,6 +61,7 @@ class Pesquisa(LoginRequiredMixin, ListView):
         else:
             return None
 
+
 class PerfilView(LoginRequiredMixin, UpdateView):
     template_name = "perfil.html"
     model = Usuario
@@ -63,6 +69,7 @@ class PerfilView(LoginRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('narrativa:narrativas')
+
 
 class Criarconta(FormView):
     template_name = "criarconta.html"
@@ -75,9 +82,11 @@ class Criarconta(FormView):
     def get_success_url(self):
         return reverse('narrativa:login')
 
+
 class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
+
 
 class PacienteDetalhes(DetailView):
     template_name = "paciente_detalhes.html"
@@ -89,12 +98,29 @@ class PacienteDetalhes(DetailView):
         context["relacionados"] = relacionados
         return context
 
+
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
+
+    # --- NOVA LÓGICA DE PERFIL ---
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+
+    # Tenta criar um registro de SessaoPaciente. Se já existir, não faz nada.
+    # Isso garante que apenas a PRIMEIRA narrativa escolhida seja salva como perfil.
+    SessaoPaciente.objects.get_or_create(
+        session_key=session_key,
+        defaults={'narrativa_perfil': narrativa}
+    )
+    # --- FIM DA NOVA LÓGICA ---
+
     if not narrativa.cena_inicial:
         messages.warning(request, f"A jornada '{narrativa.titulo}' ainda não está pronta para ser iniciada.")
         return redirect('narrativa:paciente_narrativas')
+
     return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
+
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
@@ -114,6 +140,7 @@ def exibir_cena_paciente(request, cena_id):
         'percentual': percentual,
     }
     return render(request, 'cena_paciente.html', context)
+
 
 def responder_questionario(request, questionario_id):
     questionario = get_object_or_404(Questionario, pk=questionario_id)
@@ -138,24 +165,3 @@ def responder_questionario(request, questionario_id):
         'questionario': questionario
     }
     return render(request, 'questionario.html', context)
-
-def selecionar_perfil(request):
-    perfis = Perfil.objects.all()
-    context = {
-        "perfis": perfis
-    }
-    return render(request, "selecionar_perfil.html", context)
-
-def salvar_perfil(request, perfil_id):
-    if not request.session.session_key:
-        request.session.create()
-    session_key = request.session.session_key
-
-    perfil_selecionado = get_object_or_404(Perfil, id=perfil_id)
-
-    SessaoPaciente.objects.update_or_create(
-        session_key=session_key,
-        defaults={'perfil': perfil_selecionado}
-    )
-
-    return redirect('narrativa:paciente_narrativas')
