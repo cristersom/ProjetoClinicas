@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
-
-{% block navbar %}
-    {% endblock %}
-
 {% load static %}
+{% load narrativa_extras %}
 
 {% block titulo %}
     Responder Questionário
@@ -40,10 +37,14 @@
 
 {% block content %}
 <main class="bg-primary_black min-h-screen w-full flex justify-center items-center text-gray-100 p-4">
+
     <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6">
+
         <h1 class="text-3xl font-bold mb-6 text-center">{{ questionario.titulo }}</h1>
+
         <form method="POST">
             {% csrf_token %}
+
             {% for pergunta in questionario.perguntas.all %}
             <div class="mb-5 p-4 border border-gray-700 rounded-md">
                 <p class="text-lg font-semibold mb-3">{{ forloop.counter }}. {{ pergunta.texto_pergunta }}</p>
@@ -79,17 +80,10 @@
                             </label>
                         </div>
                     {% endfor %}
-
-                {% elif pergunta.tipo_resposta == "LISTA_SUSPENSA" %}
-                    <select name="pergunta_{{ pergunta.id }}" class="form-select text-black w-full p-2 bg-gray-800 border border-gray-600 rounded-md text-gray-100">
-                        <option selected disabled>Escolha uma opção...</option>
-                        {% for opcao in pergunta.opcoes.all %}
-                            <option value="{{ opcao.texto }}">{{ opcao.texto }}</option>
-                        {% endfor %}
-                    </select>
                 {% endif %}
             </div>
             {% endfor %}
+
             <div class="text-center mt-6">
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded transition duration-300">
                     Enviar Respostas

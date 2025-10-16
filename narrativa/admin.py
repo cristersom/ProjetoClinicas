@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.urls import path, reverse
+from django.shortcuts import render
+from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
@@ -37,7 +40,7 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
             return queryset.filter(session_key__in=lista_de_session_keys)
         return queryset
 
-# --- Classes Inline para edição ---
+# --- Classes Inline para edição com nested_admin ---
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -69,6 +72,8 @@ class NarrativaAdmin(admin.ModelAdmin):
 class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
+    class Media:
+        js = ('admin/js/questionario_admin.js',)
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
@@ -96,4 +101,3 @@ class RespostaAdmin(ImportExportModelAdmin):
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 admin.site.register(Usuario, UserAdmin)
-# O PerguntaAdmin não é mais registrado separadamente, pois agora é gerenciado pelo nested_admin
