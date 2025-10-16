@@ -102,18 +102,14 @@ class PacienteDetalhes(DetailView):
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # --- NOVA LÓGICA DE PERFIL ---
     if not request.session.session_key:
         request.session.create()
     session_key = request.session.session_key
 
-    # Tenta criar um registro de SessaoPaciente. Se já existir, não faz nada.
-    # Isso garante que apenas a PRIMEIRA narrativa escolhida seja salva como perfil.
     SessaoPaciente.objects.get_or_create(
         session_key=session_key,
         defaults={'narrativa_perfil': narrativa}
     )
-    # --- FIM DA NOVA LÓGICA ---
 
     if not narrativa.cena_inicial:
         messages.warning(request, f"A jornada '{narrativa.titulo}' ainda não está pronta para ser iniciada.")
@@ -160,7 +156,12 @@ def responder_questionario(request, questionario_id):
                     session_key=session_key,
                     texto_resposta=texto_resposta
                 )
-        return redirect('narrativa:paciente_narrativas')
+
+        if questionario.cena_destino:
+            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
+        else:
+            return redirect('narrativa:paciente_narrativas')
+
     context = {
         'questionario': questionario
     }
