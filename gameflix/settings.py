@@ -9,6 +9,7 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
+    'nested_admin',  # <-- MUDANÇA: Para a interface de admin aninhada.
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,20 +76,16 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- CONFIGURAÇÃO DE ARQUIVOS (CORRIGIDA) ---
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = '/media/' # URL para acessar os uploads
+MEDIA_URL = '/media/'
 
-# A linha 'DEFAULT_FILE_STORAGE' foi removida e a lógica foi movida para 'STORAGES'
 STORAGES = {
-    # Armazenamento para uploads (mídia) - aponta para o Cloudinary
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # Armazenamento para arquivos estáticos (CSS, JS) - aponta para o Whitenoise
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
