@@ -14,7 +14,7 @@
     }
 
     $(document).ready(function() {
-        // 1. Usa delegação de eventos. Isso garante que a função funcione для
+        // 1. Usa delegação de eventos. Isso garante que a função funcione para
         //    perguntas que já existem e para novas perguntas que você adiciona dinamicamente.
         $('#perguntas-group').on('change', '.field-tipo_resposta select', function() {
             const row = $(this).closest('.inline-related');

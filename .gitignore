@@ -4,3 +4,5 @@ db.sqlite3-journal
 
 # Ignorar arquivos de mídia local (eles devem estar no Cloudinary)
 /media/
+
+/staticfiles/
