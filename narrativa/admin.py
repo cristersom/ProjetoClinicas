@@ -11,7 +11,6 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
 # --- Classes de customização (Exportação e Filtro) ---
-
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -41,7 +40,6 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
         return queryset
 
 # --- Classes Inline para edição ---
-
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -68,7 +66,6 @@ class PerguntaInline(admin.TabularInline):
     link_para_opcoes.short_description = 'Opções de Resposta'
 
 # --- Registros dos Modelos no Admin ---
-
 @admin.register(Pergunta)
 class PerguntaAdmin(admin.ModelAdmin):
     list_display = ('texto_pergunta', 'questionario', 'tipo_resposta')
@@ -92,6 +89,7 @@ class NarrativaAdmin(admin.ModelAdmin):
 class QuestionarioAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
+    # A linha 'change_list_template' foi REMOVIDA daqui.
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
