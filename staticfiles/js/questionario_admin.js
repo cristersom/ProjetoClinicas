@@ -1,33 +1,39 @@
-// Espera o DOM carregar, usando o namespace do Django para evitar conflitos
 (function($) {
     $(document).ready(function() {
-        // Função para mostrar ou esconder as opções de resposta
-        function toggleOptions(selectElement) {
-            // Encontra o 'bloco' da pergunta onde o select está
-            const perguntaBlock = $(selectElement).closest('.inline-related');
-            // Encontra a sub-seção de opções dentro do bloco da pergunta
-            const optionsBlock = perguntaBlock.find('.inline-group');
-            const selectedType = $(selectElement).val();
-
-            // Tipos de pergunta que precisam de opções
+        // Função para mostrar ou esconder o bloco de opções de resposta
+        function toggleOptions(row) {
+            const selectElement = row.find('.field-tipo_resposta select');
+            const optionsBlock = row.find('.inline-group'); // O bloco 'Opções de Resposta'
+            const selectedType = selectElement.val();
             const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
 
             if (typesWithOptions.includes(selectedType)) {
-                optionsBlock.show(); // Mostra as opções
+                optionsBlock.slideDown(); // Mostra o bloco com uma animação suave
             } else {
-                optionsBlock.hide(); // Esconde as opções
+                optionsBlock.slideUp(); // Esconde o bloco com uma animação suave
             }
         }
 
-        // Executa a função para todas as perguntas que já existem na página quando ela carrega
-        $('.field-tipo_resposta select').each(function() {
-            toggleOptions(this);
+        // Delega o evento de 'change' para o container principal das perguntas.
+        $('#perguntas-group').on('change', '.field-tipo_resposta select', function() {
+            const row = $(this).closest('.inline-related');
+            toggleOptions(row);
         });
 
-        // Adiciona um 'listener' que executa a função toda vez que um tipo de resposta é alterado
-        // Usamos 'change' e especificamos o seletor para funcionar com perguntas novas que são adicionadas dinamicamente
-        $('#perguntas-group').on('change', '.field-tipo_resposta select', function() {
-            toggleOptions(this);
+        // Delega o evento de 'added' do nested-admin para o documento.
+        $(document).on('djnesting:added', function(event, inline) {
+            // Verifica se a nova linha é uma pergunta
+            if (inline.prefix.includes('pergunta')) {
+                // Esconde o bloco de opções da nova pergunta por padrão
+                inline.row.find('.inline-group').hide();
+            }
         });
+
+        // Executa a função para todas as perguntas já existentes quando a página carrega
+        setTimeout(function() {
+            $('#perguntas-group .inline-related').each(function() {
+                toggleOptions($(this));
+            });
+        }, 150);
     });
 })(django.jQuery);
