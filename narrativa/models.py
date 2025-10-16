@@ -82,7 +82,6 @@ class Pergunta(models.Model):
         ("UNICA_ESCOLHA", "Múltipla Escolha (apenas uma resposta)"),
         ("MULTIPLA_ESCOLHA", "Múltipla Escolha (várias respostas)"),
         ("ESCALA_5", "Escala de Satisfação (1 a 5)"),
-        ("LISTA_SUSPENSA", "Lista Suspensa (Dropdown)"),
     )
     questionario = models.ForeignKey(Questionario, related_name="perguntas", on_delete=models.CASCADE)
     texto_pergunta = models.CharField(max_length=500)
