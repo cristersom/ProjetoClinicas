@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, reverse
 from django.shortcuts import render
+from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
@@ -8,6 +9,8 @@ from .models import (
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
+
+# --- Classes de customização (Exportação e Filtro) ---
 
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
@@ -37,25 +40,42 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
             return queryset.filter(session_key__in=lista_de_session_keys)
         return queryset
 
+# --- Classes Inline para edição ---
+
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
-    extra = 1
-
-class PerguntaInline(admin.TabularInline):
-    model = Pergunta
-    fk_name = 'questionario'
     extra = 1
 
 class OpcaoRespostaInline(admin.TabularInline):
     model = OpcaoResposta
     extra = 1
 
+class PerguntaInline(admin.TabularInline):
+    model = Pergunta
+    fk_name = 'questionario'
+    extra = 1
+    fields = ('texto_pergunta', 'tipo_resposta', 'link_para_opcoes')
+    readonly_fields = ('link_para_opcoes',)
+
+    def link_para_opcoes(self, instance):
+        if instance.pk:
+            if instance.tipo_resposta in ["UNICA_ESCOLHA", "MULTIPLA_ESCOLHA", "LISTA_SUSPENSA"]:
+                url = reverse('admin:narrativa_pergunta_change', args=[instance.pk])
+                return format_html('<a href="{}" target="_blank">Adicionar/Editar Opções</a>', url)
+            return "Não aplicável para este tipo de resposta."
+        return "Salve o questionário primeiro para adicionar opções."
+    link_para_opcoes.short_description = 'Opções de Resposta'
+
+# --- Registros dos Modelos no Admin ---
+
 @admin.register(Pergunta)
 class PerguntaAdmin(admin.ModelAdmin):
     list_display = ('texto_pergunta', 'questionario', 'tipo_resposta')
     list_filter = ('questionario', 'tipo_resposta')
     inlines = [OpcaoRespostaInline]
+    def get_model_perms(self, request):
+        return {} # Esconde do menu principal
 
 @admin.register(Cena)
 class CenaAdmin(admin.ModelAdmin):
@@ -72,8 +92,6 @@ class NarrativaAdmin(admin.ModelAdmin):
 class QuestionarioAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
-    # O código dos relatórios customizados foi removido para simplificar,
-    # já que a filtragem agora é mais poderosa na tela de Respostas.
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
