@@ -199,7 +199,8 @@ Narrativas
 </main>
 
 <script>
-    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:selecionar_perfil' %}";
+    // --- CORREÇÃO APLICADA AQUI ---
+    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
 
     function copyLinkToClipboard() {
         navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
