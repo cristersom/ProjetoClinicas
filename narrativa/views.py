@@ -157,8 +157,9 @@ def responder_questionario(request, questionario_id):
                     texto_resposta=texto_resposta
                 )
 
-        if questionario.cena_destino:
-            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
+        # --- LÓGICA DE REDIRECIONAMENTO SIMPLIFICADA ---
+        if questionario.cena_associada:
+            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
         else:
             return redirect('narrativa:paciente_narrativas')
 

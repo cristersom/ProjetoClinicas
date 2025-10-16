@@ -64,14 +64,7 @@ class Questionario(models.Model):
         help_text="Opcional: cena ao final da qual este questionário será exibido."
     )
     titulo = models.CharField(max_length=200, help_text="Título do questionário (ex: 'Pesquisa de Satisfação')")
-    cena_destino = models.ForeignKey(
-        'Cena',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='questionarios_de_origem',
-        help_text="Opcional: para qual cena o paciente deve ser levado após responder este questionário."
-    )
+    # O campo 'cena_destino' foi REMOVIDO daqui.
 
     def __str__(self):
         return self.titulo
