@@ -9,7 +9,7 @@ from .models import (
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
-# --- Classes de customização (Exportação e Filtro) ---
+# --- Classes de customização (Exportação e Filtro) - Nenhuma mudança ---
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -48,19 +48,25 @@ class OpcaoRespostaInline(admin.TabularInline):
     model = OpcaoResposta
     extra = 1
 
+# --- ATUALIZAÇÃO PRINCIPAL: O 'ATALHO INTELIGENTE' ---
 class PerguntaInline(admin.TabularInline):
     model = Pergunta
     fk_name = 'questionario'
     extra = 1
+    # Mostra os campos principais e o novo campo de atalho
     fields = ('texto_pergunta', 'tipo_resposta', 'link_para_opcoes')
+    # O campo de atalho é apenas para leitura (ele é gerado dinamicamente)
     readonly_fields = ('link_para_opcoes',)
 
+    # Esta função cria o link "Adicionar/Editar Opções"
     def link_para_opcoes(self, instance):
-        if instance.pk:
+        if instance.pk:  # Só mostra o link se a pergunta já foi salva
             if instance.tipo_resposta in ["UNICA_ESCOLHA", "MULTIPLA_ESCOLHA"]:
+                # Constrói a URL para a página de edição da pergunta específica
                 url = reverse('admin:narrativa_pergunta_change', args=[instance.pk])
+                # Retorna o link em HTML, abrindo em uma nova aba
                 return format_html('<a href="{}" target="_blank">Adicionar/Editar Opções</a>', url)
-            return "Não aplicável."
+            return "Não aplicável para este tipo."
         return "Salve o questionário para adicionar opções."
     link_para_opcoes.short_description = 'Ações'
 
