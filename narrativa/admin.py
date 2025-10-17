@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.html import format_html
 from django.contrib.auth.admin import UserAdmin
+import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -38,51 +37,37 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
             return queryset.filter(session_key__in=lista_de_session_keys)
         return queryset
 
-# --- Classes Inline ---
+# --- Classes Inline para edição com nested_admin ---
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
 
-class OpcaoRespostaInline(admin.TabularInline):
+class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 1
+    fk_name = 'pergunta'
 
-class PerguntaInline(admin.TabularInline):
+class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
     fk_name = 'questionario'
     extra = 1
-    fields = ('texto_pergunta', 'tipo_resposta', 'link_para_opcoes')
-    readonly_fields = ('link_para_opcoes',)
-
-    def link_para_opcoes(self, instance):
-        if instance.pk:
-            if instance.tipo_resposta in ["UNICA_ESCOLHA", "MULTIPLA_ESCOLHA"]:
-                url = reverse('admin:narrativa_pergunta_change', args=[instance.pk])
-                return format_html('<a href="{}" target="_blank">Adicionar/Editar Opções</a>', url)
-            return "Não aplicável."
-        return "Salve o questionário para adicionar opções."
-    link_para_opcoes.short_description = 'Ações'
-
-
-# --- Registros dos Modelos no Admin ---
-@admin.register(Pergunta)
-class PerguntaAdmin(admin.ModelAdmin):
-    list_display = ('texto_pergunta', 'questionario', 'tipo_resposta')
-    list_filter = ('questionario',)
     inlines = [OpcaoRespostaInline]
 
+# --- Registros dos Modelos no Admin ---
 @admin.register(Cena)
 class CenaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'narrativa')
+    list_filter = ('narrativa',)
     inlines = [EscolhaInline]
 
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
+    list_filter = ('categoria',)
 
 @admin.register(Questionario)
-class QuestionarioAdmin(admin.ModelAdmin):
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
