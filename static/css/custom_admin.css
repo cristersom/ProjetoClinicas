@@ -1,11 +1,39 @@
-/* Adiciona um espaçamento claro entre cada bloco de PERGUNTA */
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related {
-    border-bottom: 2px solid #4a5568; /* Linha cinza para separar */
-    padding-bottom: 2rem !important;
-    margin-bottom: 2rem !important;
+/* --- ESTILO GERAL PARA SEPARAR AS PERGUNTAS --- */
+
+/* Inicializa o contador de perguntas */
+#perguntas-group > .djn-fieldset {
+    counter-reset: pergunta-counter;
 }
 
-/* Remove o fundo e a borda da área de OPÇÕES RESPOSTAS */
+/* Esconde o título principal "PERGUNTAS" */
+#perguntas-group > h2 {
+    display: none;
+}
+
+/* Adiciona espaçamento e uma borda separadora entre cada bloco de pergunta */
+#perguntas-group .inline-related {
+    border-top: 2px solid #4a5568; /* Linha cinza para separar */
+    padding-top: 2rem !important;
+    margin-top: 2rem !important;
+}
+
+/* --- ESTILO PARA O TÍTULO DINÂMICO (PERGUNTA 1, 2, ...) --- */
+
+/* Adiciona o título "Pergunta X:" antes de cada bloco */
+#perguntas-group .inline-related::before {
+    counter-increment: pergunta-counter;
+    content: 'Pergunta ' counter(pergunta-counter);
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e5e7eb; /* Cor do texto (cinza claro) */
+    display: block;
+    margin-bottom: 1rem;
+}
+
+
+/* --- ESTILO PARA LIMPAR A SEÇÃO DE OPÇÕES DE RESPOSTA --- */
+
+/* Remove o fundo e a borda da área onde as opções são adicionadas */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
