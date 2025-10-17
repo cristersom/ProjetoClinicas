@@ -1,5 +1,5 @@
 /* Adiciona um espaçamento claro entre cada bloco de PERGUNTA */
-#perguntas-group > .djn-fieldset {
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related {
     border-bottom: 2px solid #4a5568; /* Linha cinza para separar */
     padding-bottom: 2rem !important;
     margin-bottom: 2rem !important;

@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
 
-# --- Classes de customização (invariáveis) ---
+# --- Classes de customização (Exportação e Filtro) ---
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -54,7 +54,7 @@ class EscolhaInline(admin.TabularInline):
 
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
-    extra = 0  # Começa com ZERO opções
+    extra = 0
     fk_name = 'pergunta'
 
 
@@ -86,9 +86,9 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     class Media:
         css = {
-            'all': ('css/custom_admin.css',)  # <-- Caminho correto do CSS
+            'all': ('css/custom_admin.css',)
         }
-        js = ('js/questionario_admin.js',)  # <-- Caminho correto do JS
+        js = ('js/questionario_admin.js',)
 
 
 @admin.register(SessaoPaciente)

@@ -13,7 +13,7 @@
     }
 
     $(document).ready(function() {
-        // Renomeia o link "Adicionar" para algo mais intuitivo
+        // Renomeia o link "Adicionar"
         setInterval(function() {
             $('.djn-add-item a').each(function() {
                 if ($(this).text().includes('Opcao Resposta')) {
@@ -22,20 +22,20 @@
             });
         }, 500);
 
-        // Delega o evento 'change' para funcionar com perguntas novas e existentes
+        // Ouve a mudança no tipo de resposta
         $('#perguntas-group').on('change', '.field-tipo_resposta select', function() {
             const row = $(this).closest('.inline-related');
             toggleOptions(row);
         });
 
-        // Garante que novas perguntas comecem com as opções escondidas
+        // Ouve a adição de uma nova pergunta
         $(document).on('djnesting:added', function(event, inline) {
             if (inline.prefix.includes('pergunta')) {
                 inline.row.find('.inline-group').hide();
             }
         });
 
-        // Roda a função para todas as perguntas já existentes ao carregar a página
+        // Roda a função para as perguntas já existentes ao carregar
         setTimeout(function() {
             $('#perguntas-group .inline-related').each(function() {
                 toggleOptions($(this));
