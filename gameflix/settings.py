@@ -9,7 +9,6 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
-    'nested_admin',  # <-- MUDANÇA: Para a interface de admin aninhada.
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
