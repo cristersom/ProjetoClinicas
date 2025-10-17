@@ -1,17 +1,30 @@
-/* Esconde o cabeçalho azul "OPCAO RESPOSTAS" */
+/* Adiciona um espaçamento claro entre cada bloco de PERGUNTA */
+#perguntas-group > .djn-fieldset {
+    border-bottom: 2px solid #4a5568; /* Linha cinza para separar */
+    padding-bottom: 2rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Remove o fundo e a borda da área de OPÇÕES RESPOSTAS */
+.inline-group .djn-fieldset {
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 15px;
+}
+
+/* Esconde completamente o título azul "OPCAO RESPOSTAS" */
 .inline-group .djn-group-title {
     display: none;
 }
 
-/* Remove o fundo e a borda da área de opções */
-.inline-group .djn-fieldset {
-    background: none;
-    border: none;
-    padding: 0 !important;
-    margin-top: 10px;
-}
-
-/* Esconde os cabeçalhos das colunas ("TEXTO", "REMOVER?") */
+/* Esconde os subtítulos ("TEXTO", "REMOVER?") dentro das opções */
 .inline-group .djn-thead {
     display: none;
+}
+
+/* Ajustes finos de alinhamento para os campos de opção */
+.inline-group .form-row {
+    padding-bottom: 5px !important;
+    border: none !important;
 }
