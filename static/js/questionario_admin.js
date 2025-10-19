@@ -1,26 +1,18 @@
 (function($) {
     // Função que mostra ou esconde o bloco de "Opções"
     function toggleOptions(row) {
-        // --- REFORÇADO: Garante que row é jQuery ---
-        const $row = $(row);
+        const $row = $(row); // Garante que é jQuery object
         const selectElement = $row.find('.field-tipo_resposta select');
         const optionsBlock = $row.find('.inline-group'); // Container das opções
 
-        // Sai se não encontrar elementos essenciais
-        if (!selectElement.length) {
-            // console.warn("Select de tipo_resposta não encontrado.");
-            return;
-        }
-        // Permite continuar mesmo sem bloco de opções (para aplicar placeholder)
-        if (!optionsBlock.length) {
-           // console.warn("Bloco de opções (.inline-group) não encontrado.");
-        }
-
+        // Sai se elementos não existem
+        if (!selectElement.length) return;
+        // Não sai se optionsBlock não existe, pois placeholders ainda precisam ser aplicados
 
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
 
-        // Só tenta mostrar/esconder se o bloco de opções existe
+        // Só age se o bloco de opções existir
         if (optionsBlock.length) {
             if (typesWithOptions.includes(selectedType)) {
                 optionsBlock.slideDown();
@@ -37,28 +29,25 @@
         if (questionInput.length > 0 && !questionInput.attr('placeholder')) {
             questionInput.attr('placeholder', 'Pergunta');
         }
-        // Placeholder para Dropdown Tipo Resposta
-        const typeSelect = $row.find('.field-tipo_resposta select');
-        if (typeSelect.length > 0 && typeSelect.find('option[value=""]').length === 0) {
-           // Adiciona opção vazia no topo se não existir
-           typeSelect.prepend('<option value="" disabled selected>-- Selecione o Tipo --</option>');
-           // Tenta definir o valor inicial como vazio (placeholder)
-           if (!typeSelect.val()) { // Só define se nenhum valor estiver selecionado
-                typeSelect.val("");
-           }
-        }
+         // Placeholder para Dropdown Tipo Resposta
+         const typeSelect = $row.find('.field-tipo_resposta select');
+         if (typeSelect.length > 0 && typeSelect.find('option[value=""]').length === 0) {
+            typeSelect.prepend('<option value="" disabled selected>-- Selecione o Tipo --</option>');
+            if (!typeSelect.val()) {
+                typeSelect.val(""); // Garante que o placeholder seja selecionado inicialmente
+            }
+         }
     }
 
     // --- NOVO: Função para adicionar placeholder na Opção ---
     function addOptionPlaceholder(row) {
         const $row = $(row);
-        // Ajuste no seletor para ser mais específico
-        const optionInput = $row.find('.field-texto input[type="text"]');
+        // Seletor mais robusto para o input da opção
+        const optionInput = $row.find('input[id$="-texto"]'); // Procura input cujo ID termina com '-texto'
         if (optionInput.length > 0 && !optionInput.attr('placeholder')) {
             optionInput.attr('placeholder', 'Opção');
         }
     }
-
 
     $(document).ready(function() {
         // Renomeia os botões
@@ -89,8 +78,8 @@
                  if (optionsBlock.length) {
                      optionsBlock.hide(); // Começa escondido
                  }
-                 toggleOptions(newRow);
-                 addQuestionPlaceholders(newRow); // Placeholder pergunta E tipo
+                 toggleOptions(newRow); // Aplica estado inicial (esconder/mostrar)
+                 addQuestionPlaceholders(newRow); // Placeholders pergunta E tipo
             } else if (inline.prefix.includes('opcaoresposta')) { // Se for uma Opção
                 addOptionPlaceholder(newRow); // Placeholder da opção
             }
@@ -103,18 +92,18 @@
                 const $questionRow = $(this);
                 const selectVal = $questionRow.find('.field-tipo_resposta select').val();
                 const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
-
-                // Esconde opções se não for tipo com opções E se o bloco existir
                 const optionsBlock = $questionRow.find('.inline-group');
+
+                // Garante que opções comecem escondidas se necessário
                 if (optionsBlock.length && !typesWithOptions.includes(selectVal)) {
                      optionsBlock.hide();
                 }
 
-                toggleOptions($questionRow); // Garante estado correto
-                addQuestionPlaceholders($questionRow); // Placeholders pergunta/tipo
+                toggleOptions($questionRow); // Aplica estado
+                addQuestionPlaceholders($questionRow); // Placeholders
 
                 // Placeholder para Opções existentes
-                $questionRow.find('.inline-group .form-row.dynamic-opcaoresposta_set').each(function() {
+                optionsBlock.find('.dynamic-opcaoresposta_set').each(function() { // Busca opções dentro do bloco
                      addOptionPlaceholder($(this));
                 });
             });

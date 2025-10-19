@@ -1,11 +1,13 @@
-/* --- RESETS GERAIS --- */
-/* Remove Borda/Padding da div EXTERNA de "Perguntas" */
+/* --- RESETS GERAIS (REFORÇADO) --- */
+/* Remove Borda/Padding da div EXTERNA principal de "Perguntas" */
 #perguntas-group > div.djn-fieldset {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
+    box-shadow: none !important; /* Garante sem sombra externa */
 }
 /* Remove Borda/Padding da div INTERNA de "Opções" */
 .inline-group > div.djn-fieldset {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
+    box-shadow: none !important; /* Garante sem sombra interna */
 }
 
 /* Esconde Títulos Azuis */
@@ -18,8 +20,8 @@
 #perguntas-group .inline-related {
     border: 1px solid #dadce0 !important; /* Borda cinza Google */
     border-radius: 8px !important;
-    padding: 20px 24px !important; /* Padding interno do card */
-    margin: 0 0 16px 0 !important; /* Apenas margem inferior para separar */
+    padding: 20px 24px !important;
+    margin: 0 0 16px 0 !important; /* Apenas margem inferior */
     box-shadow: none !important;
     border-bottom: 1px solid #dadce0 !important;
     background: none !important;
@@ -35,26 +37,35 @@
 .inline-related .form-row { margin-bottom: 1rem !important; padding: 0 !important; }
 .inline-related .form-row label { display: none; }
 
-/* Ajuste Input/Select (Mantido da sua versão) */
-.inline-related .field-tipo_resposta select,
-.inline-related .field-texto_pergunta input {
+/* --- FIX Dropdown (REFORÇADO) --- */
+.inline-related .field-tipo_resposta select {
+    display: block !important; /* Garante que se comporte como bloco */
     width: 100% !important;
-    padding: 10px !important; /* Padding ajustado */
+    padding: 10px !important;
     border: 1px solid #ccc !important;
     border-radius: 4px !important;
     box-sizing: border-box !important;
+    min-height: 40px; /* Altura mínima para evitar colapso */
+}
+.inline-related .field-texto_pergunta input {
+     display: block !important;
+     width: 100% !important;
+     padding: 10px !important;
+     border: 1px solid #ccc !important;
+     border-radius: 4px !important;
+     box-sizing: border-box !important;
 }
 .inline-related .field-texto_pergunta input::placeholder { color: #80868b; }
 
-/* --- Bloco "Opções Respostas" (Integrado, sem container extra) --- */
-.inline-group { /* Target o container das opções */
+/* --- Bloco "Opções Respostas" (Integrado) --- */
+.inline-group {
     margin-top: 1.5rem !important;
-    border-top: 1px solid #e0e0e0 !important; /* Linha separadora */
+    border-top: 1px solid #e0e0e0 !important;
     padding-top: 1.5rem !important;
     /* --- REMOVE CONTAINER EXTRA --- */
     border: none !important;
-    padding: 1.5rem 0 0 0 !important; /* Padding apenas no topo */
-    margin-left: 0 !important; /* Remove indentação */
+    padding: 1.5rem 0 0 0 !important;
+    margin-left: 0 !important;
     margin-right: 0 !important;
     background: none !important;
 }
@@ -70,7 +81,11 @@
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
-.inline-group .form-row.dynamic-opcaoresposta_set .field-texto input::placeholder { color: #80868b; }
+/* Placeholder para input da opção (REFORÇADO) */
+.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"]::placeholder {
+     color: #80868b !important; /* Adicionado !important */
+}
+
 
 /* --- Botões --- */
 .inline-group .djn-add-item a { /* Adicionar Opção */
