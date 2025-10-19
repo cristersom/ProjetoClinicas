@@ -1,58 +1,53 @@
-/* --- RESETS VISUAIS DOS CONTAINERS --- */
-/* Zera APARÊNCIA do container GERAL das perguntas */
-#perguntas-group > div.djn-fieldset {
-    border-width: 0 !important; background: none !important; box-shadow: none !important;
-    padding: 0 !important; /* Remove padding externo */
-    margin: 0 !important;
+/* --- RESETS VISUAIS COMPLETOS DOS CONTAINERS --- */
+/* Remove qualquer estilo visual dos fieldsets (interno e externo) */
+#perguntas-group div.djn-fieldset,
+.inline-group div.djn-fieldset {
+    border: none !important; background: none !important; box-shadow: none !important;
+    padding: 0 !important; margin: 0 !important;
 }
-/* Zera APARÊNCIA do container GERAL das opções */
-.inline-group.tabular > div.djn-fieldset {
-     border-width: 0 !important; background: none !important; box-shadow: none !important;
-     padding: 0 !important; /* Remove padding interno */
-     margin: 0 !important;
-}
-/* Zera APARÊNCIA do container que envolve o título azul das opções */
+/* Remove qualquer estilo visual do container .tabular (que envolve opções) */
 .inline-group.tabular {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
 }
 
 /* Esconde Títulos Azuis e Headers de Tabela */
-#perguntas-group > h2,
-.inline-group > h2.djn-group-title,
-.inline-group table thead { /* Esconde header "TEXTO | REMOVER?" */
+#perguntas-group > h2, /* Título "Perguntas" */
+.inline-group > h2.djn-group-title, /* Título "Opcao Respostas" */
+.inline-group table thead { /* Header "TEXTO | REMOVER?" */
     display: none !important;
 }
 
 /* --- CARD INDIVIDUAL DA PERGUNTA --- */
 #perguntas-group .inline-related {
-    border: 1px solid #dadce0 !important; /* Borda cinza Google */
+    border: 1px solid #dadce0 !important; /* Borda única do card */
     border-radius: 8px !important;
     padding: 20px 24px !important;
-    margin: 0 0 16px 0 !important; /* Apenas margem inferior */
+    margin: 0 0 16px 0 !important; /* Margem SÓ abaixo para separar cards */
     box-shadow: none !important;
-    border-bottom: 1px solid #dadce0 !important; /* Garante borda */
+    border-bottom: 1px solid #dadce0 !important; /* Garante borda inferior */
     background: none !important; /* Reset */
-    overflow: hidden;
+    overflow: hidden; /* Evita que conteúdo vaze */
 }
 
 /* Zebra Striping nos Cards */
 #perguntas-group .inline-related:nth-child(even) { background-color: #f8f9fa !important; }
 #perguntas-group .inline-related:nth-child(odd) { background-color: #ffffff !important; }
 
-/* Esconde o H3 padrão */
+/* Esconde o H3 padrão (#1, #2...) */
 #perguntas-group .inline-related h3 { display: none; }
 
 /* --- Campos dentro do Card (Pergunta e Tipo) --- */
+/* Container da linha Pergunta/Tipo */
 .inline-related > .form-row {
      margin-bottom: 1rem !important; padding: 0 !important; background: none !important;
      border: none !important; display: flex !important; gap: 1rem !important; align-items: flex-start !important;
 }
-.inline-related > .form-row > div { flex-grow: 1; }
+.inline-related > .form-row > div { flex-grow: 1; } /* Divs dos campos */
 .inline-related > .form-row > .field-texto_pergunta { flex-basis: 60%; }
 .inline-related > .form-row > .field-tipo_resposta { flex-basis: 40%; }
-.inline-related > .form-row label { display: none; }
+.inline-related > .form-row label { display: none; } /* Esconde labels */
 
-/* Ajuste Input/Select */
+/* Estilo Input/Select */
 .inline-related .field-tipo_resposta select,
 .inline-related .field-texto_pergunta input[type="text"] {
     display: block !important; width: 100% !important; padding: 10px !important;
@@ -65,10 +60,10 @@ select option { color: #000 !important; }
 select option[value=""][disabled] { display: none; }
 
 
-/* --- Bloco "Opções Respostas" (Integrado) --- */
-.inline-related .inline-group { /* Target o container DENTRO do card */
+/* --- Bloco "Opções Respostas" (Integrado, sem container visual) --- */
+.inline-related .inline-group {
     margin-top: 1.5rem !important; border-top: 1px solid #e0e0e0 !important; padding-top: 1.5rem !important;
-    /* Reset visual */
+    /* Reset visual completo */
     border-left: none !important; border-right: none !important; border-bottom: none !important;
     padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important;
     margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;
@@ -98,7 +93,7 @@ select option[value=""][disabled] { display: none; }
 }
 .inline-group .djn-add-item a:hover { background: #f1f3f4 !important; }
 
-#perguntas-group > .djn-add-item { text-align: center; margin-top: 1rem; } /* Container do botão Add Pergunta */
+#perguntas-group > .djn-add-item { text-align: center; margin-top: 1rem; } /* Container botão Add Pergunta */
 #perguntas-group > .djn-add-item a { /* Adicionar Pergunta */
      background: #417690 !important; color: white !important; padding: 10px 15px !important;
      border-radius: 4px !important; text-decoration: none !important; font-weight: bold !important;
