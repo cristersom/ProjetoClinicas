@@ -1,71 +1,88 @@
-/* --- Esconder Títulos Azuis --- */
+/* --- Esconde os Títulos Azuis desnecessários (Com !important) --- */
 #perguntas-group > h2,
 .inline-group .djn-group-title {
-    display: none !important; /* Essencial para limpar a UI */
+    display: none !important;
 }
 
-/* --- Card Básico da Pergunta --- */
-#perguntas-group .inline-related { /* Seletor mais geral */
+/* --- O Card Principal da Pergunta (Com !important e seletores mais específicos) --- */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original { /* Adicionado .has_original para especificidade */
     border: 1px solid #ccc !important;
     border-radius: 8px !important;
-    padding: 1rem 1.5rem !important; /* Padding ajustado */
+    padding: 1.5rem !important;
     margin-bottom: 1.5rem !important;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
     border-bottom: 1px solid #ccc !important;
-    background: none; /* Reset background */
+    background: none !important; /* Limpa qualquer fundo padrão */
 }
 
-/* --- Cores Alternadas --- */
-#perguntas-group .inline-related:nth-child(even) {
-    background-color: #f8f8f8 !important; /* Cinza claro */
+/* --- Zebra Striping (Com !important) --- */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original:nth-child(even) {
+    background-color: #f8f8f8 !important; /* Fundo cinza claro */
 }
-#perguntas-group .inline-related:nth-child(odd) {
-    background-color: #ffffff !important; /* Branco */
-}
-
-/* --- Ajuste Dropdown (Select) --- */
-.inline-related .field-tipo_resposta select {
-    width: 100% !important; /* Garante que não corte */
-    box-sizing: border-box;
-}
-.inline-related .field-texto_pergunta input {
-     width: 100% !important; /* Garante que não corte */
-    box-sizing: border-box;
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original:nth-child(odd) {
+    background-color: #ffffff !important; /* Fundo branco */
 }
 
+/* --- Campos de Pergunta (Com !important) --- */
+.inline-related .form-row {
+    padding: 0.5rem 0 !important;
+}
 
-/* --- Bloco de Opções (Visualmente dentro do Card) --- */
+.inline-related .form-row label {
+    font-weight: 600 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+    display: block !important;
+}
+
+/* --- FIX Dropdown (Com !important) --- */
+.inline-related .form-row select,
+.inline-related .form-row input[type="text"] {
+    width: 100% !important;
+    padding: 8px !important;
+    border-radius: 4px !important;
+    border: 1px solid #ccc !important;
+    box-sizing: border-box !important;
+}
+
+/* --- Bloco "Opção de Respostas" (Com !important) --- */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-top: 15px !important; /* Aproxima do campo anterior */
-    border-top: 1px dashed #ccc !important; /* Separador */
-    padding-top: 15px !important;
+    margin-top: 20px !important;
+    border-top: 1px dashed #ccc !important;
+    padding-top: 20px !important;
 }
 
-/* Remove header inútil das opções */
 .inline-group .djn-thead {
     display: none !important;
 }
 
-/* --- Botões (Manter estilo limpo) --- */
-.inline-group .djn-add-item a { /* Adicionar Opção */
+/* --- Botões "Adicionar" (Estilo Limpo - já estavam ok, mas reforçados) --- */
+.inline-group .djn-add-item a {
     background: #f0f0f0 !important;
-    padding: 6px 10px !important; /* Um pouco menor */
-    border: 1px solid #ccc !important;
+    padding: 8px 12px !important;
     border-radius: 4px !important;
     text-decoration: none !important;
     color: #444 !important;
     font-weight: 500 !important;
-    margin-top: 5px !important;
+    display: inline-block !important;
+    margin-top: 10px !important;
+    border: 1px solid #ccc !important;
 }
-#perguntas-group > .djn-add-item a { /* Adicionar Pergunta */
+.inline-group .djn-add-item a:hover { background: #e5e5e5 !important; }
+
+#perguntas-group > .djn-add-item a {
      background: #417690 !important;
      color: white !important;
      padding: 10px 15px !important;
      border-radius: 4px !important;
      text-decoration: none !important;
      font-weight: bold !important;
+     display: inline-block !important;
      margin-top: 1rem !important;
+     border: none !important;
 }
+#perguntas-group > .djn-add-item a:hover { background: #306784 !important; }
