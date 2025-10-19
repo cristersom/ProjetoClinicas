@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import nested_admin
+import nested_admin # Mantenha esta importação
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -8,8 +8,8 @@ from .models import (
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
-
 # --- Classes de customização (Exportação e Filtro) ---
+# (Mantidas como estavam)
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -45,65 +45,57 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
         return queryset
 
 
-# --- Classes Inline ---
+# --- Classes Inline (SEM template=...) ---
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
-    # Não precisa sobrescrever template aqui, só nas inlines aninhadas
-
 
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
-    # --- Força o uso do nosso template sobrescrito ---
-    template = 'nested_admin/edit_inline/tabular-djnesting.html'
-
+    # REMOVIDO: template = ...
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
-    # --- Força o uso do nosso template sobrescrito ---
-    template = 'nested_admin/edit_inline/tabular-djnesting.html'
-
+    # REMOVIDO: template = ...
 
 # --- Registros dos Modelos no Admin ---
 @admin.register(Cena)
 class CenaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'narrativa')
     list_filter = ('narrativa',)
-    inlines = [EscolhaInline] # Usa TabularInline padrão
+    inlines = [EscolhaInline]
 
 
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
-    list_filter = ('categoria',)
+   list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
+   list_filter = ('categoria',)
 
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Mantém NestedModelAdmin
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
-    inlines = [PerguntaInline] # Usa a PerguntaInline que usa o template sobrescrito
+    inlines = [PerguntaInline]
 
-    # --- Garante que APENAS nosso CSS e os JS necessários sejam carregados ---
-    class Media:
-        css = {
-            'all': ('css/custom_admin.css',) # Nosso CSS
-        }
-        js = (
-            # JS Padrão do Admin (Necessário)
-            'admin/js/vendor/jquery/jquery.min.js',
-            'admin/js/jquery.init.js',
-            # JS do Nested Admin (Necessário para funcionalidade)
-            'nested_admin/dist/nested_admin.min.js',
-            # Nosso JS Customizado (Deve vir por último)
-            'js/questionario_admin.js',
-        )
-
+    # --- CLASSE MEDIA TEMPORARIAMENTE COMENTADA PARA DEBUG ---
+    # Comentar esta classe Media remove nosso CSS e JS customizados
+    # class Media:
+    #     css = {
+    #         'all': ('css/custom_admin.css',)
+    #     }
+    #     js = (
+    #         'admin/js/vendor/jquery/jquery.min.js',
+    #         'admin/js/jquery.init.js',
+    #         'nested_admin/dist/nested_admin.min.js',
+    #         'js/questionario_admin.js',
+    #     )
+    # --- FIM DO COMENTÁRIO ---
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
