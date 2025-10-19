@@ -1,139 +1,141 @@
-(function($) { // '$' é django.jQuery aqui dentro
+// Usa o wrapper do Django Admin para garantir que django.jQuery esteja pronto
+(function($) { // '$' aqui dentro agora é o 'django.jQuery'
+    console.log("questionario_admin.js loaded using django.jQuery");
 
-    // Função que mostra ou esconde o bloco de "Opções" SOMENTE para a linha (row) especificada
+    // Função toggleOptions (com logs)
     function toggleOptions(row) {
         const $row = $(row);
         const selectElement = $row.find('.field-tipo_resposta select');
-        // Acha o container de opções DENTRO desta linha específica
-        const optionsContainer = $row.find('> .inline-group'); // '>' filho direto
+        const optionsContainer = $row.find('.inline-group'); // Container padrão das opções
 
-        // Se não encontrar os elementos DENTRO da linha, não faz nada
-        if (!selectElement.length || !optionsContainer.length) {
-            // console.warn("Toggle: Elementos não encontrados para", $row.attr('id'));
-            return;
+        if (!selectElement.length) {
+            console.warn("Toggle: Select não encontrado em", $row.attr('id')); return;
+        }
+        if (!optionsContainer.length) {
+             console.warn("Toggle: OptionsContainer não encontrado em", $row.attr('id')); return;
         }
 
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
+        const shouldShow = typesWithOptions.includes(selectedType);
 
-        // Mostra/esconde o container de opções DESTA linha
-        // Usar 'fadeToggle' ou 'slideToggle' pode ser mais suave visualmente
-        if (typesWithOptions.includes(selectedType)) {
-            optionsContainer.slideDown(200); // Mostra suavemente
+        console.log(`Toggle: Row=${$row.attr('id')}, Type=${selectedType}, ShouldShow=${shouldShow}`);
+        // Usar show/hide simples para teste
+        if (shouldShow) {
+            optionsContainer.show();
         } else {
-            optionsContainer.slideUp(200); // Esconde suavemente
+            optionsContainer.hide();
         }
     }
 
-    // Função para adicionar placeholders na Pergunta e Tipo (dentro da linha especificada)
+    // Função addQuestionPlaceholders (com logs)
     function addQuestionPlaceholders(row) {
         const $row = $(row);
         const questionInput = $row.find('.field-texto_pergunta input[type="text"]');
         if (questionInput.length && !questionInput.attr('placeholder')) {
             questionInput.attr('placeholder', 'Digite sua pergunta aqui');
+            console.log(`Placeholder Pergunta adicionado a ${$row.attr('id')}`);
         }
          const typeSelect = $row.find('.field-tipo_resposta select');
          if (typeSelect.length) {
-            // Garante que a opção placeholder exista e seja a primeira
             if (typeSelect.find('option[value=""][disabled]').length === 0) {
                  typeSelect.prepend('<option value="" disabled style="color: #80868b;">-- Selecione o Tipo --</option>');
+                 console.log(`Placeholder Tipo adicionado a ${$row.attr('id')}`);
             }
-            // Garante que o placeholder esteja selecionado se nenhum valor real estiver
-            // E define a classe para estilização CSS
             if (!typeSelect.val() || typeSelect.val() === "") {
-                typeSelect.val(""); // Força seleção do placeholder
-                typeSelect.addClass('placeholder-selected');
-            } else {
-                 typeSelect.removeClass('placeholder-selected');
+                typeSelect.val(""); // Força seleção
             }
          }
     }
 
-    // Função para adicionar placeholder na Opção (dentro da linha da opção especificada)
+    // Função addOptionPlaceholder (com logs)
     function addOptionPlaceholder(optionRow) {
         const $optionRow = $(optionRow);
-        // Seletor ajustado para pegar input DENTRO da célula correta
-        const optionInput = $optionRow.find('td.field-texto input[type="text"]');
+        // Tenta pegar pelo ID que termina em '-texto' E é text input
+        const optionInput = $optionRow.find('input[type="text"][id$="-texto"]');
         if (optionInput.length && !optionInput.attr('placeholder')) {
             optionInput.attr('placeholder', 'Opção de resposta');
+             console.log(`Placeholder Opção adicionado a ${$optionRow.attr('id')}`);
+        } else if (!optionInput.length) {
+             console.warn(`Placeholder Opção: Input não encontrado em ${$optionRow.attr('id')}`);
         }
     }
 
-    // --- LÓGICA DE APLICAÇÃO ---
-    // Aplica lógica a um elemento específico (Pergunta ou Opção)
+    // Aplica lógica a um elemento
     function applyLogicToElement(element) {
          const $element = $(element);
-         const logicFlag = 'logic-applied-v5'; // Nova flag para esta versão
+         const logicFlag = 'logic-applied-v6'; // Nova flag
 
-         // Não processa se já tiver a flag
          if ($element.data(logicFlag)) return;
 
          if ($element.hasClass('inline-related')) { // É uma Pergunta
-             addQuestionPlaceholders($element); // Placeholders pergunta/tipo
-             // Aplica placeholders a opções já existentes DENTRO desta pergunta
-             $element.find('.dynamic-opcaoresposta_set').each(function() {
-                 if (!$(this).data(logicFlag)) { // Processa se não tiver flag
-                    addOptionPlaceholder($(this));
-                    $(this).data(logicFlag, true); // Marca opção interna
-                 }
-             });
-             // Chama toggleOptions DEPOIS de processar filhos para estado inicial
+             console.log("Aplicando lógica a Pergunta:", $element.attr('id'));
+             addQuestionPlaceholders($element);
+             // Aplica a opções internas
+             $element.find('.dynamic-opcaoresposta_set').each(function() { applyLogicToElement(this); });
+             // Aplica toggle DEPOIS de processar filhos
              toggleOptions($element);
-             $element.data(logicFlag, true); // Marca pergunta
+             $element.data(logicFlag, true);
          }
          else if ($element.hasClass('dynamic-opcaoresposta_set')) { // É uma Opção
+             console.log("Aplicando lógica a Opção:", $element.attr('id'));
              addOptionPlaceholder($element);
-             $element.data(logicFlag, true); // Marca opção
+             $element.data(logicFlag, true);
          }
+    }
+
+    // Renomeia botões (com logs)
+    function renameButtons() {
+        const $addQuestionBtn = $('#perguntas-group > .djn-add-item a');
+        if ($addQuestionBtn.length && $addQuestionBtn.text() !== 'Adicionar Pergunta') {
+            $addQuestionBtn.text('Adicionar Pergunta');
+            console.log("Botão 'Adicionar Pergunta' renomeado.");
+        }
+        $('.inline-group .djn-add-item a').each(function(){
+            const $addOptionBtn = $(this);
+            if ($addOptionBtn.text() !== 'Adicionar Opção') {
+                $addOptionBtn.text('Adicionar Opção');
+                console.log("Botão 'Adicionar Opção' renomeado em:", $addOptionBtn.closest('.inline-related').attr('id'));
+            }
+        });
     }
 
     // --- Execução Principal ---
     $(document).ready(function() {
-        // Renomeia os botões dinamicamente
-        function renameButtons() {
-            // Botão Adicionar Pergunta (FORA de qualquer .inline-related)
-            $('#perguntas-group > .djn-add-item a').text('Adicionar Pergunta');
-            // Botão Adicionar Opção (DENTRO de um .inline-group)
-            $('.inline-group .djn-add-item a').text('Adicionar Opção');
-        }
-        renameButtons(); // Roda imediatamente
-        // Observador para renomear botões que aparecem depois
-        const buttonObserver = new MutationObserver(renameButtons);
-        const buttonTarget = document.getElementById('perguntas-group');
-        if(buttonTarget) buttonObserver.observe(buttonTarget, { childList: true, subtree: true });
+        console.log("Document Ready");
 
-
-        // Ouve a mudança no dropdown Tipo Resposta
+        // Ouve a mudança no dropdown
         $('body').on('change', '#perguntas-group .field-tipo_resposta select', function() {
-            const $select = $(this);
-            const row = $select.closest('.inline-related'); // Pega SÓ a linha pai
-            toggleOptions(row); // Passa a linha específica
-            // Atualiza classe do placeholder
-            if ($select.val()) { $select.removeClass('placeholder-selected'); }
-            else { $select.addClass('placeholder-selected'); }
+            console.log("Select change detectado");
+            const row = $(this).closest('.inline-related');
+            toggleOptions(row);
         });
 
-        // Ouve a adição de um novo inline (evento do nested_admin)
+        // Ouve adição de inline
         $(document).on('djnesting:added', function(event, inline) {
-            const newRow = inline.row; // A linha TR adicionada
-            // Aplica lógica ao novo elemento (seja pergunta ou opção)
-             applyLogicToElement(newRow);
-             // Se for uma pergunta nova, garante que opções comecem escondidas
-             if ($(newRow).hasClass('inline-related')) {
+            const newRow = inline.row;
+            console.log("Inline adicionado:", $(newRow).attr('id'));
+            applyLogicToElement(newRow); // Aplica placeholders
+            // Esconde opções da nova pergunta imediatamente
+            if ($(newRow).hasClass('inline-related')) {
                  const optionsContainer = $(newRow).find('> .inline-group');
                  if(optionsContainer.length) optionsContainer.hide();
-                 // Chama toggle DEPOIS de esconder, para estado inicial correto
+                 // Chama toggle para garantir estado inicial correto
                  toggleOptions(newRow);
-             }
+            }
+            // Renomeia botões de novo
+            renameButtons();
         });
 
-        // Aplica a lógica inicial aos elementos já presentes (com delay)
+        // Aplica lógica inicial com delay
         setTimeout(function() {
-            // Aplica a todas as perguntas e opções existentes
+            console.log("Aplicando lógica inicial (Timeout)...");
             $('#perguntas-group .inline-related, #perguntas-group .dynamic-opcaoresposta_set').each(function() {
                 applyLogicToElement(this);
             });
-        }, 500); // Delay para garantir
+            renameButtons(); // Renomeia botões iniciais
+            console.log("Lógica inicial (Timeout) concluída.");
+        }, 1000); // 1 segundo de delay
     });
 
 })(django.jQuery); // Passa django.jQuery como '$'

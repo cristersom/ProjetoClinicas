@@ -31,12 +31,10 @@ class EscolhaInline(admin.TabularInline):
 
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta; extra = 0; fk_name = 'pergunta'
-    # NÃO usar template override aqui
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta; fk_name = 'questionario'; extra = 1
     inlines = [OpcaoRespostaInline]
-    # NÃO usar template override aqui
 
 # --- Registros dos Modelos no Admin ---
 @admin.register(Cena)
@@ -52,19 +50,18 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
-    # --- CLASSE MEDIA ATIVA NOVAMENTE ---
-    # Carrega nosso CSS e JS customizados junto com os JS necessários
-    class Media:
-        css = {
-            'all': ('css/custom_admin.css',) # Nosso CSS
-        }
-        js = (
-            'admin/js/vendor/jquery/jquery.min.js', # jQuery (Carregado primeiro)
-            'admin/js/jquery.init.js',              # Inicializador jQuery do Admin
-            'nested_admin/dist/nested_admin.min.js',# JS do Nested Admin
-            'js/questionario_admin.js',             # Nosso JS (Carregado por último)
-        )
-    # --- FIM DA CLASSE MEDIA ---
+    # --- CLASSE MEDIA COMENTADA PARA USAR ESTILO PADRÃO ---
+    # class Media:
+    #     css = {
+    #         'all': ('css/custom_admin.css',)
+    #     }
+    #     js = (
+    #         'admin/js/vendor/jquery/jquery.min.js',
+    #         'admin/js/jquery.init.js',
+    #         'nested_admin/dist/nested_admin.min.js',
+    #         'js/questionario_admin.js',
+    #     )
+    # --- FIM DO COMENTÁRIO ---
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
