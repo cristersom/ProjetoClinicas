@@ -4,10 +4,7 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- CORREÇÃO APLICADA AQUI ---
-# Esta linha busca a variável de ambiente chamada 'SECRET_KEY'
 SECRET_KEY = os.environ.get('SECRET_KEY')
-
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
@@ -90,7 +87,10 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # --- MUDANÇA IMPORTANTE AQUI ---
+        # Trocamos o 'CompressedManifestStaticFilesStorage' por um mais simples
+        # que não renomeia os arquivos, resolvendo o problema de cache.
+        "BACKEND": "whitenoise.storage.WhiteNoiseStorage",
     },
 }
 
