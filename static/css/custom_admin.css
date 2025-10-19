@@ -1,61 +1,80 @@
-/* --- ESTILO BASE PARA O CARD DE PERGUNTA --- */
+/* --- Esconde os Títulos Azuis desnecessários --- */
+/* Esconde o título principal "PERGUNTAS" */
+#perguntas-group > h2 {
+    display: none;
+}
+
+/* Esconde o título "OPCAO RESPOSTAS" (como você pediu) */
+.inline-group .djn-group-title {
+    display: none !important;
+}
+
+/* --- O Card Principal da Pergunta (A "div separada") --- */
 #perguntas-group > .djn-fieldset > .djn-items > .inline-related {
-    background: #fdfdfd; /* Fundo do card */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 1.5rem 2rem !important; /* Espaçamento interno */
-    margin-bottom: 2rem !important;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
-    border-bottom: 1px solid #ddd; /* Sobrescreve a regra antiga */
-}
-
-/* --- ORGANIZAÇÃO DOS CAMPOS DENTRO DO CARD --- */
-
-/* Faz os campos (Texto da Pergunta, Tipo) ocuparem 100% da largura */
-.inline-related .form-row input[type="text"],
-.inline-related .form-row select {
-    width: 100%;
-    padding: 8px;
-    border-radius: 4px;
     border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #ccc !important; /* Sobrescreve regra anterior */
 }
 
-/* Melhora a aparência das labels (Texto da Pergunta, Tipo de Resposta) */
+/* --- Zebra Striping (Sua sugestão de cores alternadas) --- */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(even) {
+    background: #f8f8f8; /* Fundo cinza claro */
+}
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(odd) {
+    background: #ffffff; /* Fundo branco */
+}
+
+/* --- Campos de Pergunta (Dentro do Card) --- */
+.inline-related .form-row {
+    padding: 0.5rem 0 !important;
+}
+
 .inline-related .form-row label {
     font-weight: 600;
     color: #333;
     font-size: 14px;
     margin-bottom: 5px;
-    display: block; /* Faz a label ficar em cima do campo */
+    display: block; /* Joga a label para cima do campo */
 }
 
-/* --- ESTILO DO BLOCO DE OPÇÕES DE RESPOSTA (DENTRO DO CARD) --- */
+/* --- FIX: Garante que o Dropdown não seja cortado --- */
+.inline-related .form-row select {
+    width: 100%; /* Ocupa todo o espaço do card */
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    box-sizing: border-box; /* Garante que o padding não quebre o layout */
+}
 
-/* Remove o fundo e borda da "caixa" de opções */
+.inline-related .form-row input[type="text"] {
+     width: 100%;
+     padding: 8px;
+     border-radius: 4px;
+     border: 1px solid #ccc;
+     box-sizing: border-box;
+}
+
+/* --- Bloco "Opção de Respostas" (Integrado ao Card) --- */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
     padding: 0 !important;
     margin-top: 20px;
-    border-top: 1px dashed #ccc; /* Adiciona um separador sutil */
+    border-top: 1px dashed #ccc; /* Separador sutil */
     padding-top: 20px !important;
 }
 
-/* Esconde títulos desnecessários que o custom_admin.css já escondia */
-.inline-group .djn-group-title,
+/* Esconde cabeçalho de tabela inútil */
 .inline-group .djn-thead {
     display: none;
 }
 
-/* Alinha os campos de opção */
-.inline-group .form-row {
-    padding-bottom: 5px !important;
-    border: none !important;
-}
+/* --- Botões "Adicionar" (Estilo Limpo) --- */
 
-/* --- ESTILO DOS BOTÕES "ADICIONAR" --- */
-
-/* Botão "Adicionar Opção de Resposta" (o de dentro do card) */
+/* Botão "Adicionar Opção" (dentro do card) */
 .inline-group .djn-add-item a {
     background: #f0f0f0;
     padding: 8px 12px;
@@ -67,11 +86,9 @@
     margin-top: 10px;
     border: 1px solid #ccc;
 }
-.inline-group .djn-add-item a:hover {
-    background: #e5e5e5;
-}
+.inline-group .djn-add-item a:hover { background: #e5e5e5; }
 
-/* Botão "Adicionar Pergunta" (o botão principal, no final de tudo) */
+/* Botão "Adicionar Pergunta" (botão principal) */
 #perguntas-group > .djn-add-item a {
      background: #417690; /* Azul do admin Django */
      color: white;
@@ -83,6 +100,4 @@
      margin-top: 1rem;
      border: none;
 }
-#perguntas-group > .djn-add-item a:hover {
-    background: #306784;
-}
+#perguntas-group > .djn-add-item a:hover { background: #306784; }

@@ -17,7 +17,7 @@
 
     $(document).ready(function() {
 
-        // --- MELHORIA: Renomeia os botões para ficarem mais limpos ---
+        // --- Renomeia os botões para ficarem mais limpos ---
         // Usamos setInterval para garantir que pegamos botões adicionados dinamicamente
         setInterval(function() {
             $('.djn-add-item a').each(function() {
@@ -25,7 +25,7 @@
                 if ($(this).text().includes('Opcao Resposta')) {
                     $(this).text('Adicionar Opção de Resposta');
                 }
-                // NOVO: Renomeia "Adicionar outro(a) Pergunta"
+                // Renomeia "Adicionar outro(a) Pergunta"
                 if ($(this).text().includes('Pergunta')) {
                     $(this).text('Adicionar Pergunta');
                 }
