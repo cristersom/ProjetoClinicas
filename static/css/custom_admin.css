@@ -1,11 +1,15 @@
 /* --- RESETS VISUAIS COMPLETOS DOS CONTAINERS --- */
-/* Garante que fieldsets não tenham estilo visual */
-#perguntas-group div.djn-fieldset,
-.inline-group div.djn-fieldset {
+/* Zera APARÊNCIA do fieldset GERAL das perguntas */
+#perguntas-group > div.djn-fieldset {
     border: none !important; background: none !important; box-shadow: none !important;
     padding: 0 !important; margin: 0 !important;
 }
-/* Garante que container tabular não tenha estilo visual */
+/* Zera APARÊNCIA do fieldset GERAL das opções */
+.inline-group.tabular > div.djn-fieldset {
+     border: none !important; background: none !important; box-shadow: none !important;
+     padding: 0 !important; margin: 0 !important;
+}
+/* Zera APARÊNCIA do container .tabular das opções */
 .inline-group.tabular {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
 }
@@ -13,16 +17,12 @@
 /* Esconde Títulos Azuis e Headers de Tabela */
 #perguntas-group > h2, /* Título "Perguntas" */
 .inline-group > h2.djn-group-title, /* Título "Opcao Respostas" */
-/* Remove cabeçalho "TEXTO | REMOVER?" das opções */
-/* Ajuste no seletor para pegar o thead dentro da estrutura correta */
-.inline-group.tabular .tabular.inline-related table > thead {
+.inline-group table thead { /* Header "TEXTO | REMOVER?" */
     display: none !important;
 }
 
-
 /* --- CARD INDIVIDUAL DA PERGUNTA --- */
-/* Target direto na div.inline-related que é o card */
-#perguntas-group > .items > .inline-related { /* Mais específico */
+#perguntas-group .inline-related {
     border: 1px solid #dadce0 !important; /* Borda cinza Google */
     border-radius: 8px !important;
     padding: 20px 24px !important;
@@ -34,14 +34,15 @@
 }
 
 /* Zebra Striping nos Cards */
-#perguntas-group > .items > .inline-related:nth-child(even) { background-color: #f8f9fa !important; }
-#perguntas-group > .items > .inline-related:nth-child(odd) { background-color: #ffffff !important; }
+#perguntas-group .inline-related:nth-child(even) { background-color: #f8f9fa !important; }
+#perguntas-group .inline-related:nth-child(odd) { background-color: #ffffff !important; }
 
 /* Esconde o H3 padrão (#1, #2...) */
 #perguntas-group .inline-related > h3 { display: none; }
 
 /* --- Campos dentro do Card (Pergunta e Tipo) --- */
 /* Container da linha Pergunta/Tipo (usa fieldset.module > .form-row)*/
+/* Ajuste no seletor para garantir que pegue o form-row correto */
 .inline-related > fieldset.module > .form-row {
      margin-bottom: 1rem !important; padding: 0 !important; background: none !important;
      border: none !important; display: flex !important; gap: 1rem !important; align-items: flex-start !important;
@@ -69,44 +70,33 @@ select option[value=""][disabled] { display: none; } /* Esconde placeholder da l
 .inline-related > .inline-group.tabular {
     margin-top: 1.5rem !important; border-top: 1px solid #e0e0e0 !important; padding-top: 1.5rem !important;
     /* Reset visual completo */
-    border-left: none !important; border-right: none !important; border-bottom: none !important;
-    padding-left: 0 !important; padding-right: 0 !important; padding-bottom: 0 !important;
-    margin-left: 0 !important; margin-right: 0 !important; margin-bottom: 0 !important;
-    background: none !important;
+    border: none !important; padding: 1.5rem 0 0 0 !important; margin: 1.5rem 0 0 0 !important; background: none !important;
 }
 
 /* Linha de cada opção (<tr> dentro de tbody) */
-/* Seletor mais robusto para a linha da opção */
 .inline-group.tabular .dynamic-opcaoresposta_set {
-    border: none !important; padding: 0 0 0.75rem 0 !important; background: none !important;
-    margin: 0 !important; display: table-row !important; /* Comportamento de linha de tabela */
+    border: none !important; padding: 0 !important; background: none !important; /* Reset TR */
+    margin: 0 !important; display: table-row !important;
 }
 /* Células dentro da linha da opção */
 .inline-group.tabular .dynamic-opcaoresposta_set td {
     padding: 0 5px 0.75rem 0 !important; /* Ajuste padding da célula */
-    border: none !important;
-    background: none !important;
-    vertical-align: top; /* Alinha ao topo */
+    border: none !important; background: none !important; vertical-align: middle; /* Centraliza verticalmente */
 }
 /* Campo de texto da opção */
-.inline-group.tabular .dynamic-opcaoresposta_set .field-texto { width: 100%; } /* Ocupa espaço disponível */
-.inline-group.tabular .dynamic-opcaoresposta_set .field-texto input[type="text"] {
+.inline-group.tabular .dynamic-opcaoresposta_set td.field-texto { width: 100%; }
+.inline-group.tabular .dynamic-opcaoresposta_set td.field-texto input[type="text"] {
     width: 100% !important; padding: 10px !important; border: 1px solid #ccc !important;
     border-radius: 4px !important; box-sizing: border-box !important; margin: 0 !important;
 }
-.inline-group.tabular .dynamic-opcaoresposta_set .field-texto input::placeholder { color: #80868b !important; }
-
-/* Botão Remover (X) dentro da célula delete */
-.inline-group.tabular .dynamic-opcaoresposta_set td.delete {
-    width: 1%; /* Ocupa o mínimo necessário */
-    text-align: right;
-    padding-left: 10px !important;
-}
+.inline-group.tabular .dynamic-opcaoresposta_set td.field-texto input::placeholder { color: #80868b !important; }
+/* Botão Remover (X) */
+.inline-group.tabular .dynamic-opcaoresposta_set td.delete { width: 1%; padding-left: 10px !important; }
 
 
 /* --- Botões --- */
 /* Botão Adicionar Opção (DENTRO do .inline-group) */
-.inline-group .djn-add-item { margin-top: 0.5rem; padding-left: 0; } /* Ajuste */
+.inline-group .djn-add-item { margin-top: 0.5rem; padding-left: 0; }
 .inline-group .djn-add-item a {
     background: #f8f9fa !important; padding: 6px 12px !important; border: 1px solid #dadce0 !important;
     border-radius: 4px !important; text-decoration: none !important; color: #3c4043 !important;
@@ -114,7 +104,7 @@ select option[value=""][disabled] { display: none; } /* Esconde placeholder da l
 }
 .inline-group .djn-add-item a:hover { background: #f1f3f4 !important; }
 
-/* Botão Adicionar Pergunta (FORA dos cards, filho de #perguntas-group) */
+/* Botão Adicionar Pergunta (FORA dos cards) */
 #perguntas-group > .djn-add-item { text-align: center; margin-top: 1rem; }
 #perguntas-group > .djn-add-item a {
      background: #417690 !important; color: white !important; padding: 10px 15px !important;
