@@ -1,18 +1,15 @@
 (function($) {
     // Função que mostra ou esconde o bloco de "Opções"
     function toggleOptions(row) {
-        const $row = $(row); // Garante que é jQuery object
+        const $row = $(row);
         const selectElement = $row.find('.field-tipo_resposta select');
-        const optionsBlock = $row.find('.inline-group'); // Container das opções
+        const optionsBlock = $row.find('.inline-group');
 
-        // Sai se elementos não existem
         if (!selectElement.length) return;
-        // Não sai se optionsBlock não existe, pois placeholders ainda precisam ser aplicados
 
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
 
-        // Só age se o bloco de opções existir
         if (optionsBlock.length) {
             if (typesWithOptions.includes(selectedType)) {
                 optionsBlock.slideDown();
@@ -31,19 +28,28 @@
         }
          // Placeholder para Dropdown Tipo Resposta
          const typeSelect = $row.find('.field-tipo_resposta select');
-         if (typeSelect.length > 0 && typeSelect.find('option[value=""]').length === 0) {
-            typeSelect.prepend('<option value="" disabled selected>-- Selecione o Tipo --</option>');
+         if (typeSelect.length > 0) {
+            // Remove placeholder antigo se existir (para evitar duplicação)
+            typeSelect.find('option[value=""][disabled]').remove();
+            // Adiciona novo placeholder no topo
+            typeSelect.prepend('<option value="" disabled selected style="color: #80868b;">-- Selecione o Tipo --</option>');
+            // Define o valor para vazio SE NADA ESTIVER SELECIONADO AINDA
             if (!typeSelect.val()) {
-                typeSelect.val(""); // Garante que o placeholder seja selecionado inicialmente
+                typeSelect.val("");
+            }
+            // Adiciona classe para estilizar o placeholder (opcional)
+            if (!typeSelect.val()) {
+                typeSelect.addClass('placeholder-selected');
+            } else {
+                typeSelect.removeClass('placeholder-selected');
             }
          }
     }
 
-    // --- NOVO: Função para adicionar placeholder na Opção ---
+    // Função para adicionar placeholder na Opção
     function addOptionPlaceholder(row) {
         const $row = $(row);
-        // Seletor mais robusto para o input da opção
-        const optionInput = $row.find('input[id$="-texto"]'); // Procura input cujo ID termina com '-texto'
+        const optionInput = $row.find('input[id$="-texto"][type="text"]'); // Mais específico
         if (optionInput.length > 0 && !optionInput.attr('placeholder')) {
             optionInput.attr('placeholder', 'Opção');
         }
@@ -67,6 +73,8 @@
         $('body').on('change', '#perguntas-group .field-tipo_resposta select', function() {
             const row = $(this).closest('.inline-related');
             toggleOptions(row);
+            // Remove classe placeholder se algo for selecionado
+             $(this).removeClass('placeholder-selected');
         });
 
         // Ouve a adição de um novo inline (Pergunta ou Opção)
@@ -75,10 +83,8 @@
 
             if (inline.prefix.includes('pergunta')) { // Se for uma Pergunta
                  const optionsBlock = newRow.find('.inline-group');
-                 if (optionsBlock.length) {
-                     optionsBlock.hide(); // Começa escondido
-                 }
-                 toggleOptions(newRow); // Aplica estado inicial (esconder/mostrar)
+                 if (optionsBlock.length) { optionsBlock.hide(); }
+                 toggleOptions(newRow);
                  addQuestionPlaceholders(newRow); // Placeholders pergunta E tipo
             } else if (inline.prefix.includes('opcaoresposta')) { // Se for uma Opção
                 addOptionPlaceholder(newRow); // Placeholder da opção
@@ -94,19 +100,33 @@
                 const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
                 const optionsBlock = $questionRow.find('.inline-group');
 
-                // Garante que opções comecem escondidas se necessário
+                // Esconde opções se necessário
                 if (optionsBlock.length && !typesWithOptions.includes(selectVal)) {
                      optionsBlock.hide();
                 }
 
-                toggleOptions($questionRow); // Aplica estado
+                toggleOptions($questionRow); // Garante estado
                 addQuestionPlaceholders($questionRow); // Placeholders
 
                 // Placeholder para Opções existentes
-                optionsBlock.find('.dynamic-opcaoresposta_set').each(function() { // Busca opções dentro do bloco
+                optionsBlock.find('.dynamic-opcaoresposta_set').each(function() {
                      addOptionPlaceholder($(this));
                 });
             });
-        }, 300);
+        }, 350); // Aumentado um pouco mais
     });
+
+    // CSS opcional para estilizar o placeholder do select (adicionar ao custom_admin.css se quiser)
+    /*
+    select.placeholder-selected {
+        color: #80868b !important;
+    }
+    select option {
+        color: #000 !important; // Cor normal das opções
+    }
+    select option[value=""][disabled] {
+        display: none; // Esconde a opção placeholder da lista dropdown
+    }
+    */
+
 })(jQuery);

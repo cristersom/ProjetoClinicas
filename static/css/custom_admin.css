@@ -1,31 +1,37 @@
-/* --- RESETS GERAIS (REFORÇADO) --- */
-/* Remove Borda/Padding da div EXTERNA principal de "Perguntas" */
+/* --- RESETS GERAIS (MAIS AGRESSIVOS) --- */
+/* Remove Borda/Padding/Fundo/Sombra da div EXTERNA principal de "Perguntas" */
 #perguntas-group > div.djn-fieldset {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
-    box-shadow: none !important; /* Garante sem sombra externa */
+    box-shadow: none !important;
 }
-/* Remove Borda/Padding da div INTERNA de "Opções" */
+/* Remove Borda/Padding/Fundo/Sombra da div INTERNA de "Opções" */
 .inline-group > div.djn-fieldset {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
-    box-shadow: none !important; /* Garante sem sombra interna */
+    box-shadow: none !important;
+}
+/* Remove Borda/Padding/Fundo do container GERAL do inline-group (que contém o título azul) */
+.inline-group.tabular { /* Adiciona .tabular para especificidade */
+    padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
 }
 
-/* Esconde Títulos Azuis */
+
+/* Esconde Títulos Azuis e Headers de Tabela */
 #perguntas-group > h2,
-.inline-group > h2.djn-group-title {
+.inline-group > h2.djn-group-title,
+.inline-group table thead { /* Esconde header "TEXTO | REMOVER?" */
     display: none !important;
 }
 
 /* --- CARD INDIVIDUAL DA PERGUNTA --- */
 #perguntas-group .inline-related {
-    border: 1px solid #dadce0 !important; /* Borda cinza Google */
+    border: 1px solid #dadce0 !important;
     border-radius: 8px !important;
     padding: 20px 24px !important;
     margin: 0 0 16px 0 !important; /* Apenas margem inferior */
     box-shadow: none !important;
     border-bottom: 1px solid #dadce0 !important;
     background: none !important;
-    /* Remove padding/margin extra dos lados */
+    /* Reset extra */
     padding-left: 24px !important; padding-right: 24px !important;
 }
 
@@ -34,56 +40,49 @@
 #perguntas-group .inline-related:nth-child(odd) { background-color: #ffffff !important; }
 
 /* --- Campos dentro do Card --- */
-.inline-related .form-row { margin-bottom: 1rem !important; padding: 0 !important; }
-.inline-related .form-row label { display: none; }
+.inline-related .form-row { margin-bottom: 1rem !important; padding: 0 !important; background: none !important; border: none !important; } /* Reset extra */
+.inline-related .form-row label { display: none; } /* Esconde labels "Texto Pergunta", "Tipo Resposta" */
 
 /* --- FIX Dropdown (REFORÇADO) --- */
 .inline-related .field-tipo_resposta select {
-    display: block !important; /* Garante que se comporte como bloco */
+    display: block !important;
     width: 100% !important;
     padding: 10px !important;
     border: 1px solid #ccc !important;
     border-radius: 4px !important;
     box-sizing: border-box !important;
-    min-height: 40px; /* Altura mínima para evitar colapso */
+    min-height: 40px !important; /* Altura mínima */
+    appearance: none; /* Tenta remover estilo padrão do browser que pode limitar */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: white; /* Garante fundo branco */
 }
 .inline-related .field-texto_pergunta input {
-     display: block !important;
-     width: 100% !important;
-     padding: 10px !important;
-     border: 1px solid #ccc !important;
-     border-radius: 4px !important;
-     box-sizing: border-box !important;
+     display: block !important; width: 100% !important; padding: 10px !important;
+     border: 1px solid #ccc !important; border-radius: 4px !important; box-sizing: border-box !important;
 }
 .inline-related .field-texto_pergunta input::placeholder { color: #80868b; }
 
 /* --- Bloco "Opções Respostas" (Integrado) --- */
-.inline-group {
+.inline-group { /* Container das opções */
     margin-top: 1.5rem !important;
     border-top: 1px solid #e0e0e0 !important;
     padding-top: 1.5rem !important;
-    /* --- REMOVE CONTAINER EXTRA --- */
-    border: none !important;
-    padding: 1.5rem 0 0 0 !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    background: none !important;
+    /* Reset container */
+    border: none !important; padding: 1.5rem 0 0 0 !important; margin-left: 0 !important; margin-right: 0 !important; background: none !important;
 }
-
-/* Remove header inútil da tabela de opções */
-.inline-group .tabular.djn-fieldset table thead { display: none !important; }
 
 /* Estilo da linha de cada opção */
 .inline-group .form-row.dynamic-opcaoresposta_set {
-    border: none !important;
-    padding: 0 0 0.75rem 0 !important;
-    background: none !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    border: none !important; padding: 0 0 0.75rem 0 !important; background: none !important;
+    margin-left: 0 !important; margin-right: 0 !important;
 }
-/* Placeholder para input da opção (REFORÇADO) */
-.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"]::placeholder {
-     color: #80868b !important; /* Adicionado !important */
+/* Placeholder para input da opção */
+.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"]::placeholder { color: #80868b !important; }
+/* Ajusta largura do input da opção */
+.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"] {
+    width: 100% !important; padding: 10px !important; border: 1px solid #ccc !important;
+    border-radius: 4px !important; box-sizing: border-box !important;
 }
 
 
@@ -91,7 +90,7 @@
 .inline-group .djn-add-item a { /* Adicionar Opção */
     background: #f8f9fa !important; padding: 6px 12px !important; border: 1px solid #dadce0 !important;
     border-radius: 4px !important; text-decoration: none !important; color: #3c4043 !important;
-    font-weight: 500 !important; margin-top: 5px !important; font-size: 13px !important;
+    font-weight: 500 !important; margin-top: 5px !important; font-size: 13px !important; display: inline-block !important; /* Garante visibilidade */
 }
 .inline-group .djn-add-item a:hover { background: #f1f3f4 !important; }
 
