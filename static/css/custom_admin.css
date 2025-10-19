@@ -1,103 +1,88 @@
-/* --- Esconde os Títulos Azuis desnecessários --- */
-/* Esconde o título principal "PERGUNTAS" */
-#perguntas-group > h2 {
-    display: none;
-}
-
-/* Esconde o título "OPCAO RESPOSTAS" (como você pediu) */
+/* --- Esconde os Títulos Azuis desnecessários (Com !important) --- */
+#perguntas-group > h2,
 .inline-group .djn-group-title {
     display: none !important;
 }
 
-/* --- O Card Principal da Pergunta (A "div separada") --- */
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related {
-    border: 1px solid #ccc;
-    border-radius: 8px;
+/* --- O Card Principal da Pergunta (Com !important e seletores mais específicos) --- */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original { /* Adicionado .has_original para especificidade */
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
     padding: 1.5rem !important;
     margin-bottom: 1.5rem !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border-bottom: 1px solid #ccc !important; /* Sobrescreve regra anterior */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
+    border-bottom: 1px solid #ccc !important;
+    background: none !important; /* Limpa qualquer fundo padrão */
 }
 
-/* --- Zebra Striping (Sua sugestão de cores alternadas) --- */
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(even) {
-    background: #f8f8f8; /* Fundo cinza claro */
+/* --- Zebra Striping (Com !important) --- */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original:nth-child(even) {
+    background-color: #f8f8f8 !important; /* Fundo cinza claro */
 }
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(odd) {
-    background: #ffffff; /* Fundo branco */
+#perguntas-group > .djn-fieldset > .djn-items > .inline-related.has_original:nth-child(odd) {
+    background-color: #ffffff !important; /* Fundo branco */
 }
 
-/* --- Campos de Pergunta (Dentro do Card) --- */
+/* --- Campos de Pergunta (Com !important) --- */
 .inline-related .form-row {
     padding: 0.5rem 0 !important;
 }
 
 .inline-related .form-row label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 5px;
-    display: block; /* Joga a label para cima do campo */
+    font-weight: 600 !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+    display: block !important;
 }
 
-/* --- FIX: Garante que o Dropdown não seja cortado --- */
-.inline-related .form-row select {
-    width: 100%; /* Ocupa todo o espaço do card */
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box; /* Garante que o padding não quebre o layout */
-}
-
+/* --- FIX Dropdown (Com !important) --- */
+.inline-related .form-row select,
 .inline-related .form-row input[type="text"] {
-     width: 100%;
-     padding: 8px;
-     border-radius: 4px;
-     border: 1px solid #ccc;
-     box-sizing: border-box;
+    width: 100% !important;
+    padding: 8px !important;
+    border-radius: 4px !important;
+    border: 1px solid #ccc !important;
+    box-sizing: border-box !important;
 }
 
-/* --- Bloco "Opção de Respostas" (Integrado ao Card) --- */
+/* --- Bloco "Opção de Respostas" (Com !important) --- */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-top: 20px;
-    border-top: 1px dashed #ccc; /* Separador sutil */
+    margin-top: 20px !important;
+    border-top: 1px dashed #ccc !important;
     padding-top: 20px !important;
 }
 
-/* Esconde cabeçalho de tabela inútil */
 .inline-group .djn-thead {
-    display: none;
+    display: none !important;
 }
 
-/* --- Botões "Adicionar" (Estilo Limpo) --- */
-
-/* Botão "Adicionar Opção" (dentro do card) */
+/* --- Botões "Adicionar" (Estilo Limpo - já estavam ok, mas reforçados) --- */
 .inline-group .djn-add-item a {
-    background: #f0f0f0;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    display: inline-block;
-    margin-top: 10px;
-    border: 1px solid #ccc;
+    background: #f0f0f0 !important;
+    padding: 8px 12px !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    color: #444 !important;
+    font-weight: 500 !important;
+    display: inline-block !important;
+    margin-top: 10px !important;
+    border: 1px solid #ccc !important;
 }
-.inline-group .djn-add-item a:hover { background: #e5e5e5; }
+.inline-group .djn-add-item a:hover { background: #e5e5e5 !important; }
 
-/* Botão "Adicionar Pergunta" (botão principal) */
 #perguntas-group > .djn-add-item a {
-     background: #417690; /* Azul do admin Django */
-     color: white;
-     padding: 10px 15px;
-     border-radius: 4px;
-     text-decoration: none;
-     font-weight: bold;
-     display: inline-block;
-     margin-top: 1rem;
-     border: none;
+     background: #417690 !important;
+     color: white !important;
+     padding: 10px 15px !important;
+     border-radius: 4px !important;
+     text-decoration: none !important;
+     font-weight: bold !important;
+     display: inline-block !important;
+     margin-top: 1rem !important;
+     border: none !important;
 }
-#perguntas-group > .djn-add-item a:hover { background: #306784; }
+#perguntas-group > .djn-add-item a:hover { background: #306784 !important; }
