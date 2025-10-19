@@ -4,7 +4,10 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('django-insecure-zm*--r$@&xjk&6_$xb=*=i79^ux806x^@-_)zz&5*)(6wl_0p%')
+# --- CORREÇÃO APLICADA AQUI ---
+# Esta linha busca a variável de ambiente chamada 'SECRET_KEY'
+SECRET_KEY = os.environ.get('SECRET_KEY')
+
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
