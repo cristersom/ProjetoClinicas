@@ -1,150 +1,178 @@
-// Usa o wrapper do Django Admin
 (function($) { // '$' é django.jQuery
-    console.log("[QAdmin V9] Script loaded.");
+    console.log("[QAdmin V10] Script loaded.");
 
     // Função toggleOptions (Seletores ajustados para layout padrão)
     function toggleOptions(row) {
         const $row = $(row);
-        const rowId = $row.attr('id') || $row.index(); // Usa index como fallback ID
-        // console.log(`[QAdmin V9] toggleOptions called for row: ${rowId}`);
-        const selectElement = $row.find('.field-tipo_resposta select');
-        // No layout padrão, o container é um fieldset DENTRO de .inline-group
-        // nested_admin também pode usar uma div.djn-group em vez de fieldset às vezes
-        const optionsContainer = $row.find('.inline-group > .module, .inline-group > .djn-group'); // Tenta pegar fieldset ou div
+        const rowId = $row.attr('id') || $row.index();
+        const selectElement = $row.find('td.field-tipo_resposta select'); // Campo tipo está numa TD
+        // Container das opções é um fieldset DENTRO do .inline-group (que está dentro de uma TD no TR da pergunta)
+        const optionsContainer = $row.find('td.original > .inline-group > fieldset.module, td.original > .inline-group > .djn-group'); // Acha dentro da célula 'original'
 
-        if (!selectElement.length) { /* console.warn(`[QAdmin V9] Toggle: Select not found in ${rowId}`); */ return; }
-        if (!optionsContainer.length) { /* console.warn(`[QAdmin V9] Toggle: Options Container not found in ${rowId}`); */ return; }
+        if (!selectElement.length) { /* console.warn(`[QAdmin V10] Toggle: Select not found in ${rowId}`); */ return; }
+        if (!optionsContainer.length) { /* console.warn(`[QAdmin V10] Toggle: Options Container not found in ${rowId}`); */ return; }
 
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
         const shouldShow = typesWithOptions.includes(selectedType);
 
-        // console.log(`[QAdmin V9] Toggle: Row=${rowId}, Type=${selectedType}, ShouldShow=${shouldShow}`);
-        // Usar show/hide simples
-        if (shouldShow) {
-            optionsContainer.show();
-        } else {
-            optionsContainer.hide();
-        }
+        // console.log(`[QAdmin V10] Toggle: Row=${rowId}, Type=${selectedType}, ShouldShow=${shouldShow}`);
+        optionsContainer.toggle(shouldShow);
     }
 
-    // Função addQuestionPlaceholders (Adiciona placeholder Pergunta/Tipo)
+    // Função addQuestionPlaceholders (Seletores ajustados)
     function addQuestionPlaceholders(row) {
         const $row = $(row);
         const rowId = $row.attr('id') || $row.index();
-        const questionInput = $row.find('.field-texto_pergunta input[type="text"]');
+        // Input da pergunta está em td.field-texto_pergunta
+        const questionInput = $row.find('td.field-texto_pergunta input[type="text"]');
         if (questionInput.length && !questionInput.attr('placeholder')) {
             questionInput.attr('placeholder', 'Digite sua pergunta aqui');
-            // console.log(`[QAdmin V9] Placeholder Pergunta added to ${rowId}`);
+            // console.log(`[QAdmin V10] Placeholder Pergunta added to ${rowId}`);
         }
-         const typeSelect = $row.find('.field-tipo_resposta select');
+         // Select do tipo está em td.field-tipo_resposta
+         const typeSelect = $row.find('td.field-tipo_resposta select');
          if (typeSelect.length) {
             if (typeSelect.find('option[value=""][disabled]').length === 0) {
                  typeSelect.prepend('<option value="" disabled style="color: #80868b;">-- Selecione o Tipo --</option>');
-                 // console.log(`[QAdmin V9] Placeholder Tipo added to ${rowId}`);
+                 // console.log(`[QAdmin V10] Placeholder Tipo added to ${rowId}`);
             }
-            // Força seleção do placeholder se valor for vazio
             if (!typeSelect.val() || typeSelect.val() === "") { typeSelect.val(""); }
          }
     }
 
-    // Função addOptionPlaceholder (Adiciona placeholder Opção)
+    // Função addOptionPlaceholder (Seletores ajustados)
     function addOptionPlaceholder(optionRow) {
         const $optionRow = $(optionRow);
         const rowId = $optionRow.attr('id') || $optionRow.index();
-        // No layout padrão, input está em td.field-texto
+        // Input da opção está em td.field-texto
         const optionInput = $optionRow.find('td.field-texto input[type="text"]');
         if (optionInput.length && !optionInput.attr('placeholder')) {
             optionInput.attr('placeholder', 'Opção de resposta');
-            // console.log(`[QAdmin V9] Placeholder Opção added to ${rowId}`);
+            // console.log(`[QAdmin V10] Placeholder Opção added to ${rowId}`);
         }
     }
 
     // Aplica lógica a um elemento (Pergunta ou Opção)
     function applyLogicToElement(element) {
          const $element = $(element);
-         const logicFlag = 'logic-applied-v9'; // Nova flag
+         const logicFlag = 'logic-applied-v10';
 
-         if ($element.data(logicFlag) || $element.hasClass('empty-form')) return; // Não processa template vazio
+         if ($element.data(logicFlag) || $element.hasClass('djn-empty-form')) return; // Não processa template vazio
 
-         if ($element.hasClass('inline-related')) { // É uma Pergunta
-             // console.log("[QAdmin V9] Applying logic to Pergunta:", $element.attr('id') || $element.index());
+         // Verifica se é uma linha de PERGUNTA (TR dentro do tbody de #perguntas-group)
+         if ($element.is('#perguntas-group tbody tr.dynamic-perguntas_set')) { // Ajuste prefixo se necessário
+             // console.log("[QAdmin V10] Applying logic to Pergunta:", $element.attr('id') || $element.index());
              addQuestionPlaceholders($element);
              // Aplica a opções internas JÁ EXISTENTES
-             $element.find('.dynamic-opcaoresposta_set').each(function() { applyLogicToElement(this); });
-             // Aplica toggle DEPOIS de processar filhos e placeholders
+             $element.find('tr.dynamic-opcaoresposta_set').each(function() { applyLogicToElement(this); }); // Acha opções DENTRO desta pergunta
+             // Aplica toggle DEPOIS
              toggleOptions($element);
              $element.data(logicFlag, true);
          }
-         else if ($element.hasClass('dynamic-opcaoresposta_set')) { // É uma Opção
-             // console.log("[QAdmin V9] Applying logic to Opção:", $element.attr('id') || $element.index());
+         // Verifica se é uma linha de OPÇÃO (TR dentro do tbody de um .inline-group)
+         else if ($element.is('.inline-group tbody tr.dynamic-opcaoresposta_set')) { // Ajuste prefixo se necessário
+             // console.log("[QAdmin V10] Applying logic to Opção:", $element.attr('id') || $element.index());
              addOptionPlaceholder($element);
              $element.data(logicFlag, true);
          }
     }
 
-    // Renomeia botões (Seletores Corrigidos)
+    // Renomeia botões (Seletores Corrigidos para layout padrão)
     function renameButtons() {
-        // console.log("[QAdmin V9] Attempting to rename buttons...");
-        // Botão Adicionar Pergunta (FORA de .inline-related, dentro de #perguntas-group > div.djn-fieldset > div.djn-add-item )
-        const $addQuestionBtn = $('#perguntas-group > div.djn-fieldset > div.djn-add-item a');
-        if ($addQuestionBtn.length && $addQuestionBtn.text() !== 'Adicionar Pergunta') {
-            $addQuestionBtn.text('Adicionar Pergunta');
-            // console.log("[QAdmin V9] Botão 'Adicionar Pergunta' RENAMED.");
+        // console.log("[QAdmin V10] Attempting to rename buttons...");
+        // Botão Adicionar Pergunta (Link dentro de div.djn-add-item que é filho do fieldset principal)
+        const $addQuestionBtn = $('#perguntas-group > fieldset.module > div.djn-add-item a');
+        if ($addQuestionBtn.length && $addQuestionBtn.text().includes('Pergunta')) { // Verifica se já não está certo
+             if ($addQuestionBtn.text() !== 'Adicionar Pergunta') {
+                 $addQuestionBtn.text('Adicionar Pergunta');
+                 // console.log("[QAdmin V10] Botão 'Adicionar Pergunta' RENAMED.");
+             }
+        } else {
+             // console.warn("[QAdmin V10] Botão 'Adicionar Pergunta' not found or text incorrect.");
         }
 
-        // Botão Adicionar Opção (DENTRO de .inline-group > fieldset.module > div.djn-add-item OU .inline-group > div.djn-group > div.djn-add-item)
-        $('.inline-group > fieldset.module > div.djn-add-item a, .inline-group > div.djn-group > div.djn-add-item a').each(function(){
+        // Botão Adicionar Opção (Link dentro de div.djn-add-item que é filho do fieldset interno das opções)
+        $('.inline-group fieldset.module > div.djn-add-item a').each(function(){
             const $addOptionBtn = $(this);
             // Evita renomear o botão do template vazio
-            if ($addOptionBtn.closest('.empty-form').length === 0 && $addOptionBtn.text() !== 'Adicionar Opção') {
+            if ($addOptionBtn.closest('.djn-empty-form').length === 0 && $addOptionBtn.text() !== 'Adicionar Opção') {
                 $addOptionBtn.text('Adicionar Opção');
-                // console.log("[QAdmin V9] Botão 'Adicionar Opção' RENAMED.");
+                // console.log("[QAdmin V10] Botão 'Adicionar Opção' RENAMED.");
             }
         });
     }
 
     // --- Execução Principal ---
     $(document).ready(function() {
-        console.log("[QAdmin V9] Document Ready");
+        console.log("[QAdmin V10] Document Ready");
 
-        // Ouve a mudança no dropdown
-        $('body').on('change', '#perguntas-group .field-tipo_resposta select', function() {
-            // console.log("[QAdmin V9] Select change detected");
-            const row = $(this).closest('.inline-related');
+        // Ouve a mudança no dropdown Tipo Resposta
+        // Target mais específico no select dentro da célula
+        $('body').on('change', '#perguntas-group td.field-tipo_resposta select', function() {
+            // console.log("[QAdmin V10] Select change detected");
+            // Sobe para o TR da pergunta
+            const row = $(this).closest('tr.dynamic-perguntas_set'); // Ajuste prefixo se necessário
             toggleOptions(row);
         });
 
-        // Ouve adição de inline
-        $(document).on('djnesting:added', function(event, inline) {
-            const newRow = inline.row;
-            // console.log("[QAdmin V9] Inline added:", $(newRow).attr('id') || $(newRow).index());
+        // --- OBSERVAR MUDANÇAS NO DOM ---
+        const observerTargetNode = document.getElementById('perguntas-group');
+        if (observerTargetNode) {
+            console.log("[QAdmin V10] Setting up MutationObserver.");
+            const observer = new MutationObserver(function(mutations) {
+                let addedElements = [];
+                mutations.forEach(function(mutation) {
+                    mutation.addedNodes.forEach(function(node) {
+                        // Considera apenas elementos TR que são inlines
+                        if (node.nodeType === 1 && node.tagName === 'TR' && ($(node).hasClass('dynamic-perguntas_set') || $(node).hasClass('dynamic-opcaoresposta_set'))) {
+                            addedElements.push(node);
+                        }
+                    });
+                });
 
-            // Espera um pouco para garantir que o DOM esteja completo
-            setTimeout(function() {
-                // Aplica lógica APENAS ao novo elemento
-                applyLogicToElement(newRow);
-                 // Se for uma PERGUNTA, garante que opções comecem escondidas
-                 if ($(newRow).hasClass('inline-related')) {
-                    const optionsContainer = $(newRow).find('> .inline-group > fieldset.module, > .inline-group > .djn-group');
-                    if(optionsContainer.length) optionsContainer.hide();
-                    // Chama toggle DEPOIS para garantir estado correto
-                    toggleOptions(newRow);
-                 }
-                 // Renomeia botões DE NOVO
-                renameButtons();
-            }, 100); // Delay curto
-        });
-
-        // Aplica lógica inicial com delay maior
-        setTimeout(function() {
-            console.log("[QAdmin V9] Applying initial logic (Timeout)...");
-            $('#perguntas-group .inline-related, #perguntas-group .dynamic-opcaoresposta_set').each(function() {
-                 applyLogicToElement(this);
+                if (addedElements.length > 0) {
+                    console.log("[QAdmin V10] Observer detected added nodes:", addedElements.length);
+                    // Aplica lógica aos nós adicionados
+                    $(addedElements).each(function(){
+                        applyLogicToElement(this);
+                        // Se for pergunta nova, garante opções escondidas e aplica toggle
+                        if ($(this).hasClass('dynamic-perguntas_set')) {
+                             const optionsContainer = $(this).find('.inline-group > fieldset.module, .inline-group > .djn-group');
+                             if(optionsContainer.length) optionsContainer.hide();
+                             toggleOptions(this); // Aplica estado correto
+                        }
+                    });
+                    // Renomeia botões DEPOIS que os elementos foram adicionados
+                    renameButtons();
+                }
             });
-            renameButtons(); // Renomeia botões iniciais
-            console.log("[QAdmin V9] Initial logic (Timeout) completed.");
-        }, 1200); // 1.2 segundos
-    });
+            const config = { childList: true, subtree: true };
+            observer.observe(observerTargetNode, config);
+        } else {
+             console.error("[QAdmin V10] Elemento #perguntas-group não encontrado para o MutationObserver.");
+        }
+
+        // Aplica lógica inicial aos elementos já presentes (com delay e verificação)
+        function runInitialLogic() {
+             console.log("[QAdmin V10] Running initial logic...");
+             let foundElements = 0;
+             $('#perguntas-group tbody tr.dynamic-perguntas_set, #perguntas-group tbody tr.dynamic-opcaoresposta_set').each(function() {
+                 // Evita o template vazio
+                 if (!$(this).hasClass('djn-empty-form')) {
+                    applyLogicToElement(this);
+                    foundElements++;
+                 }
+             });
+             renameButtons(); // Renomeia botões iniciais
+             console.log(`[QAdmin V10] Initial logic applied to ${foundElements} elements.`);
+             // Se nenhum elemento foi encontrado, tenta de novo um pouco mais tarde
+             if (foundElements === 0) {
+                 setTimeout(runInitialLogic, 1500); // Tenta de novo após 1.5s
+             }
+        }
+        setTimeout(runInitialLogic, 800); // Delay inicial de 0.8s
+
+    }); // Fim Document Ready
 
 })(django.jQuery); // Passa django.jQuery como '$'
