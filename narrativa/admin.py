@@ -50,14 +50,15 @@ class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
+    # Não precisa sobrescrever template aqui, só nas inlines aninhadas
 
 
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
-    # REMOVIDO: template = 'nested_admin/edit_inline/tabular-djnesting.html'
-    # REMOVIDO: css = { 'all': [] }
+    # --- Força o uso do nosso template sobrescrito ---
+    template = 'nested_admin/edit_inline/tabular-djnesting.html'
 
 
 class PerguntaInline(nested_admin.NestedTabularInline):
@@ -65,8 +66,8 @@ class PerguntaInline(nested_admin.NestedTabularInline):
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
-    # REMOVIDO: template = 'nested_admin/edit_inline/tabular-djnesting.html'
-    # REMOVIDO: css = { 'all': [] }
+    # --- Força o uso do nosso template sobrescrito ---
+    template = 'nested_admin/edit_inline/tabular-djnesting.html'
 
 
 # --- Registros dos Modelos no Admin ---
@@ -74,7 +75,7 @@ class PerguntaInline(nested_admin.NestedTabularInline):
 class CenaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'narrativa')
     list_filter = ('narrativa',)
-    inlines = [EscolhaInline]
+    inlines = [EscolhaInline] # Usa TabularInline padrão
 
 
 @admin.register(Narrativa)
@@ -84,20 +85,23 @@ class NarrativaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin):
+class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Mantém NestedModelAdmin
     list_display = ('titulo', 'cena_associada')
-    inlines = [PerguntaInline]
+    inlines = [PerguntaInline] # Usa a PerguntaInline que usa o template sobrescrito
 
-    # Mantém a classe Media que carrega nosso CSS e os JS necessários
+    # --- Garante que APENAS nosso CSS e os JS necessários sejam carregados ---
     class Media:
         css = {
             'all': ('css/custom_admin.css',) # Nosso CSS
         }
         js = (
+            # JS Padrão do Admin (Necessário)
             'admin/js/vendor/jquery/jquery.min.js',
             'admin/js/jquery.init.js',
+            # JS do Nested Admin (Necessário para funcionalidade)
             'nested_admin/dist/nested_admin.min.js',
-            'js/questionario_admin.js', # Nosso JS
+            # Nosso JS Customizado (Deve vir por último)
+            'js/questionario_admin.js',
         )
 
 
@@ -109,7 +113,6 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
     def session_key_abreviada(self, obj):
         return obj.session_key[:8] + '...'
-
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 
@@ -124,12 +127,10 @@ class RespostaAdmin(ImportExportModelAdmin):
 
     def questionario_associado(self, obj):
         return obj.pergunta.questionario.titulo
-
     questionario_associado.short_description = 'Questionário'
 
     def session_key_abreviada(self, obj):
         return obj.session_key[:8] + '...'
-
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 

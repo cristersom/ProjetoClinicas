@@ -1,65 +1,93 @@
 (function($) { // '$' é django.jQuery
 
-    // Função toggleOptions (sem alterações, deve funcionar se chamada corretamente)
+    // Função toggleOptions (verifica container antes de agir)
     function toggleOptions(row) {
         const $row = $(row);
         const selectElement = $row.find('.field-tipo_resposta select');
-        const optionsContainer = $row.find('> .inline-group'); // Filho direto
-        if (!selectElement.length || !optionsContainer.length) return;
+        // Acha o container de opções DENTRO desta linha específica
+        const optionsContainer = $row.find('> .inline-group'); // '>' filho direto
+
+        if (!selectElement.length || !optionsContainer.length) return; // Só age se ambos existirem
+
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
+
+        // Mostra/esconde o container de opções DESTA linha
         optionsContainer.toggle(typesWithOptions.includes(selectedType));
     }
 
-    // Função addQuestionPlaceholders (sem alterações)
-    function addQuestionPlaceholders(row) { /* ... código mantido ... */ }
+    // Função addQuestionPlaceholders (adiciona placeholder pergunta/tipo)
+    function addQuestionPlaceholders(row) {
+        const $row = $(row);
+        const questionInput = $row.find('.field-texto_pergunta input[type="text"]');
+        if (questionInput.length && !questionInput.attr('placeholder')) {
+            questionInput.attr('placeholder', 'Digite sua pergunta aqui');
+        }
+         const typeSelect = $row.find('.field-tipo_resposta select');
+         if (typeSelect.length) {
+            if (typeSelect.find('option[value=""][disabled]').length === 0) {
+                 typeSelect.prepend('<option value="" disabled selected style="color: #80868b;">-- Selecione o Tipo --</option>');
+            }
+            if (!typeSelect.val() || typeSelect.val() === "") {
+                typeSelect.val(""); // Força seleção do placeholder
+                typeSelect.addClass('placeholder-selected');
+            } else {
+                 typeSelect.removeClass('placeholder-selected');
+            }
+         }
+    }
 
-    // Função addOptionPlaceholder (sem alterações)
-    function addOptionPlaceholder(optionRow) { /* ... código mantido ... */ }
+    // Função addOptionPlaceholder (adiciona placeholder opção)
+    function addOptionPlaceholder(optionRow) {
+        const $optionRow = $(optionRow);
+        // Usa seletor que funciona no template sobrescrito (input dentro de td.field-texto)
+        const optionInput = $optionRow.find('td.field-texto input[type="text"]');
+        if (optionInput.length && !optionInput.attr('placeholder')) {
+            optionInput.attr('placeholder', 'Opção de resposta');
+        }
+    }
 
-    // --- LÓGICA DE APLICAÇÃO ---
+    // --- LÓGICA DE APLICAÇÃO (Marca elementos processados) ---
     function applyLogicToElement(element) {
          const $element = $(element);
-         if ($element.data('logic-applied-v3')) return; // Evita reprocessar com nova flag
+         const logicFlag = 'logic-applied-v4'; // Nova flag para garantir reprocessamento
+
+         // Não processa se já tiver a flag
+         if ($element.data(logicFlag)) return;
 
          if ($element.hasClass('inline-related')) { // É uma Pergunta
              addQuestionPlaceholders($element);
-             // --- CORREÇÃO IMPORTANTE: Chama toggleOptions AQUI ---
-             // Garante que o estado inicial (escondido/mostrado) seja aplicado
-             toggleOptions($element);
+             // Aplica placeholders a opções já existentes DENTRO desta pergunta
              $element.find('.dynamic-opcaoresposta_set').each(function() {
-                if (!$(this).data('logic-applied-v3')) {
-                    addOptionPlaceholder($(this));
-                    $(this).data('logic-applied-v3', true);
-                }
+                 addOptionPlaceholder($(this));
+                 $(this).data(logicFlag, true); // Marca opção interna
              });
-             $element.data('logic-applied-v3', true);
+             // Chama toggleOptions DEPOIS de processar filhos
+             toggleOptions($element);
+             $element.data(logicFlag, true); // Marca pergunta
          }
          else if ($element.hasClass('dynamic-opcaoresposta_set')) { // É uma Opção
              addOptionPlaceholder($element);
-             $element.data('logic-applied-v3', true);
+             $element.data(logicFlag, true); // Marca opção
          }
     }
 
     // --- Execução Principal ---
     $(document).ready(function() {
-        // --- CORREÇÃO: Renomear botões com seletores específicos ---
+        // Renomeia os botões (apenas uma vez, mais eficiente)
         function renameButtons() {
-            // Botão Adicionar Pergunta (diretamente filho de #perguntas-group)
+            // Botão Adicionar Pergunta (FORA de qualquer .inline-related)
             $('#perguntas-group > .djn-add-item a').text('Adicionar Pergunta');
             // Botão Adicionar Opção (DENTRO de um .inline-group)
             $('.inline-group .djn-add-item a').text('Adicionar Opção');
         }
         renameButtons(); // Roda imediatamente
-        // Roda de novo após um tempo para pegar botões dinâmicos
-        setTimeout(renameButtons, 700);
-
 
         // Ouve a mudança no dropdown Tipo Resposta
         $('body').on('change', '#perguntas-group .field-tipo_resposta select', function() {
             const $select = $(this);
-            const row = $select.closest('.inline-related');
-            toggleOptions(row); // Chama toggle SÓ para esta linha
+            const row = $select.closest('.inline-related'); // Pega SÓ a linha pai
+            toggleOptions(row); // Passa a linha específica
             // Atualiza classe do placeholder
             if ($select.val()) { $select.removeClass('placeholder-selected'); }
             else { $select.addClass('placeholder-selected'); }
@@ -77,24 +105,27 @@
                             // Se o nó adicionado for uma pergunta ou opção, processa
                             if ($node.hasClass('inline-related') || $node.hasClass('dynamic-opcaoresposta_set')) {
                                 applyLogicToElement($node);
-                                // --- GARANTE QUE OPÇÕES DA NOVA PERGUNTA COMECEM ESCONDIDAS ---
-                                if ($node.hasClass('inline-related')) {
-                                    const optionsContainer = $node.find('> .inline-group');
-                                    if(optionsContainer.length) optionsContainer.hide();
-                                    // Chama toggle DEPOIS de esconder, para estado inicial correto
-                                    toggleOptions($node);
-                                }
-                                needsRename = true; // Precisa renomear botões
+                                needsRename = true;
                             }
                             // Processa também perguntas/opções DENTRO do nó adicionado
                             $node.find('.inline-related, .dynamic-opcaoresposta_set').each(function() {
                                 applyLogicToElement(this);
-                                if ($(this).hasClass('inline-related')) toggleOptions(this); // Aplica toggle inicial
                             });
+                             // Garante que toggleOptions rode para a NOVA pergunta
+                            if ($node.hasClass('inline-related')) {
+                                // Esconder opções imediatamente ao adicionar
+                                const optionsContainer = $node.find('> .inline-group');
+                                if(optionsContainer.length) optionsContainer.hide();
+                                // Chama toggle DEPOIS de esconder, para estado inicial correto
+                                toggleOptions($node);
+                            }
                         }
                     });
                 });
-                if(needsRename) renameButtons(); // Renomeia se nós foram adicionados
+                if(needsRename) {
+                    // Renomeia botões DEPOIS que o DOM foi atualizado
+                    setTimeout(renameButtons, 50);
+                }
             });
             const config = { childList: true, subtree: true };
             observer.observe(observerTargetNode, config);
@@ -102,14 +133,12 @@
 
         // Aplica a lógica inicial aos elementos já presentes (com delay)
         setTimeout(function() {
+            // console.log("Applying initial logic...");
             $('#perguntas-group .inline-related, #perguntas-group .dynamic-opcaoresposta_set').each(function() {
                 applyLogicToElement(this);
             });
-            // Garante estado inicial correto das opções para TODAS as perguntas
-             $('#perguntas-group .inline-related').each(function(){
-                 toggleOptions(this);
-            });
-        }, 500);
+            // console.log("Initial logic applied.");
+        }, 700); // Aumentado um pouco mais para garantir
     });
 
 })(django.jQuery); // Passa django.jQuery como '$'
