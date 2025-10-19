@@ -50,19 +50,18 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
-    # --- CLASSE MEDIA ATIVA NOVAMENTE ---
-    # Carrega CSS customizado (mesmo que vazio) e JS necessários
+    # --- CLASSE MEDIA ATIVA ---
+    # Carrega CSS customizado (mesmo vazio) e JS necessários na ordem correta
     class Media:
         css = {
-            # Mantemos nosso CSS, mesmo que vazio por enquanto
-            'all': ('css/custom_admin.css',)
+            'all': ('css/custom_admin.css',) # CSS Vazio (por enquanto)
         }
         js = (
             # Ordem correta: jQuery -> init -> nested_admin -> nosso script
             'admin/js/vendor/jquery/jquery.min.js',
             'admin/js/jquery.init.js',
             'nested_admin/dist/nested_admin.min.js',
-            'js/questionario_admin.js', # Nosso JS é carregado
+            'js/questionario_admin.js', # Nosso JS com logs e django.jQuery
         )
     # --- FIM DA CLASSE MEDIA ---
 
