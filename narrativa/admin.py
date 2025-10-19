@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import nested_admin # Mantenha esta importação
+import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -56,9 +56,8 @@ class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
-    # Remove CSS padrão do nested_admin para esta inline
-    template = 'nested_admin/edit_inline/tabular-djnesting.html'
-    css = { 'all': [] }
+    # REMOVIDO: template = 'nested_admin/edit_inline/tabular-djnesting.html'
+    # REMOVIDO: css = { 'all': [] }
 
 
 class PerguntaInline(nested_admin.NestedTabularInline):
@@ -66,9 +65,8 @@ class PerguntaInline(nested_admin.NestedTabularInline):
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
-    # Remove CSS padrão do nested_admin para esta inline
-    template = 'nested_admin/edit_inline/tabular-djnesting.html'
-    css = { 'all': [] }
+    # REMOVIDO: template = 'nested_admin/edit_inline/tabular-djnesting.html'
+    # REMOVIDO: css = { 'all': [] }
 
 
 # --- Registros dos Modelos no Admin ---
@@ -86,20 +84,19 @@ class NarrativaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Mantenha NestedModelAdmin aqui
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
-    # --- ALTERAÇÃO PRINCIPAL ---
-    # Carrega APENAS o nosso CSS customizado e o JS necessário
+    # Mantém a classe Media que carrega nosso CSS e os JS necessários
     class Media:
         css = {
             'all': ('css/custom_admin.css',) # Nosso CSS
         }
         js = (
-            'admin/js/vendor/jquery/jquery.min.js', # jQuery (necessário pelo nested_admin JS)
+            'admin/js/vendor/jquery/jquery.min.js',
             'admin/js/jquery.init.js',
-            'nested_admin/dist/nested_admin.min.js', # JS do Nested Admin
+            'nested_admin/dist/nested_admin.min.js',
             'js/questionario_admin.js', # Nosso JS
         )
 
