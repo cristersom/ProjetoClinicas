@@ -87,10 +87,9 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        # --- MUDANÇA IMPORTANTE AQUI ---
-        # Trocamos o 'CompressedManifestStaticFilesStorage' por um mais simples
-        # que não renomeia os arquivos, resolvendo o problema de cache.
-        "BACKEND": "whitenoise.storage.WhiteNoiseStorage",
+        # --- CORREÇÃO DO ERRO DE DIGITAÇÃO ---
+        # O nome correto da classe é 'CompressedStaticFilesStorage'
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
