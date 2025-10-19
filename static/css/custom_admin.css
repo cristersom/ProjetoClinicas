@@ -1,4 +1,4 @@
-/* --- RESETS GERAIS (MAIS AGRESSIVOS) --- */
+/* --- RESETS GERAIS --- */
 /* Remove Borda/Padding/Fundo/Sombra da div EXTERNA principal de "Perguntas" */
 #perguntas-group > div.djn-fieldset {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
@@ -9,8 +9,8 @@
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
     box-shadow: none !important;
 }
-/* Remove Borda/Padding/Fundo do container GERAL do inline-group (que contém o título azul) */
-.inline-group.tabular { /* Adiciona .tabular para especificidade */
+/* Remove Borda/Padding/Fundo do container GERAL do inline-group */
+.inline-group.tabular {
     padding: 0 !important; margin: 0 !important; border: none !important; background: none !important;
 }
 
@@ -18,7 +18,7 @@
 /* Esconde Títulos Azuis e Headers de Tabela */
 #perguntas-group > h2,
 .inline-group > h2.djn-group-title,
-.inline-group table thead { /* Esconde header "TEXTO | REMOVER?" */
+.inline-group table thead {
     display: none !important;
 }
 
@@ -27,11 +27,11 @@
     border: 1px solid #dadce0 !important;
     border-radius: 8px !important;
     padding: 20px 24px !important;
-    margin: 0 0 16px 0 !important; /* Apenas margem inferior */
+    margin: 0 0 16px 0 !important;
     box-shadow: none !important;
     border-bottom: 1px solid #dadce0 !important;
     background: none !important;
-    /* Reset extra */
+    overflow: hidden;
     padding-left: 24px !important; padding-right: 24px !important;
 }
 
@@ -39,63 +39,64 @@
 #perguntas-group .inline-related:nth-child(even) { background-color: #f8f9fa !important; }
 #perguntas-group .inline-related:nth-child(odd) { background-color: #ffffff !important; }
 
-/* --- Campos dentro do Card --- */
-.inline-related .form-row { margin-bottom: 1rem !important; padding: 0 !important; background: none !important; border: none !important; } /* Reset extra */
-.inline-related .form-row label { display: none; } /* Esconde labels "Texto Pergunta", "Tipo Resposta" */
+/* Esconde o H3 padrão dentro do card */
+#perguntas-group .inline-related h3 { display: none; }
 
-/* --- FIX Dropdown (REFORÇADO) --- */
-.inline-related .field-tipo_resposta select {
-    display: block !important;
-    width: 100% !important;
-    padding: 10px !important;
-    border: 1px solid #ccc !important;
-    border-radius: 4px !important;
-    box-sizing: border-box !important;
-    min-height: 40px !important; /* Altura mínima */
-    appearance: none; /* Tenta remover estilo padrão do browser que pode limitar */
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: white; /* Garante fundo branco */
+/* --- Campos dentro do Card (Pergunta e Tipo) --- */
+.inline-related > .form-row { /* Seletor mais direto para os campos da pergunta */
+     margin-bottom: 1rem !important; padding: 0 !important; background: none !important;
+     border: none !important; display: flex !important; gap: 1rem !important; align-items: flex-start !important;
 }
+.inline-related > .form-row > div { flex-grow: 1; }
+.inline-related > .form-row > .field-texto_pergunta { flex-basis: 60%; }
+.inline-related > .form-row > .field-tipo_resposta { flex-basis: 40%; }
+.inline-related > .form-row label { display: none; } /* Esconde labels */
+
+/* Ajuste Input/Select */
+.inline-related .field-tipo_resposta select,
 .inline-related .field-texto_pergunta input {
-     display: block !important; width: 100% !important; padding: 10px !important;
-     border: 1px solid #ccc !important; border-radius: 4px !important; box-sizing: border-box !important;
+    width: 100% !important; padding: 10px !important; border: 1px solid #ccc !important;
+    border-radius: 4px !important; box-sizing: border-box !important; min-height: 40px !important;
+    background-color: white !important;
 }
 .inline-related .field-texto_pergunta input::placeholder { color: #80868b; }
+select.placeholder-selected { color: #80868b !important; } /* Cor do placeholder select */
+select option { color: #000 !important; } /* Cor normal das opções */
+select option[value=""][disabled] { display: none; } /* Esconde placeholder da lista */
 
-/* --- Bloco "Opções Respostas" (Integrado) --- */
-.inline-group { /* Container das opções */
-    margin-top: 1.5rem !important;
-    border-top: 1px solid #e0e0e0 !important;
-    padding-top: 1.5rem !important;
-    /* Reset container */
-    border: none !important; padding: 1.5rem 0 0 0 !important; margin-left: 0 !important; margin-right: 0 !important; background: none !important;
+
+/* --- Bloco "Opções Respostas" (Agora é o .inline-group dentro do .inline-related) --- */
+.inline-related .inline-group {
+    margin-top: 1.5rem !important; border-top: 1px solid #e0e0e0 !important; padding-top: 1.5rem !important;
+    border: none !important; padding: 1.5rem 0 0 0 !important; margin: 1.5rem 0 0 0 !important; background: none !important;
 }
 
 /* Estilo da linha de cada opção */
 .inline-group .form-row.dynamic-opcaoresposta_set {
     border: none !important; padding: 0 0 0.75rem 0 !important; background: none !important;
-    margin-left: 0 !important; margin-right: 0 !important;
+    margin: 0 !important; display: flex !important; align-items: center; gap: 1rem;
 }
-/* Placeholder para input da opção */
-.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"]::placeholder { color: #80868b !important; }
-/* Ajusta largura do input da opção */
-.inline-group .form-row.dynamic-opcaoresposta_set input[id$="-texto"] {
+.inline-group .form-row.dynamic-opcaoresposta_set .field-texto { flex-grow: 1; }
+.inline-group .form-row.dynamic-opcaoresposta_set .field-texto input {
     width: 100% !important; padding: 10px !important; border: 1px solid #ccc !important;
     border-radius: 4px !important; box-sizing: border-box !important;
 }
+.inline-group .form-row.dynamic-opcaoresposta_set .field-texto input::placeholder { color: #80868b !important; }
+.inline-group .form-row.dynamic-opcaoresposta_set .delete { margin-left: auto; }
 
 
 /* --- Botões --- */
+.inline-group .djn-add-item { margin-top: 0.5rem; }
 .inline-group .djn-add-item a { /* Adicionar Opção */
     background: #f8f9fa !important; padding: 6px 12px !important; border: 1px solid #dadce0 !important;
     border-radius: 4px !important; text-decoration: none !important; color: #3c4043 !important;
-    font-weight: 500 !important; margin-top: 5px !important; font-size: 13px !important; display: inline-block !important; /* Garante visibilidade */
+    font-weight: 500 !important; font-size: 13px !important; display: inline-block !important;
 }
 .inline-group .djn-add-item a:hover { background: #f1f3f4 !important; }
 
+#perguntas-group > .djn-add-item { text-align: center; margin-top: 1rem; }
 #perguntas-group > .djn-add-item a { /* Adicionar Pergunta */
      background: #417690 !important; color: white !important; padding: 10px 15px !important;
      border-radius: 4px !important; text-decoration: none !important; font-weight: bold !important;
-     margin-top: 0 !important; margin-bottom: 1rem !important; display: inline-block !important;
+     display: inline-block !important;
 }

@@ -1,0 +1,57 @@
+{% load i18n admin_urls static nested_admin %}
+
+<div class="inline-group djn-inline-group djn-tabular{% if inline_admin_formset.opts.classes %} {{ inline_admin_formset.opts.classes|join:" " }}{% endif %}"
+     id="{{ inline_admin_formset.formset.prefix }}-group"
+     data-inline-type="tabular"
+     data-inline-formset="{{ inline_admin_formset.inline_formset_data }}">
+
+  {# REMOVIDO: Fieldset externo e Título H2 #}
+
+  {{ inline_admin_formset.formset.management_form }}
+  {{ inline_admin_formset.formset.non_form_errors }}
+
+  <div class="items djn-items">
+      {% for inline_admin_form in inline_admin_formset %}
+          <div class="inline-related djn-inline-form{% if inline_admin_form.original or inline_admin_form.show_url %} has_original{% endif %}{% if forloop.last %} empty-form djn-empty-form{% endif %}"
+               id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}"
+               {% if inline_admin_form.pk_field.field %}data-pk-field-name="{{ inline_admin_form.pk_field.field.name }}"{% endif %}
+               {% if inline_admin_form.fk_field.field %}data-fk-field-name="{{ inline_admin_form.fk_field.field.name }}"{% endif %}
+               >
+            {# REMOVIDO: Fieldset interno #}
+
+            {# H3 padrão escondido via CSS, mas mantido aqui para estrutura do Django #}
+            <h3>
+              <b>{{ inline_admin_formset.opts.verbose_name|capfirst }}:</b>&nbsp;
+              <span class="inline_label">
+              {% if inline_admin_form.original %}
+                  {{ inline_admin_form.original }}
+                  {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="inlinechangelink">{% translate "Change" %}</a>{% endif %}
+              {% else %}
+                  #{{ forloop.counter }}
+              {% endif %}
+              </span>
+                {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% translate "View on site" %}</a>{% endif %}
+                {% if inline_admin_formset.formset.can_delete and inline_admin_form.original %}<span class="delete">{{ inline_admin_form.deletion_field.field }} {{ inline_admin_form.deletion_field.label_tag }}</span>{% endif %}
+            </h3>
+
+            {% if inline_admin_form.form.non_field_errors %}{{ inline_admin_form.form.non_field_errors }}{% endif %}
+            {% for fieldset in inline_admin_form %}
+              {# Inclui os campos da pergunta/opção #}
+              {% include "admin/includes/fieldset.html" %}
+            {% endfor %}
+            {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+            {{ inline_admin_form.fk_field.field }}
+
+            {# REMOVIDO: Fechamento do Fieldset interno #}
+          </div>
+      {% endfor %}
+  </div>
+
+  {# Botão Adicionar Pergunta/Opção (renderizado pelo Django) #}
+  <div class="add-item djn-add-item">
+      {% if inline_admin_formset.has_add_permission %}
+      {% add_item_link inline_admin_formset %}{% endif %}
+  </div>
+
+  {# REMOVIDO: Fechamento do Fieldset externo #}
+</div>
