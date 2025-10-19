@@ -1,103 +1,71 @@
-/* --- Esconde os Títulos Azuis desnecessários --- */
-/* Esconde o título principal "PERGUNTAS" */
-#perguntas-group > h2 {
-    display: none;
-}
-
-/* Esconde o título "OPCAO RESPOSTAS" (como você pediu) */
+/* --- Esconder Títulos Azuis --- */
+#perguntas-group > h2,
 .inline-group .djn-group-title {
-    display: none !important;
+    display: none !important; /* Essencial para limpar a UI */
 }
 
-/* --- O Card Principal da Pergunta (A "div separada") --- */
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related {
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 1.5rem !important;
+/* --- Card Básico da Pergunta --- */
+#perguntas-group .inline-related { /* Seletor mais geral */
+    border: 1px solid #ccc !important;
+    border-radius: 8px !important;
+    padding: 1rem 1.5rem !important; /* Padding ajustado */
     margin-bottom: 1.5rem !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border-bottom: 1px solid #ccc !important; /* Sobrescreve regra anterior */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+    border-bottom: 1px solid #ccc !important;
+    background: none; /* Reset background */
 }
 
-/* --- Zebra Striping (Sua sugestão de cores alternadas) --- */
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(even) {
-    background: #f8f8f8; /* Fundo cinza claro */
+/* --- Cores Alternadas --- */
+#perguntas-group .inline-related:nth-child(even) {
+    background-color: #f8f8f8 !important; /* Cinza claro */
 }
-#perguntas-group > .djn-fieldset > .djn-items > .inline-related:nth-child(odd) {
-    background: #ffffff; /* Fundo branco */
-}
-
-/* --- Campos de Pergunta (Dentro do Card) --- */
-.inline-related .form-row {
-    padding: 0.5rem 0 !important;
+#perguntas-group .inline-related:nth-child(odd) {
+    background-color: #ffffff !important; /* Branco */
 }
 
-.inline-related .form-row label {
-    font-weight: 600;
-    color: #333;
-    font-size: 14px;
-    margin-bottom: 5px;
-    display: block; /* Joga a label para cima do campo */
+/* --- Ajuste Dropdown (Select) --- */
+.inline-related .field-tipo_resposta select {
+    width: 100% !important; /* Garante que não corte */
+    box-sizing: border-box;
+}
+.inline-related .field-texto_pergunta input {
+     width: 100% !important; /* Garante que não corte */
+    box-sizing: border-box;
 }
 
-/* --- FIX: Garante que o Dropdown não seja cortado --- */
-.inline-related .form-row select {
-    width: 100%; /* Ocupa todo o espaço do card */
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    box-sizing: border-box; /* Garante que o padding não quebre o layout */
-}
 
-.inline-related .form-row input[type="text"] {
-     width: 100%;
-     padding: 8px;
-     border-radius: 4px;
-     border: 1px solid #ccc;
-     box-sizing: border-box;
-}
-
-/* --- Bloco "Opção de Respostas" (Integrado ao Card) --- */
+/* --- Bloco de Opções (Visualmente dentro do Card) --- */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-top: 20px;
-    border-top: 1px dashed #ccc; /* Separador sutil */
-    padding-top: 20px !important;
+    margin-top: 15px !important; /* Aproxima do campo anterior */
+    border-top: 1px dashed #ccc !important; /* Separador */
+    padding-top: 15px !important;
 }
 
-/* Esconde cabeçalho de tabela inútil */
+/* Remove header inútil das opções */
 .inline-group .djn-thead {
-    display: none;
+    display: none !important;
 }
 
-/* --- Botões "Adicionar" (Estilo Limpo) --- */
-
-/* Botão "Adicionar Opção" (dentro do card) */
-.inline-group .djn-add-item a {
-    background: #f0f0f0;
-    padding: 8px 12px;
-    border-radius: 4px;
-    text-decoration: none;
-    color: #444;
-    font-weight: 500;
-    display: inline-block;
-    margin-top: 10px;
-    border: 1px solid #ccc;
+/* --- Botões (Manter estilo limpo) --- */
+.inline-group .djn-add-item a { /* Adicionar Opção */
+    background: #f0f0f0 !important;
+    padding: 6px 10px !important; /* Um pouco menor */
+    border: 1px solid #ccc !important;
+    border-radius: 4px !important;
+    text-decoration: none !important;
+    color: #444 !important;
+    font-weight: 500 !important;
+    margin-top: 5px !important;
 }
-.inline-group .djn-add-item a:hover { background: #e5e5e5; }
-
-/* Botão "Adicionar Pergunta" (botão principal) */
-#perguntas-group > .djn-add-item a {
-     background: #417690; /* Azul do admin Django */
-     color: white;
-     padding: 10px 15px;
-     border-radius: 4px;
-     text-decoration: none;
-     font-weight: bold;
-     display: inline-block;
-     margin-top: 1rem;
-     border: none;
+#perguntas-group > .djn-add-item a { /* Adicionar Pergunta */
+     background: #417690 !important;
+     color: white !important;
+     padding: 10px 15px !important;
+     border-radius: 4px !important;
+     text-decoration: none !important;
+     font-weight: bold !important;
+     margin-top: 1rem !important;
 }
-#perguntas-group > .djn-add-item a:hover { background: #306784; }
