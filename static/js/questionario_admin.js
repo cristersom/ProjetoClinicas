@@ -9,17 +9,23 @@
         console.log(`[QAdmin] toggleOptions called for row: ${rowId}`);
         const selectElement = $row.find('.field-tipo_resposta select');
         // No layout padrão, o container é um fieldset dentro do inline-group
-        const optionsContainer = $row.find('.inline-group > fieldset.module');
+        const optionsContainer = $row.find('.inline-group > fieldset.module'); // Seleciona o fieldset filho direto
 
         if (!selectElement.length) { console.warn(`[QAdmin] Toggle: Select not found in ${rowId}`); return; }
-        if (!optionsContainer.length) { console.warn(`[QAdmin] Toggle: Options Container (.inline-group > fieldset.module) not found in ${rowId}`); return; }
+        // É normal não encontrar optionsContainer se a linha for o 'empty-form' template
+        // if (!optionsContainer.length) { console.warn(`[QAdmin] Toggle: Options Container (.inline-group > fieldset.module) not found in ${rowId}`); return; }
 
         const selectedType = selectElement.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
         const shouldShow = typesWithOptions.includes(selectedType);
 
         console.log(`[QAdmin] Toggle: Row=${rowId}, Type=${selectedType}, ShouldShow=${shouldShow}`);
-        optionsContainer.toggle(shouldShow); // Usar toggle simples
+        // Só tenta mostrar/esconder se o container existir
+        if (optionsContainer.length) {
+            optionsContainer.toggle(shouldShow);
+        } else if (shouldShow) {
+             console.warn(`[QAdmin] Toggle: Tentando mostrar opções, mas container não encontrado em ${rowId}`);
+        }
     }
 
     // Função addQuestionPlaceholders (com logs)
@@ -31,36 +37,38 @@
             questionInput.attr('placeholder', 'Digite sua pergunta aqui');
             console.log(`[QAdmin] Placeholder Pergunta added to ${rowId}`);
         }
-        const typeSelect = $row.find('.field-tipo_resposta select');
-        if (typeSelect.length) {
+         const typeSelect = $row.find('.field-tipo_resposta select');
+         if (typeSelect.length) {
             if (typeSelect.find('option[value=""][disabled]').length === 0) {
                  typeSelect.prepend('<option value="" disabled style="color: #80868b;">-- Selecione o Tipo --</option>');
                  console.log(`[QAdmin] Placeholder Tipo added to ${rowId}`);
             }
             if (!typeSelect.val() || typeSelect.val() === "") { typeSelect.val(""); }
-        }
+         }
     }
 
     // Função addOptionPlaceholder (com logs)
     function addOptionPlaceholder(optionRow) {
         const $optionRow = $(optionRow);
         const rowId = $optionRow.attr('id') || 'unknown';
-        // No layout padrão, o input está numa célula TD com classe field-texto
+        // No layout padrão, input está em td.field-texto
         const optionInput = $optionRow.find('td.field-texto input[type="text"]');
         if (optionInput.length && !optionInput.attr('placeholder')) {
             optionInput.attr('placeholder', 'Opção de resposta');
             console.log(`[QAdmin] Placeholder Opção added to ${rowId}`);
         } else if (!optionInput.length) {
-             console.warn(`[QAdmin] Placeholder Opção: Input not found in ${rowId}`);
+             // É normal não encontrar no 'empty-form' template
+             // console.warn(`[QAdmin] Placeholder Opção: Input not found in ${rowId}`);
         }
     }
 
     // Aplica lógica a um elemento
     function applyLogicToElement(element) {
          const $element = $(element);
-         const logicFlag = 'logic-applied-v7'; // Nova flag
+         const logicFlag = 'logic-applied-v8'; // Nova flag
 
-         if ($element.data(logicFlag)) return;
+         // Não processa se já tiver a flag OU se for o template vazio
+         if ($element.data(logicFlag) || $element.hasClass('empty-form')) return;
 
          if ($element.hasClass('inline-related')) { // É uma Pergunta
              console.log("[QAdmin] Applying logic to Pergunta:", $element.attr('id'));
@@ -93,7 +101,8 @@
         // Botão Adicionar Opção (DENTRO de .inline-group)
         $('.inline-group .djn-add-item a').each(function(){
             const $addOptionBtn = $(this);
-            if ($addOptionBtn.text() !== 'Adicionar Opção') {
+            // Evita renomear o botão do template vazio
+            if ($addOptionBtn.closest('.empty-form').length === 0 && $addOptionBtn.text() !== 'Adicionar Opção') {
                 $addOptionBtn.text('Adicionar Opção');
                 console.log("[QAdmin] Botão 'Adicionar Opção' RENAMED in:", $addOptionBtn.closest('.inline-related').attr('id'));
             }
@@ -104,7 +113,7 @@
     $(document).ready(function() {
         console.log("[QAdmin] Document Ready");
 
-        // Ouve a mudança no dropdown Tipo Resposta
+        // Ouve a mudança no dropdown
         $('body').on('change', '#perguntas-group .field-tipo_resposta select', function() {
             console.log("[QAdmin] Select change detected");
             const row = $(this).closest('.inline-related');
@@ -115,7 +124,8 @@
         $(document).on('djnesting:added', function(event, inline) {
             const newRow = inline.row;
             console.log("[QAdmin] Inline added:", $(newRow).attr('id'));
-            applyLogicToElement(newRow); // Aplica placeholders
+            // Aplica lógica APENAS ao novo elemento adicionado
+            applyLogicToElement(newRow);
             // Esconde opções da nova pergunta imediatamente
             if ($(newRow).hasClass('inline-related')) {
                  const optionsContainer = $(newRow).find('> .inline-group > fieldset.module');
@@ -130,11 +140,14 @@
         setTimeout(function() {
             console.log("[QAdmin] Applying initial logic (Timeout)...");
             $('#perguntas-group .inline-related, #perguntas-group .dynamic-opcaoresposta_set').each(function() {
-                applyLogicToElement(this);
+                 // Evita aplicar ao template vazio
+                if (!$(this).hasClass('empty-form')) {
+                    applyLogicToElement(this);
+                }
             });
             renameButtons(); // Renomeia botões iniciais
             console.log("[QAdmin] Initial logic (Timeout) completed.");
-        }, 1200); // Delay maior: 1.2 segundos
+        }, 1200); // 1.2 segundos de delay
     });
 
 })(django.jQuery); // Passa django.jQuery como '$'
