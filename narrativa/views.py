@@ -157,10 +157,16 @@ def responder_questionario(request, questionario_id):
                     texto_resposta=texto_resposta
                 )
 
-        # --- LÓGICA DE REDIRECIONAMENTO SIMPLIFICADA ---
-        if questionario.cena_associada:
-            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
+        # --- CORREÇÃO DE LÓGICA APLICADA AQUI ---
+        # Se houver uma cena de destino, vá para ela.
+        # Se não, volte para a lista de narrativas.
+        if questionario.cena_destino:
+            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
         else:
+            # Se não houver destino, talvez voltar para a cena de onde veio
+            # ou para a home de narrativas. A home parece mais segura.
+            if questionario.cena_associada:
+                 return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
             return redirect('narrativa:paciente_narrativas')
 
     context = {

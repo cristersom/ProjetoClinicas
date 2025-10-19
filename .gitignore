@@ -1,8 +1,26 @@
-# Ignorar banco de dados local
+# Banco de dados local
 db.sqlite3
 db.sqlite3-journal
 
-# Ignorar arquivos de mídia local (eles devem estar no Cloudinary)
+# Pastas de deploy
+/staticfiles/
 /media/
 
-/staticfiles/
+# Ambiente Virtual
+.venv/
+venv/
+ENV/
+
+# Arquivos de Cache do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Configuração do Editor/IDE
+.idea/
+.vscode/
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db

@@ -4,11 +4,12 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-zm*--r$@&xjk&6_$xb=*=i79^ux806x^@-_)zz&5*)(6wl_0p%')
+SECRET_KEY = os.environ.get('django-insecure-zm*--r$@&xjk&6_$xb=*=i79^ux806x^@-_)zz&5*)(6wl_0p%')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
+    'nested_admin',  # <-- GARANTA QUE ESTA LINHA ESTEJA AQUI
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
