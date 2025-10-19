@@ -1,30 +1,88 @@
-/* Adiciona um espaçamento claro entre cada bloco de PERGUNTA */
+/* --- ESTILO BASE PARA O CARD DE PERGUNTA --- */
 #perguntas-group > .djn-fieldset > .djn-items > .inline-related {
-    border-bottom: 2px solid #4a5568; /* Linha cinza para separar */
-    padding-bottom: 2rem !important;
+    background: #fdfdfd; /* Fundo do card */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1.5rem 2rem !important; /* Espaçamento interno */
     margin-bottom: 2rem !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+    border-bottom: 1px solid #ddd; /* Sobrescreve a regra antiga */
 }
 
-/* Remove o fundo e a borda da área de OPÇÕES RESPOSTAS */
+/* --- ORGANIZAÇÃO DOS CAMPOS DENTRO DO CARD --- */
+
+/* Faz os campos (Texto da Pergunta, Tipo) ocuparem 100% da largura */
+.inline-related .form-row input[type="text"],
+.inline-related .form-row select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* Melhora a aparência das labels (Texto da Pergunta, Tipo de Resposta) */
+.inline-related .form-row label {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block; /* Faz a label ficar em cima do campo */
+}
+
+/* --- ESTILO DO BLOCO DE OPÇÕES DE RESPOSTA (DENTRO DO CARD) --- */
+
+/* Remove o fundo e borda da "caixa" de opções */
 .inline-group .djn-fieldset {
     background: none !important;
     border: none !important;
     padding: 0 !important;
-    margin-top: 15px;
+    margin-top: 20px;
+    border-top: 1px dashed #ccc; /* Adiciona um separador sutil */
+    padding-top: 20px !important;
 }
 
-/* Esconde completamente o título azul "OPCAO RESPOSTAS" */
-.inline-group .djn-group-title {
-    display: none;
-}
-
-/* Esconde os subtítulos ("TEXTO", "REMOVER?") dentro das opções */
+/* Esconde títulos desnecessários que o custom_admin.css já escondia */
+.inline-group .djn-group-title,
 .inline-group .djn-thead {
     display: none;
 }
 
-/* Ajustes finos de alinhamento para os campos de opção */
+/* Alinha os campos de opção */
 .inline-group .form-row {
     padding-bottom: 5px !important;
     border: none !important;
+}
+
+/* --- ESTILO DOS BOTÕES "ADICIONAR" --- */
+
+/* Botão "Adicionar Opção de Resposta" (o de dentro do card) */
+.inline-group .djn-add-item a {
+    background: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 10px;
+    border: 1px solid #ccc;
+}
+.inline-group .djn-add-item a:hover {
+    background: #e5e5e5;
+}
+
+/* Botão "Adicionar Pergunta" (o botão principal, no final de tudo) */
+#perguntas-group > .djn-add-item a {
+     background: #417690; /* Azul do admin Django */
+     color: white;
+     padding: 10px 15px;
+     border-radius: 4px;
+     text-decoration: none;
+     font-weight: bold;
+     display: inline-block;
+     margin-top: 1rem;
+     border: none;
+}
+#perguntas-group > .djn-add-item a:hover {
+    background: #306784;
 }
