@@ -1,0 +1,84 @@
+{% extends "admin/base_site.html" %}
+{% block title %} Resumo Agregado: {{ questionario.titulo }} {% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<div id="content-main">
+  <h1>Resumo Agregado: "{{ questionario.titulo }}"</h1>
+
+  {% for item in dados_relatorio_agregado %}
+  <div class="module">
+    <h2>Pergunta: {{ item.pergunta.texto_pergunta }}</h2>
+    <p><strong>Tipo:</strong> {{ item.pergunta.get_tipo_resposta_display }} | <strong>Total de Respostas:</strong> {{ item.total_respostas }}</p>
+
+    {% if item.tipo == "TEXTO" %}
+        <div class="results" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
+            <ul style="list-style-type: disc; padding-left: 20px;">
+                {% for resposta_txt in item.respostas_texto %}
+                    {% if resposta_txt %}
+                        <li>{{ resposta_txt }}</li>
+                    {% endif %}
+                {% empty %}
+                    <li>Nenhuma resposta em texto livre.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    {% elif item.dados_grafico %}
+        <div style="width: 100%; max-width: 600px; margin: auto;">
+            <canvas id="grafico-pergunta-{{ item.pergunta.id }}"></canvas>
+        </div>
+
+        <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const ctx_{{ item.pergunta.id }} = document.getElementById('grafico-pergunta-{{ item.pergunta.id }}');
+
+            new Chart(ctx_{{ item.pergunta.id }}, {
+                type: '{{ item.dados_grafico.tipo_grafico }}', // 'pie' ou 'bar'
+                data: {
+                    labels: {{ item.dados_grafico.labels|safe }}, // Dados do Python (JSON)
+                    datasets: [{
+                        label: 'Nº de Respostas',
+                        data: {{ item.dados_grafico.data|safe }}, // Dados do Python (JSON)
+                        backgroundColor: [ // Cores aleatórias para gráficos de pizza
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)',
+                            'rgba(255, 159, 64, 0.7)',
+                            'rgba(199, 199, 199, 0.7)'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição das Respostas'
+                        }
+                    }
+                }
+            });
+        });
+        </script>
+    {% endif %}
+
+  </div>
+  {% empty %}
+  <p>Ainda não há perguntas ou respostas para este questionário.</p>
+  {% endfor %}
+
+</div>
+{% endblock %}
