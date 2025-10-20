@@ -1,170 +1,382 @@
-from django.shortcuts import render, redirect, reverse, get_object_or_404
-from django.contrib import messages
-from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente
-from .forms import CriarContaForm, FormHomepage
-from django.views.generic import ListView, DetailView, FormView, UpdateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+import nested_admin
+from .models import (
+    Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
+    SessaoPaciente, OpcaoResposta
+)
+from import_export.admin import ImportExportModelAdmin
+from import_export import resources
+
+from django.urls import path, reverse
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.utils.html import format_html
+from collections import Counter
+import json
 
 
-class Homepage(FormView):
-    template_name = "homepage.html"
-    form_class = FormHomepage
+# --- Classes de customização (Exportação e Filtro) ---
+class RespostaResource(resources.ModelResource):
+    questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
+    perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('narrativa:narrativas')
+    class Meta:
+        model = Resposta
+        fields = ('id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',
+                  'data_resposta')
+        export_order = fields
+
+    def dehydrate_perfil_narrativa(self, resposta):
+        try:
+            sessao = SessaoPaciente.objects.get(session_key=resposta.session_key)
+            if sessao.narrativa_perfil:
+                return sessao.narrativa_perfil.titulo
+        except SessaoPaciente.DoesNotExist:
+            return 'Não definido'
+        return 'Não definido'
+
+
+class NarrativaPerfilFilter(admin.SimpleListFilter):
+    title = 'por Perfil (Narrativa)'
+    parameter_name = 'narrativa_perfil'
+
+    def lookups(self, request, model_admin):
+        return [(narrativa.id, narrativa.titulo) for narrativa in Narrativa.objects.all()]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=self.value())
+            lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+            return queryset.filter(session_key__in=lista_de_session_keys)
+        return queryset
+
+
+# --- Classes Inline ---
+class EscolhaInline(admin.TabularInline):
+    model = Escolha
+    fk_name = 'cena_origem'
+    extra = 1
+
+
+class OpcaoRespostaInline(nested_admin.NestedTabularInline):
+    model = OpcaoResposta
+    extra = 0
+    fk_name = 'pergunta'
+
+
+class PerguntaInline(nested_admin.NestedTabularInline):
+    model = Pergunta
+    fk_name = 'questionario'
+    extra = 1
+    inlines = [OpcaoRespostaInline]
+
+
+# --- Registros dos Modelos no Admin ---
+@admin.register(Cena)
+class CenaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'narrativa')
+    list_filter = ('narrativa',)
+    inlines = [EscolhaInline]
+
+
+@admin.register(Narrativa)
+class NarrativaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
+    list_filter = ('categoria',)
+
+
+@admin.register(Questionario)
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
+    list_display = ('titulo', 'cena_associada', 'links_relatorios')
+    inlines = [PerguntaInline]
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                '<path:object_id>/resumo/',
+                self.admin_site.admin_view(self.resumo_agregado_view),
+                name='narrativa_questionario_resumo_agregado',
+            ),
+            path(
+                '<path:object_id>/relatorio_detalhe/',
+                self.admin_site.admin_view(self.relatorio_detalhado_view),
+                name='narrativa_questionario_relatorio_detalhe',
+            ),
+        ]
+        return custom_urls + urls
+
+    def links_relatorios(self, obj):
+        url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
+        url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
+
+        return format_html(
+            '<a class="button" href="{}">Ver Detalhado (por Paciente)</a>&nbsp;'
+            '<a class="button" href="{}">Ver Resumo (Agregado)</a>',
+            url_detalhe,
+            url_resumo
+        )
+
+    links_relatorios.short_description = 'Relatórios'
+
+    def resumo_agregado_view(self, request, object_id, *args, **kwargs):
+        questionario = self.get_object(request, object_id)
+
+        todos_os_perfis = Narrativa.objects.all()
+        perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
+
+        perfis_a_processar = []
+
+        if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
+            perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis'})
+            perfis_selecionados_ids = ['all']
         else:
-            return super().get(request, *args, **kwargs)
+            perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
+            for p in perfis_selecionados:
+                perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
 
-    def get_success_url(self):
-        email = self.request.POST.get("email")
-        usuarios = Usuario.objects.filter(email=email)
-        if usuarios:
-            return reverse('narrativa:login')
-        else:
-            return reverse('narrativa:criarconta')
+        respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)
 
+        dados_comparativos = {}
 
-class Narrativas(LoginRequiredMixin, ListView):
-    template_name = "narrativas.html"
-    model = Narrativa
-
-
-class Detalhes(LoginRequiredMixin, DetailView):
-    template_name = "detalhes.html"
-    model = Narrativa
-
-    def get(self, request, *args, **kwargs):
-        narrativa = self.get_object()
-        narrativa.visualizacoes += 1
-        narrativa.save()
-        usuario = request.user
-        usuario.narrativas_vistas.add(narrativa)
-        return super().get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super(Detalhes, self).get_context_data(**kwargs)
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
-        context["relacionados"] = relacionados
-        return context
-
-
-class Pesquisa(LoginRequiredMixin, ListView):
-    template_name = "pesquisa.html"
-    model = Narrativa
-
-    def get_queryset(self):
-        termo_pesquisa = self.request.GET.get('query')
-        if termo_pesquisa:
-            object_list = self.model.objects.filter(titulo__icontains=termo_pesquisa)
-            return object_list
-        else:
-            return None
-
-
-class PerfilView(LoginRequiredMixin, UpdateView):
-    template_name = "perfil.html"
-    model = Usuario
-    fields = ['first_name', 'last_name', 'email']
-
-    def get_success_url(self):
-        return reverse('narrativa:narrativas')
-
-
-class Criarconta(FormView):
-    template_name = "criarconta.html"
-    form_class = CriarContaForm
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('narrativa:login')
-
-
-class PacienteNarrativas(ListView):
-    template_name = "paciente_narrativas.html"
-    model = Narrativa
-
-
-class PacienteDetalhes(DetailView):
-    template_name = "paciente_detalhes.html"
-    model = Narrativa
-
-    def get_context_data(self, **kwargs):
-        context = super(PacienteDetalhes, self).get_context_data(**kwargs)
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
-        context["relacionados"] = relacionados
-        return context
-
-
-def iniciar_jornada_paciente(request, narrativa_id):
-    narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
-
-    if not request.session.session_key:
-        request.session.create()
-    session_key = request.session.session_key
-
-    SessaoPaciente.objects.get_or_create(
-        session_key=session_key,
-        defaults={'narrativa_perfil': narrativa}
-    )
-
-    if not narrativa.cena_inicial:
-        messages.warning(request, f"A jornada '{narrativa.titulo}' ainda não está pronta para ser iniciada.")
-        return redirect('narrativa:paciente_narrativas')
-
-    return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
-
-
-def exibir_cena_paciente(request, cena_id):
-    cena = get_object_or_404(Cena, pk=cena_id)
-    try:
-        todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
-        total_cenas = len(todas_cenas)
-        progresso_atual = todas_cenas.index(cena) + 1
-        percentual = int((progresso_atual / total_cenas) * 100)
-    except (ValueError, ZeroDivisionError):
-        total_cenas = 0
-        progresso_atual = 0
-        percentual = 0
-    context = {
-        'cena': cena,
-        'total_cenas': total_cenas,
-        'progresso_atual': progresso_atual,
-        'percentual': percentual,
-    }
-    return render(request, 'cena_paciente.html', context)
-
-
-def responder_questionario(request, questionario_id):
-    questionario = get_object_or_404(Questionario, pk=questionario_id)
-    if request.method == "POST":
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
         for pergunta in questionario.perguntas.all():
-            if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
-                respostas = request.POST.getlist(f'pergunta_{pergunta.id}')
-                texto_resposta = ",".join(respostas)
-            else:
-                texto_resposta = request.POST.get(f'pergunta_{pergunta.id}')
-            if texto_resposta:
-                Resposta.objects.create(
-                    pergunta=pergunta,
-                    session_key=session_key,
-                    texto_resposta=texto_resposta
-                )
 
-        if questionario.cena_destino:
-            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
+            dados_comparativos[pergunta.id] = {
+                'pergunta_texto': pergunta.texto_pergunta,
+                'pergunta_tipo': pergunta.get_tipo_resposta_display,
+                'pergunta_tipo_raw': pergunta.tipo_resposta,
+                'dados_por_perfil': []
+            }
+
+            for perfil_info in perfis_a_processar:
+
+                respostas_perfil = respostas_base.filter(pergunta=pergunta)
+
+                if perfil_info['id'] != 'all':
+                    sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
+                    lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+                    respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)
+
+                total_respostas_perfil = respostas_perfil.count()
+
+                dados_perfil_para_pergunta = {
+                    'perfil_titulo': perfil_info['titulo'],
+                    'total_respostas': total_respostas_perfil,
+                    'dados_grafico': None,
+                    'respostas_texto': None
+                }
+
+                if pergunta.tipo_resposta == "TEXTO":
+                    dados_perfil_para_pergunta['respostas_texto'] = list(
+                        respostas_perfil.values_list('texto_resposta', flat=True))
+
+                elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
+                    contador = Counter()
+
+                    if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
+                        for resp in respostas_perfil:
+                            opcoes_selecionadas = resp.texto_resposta.split(',')
+                            contador.update(opcoes_selecionadas)
+                    else:
+                        lista_de_textos = list(respostas_perfil.values_list('texto_resposta', flat=True))
+                        contador.update(lista_de_textos)
+
+                    labels = list(contador.keys())
+                    data = list(contador.values())
+
+                    dados_perfil_para_pergunta['dados_grafico'] = {
+                        'labels': json.dumps(labels),
+                        'data': json.dumps(data),
+                        'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                    }
+
+                dados_comparativos[pergunta.id]['dados_por_perfil'].append(dados_perfil_para_pergunta)
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': f"Resumo Comparativo: {questionario.titulo}",
+            'questionario': questionario,
+            'dados_comparativos': dados_comparativos,
+            'todos_os_perfis': todos_os_perfis,
+            'perfis_selecionados_ids': perfis_selecionados_ids,
+        }
+
+        return render(request, 'admin/relatorio_questionario_agregado.html', context)
+
+    def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
+        questionario = self.get_object(request, object_id)
+
+        respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
+
+        dados_do_relatorio = {}
+        for resposta in respostas:
+            if resposta.session_key not in dados_do_relatorio:
+                dados_do_relatorio[resposta.session_key] = []
+            dados_do_relatorio[resposta.session_key].append(resposta)
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': f"Relatório: {questionario.titulo}",
+            'questionario': questionario,
+            'dados_do_relatorio': dados_do_relatorio,
+        }
+        return render(request, 'admin/relatorio_questionario_detalhe.html', context)
+
+
+@admin.register(SessaoPaciente)
+class SessaoPacienteAdmin(admin.ModelAdmin):
+    list_display = ('session_key_abreviada', 'narrativa_perfil', 'data_criacao')
+    list_filter = ('narrativa_perfil',)
+    readonly_fields = ('session_key', 'narrativa_perfil', 'data_criacao')
+
+    def session_key_abreviada(self, obj):
+        return obj.session_key[:8] + '...'
+
+    session_key_abreviada.short_description = 'Sessão do Paciente'
+
+
+@admin.register(Resposta)
+class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
+    resource_class = RespostaResource
+    list_display = (
+        'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
+    list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',)
+    search_fields = ('texto_resposta', 'session_key')
+    ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
+
+    # --- INÍCIO DA ADIÇÃO DA VIEW GLOBAL ---
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'resumo_global/',
+                self.admin_site.admin_view(self.resumo_global_view),
+                name='narrativa_resposta_resumo_global',
+            ),
+        ]
+        return custom_urls + urls
+
+    def resumo_global_view(self, request, *args, **kwargs):
+
+        # --- LÓGICA DOS FILTROS ---
+        todos_os_perfis = Narrativa.objects.all()
+        todos_os_questionarios = Questionario.objects.all()
+
+        perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
+        questionarios_selecionados_ids = request.GET.getlist('questionario_id')
+
+        # Query base de TODAS as respostas
+        respostas_base = Resposta.objects.all()
+
+        # Filtro de Questionários
+        if questionarios_selecionados_ids and 'all' not in questionarios_selecionados_ids:
+            respostas_base = respostas_base.filter(pergunta__questionario_id__in=questionarios_selecionados_ids)
         else:
-            if questionario.cena_associada:
-                 return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
-            return redirect('narrativa:paciente_narrativas')
+            questionarios_selecionados_ids = ['all']  # Default
 
-    context = {
-        'questionario': questionario
-    }
-    return render(request, 'questionario.html', context)
+        # Filtro de Perfis
+        perfis_a_processar = []
+        if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
+            perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis (Agregado)'})
+            perfis_selecionados_ids = ['all']  # Default
+        else:
+            perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
+            for p in perfis_selecionados:
+                perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
+
+        # --- FIM DOS FILTROS ---
+
+        # Busca perguntas relevantes (apenas dos questionários selecionados)
+        if 'all' in questionarios_selecionados_ids:
+            perguntas = Pergunta.objects.all().order_by('questionario__id', 'id')
+        else:
+            perguntas = Pergunta.objects.filter(questionario_id__in=questionarios_selecionados_ids).order_by(
+                'questionario__id', 'id')
+
+        dados_comparativos = {}
+
+        # O processamento é idêntico ao anterior, mas agora iteramos
+        # sobre as perguntas filtradas e os perfis filtrados.
+        for pergunta in perguntas:
+
+            dados_comparativos[pergunta.id] = {
+                'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",
+                # Adiciona nome do Q.
+                'pergunta_tipo': pergunta.get_tipo_resposta_display,
+                'pergunta_tipo_raw': pergunta.tipo_resposta,
+                'dados_por_perfil': []
+            }
+
+            for perfil_info in perfis_a_processar:
+
+                respostas_perfil = respostas_base.filter(pergunta=pergunta)
+
+                if perfil_info['id'] != 'all':
+                    sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
+                    lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+                    respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)
+
+                total_respostas_perfil = respostas_perfil.count()
+
+                dados_perfil_para_pergunta = {
+                    'perfil_titulo': perfil_info['titulo'],
+                    'total_respostas': total_respostas_perfil,
+                    'dados_grafico': None,
+                    'respostas_texto': None
+                }
+
+                if pergunta.tipo_resposta == "TEXTO":
+                    dados_perfil_para_pergunta['respostas_texto'] = list(
+                        respostas_perfil.values_list('texto_resposta', flat=True))
+
+                elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
+                    contador = Counter()
+
+                    if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
+                        for resp in respostas_perfil:
+                            opcoes_selecionadas = resp.texto_resposta.split(',')
+                            contador.update(opcoes_selecionadas)
+                    else:
+                        lista_de_textos = list(respostas_perfil.values_list('texto_resposta', flat=True))
+                        contador.update(lista_de_textos)
+
+                    labels = list(contador.keys())
+                    data = list(contador.values())
+
+                    dados_perfil_para_pergunta['dados_grafico'] = {
+                        'labels': json.dumps(labels),
+                        'data': json.dumps(data),
+                        'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                    }
+
+                dados_comparativos[pergunta.id]['dados_por_perfil'].append(dados_perfil_para_pergunta)
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': "Relatório Global Comparativo de Respostas",
+            'dados_comparativos': dados_comparativos,
+            # Passa os dados dos filtros
+            'todos_os_perfis': todos_os_perfis,
+            'perfis_selecionados_ids': perfis_selecionados_ids,
+            'todos_os_questionarios': todos_os_questionarios,
+            'questionarios_selecionados_ids': questionarios_selecionados_ids,
+        }
+
+        return render(request, 'admin/relatorio_resumo_global.html', context)
+
+    # --- FIM DA ADIÇÃO ---
+
+    def questionario_associado(self, obj):
+        return obj.pergunta.questionario.titulo
+
+    questionario_associado.short_description = 'Questionário'
+
+    def session_key_abreviada(self, obj):
+        return obj.session_key[:8] + '...'
+
+    session_key_abreviada.short_description = 'Sessão do Paciente'
+
+
+admin.site.register(Usuario, UserAdmin)

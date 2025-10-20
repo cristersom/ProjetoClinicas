@@ -1,23 +1,21 @@
 {% extends "admin/base_site.html" %}
-{% block title %} Resumo Comparativo: {{ questionario.titulo }} {% endblock %}
+{% block title %} Relatório Global Comparativo {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-    /* Estilos para o container de comparação */
+    /* (Os estilos CSS são idênticos ao do outro relatório) */
     .comparison-container {
         display: flex;
-        flex-wrap: wrap; /* Permite que os perfis quebrem a linha em telas menores */
-        gap: 20px; /* Espaço entre os blocos de perfil */
+        flex-wrap: wrap;
+        gap: 20px;
         justify-content: center;
         width: 100%;
     }
-    /* Estilo para cada bloco de perfil */
     .profile-block {
-        flex: 1; /* Faz com que os blocos cresçam igualmente */
-        min-width: 300px; /* Largura mínima antes de quebrar a linha */
-        /* Ajuste max-width para mais colunas se necessário, ex: 30% para 3 colunas */
+        flex: 1;
+        min-width: 300px;
         max-width: 45%;
         border: 1px solid #eee;
         padding: 15px;
@@ -41,11 +39,11 @@
         list-style-type: disc;
         padding-left: 25px;
     }
-    /* Estilos para o formulário de filtro */
     .filter-form fieldset {
         border: 1px solid #ccc;
         padding: 15px;
         border-radius: 4px;
+        margin-bottom: 10px;
     }
     .filter-form legend {
         font-weight: bold;
@@ -53,7 +51,6 @@
     }
     .filter-form .checkbox-grid {
         display: grid;
-        /* Ajuste minmax para mais colunas de checkbox */
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 10px;
     }
@@ -70,9 +67,30 @@
 {% block content %}
 <div id="content-main">
   <div class="module filter-form">
-    <form method="GET" action="" id="profile-filter-form">
+    <form method="GET" action="" id="global-filter-form">
+
       <fieldset>
-        <legend>Comparar Perfis de Paciente</legend>
+        <legend>1. Selecione os Questionários</legend>
+        <div class="checkbox-grid">
+            <label>
+                <input type="checkbox" name="questionario_id" value="all"
+                       {% if 'all' in questionarios_selecionados_ids %}checked{% endif %}
+                       id="check-all-questionarios">
+                <strong>Todos os Questionários</strong>
+            </label>
+            {% for q in todos_os_questionarios %}
+            <label>
+                <input type="checkbox" name="questionario_id" value="{{ q.id }}"
+                       class="questionario-check"
+                       {% if q.id|stringformat:"s" in questionarios_selecionados_ids %}checked{% endif %}>
+                {{ q.titulo }}
+            </label>
+            {% endfor %}
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>2. Selecione os Perfis para Comparar</legend>
         <div class="checkbox-grid">
             <label>
                 <input type="checkbox" name="narrativa_perfil_id" value="all"
@@ -89,19 +107,18 @@
             </label>
             {% endfor %}
         </div>
-        <div style="margin-top: 15px;">
-            <input type="submit" value="Comparar" class="button default">
-        </div>
       </fieldset>
+
+      <div style="margin-top: 15px;">
+          <input type="submit" value="Gerar Relatório Global" class="button default">
+      </div>
     </form>
   </div>
   {% for pergunta_id, dados_pergunta in dados_comparativos.items %}
   <div class="module">
-    <h2>Pergunta: {{ dados_pergunta.pergunta_texto }}</h2>
-    <p><strong>Tipo:</strong> {{ dados_pergunta.pergunta_tipo }}</p>
+    <h2>{{ dados_pergunta.pergunta_texto }}</h2> <p><strong>Tipo:</strong> {{ dados_pergunta.pergunta_tipo }}</p>
 
     <div class="comparison-container">
-
         {% for dados_perfil in dados_pergunta.dados_por_perfil %}
         <div class="profile-block">
             <h3>{{ dados_perfil.perfil_titulo }}</h3>
@@ -126,7 +143,6 @@
 
                     <script>
                     document.addEventListener('DOMContentLoaded', (event) => {
-                        // ID ÚNICO
                         const ctx_{{ pergunta_id }}_{{ forloop.counter }} = document.getElementById('grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}');
 
                         new Chart(ctx_{{ pergunta_id }}_{{ forloop.counter }}, {
@@ -154,12 +170,9 @@
                                 plugins: {
                                     legend: {
                                         position: 'top',
-                                        /* Oculta a legenda para gráficos de barras, pois ela é redundante */
                                         display: '{{ dados_perfil.dados_grafico.tipo_grafico }}' === 'pie' ? true : false,
                                     },
-                                    title: {
-                                        display: false, /* O título do bloco já diz qual é o perfil */
-                                    }
+                                    title: { display: false }
                                 }
                             }
                         });
@@ -169,36 +182,48 @@
                     <p>Nenhuma resposta encontrada.</p>
                 {% endif %}
             {% endif %}
-
         </div>
         {% endfor %}
     </div>
   </div>
   {% empty %}
-  <p>Ainda não há perguntas ou respostas para este questionário.</p>
+  <p>Nenhum dado encontrado para os filtros selecionados. Certifique-se de que os questionários e perfis selecionados têm respostas.</p>
   {% endfor %}
 
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
-    const checkAll = document.getElementById('check-all-profiles');
+    // Lógica para os checkboxes de Perfil
+    const checkAllProfiles = document.getElementById('check-all-profiles');
     const profileChecks = document.querySelectorAll('.profile-check');
 
-    checkAll.addEventListener('change', function() {
+    checkAllProfiles.addEventListener('change', function() {
         if (this.checked) {
-            // Se "Todos" for marcado, desmarca os outros
-            profileChecks.forEach(check => {
-                check.checked = false;
-            });
+            profileChecks.forEach(check => { check.checked = false; });
         }
     });
-
     profileChecks.forEach(check => {
         check.addEventListener('change', function() {
             if (this.checked) {
-                // Se um perfil específico for marcado, desmarca "Todos"
-                checkAll.checked = false;
+                checkAllProfiles.checked = false;
+            }
+        });
+    });
+
+    // Lógica para os checkboxes de Questionário
+    const checkAllQuestionarios = document.getElementById('check-all-questionarios');
+    const questionarioChecks = document.querySelectorAll('.questionario-check');
+
+    checkAllQuestionarios.addEventListener('change', function() {
+        if (this.checked) {
+            questionarioChecks.forEach(check => { check.checked = false; });
+        }
+    });
+    questionarioChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            if (this.checked) {
+                checkAllQuestionarios.checked = false;
             }
         });
     });
