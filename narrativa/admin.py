@@ -120,51 +120,39 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     links_relatorios.short_description = 'Relatórios'
 
-    # --- VIEW DE RESUMO AGREGADO (ATUALIZADA PARA COMPARAÇÃO) ---
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
 
-        # --- LÓGICA DO FILTRO DE COMPARAÇÃO ---
         todos_os_perfis = Narrativa.objects.all()
-        # Pega a LISTA de IDs de perfis selecionados do <form>
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
 
         perfis_a_processar = []
 
-        # Se a lista estiver vazia (primeiro acesso) ou 'all' for selecionado,
-        # mostramos "Todos os Perfis" como um único bloco.
         if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
             perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis'})
-            perfis_selecionados_ids = ['all']  # Para marcar o checkbox no template
+            perfis_selecionados_ids = ['all']
         else:
-            # Caso contrário, pegamos os perfis selecionados
             perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
             for p in perfis_selecionados:
                 perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
 
-        # Query base de respostas para este questionário
         respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)
-        # --- FIM DA LÓGICA DO FILTRO ---
 
-        # Nova estrutura de dados para comparação
         dados_comparativos = {}
 
-        # 1. Itera por cada PERGUNTA do questionário
         for pergunta in questionario.perguntas.all():
 
             dados_comparativos[pergunta.id] = {
                 'pergunta_texto': pergunta.texto_pergunta,
                 'pergunta_tipo': pergunta.get_tipo_resposta_display,
                 'pergunta_tipo_raw': pergunta.tipo_resposta,
-                'dados_por_perfil': []  # Lista para guardar os dados de cada perfil
+                'dados_por_perfil': []
             }
 
-            # 2. Itera por cada PERFIL selecionado para processar
             for perfil_info in perfis_a_processar:
 
                 respostas_perfil = respostas_base.filter(pergunta=pergunta)
 
-                # Se não for "Todos os Perfis", filtre pelas sessões daquele perfil
                 if perfil_info['id'] != 'all':
                     sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
                     lista_de_session_keys = sessoes.values_list('session_key', flat=True)
@@ -203,7 +191,6 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                         'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
                     }
 
-                # Adiciona os dados deste perfil à lista da pergunta
                 dados_comparativos[pergunta.id]['dados_por_perfil'].append(dados_perfil_para_pergunta)
 
         context = {
@@ -211,9 +198,8 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             'title': f"Resumo Comparativo: {questionario.titulo}",
             'questionario': questionario,
             'dados_comparativos': dados_comparativos,
-            # Passa os dados do filtro para o template
             'todos_os_perfis': todos_os_perfis,
-            'perfis_selecionados_ids': perfis_selecionados_ids,  # Lista de IDs selecionados
+            'perfis_selecionados_ids': perfis_selecionados_ids,
         }
 
         return render(request, 'admin/relatorio_questionario_agregado.html', context)
@@ -251,13 +237,136 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 
 @admin.register(Resposta)
-class RespostaAdmin(ImportExportModelAdmin):
+class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
     resource_class = RespostaResource
     list_display = (
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
     list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',)
     search_fields = ('texto_resposta', 'session_key')
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
+
+    # --- INÍCIO DA ADIÇÃO DA VIEW GLOBAL ---
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'resumo_global/',
+                self.admin_site.admin_view(self.resumo_global_view),
+                name='narrativa_resposta_resumo_global',
+            ),
+        ]
+        return custom_urls + urls
+
+    def resumo_global_view(self, request, *args, **kwargs):
+
+        # --- LÓGICA DOS FILTROS ---
+        todos_os_perfis = Narrativa.objects.all()
+        todos_os_questionarios = Questionario.objects.all()
+
+        perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
+        questionarios_selecionados_ids = request.GET.getlist('questionario_id')
+
+        # Query base de TODAS as respostas
+        respostas_base = Resposta.objects.all()
+
+        # Filtro de Questionários
+        if questionarios_selecionados_ids and 'all' not in questionarios_selecionados_ids:
+            respostas_base = respostas_base.filter(pergunta__questionario_id__in=questionarios_selecionados_ids)
+        else:
+            questionarios_selecionados_ids = ['all']  # Default
+
+        # Filtro de Perfis
+        perfis_a_processar = []
+        if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
+            perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis (Agregado)'})
+            perfis_selecionados_ids = ['all']  # Default
+        else:
+            perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
+            for p in perfis_selecionados:
+                perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
+
+        # --- FIM DOS FILTROS ---
+
+        # Busca perguntas relevantes (apenas dos questionários selecionados)
+        if 'all' in questionarios_selecionados_ids:
+            perguntas = Pergunta.objects.all().order_by('questionario__id', 'id')
+        else:
+            perguntas = Pergunta.objects.filter(questionario_id__in=questionarios_selecionados_ids).order_by(
+                'questionario__id', 'id')
+
+        dados_comparativos = {}
+
+        # O processamento é idêntico ao anterior, mas agora iteramos
+        # sobre as perguntas filtradas e os perfis filtrados.
+        for pergunta in perguntas:
+
+            dados_comparativos[pergunta.id] = {
+                'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",
+                # Adiciona nome do Q.
+                'pergunta_tipo': pergunta.get_tipo_resposta_display,
+                'pergunta_tipo_raw': pergunta.tipo_resposta,
+                'dados_por_perfil': []
+            }
+
+            for perfil_info in perfis_a_processar:
+
+                respostas_perfil = respostas_base.filter(pergunta=pergunta)
+
+                if perfil_info['id'] != 'all':
+                    sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
+                    lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+                    respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)
+
+                total_respostas_perfil = respostas_perfil.count()
+
+                dados_perfil_para_pergunta = {
+                    'perfil_titulo': perfil_info['titulo'],
+                    'total_respostas': total_respostas_perfil,
+                    'dados_grafico': None,
+                    'respostas_texto': None
+                }
+
+                if pergunta.tipo_resposta == "TEXTO":
+                    dados_perfil_para_pergunta['respostas_texto'] = list(
+                        respostas_perfil.values_list('texto_resposta', flat=True))
+
+                elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
+                    contador = Counter()
+
+                    if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
+                        for resp in respostas_perfil:
+                            opcoes_selecionadas = resp.texto_resposta.split(',')
+                            contador.update(opcoes_selecionadas)
+                    else:
+                        lista_de_textos = list(respostas_perfil.values_list('texto_resposta', flat=True))
+                        contador.update(lista_de_textos)
+
+                    labels = list(contador.keys())
+                    data = list(contador.values())
+
+                    dados_perfil_para_pergunta['dados_grafico'] = {
+                        'labels': json.dumps(labels),
+                        'data': json.dumps(data),
+                        'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                    }
+
+                dados_comparativos[pergunta.id]['dados_por_perfil'].append(dados_perfil_para_pergunta)
+
+        context = {
+            **self.admin_site.each_context(request),
+            'title': "Relatório Global Comparativo de Respostas",
+            'dados_comparativos': dados_comparativos,
+            # Passa os dados dos filtros
+            'todos_os_perfis': todos_os_perfis,
+            'perfis_selecionados_ids': perfis_selecionados_ids,
+            'todos_os_questionarios': todos_os_questionarios,
+            'questionarios_selecionados_ids': questionarios_selecionados_ids,
+        }
+
+        return render(request, 'admin/relatorio_resumo_global.html', context)
+
+    # --- FIM DA ADIÇÃO ---
 
     def questionario_associado(self, obj):
         return obj.pergunta.questionario.titulo
