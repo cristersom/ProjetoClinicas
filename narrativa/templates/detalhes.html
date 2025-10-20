@@ -97,8 +97,6 @@
 </main>
 
 <script>
-    // --- CORREÇÃO APLICADA AQUI ---
-    // O link agora aponta para a URL 'iniciar_jornada_paciente' específica desta narrativa.
     const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
 
     function copyLinkToClipboard() {

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import nested_admin # Mantenha esta importação
+import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -50,18 +50,16 @@ class EscolhaInline(admin.TabularInline):
     fk_name = 'cena_origem'
     extra = 1
 
-# Usa NestedTabularInline para Opcao DENTRO de Pergunta
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
-    fk_name = 'pergunta' # Garante FK correta
+    fk_name = 'pergunta'
 
-# Usa NestedTabularInline para Pergunta DENTRO de Questionario
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
-    fk_name = 'questionario' # Garante FK correta
+    fk_name = 'questionario'
     extra = 1
-    inlines = [OpcaoRespostaInline] # Aninha OpcaoRespostaInline aqui
+    inlines = [OpcaoRespostaInline]
 
 
 # --- Registros dos Modelos no Admin ---
@@ -69,7 +67,7 @@ class PerguntaInline(nested_admin.NestedTabularInline):
 class CenaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'narrativa')
     list_filter = ('narrativa',)
-    inlines = [EscolhaInline] # Escolha é TabularInline simples
+    inlines = [EscolhaInline]
 
 
 @admin.register(Narrativa)
@@ -79,9 +77,9 @@ class NarrativaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Precisa ser NestedModelAdmin
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
-    inlines = [PerguntaInline] # Usa PerguntaInline (que é Nested)
+    inlines = [PerguntaInline]
 
 
 @admin.register(SessaoPaciente)
@@ -96,7 +94,7 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 
 @admin.register(Resposta)
-class RespostaAdmin(ImportExportModelAdmin): # Usa ImportExportModelAdmin
+class RespostaAdmin(ImportExportModelAdmin):
     resource_class = RespostaResource
     list_display = (
     'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
@@ -112,8 +110,4 @@ class RespostaAdmin(ImportExportModelAdmin): # Usa ImportExportModelAdmin
         return obj.session_key[:8] + '...'
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
-# Registra o modelo de usuário customizado
 admin.site.register(Usuario, UserAdmin)
-
-# Modelos Pergunta e OpcaoResposta não precisam ser registrados separadamente
-# porque já estão como inlines.
