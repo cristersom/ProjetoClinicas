@@ -9,6 +9,13 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
+    # --- VERIFIQUE AQUI ---
+    # Procure o nome do seu tema customizado do admin nesta lista.
+    # Se encontrar algo como 'jazzmin', 'grappelli', 'admin_interface', etc.,
+    # coloque um '#' no início da linha para desativá-lo temporariamente.
+    # Exemplo: #'jazzmin',
+    # ----------------------
+
     'nested_admin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +48,7 @@ ROOT_URLCONF = 'gameflix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': ['templates'], # Ensure this includes the root templates directory
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
