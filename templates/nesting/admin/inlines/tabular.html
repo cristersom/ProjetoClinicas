@@ -1,0 +1,82 @@
+{% load i18n admin_urls static admin_modify %}{% load nested_admin %}
+{# Modified version to remove outer fieldset/h2 and inner fieldset #}
+
+<div class="inline-group djn-inline-group djn-tabular" id="{{ inline_admin_formset.formset.prefix }}-group"
+  data-inline-type="tabular"
+  data-inline-formset="{{ inline_admin_formset.inline_formset_data|safe }}">
+
+  {# REMOVED: Outer fieldset and H2 #}
+  {# <fieldset class="module {{ inline_admin_formset.classes }}"> #}
+  {#  <h2>{{ inline_admin_formset.opts.verbose_name_plural|capfirst }}</h2> #}
+
+   {{ inline_admin_formset.formset.management_form }}
+   {{ inline_admin_formset.formset.non_form_errors }}
+
+   <div class="djn-items">
+   <table>
+     <thead><tr>
+       {% for field in inline_admin_formset.fields %}
+         <th class="required{% if field.field.required %} required{% endif %}">{{ field.label|capfirst }}
+         {% if field.field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.field.help_text|striptags }})" title="{{ field.field.help_text|striptags }}">{% endif %}
+         </th>
+       {% endfor %}
+       {% if inline_admin_formset.formset.can_delete %}<th class="djn-delete-col">{% translate "Delete?" %}</th>{% endif %}
+     </tr></thead>
+
+     <tbody>
+       {% for inline_admin_form in inline_admin_formset %}
+         {% if inline_admin_form.form.non_field_errors %}
+         <tr class="djn-error-row"><td colspan="{{ inline_admin_formset.fields|length|add:"1" }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
+         {% endif %}
+         <tr id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}"
+           class="{% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}{% if forloop.last %} djn-empty-form{% endif %} dynamic-{{ inline_admin_formset.formset.prefix }} {% cycle "row1" "row2" %} {% if inline_admin_form.form.errors %}error{% endif %} djn-inline-form">
+           {% if inline_admin_form.form.fields %}{% else %}<td colspan="100%"></td>{% endif %} {# Handle case where there are no fields #}
+           {% with original=inline_admin_form.original inline_formset=inline_admin_formset.opts.formset %}
+           <td class="original djn-original">
+             {# REMOVED: Inner Fieldset #}
+             {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="inlinechangelink">{% translate "Change" %}</a>{% endif %}
+
+             {# Hidden fields #}
+             {% if inline_admin_form.form.is_bound %}
+             {{ inline_admin_form.form.pk_field.field }}
+             {{ inline_admin_form.form.fk_field.field }}
+             {% else %}
+             {{ inline_admin_form.pk_field.field }}
+             {{ inline_admin_form.fk_field.field }}
+             {% endif %}
+             {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
+
+             {# Render nested inlines if any #}
+             {% nested_admin_includes inline_admin_form %}
+
+           </td>
+           {% endwith %}
+           {% for fieldset in inline_admin_form %}
+             {% for line in fieldset %}
+               {% for field in line %}
+                 <td class="{{ field.field.name }}{% if field.field.errors %} error{% endif %} field-{{ field.field.name }}">
+                 {% if field.is_readonly %}
+                     <p>{{ field.contents }}</p>
+                 {% else %}
+                     {{ field.field }}
+                     {% if field.field.errors %}<div class="inline-related-errors">{{ field.field.errors }}</div>{% endif %}
+                 {% endif %}
+                 </td>
+               {% endfor %}
+             {% endfor %}
+           {% endfor %}
+           {% if inline_admin_formset.formset.can_delete %}
+             <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
+           {% endif %}
+         </tr>
+       {% endfor %}
+     </tbody>
+   </table>
+   </div>
+
+  <div class="add-item djn-add-item">
+    {% if inline_admin_formset.has_add_permission %}
+    {% add_item_link inline_admin_formset %}{% endif %}
+  </div>
+  {# REMOVED: Closing outer fieldset #}
+</div>
