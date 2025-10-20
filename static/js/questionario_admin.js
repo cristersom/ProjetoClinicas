@@ -1,68 +1,80 @@
 (function($) { // '$' é django.jQuery
-    console.log("[QAdmin V17 - Toggle Focus] Script loaded.");
+    console.log("[QAdmin V18 - Wide Search] Script loaded.");
 
-    // Função toggleOptions (Busca a partir do select)
+    // Função toggleOptions (Busca Ampla)
     function toggleOptions(selectElement) {
         const $select = $(selectElement);
-        // 1. Sobe para a linha da tabela (TR) que contém a pergunta
-        const $questionRow = $select.closest('tr'); // O TR pai mais próximo
+        // Tenta achar a linha/container da PERGUNTA de várias formas
+        const $questionContainer = $select.closest('.inline-related'); // Método 1: Pelo .inline-related (se existir)
+        const $questionRow = $select.closest('tr'); // Método 2: Pelo TR pai mais próximo
 
-        if (!$questionRow.length) {
-            console.error("[QAdmin V17] Toggle: Could not find parent TR for select:", $select.attr('name'));
+        if (!$questionContainer.length && !$questionRow.length) {
+            console.error("[QAdmin V18] Toggle: Could not find parent container (.inline-related or TR) for select:", $select.attr('name'));
             return;
         }
-        const rowId = $questionRow.attr('id') || $questionRow.index(); // Pega ID ou índice
 
-        // 2. Tenta achar o container de opções DENTRO dessa linha TR
-        //    nested_admin geralmente coloca o formset aninhado (opções) dentro de uma célula TD
-        //    e dentro dela há um .inline-group
-        const optionsContainer = $questionRow.find('td .inline-group').first(); // Pega o PRIMEIRO .inline-group dentro de qualquer TD
+        // Usa o container que foi encontrado (prioriza .inline-related se existir)
+        const $searchContext = $questionContainer.length ? $questionContainer : $questionRow;
+        const contextId = $searchContext.attr('id') || $searchContext.index();
+        console.log(`[QAdmin V18] toggleOptions called for context: ${contextId}`);
+
+        // Tenta achar o container de opções DENTRO do contexto encontrado
+        // Busca por .inline-group em qualquer nível DENTRO do contexto
+        let optionsContainer = $searchContext.find('.inline-group');
 
         if (!optionsContainer.length) {
-            console.warn(`[QAdmin V17] Toggle: Options Container (.inline-group) not found within row ${rowId}. Cannot toggle.`);
-            return; // Sai se não achar o container das opções
+             // Fallback: Tenta achar um fieldset que NÃO seja o fieldset dos campos principais
+             optionsContainer = $searchContext.find('fieldset.module').not(':has(select[name$="-tipo_resposta"])');
+             if(!optionsContainer.length){
+                 console.warn(`[QAdmin V18] Toggle: Options Container (.inline-group or fieldset.module) not found within ${contextId}. Cannot toggle.`);
+                 return; // Sai se não achar
+             }
+             console.log(`[QAdmin V18] Toggle: Using fallback options container (fieldset) in ${contextId}`);
+        } else {
+             console.log(`[QAdmin V18] Toggle: Found options container (.inline-group) in ${contextId}`);
         }
+
 
         const selectedType = $select.val();
         const typesWithOptions = ['UNICA_ESCOLHA', 'MULTIPLA_ESCOLHA'];
         const shouldShow = typesWithOptions.includes(selectedType);
 
-        console.log(`[QAdmin V17] Toggle: Row=${rowId}, Type=${selectedType}, ShouldShow=${shouldShow}`);
-        // Força show/hide no container encontrado
+        console.log(`[QAdmin V18] Toggle: Context=${contextId}, Type=${selectedType}, ShouldShow=${shouldShow}`);
+        // Força show/hide
         optionsContainer.toggle(shouldShow);
     }
 
     // --- Execução Principal ---
     $(document).ready(function() {
-        console.log("[QAdmin V17] Document Ready");
+        console.log("[QAdmin V18] Document Ready");
 
-        // Aplica toggle inicial a TODAS as perguntas existentes
+        // Aplica toggle inicial (com busca ampla)
         function runInitialToggle() {
-            console.log("[QAdmin V17] Applying initial toggle logic...");
+            console.log("[QAdmin V18] Applying initial toggle logic...");
             let count = 0;
-             // Seleciona TODOS os selects de tipo_resposta visíveis (não do template vazio)
-             $('tr:not(.djn-empty-form) select[name$="-tipo_resposta"]').each(function() {
+             // Seleciona TODOS os selects de tipo_resposta visíveis
+             $('select[name$="-tipo_resposta"]').not('.djn-empty-form select').each(function() {
                  try {
-                     toggleOptions(this); // Passa o elemento select diretamente
+                     // Tenta aplicar toggle diretamente ao select encontrado
+                     toggleOptions(this);
                      count++;
                  } catch (e) {
-                     console.error("[QAdmin V17] Error during initial toggle:", e, "on select:", $(this).attr('name'));
+                     console.error("[QAdmin V18] Error during initial toggle:", e, "on select:", $(this).attr('name'));
                  }
             });
-             console.log(`[QAdmin V17] Initial toggle logic attempted on ${count} selects.`);
+             console.log(`[QAdmin V18] Initial toggle logic attempted on ${count} selects.`);
         }
-        // Roda APÓS um delay maior para dar chance ao nested_admin
+        // Roda APÓS um delay maior
         setTimeout(runInitialToggle, 2000); // 2 segundos
 
 
-        // Ouve a mudança em QUALQUER select de tipo_resposta usando event delegation
-        // Usa 'body' para garantir que funcione para selects adicionados dinamicamente
-        $('body').on('change', 'select[name$="-tipo_resposta"]', function() {
-             console.log("[QAdmin V17] Select change detected");
+        // Ouve a mudança em QUALQUER select de tipo_resposta
+        $(document).on('change', 'select[name$="-tipo_resposta"]', function() {
+             console.log("[QAdmin V18] Select change detected");
              try {
                  toggleOptions(this); // 'this' é o elemento select que mudou
              } catch (e) {
-                  console.error("[QAdmin V17] Error during change toggle:", e, "on select:", $(this).attr('name'));
+                  console.error("[QAdmin V18] Error during change toggle:", e, "on select:", $(this).attr('name'));
              }
         });
 
