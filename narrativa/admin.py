@@ -8,7 +8,6 @@ from .models import (
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
-# --- NOVOS IMPORTS ---
 from django.urls import path, reverse
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -16,8 +15,6 @@ from django.utils.html import format_html
 from collections import Counter
 import json
 
-
-# ---------------------
 
 # --- Classes de customização (Exportação e Filtro) ---
 class RespostaResource(resources.ModelResource):
@@ -91,21 +88,17 @@ class NarrativaAdmin(admin.ModelAdmin):
 
 @admin.register(Questionario)
 class QuestionarioAdmin(nested_admin.NestedModelAdmin):
-    list_display = ('titulo', 'cena_associada', 'links_relatorios')  # Modificado
+    list_display = ('titulo', 'cena_associada', 'links_relatorios')
     inlines = [PerguntaInline]
-
-    # --- PASSO 1: ADICIONAR A NOVA VIEW E URL ---
 
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
-            # URL para o novo resumo agregado
             path(
                 '<path:object_id>/resumo/',
                 self.admin_site.admin_view(self.resumo_agregado_view),
                 name='narrativa_questionario_resumo_agregado',
             ),
-            # (Mantemos a URL do relatório detalhado que já existia)
             path(
                 '<path:object_id>/relatorio_detalhe/',
                 self.admin_site.admin_view(self.relatorio_detalhado_view),
@@ -114,7 +107,6 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         ]
         return custom_urls + urls
 
-    # Método para criar os links na lista do admin
     def links_relatorios(self, obj):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
@@ -128,75 +120,107 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     links_relatorios.short_description = 'Relatórios'
 
-    # --- PASSO 2: CRIAR A VIEW DE AGREGAÇÃO ---
-
+    # --- VIEW DE RESUMO AGREGADO (ATUALIZADA PARA COMPARAÇÃO) ---
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
-        # Busca o questionário
         questionario = self.get_object(request, object_id)
 
-        # Prepara os dados para o template
-        dados_relatorio_agregado = []
+        # --- LÓGICA DO FILTRO DE COMPARAÇÃO ---
+        todos_os_perfis = Narrativa.objects.all()
+        # Pega a LISTA de IDs de perfis selecionados do <form>
+        perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
 
+        perfis_a_processar = []
+
+        # Se a lista estiver vazia (primeiro acesso) ou 'all' for selecionado,
+        # mostramos "Todos os Perfis" como um único bloco.
+        if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
+            perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis'})
+            perfis_selecionados_ids = ['all']  # Para marcar o checkbox no template
+        else:
+            # Caso contrário, pegamos os perfis selecionados
+            perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
+            for p in perfis_selecionados:
+                perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
+
+        # Query base de respostas para este questionário
+        respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)
+        # --- FIM DA LÓGICA DO FILTRO ---
+
+        # Nova estrutura de dados para comparação
+        dados_comparativos = {}
+
+        # 1. Itera por cada PERGUNTA do questionário
         for pergunta in questionario.perguntas.all():
-            # Busca todas as respostas para esta pergunta
-            respostas = Resposta.objects.filter(pergunta=pergunta)
 
-            total_respostas = respostas.count()
-            dados_pergunta = {
-                'pergunta': pergunta,
-                'tipo': pergunta.tipo_resposta,
-                'total_respostas': total_respostas,
-                'dados_grafico': None,
-                'respostas_texto': None
+            dados_comparativos[pergunta.id] = {
+                'pergunta_texto': pergunta.texto_pergunta,
+                'pergunta_tipo': pergunta.get_tipo_resposta_display,
+                'pergunta_tipo_raw': pergunta.tipo_resposta,
+                'dados_por_perfil': []  # Lista para guardar os dados de cada perfil
             }
 
-            if pergunta.tipo_resposta == "TEXTO":
-                # Se for texto, apenas lista as respostas
-                dados_pergunta['respostas_texto'] = list(respostas.values_list('texto_resposta', flat=True))
+            # 2. Itera por cada PERFIL selecionado para processar
+            for perfil_info in perfis_a_processar:
 
-            elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
-                # Se for múltipla escolha ou escala, contamos as ocorrências
+                respostas_perfil = respostas_base.filter(pergunta=pergunta)
 
-                # Usamos um Counter para contar facilmente
-                contador = Counter()
+                # Se não for "Todos os Perfis", filtre pelas sessões daquele perfil
+                if perfil_info['id'] != 'all':
+                    sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
+                    lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+                    respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)
 
-                if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
-                    # Se for múltipla, temos que quebrar as respostas "A,B,C"
-                    for resp in respostas:
-                        opcoes_selecionadas = resp.texto_resposta.split(',')
-                        contador.update(opcoes_selecionadas)
-                else:
-                    # Para escolha única ou escala, a resposta é o próprio valor
-                    lista_de_textos = list(respostas.values_list('texto_resposta', flat=True))
-                    contador.update(lista_de_textos)
+                total_respostas_perfil = respostas_perfil.count()
 
-                # Prepara os dados para o Chart.js
-                labels = list(contador.keys())
-                data = list(contador.values())
-
-                dados_pergunta['dados_grafico'] = {
-                    'labels': json.dumps(labels),  # Converte para JSON para o JS
-                    'data': json.dumps(data),  # Converte para JSON para o JS
-                    'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                dados_perfil_para_pergunta = {
+                    'perfil_titulo': perfil_info['titulo'],
+                    'total_respostas': total_respostas_perfil,
+                    'dados_grafico': None,
+                    'respostas_texto': None
                 }
 
-            dados_relatorio_agregado.append(dados_pergunta)
+                if pergunta.tipo_resposta == "TEXTO":
+                    dados_perfil_para_pergunta['respostas_texto'] = list(
+                        respostas_perfil.values_list('texto_resposta', flat=True))
+
+                elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
+                    contador = Counter()
+
+                    if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
+                        for resp in respostas_perfil:
+                            opcoes_selecionadas = resp.texto_resposta.split(',')
+                            contador.update(opcoes_selecionadas)
+                    else:
+                        lista_de_textos = list(respostas_perfil.values_list('texto_resposta', flat=True))
+                        contador.update(lista_de_textos)
+
+                    labels = list(contador.keys())
+                    data = list(contador.values())
+
+                    dados_perfil_para_pergunta['dados_grafico'] = {
+                        'labels': json.dumps(labels),
+                        'data': json.dumps(data),
+                        'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                    }
+
+                # Adiciona os dados deste perfil à lista da pergunta
+                dados_comparativos[pergunta.id]['dados_por_perfil'].append(dados_perfil_para_pergunta)
 
         context = {
             **self.admin_site.each_context(request),
-            'title': f"Resumo Agregado: {questionario.titulo}",
+            'title': f"Resumo Comparativo: {questionario.titulo}",
             'questionario': questionario,
-            'dados_relatorio_agregado': dados_relatorio_agregado,
+            'dados_comparativos': dados_comparativos,
+            # Passa os dados do filtro para o template
+            'todos_os_perfis': todos_os_perfis,
+            'perfis_selecionados_ids': perfis_selecionados_ids,  # Lista de IDs selecionados
         }
 
-        # (O template será criado no Passo 3)
         return render(request, 'admin/relatorio_questionario_agregado.html', context)
 
-    # View do relatório detalhado (como estava nos seus templates)
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
 
-        # Agrupa respostas por session_key
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
 
         dados_do_relatorio = {}
@@ -211,7 +235,6 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             'questionario': questionario,
             'dados_do_relatorio': dados_do_relatorio,
         }
-        # Usa o template que você já tinha
         return render(request, 'admin/relatorio_questionario_detalhe.html', context)
 
 

@@ -1,84 +1,210 @@
 {% extends "admin/base_site.html" %}
-{% block title %} Resumo Agregado: {{ questionario.titulo }} {% endblock %}
+{% block title %} Resumo Comparativo: {{ questionario.titulo }} {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Estilos para o container de comparação */
+    .comparison-container {
+        display: flex;
+        flex-wrap: wrap; /* Permite que os perfis quebrem a linha em telas menores */
+        gap: 20px; /* Espaço entre os blocos de perfil */
+        justify-content: center;
+        width: 100%;
+    }
+    /* Estilo para cada bloco de perfil */
+    .profile-block {
+        flex: 1; /* Faz com que os blocos cresçam igualmente */
+        min-width: 300px; /* Largura mínima antes de quebrar a linha */
+        /* Ajuste max-width para mais colunas se necessário, ex: 30% para 3 colunas */
+        max-width: 45%;
+        border: 1px solid #eee;
+        padding: 15px;
+        background: #fdfdfd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .profile-block h3 {
+        color: #333;
+        font-size: 1.2rem;
+        border-bottom: 2px solid #f0f0f0;
+        padding-bottom: 5px;
+        margin-top: 0;
+    }
+    .text-response-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: #f9f9f9;
+        list-style-type: disc;
+        padding-left: 25px;
+    }
+    /* Estilos para o formulário de filtro */
+    .filter-form fieldset {
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 4px;
+    }
+    .filter-form legend {
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .filter-form .checkbox-grid {
+        display: grid;
+        /* Ajuste minmax para mais colunas de checkbox */
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    .filter-form label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+</style>
 {% endblock %}
 
 
 {% block content %}
 <div id="content-main">
-  <h1>Resumo Agregado: "{{ questionario.titulo }}"</h1>
+  <h1>Resumo Comparativo: "{{ questionario.titulo }}"</h1>
 
-  {% for item in dados_relatorio_agregado %}
+  <div class="module filter-form">
+    <form method="GET" action="" id="profile-filter-form">
+      <fieldset>
+        <legend>Comparar Perfis de Paciente</legend>
+        <div class="checkbox-grid">
+            <label>
+                <input type="checkbox" name="narrativa_perfil_id" value="all"
+                       {% if 'all' in perfis_selecionados_ids %}checked{% endif %}
+                       id="check-all-profiles">
+                <strong>Todos os Perfis (Agregado)</strong>
+            </label>
+            {% for perfil in todos_os_perfis %}
+            <label>
+                <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}"
+                       class="profile-check"
+                       {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
+                {{ perfil.titulo }}
+            </label>
+            {% endfor %}
+        </div>
+        <div style="margin-top: 15px;">
+            <input type="submit" value="Comparar" class="button default">
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  {% for pergunta_id, dados_pergunta in dados_comparativos.items %}
   <div class="module">
-    <h2>Pergunta: {{ item.pergunta.texto_pergunta }}</h2>
-    <p><strong>Tipo:</strong> {{ item.pergunta.get_tipo_resposta_display }} | <strong>Total de Respostas:</strong> {{ item.total_respostas }}</p>
+    <h2>Pergunta: {{ dados_pergunta.pergunta_texto }}</h2>
+    <p><strong>Tipo:</strong> {{ dados_pergunta.pergunta_tipo }}</p>
 
-    {% if item.tipo == "TEXTO" %}
-        <div class="results" style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9;">
-            <ul style="list-style-type: disc; padding-left: 20px;">
-                {% for resposta_txt in item.respostas_texto %}
-                    {% if resposta_txt %}
-                        <li>{{ resposta_txt }}</li>
-                    {% endif %}
-                {% empty %}
-                    <li>Nenhuma resposta em texto livre.</li>
-                {% endfor %}
-            </ul>
+    <div class="comparison-container">
+
+        {% for dados_perfil in dados_pergunta.dados_por_perfil %}
+        <div class="profile-block">
+            <h3>{{ dados_perfil.perfil_titulo }}</h3>
+            <p><strong>Total de Respostas:</strong> {{ dados_perfil.total_respostas }}</p>
+
+            {% if dados_pergunta.pergunta_tipo_raw == "TEXTO" %}
+                <ul class="text-response-list">
+                    {% for resposta_txt in dados_perfil.respostas_texto %}
+                        {% if resposta_txt %}
+                            <li>{{ resposta_txt }}</li>
+                        {% endif %}
+                    {% empty %}
+                        <li>Nenhuma resposta.</li>
+                    {% endfor %}
+                </ul>
+
+            {% elif dados_perfil.dados_grafico %}
+                {% if dados_perfil.total_respostas > 0 %}
+                    <div style="width: 100%; margin: auto;">
+                        <canvas id="grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}"></canvas>
+                    </div>
+
+                    <script>
+                    document.addEventListener('DOMContentLoaded', (event) => {
+                        // ID ÚNICO
+                        const ctx_{{ pergunta_id }}_{{ forloop.counter }} = document.getElementById('grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}');
+
+                        new Chart(ctx_{{ pergunta_id }}_{{ forloop.counter }}, {
+                            type: '{{ dados_perfil.dados_grafico.tipo_grafico }}',
+                            data: {
+                                labels: {{ dados_perfil.dados_grafico.labels|safe }},
+                                datasets: [{
+                                    label: 'Nº de Respostas',
+                                    data: {{ dados_perfil.dados_grafico.data|safe }},
+                                    backgroundColor: [
+                                        'rgba(54, 162, 235, 0.7)',
+                                        'rgba(255, 99, 132, 0.7)',
+                                        'rgba(255, 206, 86, 0.7)',
+                                        'rgba(75, 192, 192, 0.7)',
+                                        'rgba(153, 102, 255, 0.7)',
+                                        'rgba(255, 159, 64, 0.7)',
+                                        'rgba(199, 199, 199, 0.7)'
+                                    ],
+                                    borderColor: '#fff',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                        /* Oculta a legenda para gráficos de barras, pois ela é redundante */
+                                        display: '{{ dados_perfil.dados_grafico.tipo_grafico }}' === 'pie' ? true : false,
+                                    },
+                                    title: {
+                                        display: false, /* O título do bloco já diz qual é o perfil */
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    </script>
+                {% else %}
+                    <p>Nenhuma resposta encontrada.</p>
+                {% endif %}
+            {% endif %}
+
         </div>
-
-    {% elif item.dados_grafico %}
-        <div style="width: 100%; max-width: 600px; margin: auto;">
-            <canvas id="grafico-pergunta-{{ item.pergunta.id }}"></canvas>
-        </div>
-
-        <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            const ctx_{{ item.pergunta.id }} = document.getElementById('grafico-pergunta-{{ item.pergunta.id }}');
-
-            new Chart(ctx_{{ item.pergunta.id }}, {
-                type: '{{ item.dados_grafico.tipo_grafico }}', // 'pie' ou 'bar'
-                data: {
-                    labels: {{ item.dados_grafico.labels|safe }}, // Dados do Python (JSON)
-                    datasets: [{
-                        label: 'Nº de Respostas',
-                        data: {{ item.dados_grafico.data|safe }}, // Dados do Python (JSON)
-                        backgroundColor: [ // Cores aleatórias para gráficos de pizza
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(54, 162, 235, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(153, 102, 255, 0.7)',
-                            'rgba(255, 159, 64, 0.7)',
-                            'rgba(199, 199, 199, 0.7)'
-                        ],
-                        borderColor: '#fff',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribuição das Respostas'
-                        }
-                    }
-                }
-            });
-        });
-        </script>
-    {% endif %}
-
+        {% endfor %}
+    </div>
   </div>
   {% empty %}
   <p>Ainda não há perguntas ou respostas para este questionário.</p>
   {% endfor %}
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    const checkAll = document.getElementById('check-all-profiles');
+    const profileChecks = document.querySelectorAll('.profile-check');
+
+    checkAll.addEventListener('change', function() {
+        if (this.checked) {
+            // Se "Todos" for marcado, desmarca os outros
+            profileChecks.forEach(check => {
+                check.checked = false;
+            });
+        }
+    });
+
+    profileChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            if (this.checked) {
+                // Se um perfil específico for marcado, desmarca "Todos"
+                checkAll.checked = false;
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}
