@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import nested_admin # Mantenha esta importação
+import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
 # --- Classes de customização (Exportação e Filtro) ---
-# (Mantidas como estavam)
+# ... (código existente mantido) ...
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -46,10 +46,24 @@ class NarrativaAdmin(admin.ModelAdmin):
    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial'); list_filter = ('categoria',)
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Mantém NestedModelAdmin
+class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
-    # NENHUMA class Media customizada aqui
+
+    # --- CLASSE MEDIA ATIVA, MAS SEM NOSSO JS ---
+    class Media:
+        css = {
+            # Mantemos o CSS (mesmo vazio) para consistência
+            'all': ('css/custom_admin.css',)
+        }
+        js = (
+            # Ordem correta: jQuery -> init -> nested_admin
+            'admin/js/vendor/jquery/jquery.min.js',
+            'admin/js/jquery.init.js',
+            'nested_admin/dist/nested_admin.min.js',
+            # 'js/questionario_admin.js', # <--- LINHA REMOVIDA TEMPORARIAMENTE
+        )
+    # --- FIM DA CLASSE MEDIA ---
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
