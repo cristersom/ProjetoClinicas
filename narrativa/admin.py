@@ -50,20 +50,18 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
-    # --- CLASSE MEDIA ATIVA, MAS SEM NOSSO JS ---
-    class Media:
-        css = {
-            # Mantemos o CSS (mesmo vazio) para consistência
-            'all': ('css/custom_admin.css',)
-        }
-        js = (
-            # Ordem correta: jQuery -> init -> nested_admin
-            'admin/js/vendor/jquery/jquery.min.js',
-            'admin/js/jquery.init.js',
-            'nested_admin/dist/nested_admin.min.js',
-            # 'js/questionario_admin.js', # <--- LINHA REMOVIDA TEMPORARIAMENTE
-        )
-    # --- FIM DA CLASSE MEDIA ---
+    # --- CLASSE MEDIA **INTEIRA** COMENTADA ---
+    # class Media:
+    #     css = {
+    #         'all': ('css/custom_admin.css',)
+    #     }
+    #     js = (
+    #         'admin/js/vendor/jquery/jquery.min.js',
+    #         'admin/js/jquery.init.js',
+    #         'nested_admin/dist/nested_admin.min.js',
+    #         'js/questionario_admin.js',
+    #     )
+    # --- FIM DO COMENTÁRIO ---
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
