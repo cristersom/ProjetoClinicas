@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import nested_admin
+import nested_admin # Mantenha esta importação
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
@@ -9,7 +9,7 @@ from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
 # --- Classes de customização (Exportação e Filtro) ---
-# ... (código existente mantido) ...
+# (Mantidas como estavam)
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -46,33 +46,33 @@ class NarrativaAdmin(admin.ModelAdmin):
    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial'); list_filter = ('categoria',)
 
 @admin.register(Questionario)
-class QuestionarioAdmin(nested_admin.NestedModelAdmin):
+class QuestionarioAdmin(nested_admin.NestedModelAdmin): # Mantém NestedModelAdmin
     list_display = ('titulo', 'cena_associada')
     inlines = [PerguntaInline]
 
-    # --- CLASSE MEDIA **INTEIRA** COMENTADA ---
-    # class Media:
-    #     css = {
-    #         'all': ('css/custom_admin.css',)
-    #     }
-    #     js = (
-    #         'admin/js/vendor/jquery/jquery.min.js',
-    #         'admin/js/jquery.init.js',
-    #         'nested_admin/dist/nested_admin.min.js',
-    #         'js/questionario_admin.js',
-    #     )
-    # --- FIM DO COMENTÁRIO ---
+    # --- CLASSE MEDIA ATIVA ---
+    # Carrega CSS customizado (mesmo vazio) e JS necessários na ordem correta
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',) # CSS Vazio (por enquanto)
+        }
+        js = (
+            # Ordem correta: jQuery -> init -> nested_admin -> nosso script
+            'admin/js/vendor/jquery/jquery.min.js',
+            'admin/js/jquery.init.js',
+            'nested_admin/dist/nested_admin.min.js',
+            'js/questionario_admin.js', # Nosso JS (V18 ou a versão mais recente)
+        )
+    # --- FIM DA CLASSE MEDIA ---
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
-    # ... (código existente mantido) ...
     list_display = ('session_key_abreviada', 'narrativa_perfil', 'data_criacao'); list_filter = ('narrativa_perfil',); readonly_fields = ('session_key', 'narrativa_perfil', 'data_criacao')
     def session_key_abreviada(self, obj): return obj.session_key[:8] + '...'
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
-    # ... (código existente mantido) ...
     resource_class = RespostaResource; list_display = ('id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta'); list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',); search_fields = ('texto_resposta', 'session_key'); ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
     def questionario_associado(self, obj): return obj.pergunta.questionario.titulo
     questionario_associado.short_description = 'Questionário'
