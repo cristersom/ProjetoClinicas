@@ -1,4 +1,4 @@
-# ESTE É O ARQUIVO COMPLETO E CORRETO
+# FORÇANDO ATUALIZAÇÃO v122
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Pergunta
 from django import forms
@@ -24,18 +24,15 @@ class CriarContaForm(UserCreationForm):
 
 
 # --- Formulário Customizado para Pergunta no Admin (Novo) ---
-# Obtém as opções originais do model
 PERGUNTA_TIPO_CHOICES = list(Pergunta.TIPOS_RESPOSTA)
 
 class PerguntaAdminForm(forms.ModelForm):
 
-    # Adiciona a opção "Selecione o tipo" ao dropdown
     tipo_resposta = forms.ChoiceField(
         choices=[('', 'Selecione o tipo')] + PERGUNTA_TIPO_CHOICES,
         required=True
     )
 
-    # Adiciona placeholder ao campo de texto da pergunta
     texto_pergunta = forms.CharField(
         widget=forms.TextInput(attrs={
             'placeholder': 'Digite o texto da pergunta aqui...',
