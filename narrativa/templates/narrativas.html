@@ -40,6 +40,7 @@ Narrativas
 {% block content %}
 
 <main class='bg-primary_black min-h-screen w-full'>
+{% if narrativa_destaque %} {# Garante que narrativa_destaque existe #}
 <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
     <div>
         <h2 class="text-6xl font-semibold text-white my-4">
@@ -80,6 +81,12 @@ Narrativas
         </div>
     </div>
 </section>
+{% else %}
+{# Mensagem ou layout alternativo se não houver narrativa_destaque #}
+<section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-center justify-center bg-gray-800">
+    <h2 class="text-4xl font-semibold text-white my-4">Nenhuma narrativa em destaque encontrada.</h2>
+</section>
+{% endif %}
 
 
 <section class='bg-primary_black flex justify-center py-10'>
@@ -163,9 +170,14 @@ Narrativas
        Narrativas vistas
     </h2>
     <div class="wrapper">
+
+      {# --- CORREÇÃO APLICADA AQUI --- #}
+      {% if user.is_authenticated and request.user.narrativas_vistas.all %}
+      {# Garante que só tenta iterar se o usuário estiver logado E tiver narrativas vistas #}
+
       <section id="section1vistos" class="flex flex-nowrap items-center justify-center space-x-8">
         <a href="#section2vistos" class="arrow__btn text-6xl page">‹</a>
-        {% for narrativa in  request.user.narrativas_vistas.all  %}
+        {% for narrativa in request.user.narrativas_vistas.all %}
         {% if forloop.counter < 5 %}
             <div class="item h-64 w-1/4 m-4">
                 <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
@@ -179,7 +191,7 @@ Narrativas
         {% if request.user.narrativas_vistas.all|length > 4 %}
           <section id="section2vistos" class="flex flex-nowrap items-center justify-center">
             <a href="#section1vistos" class="arrow__btn text-6xl">‹</a>
-                {% for narrativa in  request.user.narrativas_vistas.all  %}
+                {% for narrativa in request.user.narrativas_vistas.all %}
                 {% if forloop.counter > 4 %}
                     <div class="item h-64 w-1/4 m-4">
                         <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
@@ -191,6 +203,14 @@ Narrativas
             <a href="#section1vistos" class="arrow__btn text-6xl">›</a>
           </section>
         {% endif %}
+      {% else %}
+        {# Mensagem opcional se não houver narrativas vistas ou usuário não logado #}
+        {% if user.is_authenticated %}
+        <p class="text-gray-400">Você ainda não visualizou nenhuma narrativa.</p>
+        {% endif %}
+        {# Se o usuário não estiver logado, não mostra nada aqui intencionalmente #}
+      {% endif %}
+      {# --- FIM DA CORREÇÃO --- #}
     </div>
 </div>
 </section>
@@ -199,15 +219,18 @@ Narrativas
 </main>
 
 <script>
-    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
+    // Usa uma URL segura caso narrativa_destaque não exista
+    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% if narrativa_destaque %}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=narrativa_destaque.pk %}{% else %}{% url 'narrativa:paciente_narrativas' %}{% endif %}";
 
     function copyLinkToClipboard() {
         navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
             const buttonText = document.getElementById('copy-button-text');
-            buttonText.innerText = 'Copiado!';
-            setTimeout(function() {
-                buttonText.innerText = 'Copiar Link';
-            }, 2000);
+            if (buttonText) { // Verifica se o botão existe
+                buttonText.innerText = 'Copiado!';
+                setTimeout(function() {
+                    buttonText.innerText = 'Copiar Link';
+                }, 2000);
+            }
         }, function(err) {
             console.error('Erro ao copiar o link: ', err);
         });
@@ -218,14 +241,17 @@ Narrativas
             navigator.share({
                 title: 'Convite para Jornada Interativa',
                 text: 'Olá! Gostaria de te convidar para iniciar uma jornada interativa.',
-                url: linkParaCompartilharr
+                url: linkParaCompartilhar // Corrigido nome da variável
             });
         }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
         if (navigator.share) {
-            document.getElementById('share-button').style.display = 'flex';
+            const shareButton = document.getElementById('share-button');
+            if (shareButton) { // Verifica se o botão existe
+                shareButton.style.display = 'flex';
+            }
         }
     });
 </script>
