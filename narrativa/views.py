@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
 from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente
+
+# --- CORREÇÃO APLICADA AQUI: Remover PerguntaAdminForm da importação ---
 from .forms import CriarContaForm, FormHomepage
+# -----------------------------------------------------------
+
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
