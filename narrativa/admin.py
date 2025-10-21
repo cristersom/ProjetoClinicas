@@ -12,7 +12,7 @@ from import_export.widgets import ForeignKeyWidget
 # ------------------------------------
 
 # --- Outras Importações ---
-from django.urls import path, reverse  # Importação de 'path' está aqui
+from django.urls import path, reverse
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.html import format_html
@@ -20,11 +20,11 @@ from collections import Counter
 import json
 from django.db.models import Count
 
-# Importar o formulário customizado
+# --- Importação Correta ---
 from .forms import PerguntaAdminForm
 
 
-# ---------------------------
+# --------------------------
 
 
 # --- Filtro de Perfil ---
@@ -73,14 +73,11 @@ class CenaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Narrativa)
-class NarrativaAdmin(admin.ModelAdmin):  # <-- REVERTIDO para admin.ModelAdmin
-    # list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios_narrativa') # Revertido
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')  # Versão original
+class NarrativaAdmin(admin.ModelAdmin):  # Revertido para admin.ModelAdmin
+    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
     list_filter = ('categoria',)
     search_fields = ('titulo', 'descricao')
     list_select_related = ('cena_inicial',)
-
-    # --- RELATÓRIOS DE NARRATIVA REMOVIDOS ---
 
 
 @admin.register(Questionario)
