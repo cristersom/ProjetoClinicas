@@ -1,6 +1,6 @@
-# FORÇANDO ATUALIZAÇÃO - v125 - ESTE É O ARQUIVO CORRETO
+# FORÇANDO ATUALIZAÇÃO - ESTE É O ARQUIVO CORRETO (v135)
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Pergunta 
+from .models import Usuario, Pergunta
 from django import forms
 
 # --- Formulário da Homepage (Necessário para views.py) ---
@@ -9,7 +9,7 @@ class FormHomepage(forms.Form):
 
 # --- Formulário de Criar Conta (Necessário para views.py) ---
 class CriarContaForm(UserCreationForm):
-    email = forms.EmailField(required=True) 
+    email = forms.EmailField(required=True)
 
     class Meta:
         model = Usuario
