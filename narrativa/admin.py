@@ -5,20 +5,51 @@ from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta
 )
+# --- Importações para Exportação ---
 from import_export.admin import ImportExportModelAdmin
-from import_export import resources
+from import_export import resources, fields
+from import_export.widgets import ForeignKeyWidget
+# ------------------------------------
 
-# --- CORREÇÃO AQUI: Adicionar 'path' ---
+# --- Outras Importações ---
 from django.urls import path, reverse
-# -------------------------------------
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
 import json
+from django.db.models import Count # Para agregação
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
+# ---------------------------
+
+
+# --- Resource para Exportação de Narrativa ---
+class NarrativaResource(resources.ModelResource):
+    # Campo calculado para contar inícios
+    total_inicios = fields.Field()
+
+    class Meta:
+        model = Narrativa
+        fields = ('id', 'titulo', 'categoria', 'visualizacoes', 'data_criacao', 'cena_inicial__titulo', 'total_inicios') # Inclui título da cena inicial
+        export_order = fields
+
+    # Método para calcular o total de inícios para cada narrativa
+    def dehydrate_total_inicios(self, narrativa):
+        return SessaoPaciente.objects.filter(narrativa_perfil=narrativa).count()
+
+    # Define o nome da coluna para cena_inicial__titulo
+    def get_export_headers(self):
+        headers = super().get_export_headers()
+        try:
+            # Renomeia o header da coluna da cena inicial
+            idx = headers.index('cena_inicial__titulo')
+            headers[idx] = 'Cena Inicial (Título)'
+        except ValueError:
+            pass # Ignora se a coluna não estiver presente
+        return headers
+# ---------------------------------------------
 
 
 # --- Filtro de Perfil ---
@@ -65,9 +96,67 @@ class CenaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Narrativa)
-class NarrativaAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial') #
+class NarrativaAdmin(ImportExportModelAdmin): # <-- MUDADO AQUI para incluir exportação
+    resource_class = NarrativaResource # <-- Define o resource para exportação
+    list_display = ('titulo', 'categoria', 'visualizacoes', 'data_criacao', 'cena_inicial', 'links_relatorios_narrativa') # Adicionado link
     list_filter = ('categoria',) #
+    search_fields = ('titulo', 'descricao') # Adicionado campo de busca
+    list_select_related = ('cena_inicial',) # Otimiza busca da cena inicial
+
+    # --- Link para Relatório ---
+    def links_relatorios_narrativa(self, obj):
+        url_agregado = reverse('admin:narrativa_narrativa_relatorio_agregado') #
+        url_detalhado_inicios = reverse('admin:narrativa_sessaopaciente_changelist') + f'?narrativa_perfil__id__exact={obj.pk}' #
+
+        return format_html( #
+            '<a class="button" href="{}?narrativa_id={}">Ver Inícios (Agregado)</a>&nbsp;'
+            '<a class="button" href="{}">Ver Sessões Iniciadas (Detalhado)</a>',
+            url_agregado, #
+            obj.pk, # Passa o ID da narrativa como parâmetro para o agregado
+            url_detalhado_inicios #
+        )
+    links_relatorios_narrativa.short_description = 'Relatórios de Uso' #
+    # ---------------------------
+
+    # --- View e URL do Relatório Agregado ---
+    def get_urls(self):
+        urls = super().get_urls() #
+        custom_urls = [ #
+            path( #
+                'relatorio_agregado/', # URL única para o relatório agregado de TODAS as narrativas
+                self.admin_site.admin_view(self.relatorio_agregado_view), #
+                name='narrativa_narrativa_relatorio_agregado', #
+            ),
+        ]
+        return custom_urls + urls #
+
+    def relatorio_agregado_view(self, request, *args, **kwargs):
+        # Agrupa SessaoPaciente por narrativa_perfil e conta
+        dados_inicios = SessaoPaciente.objects.values('narrativa_perfil__titulo') \
+                                            .annotate(total_inicios=Count('id')) \
+                                            .order_by('-total_inicios') #
+
+        dados_narrativas = Narrativa.objects.order_by('titulo').values('id', 'titulo', 'visualizacoes') #
+
+        narrativa_id_filtrada = request.GET.get('narrativa_id') #
+        narrativa_filtrada = None #
+        if narrativa_id_filtrada: #
+            try: #
+                narrativa_filtrada = Narrativa.objects.get(pk=narrativa_id_filtrada) #
+                dados_inicios = dados_inicios.filter(narrativa_perfil_id=narrativa_id_filtrada) #
+            except Narrativa.DoesNotExist: #
+                pass # Ignora ID inválido
+
+        context = { #
+            **self.admin_site.each_context(request), #
+            'title': f"Relatório Agregado de Inícios de Narrativa {'- ' + narrativa_filtrada.titulo if narrativa_filtrada else ''}", #
+            'dados_inicios': dados_inicios, #
+            'dados_narrativas': dados_narrativas, # Passa dados gerais também
+            'narrativa_filtrada': narrativa_filtrada, # Para saber se estamos em modo filtrado
+        }
+
+        return render(request, 'admin/relatorio_narrativas_agregado.html', context) #
+    # ------------------------------------
 
 
 @admin.register(Questionario)
@@ -75,13 +164,13 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios') #
     inlines = [PerguntaInline] #
 
-    # Adiciona CSS para separação visual das perguntas
     class Media:
         css = {
             'all': ('css/admin_custom.css',) # Usa o caminho ajustado
         }
 
     # Funções get_urls, links_relatorios, resumo_agregado_view, relatorio_detalhado_view
+    # (Mantidas da versão anterior)
     def get_urls(self):
         urls = super().get_urls() #
         custom_urls = [ #
@@ -227,8 +316,8 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 # --- Define RespostaResource ANTES de RespostaAdmin ---
 class RespostaResource(resources.ModelResource):
-    questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário') #
-    perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)') #
+    questionario = fields.Field(attribute='pergunta__questionario__titulo', column_name='Questionário') #
+    perfil_narrativa = fields.Field(column_name='Perfil (Narrativa)') #
 
     class Meta:
         model = Resposta #
@@ -248,14 +337,14 @@ class RespostaResource(resources.ModelResource):
 
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
-    resource_class = RespostaResource # Agora deve encontrar a classe
+    resource_class = RespostaResource # Usa o resource para exportação
     list_display = ( #
     'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
     list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',) #
     search_fields = ('texto_resposta', 'session_key') #
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id') #
 
-    # Funções get_urls e resumo_global_view
+    # Funções get_urls e resumo_global_view (Mantidas da versão anterior)
     def get_urls(self):
         urls = super().get_urls() #
         custom_urls = [ #
