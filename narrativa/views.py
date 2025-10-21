@@ -1,12 +1,7 @@
-# FORÇANDO ATUALIZAÇÃO - v127 - ARQUIVO COMPLETO
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
 from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente
-
-# --- Importação Correta ---
 from .forms import CriarContaForm, FormHomepage
-# --------------------------
-
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -40,9 +35,6 @@ class Detalhes(LoginRequiredMixin, DetailView):
     model = Narrativa
 
     def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(reverse('narrativa:login') + '?next=' + request.path)
-
         narrativa = self.get_object()
         narrativa.visualizacoes += 1
         narrativa.save()
@@ -52,11 +44,8 @@ class Detalhes(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Detalhes, self).get_context_data(**kwargs)
-        if hasattr(self, 'object') and self.object:
-            relacionados = Narrativa.objects.filter(categoria=self.object.categoria).order_by('-visualizacoes')[:5]
-            context["relacionados"] = relacionados
-        else:
-             context["relacionados"] = []
+        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
+        context["relacionados"] = relacionados
         return context
 
 
@@ -105,11 +94,8 @@ class PacienteDetalhes(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PacienteDetalhes, self).get_context_data(**kwargs)
-        if hasattr(self, 'object') and self.object:
-            relacionados = Narrativa.objects.filter(categoria=self.object.categoria).order_by('-visualizacoes')[:5]
-            context["relacionados"] = relacionados
-        else:
-            context["relacionados"] = []
+        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
+        context["relacionados"] = relacionados
         return context
 
 
@@ -171,11 +157,10 @@ def responder_questionario(request, questionario_id):
                     texto_resposta=texto_resposta
                 )
 
-        if questionario.cena_destino:
-            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
+        # --- LÓGICA DE REDIRECIONAMENTO SIMPLIFICADA ---
+        if questionario.cena_associada:
+            return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
         else:
-            if questionario.cena_associada:
-                 return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_associada.id)
             return redirect('narrativa:paciente_narrativas')
 
     context = {
