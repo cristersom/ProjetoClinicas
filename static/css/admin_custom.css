@@ -1,20 +1,60 @@
-/* Adiciona uma borda superior e um pouco de margem acima de cada linha do inline tabular */
-/* O seletor pode precisar de ajuste dependendo da estrutura exata do Jazzmin/nested-admin */
+/* --- Melhorias no Inline de Perguntas (QuestionarioAdmin) --- */
 
+/* Seleciona o container de cada pergunta (linha) dentro do inline */
 .js-nested-inline-formset .nested-inline-row {
-    border-top: 2px solid #dee2e6; /* Cor cinza claro, ajuste conforme o tema */
-    padding-top: 15px; /* Espaçamento acima da borda */
-    margin-top: 15px; /* Espaçamento entre as linhas */
+    padding: 20px; /* Adiciona mais espaço interno */
+    margin-top: 15px; /* Mantém o espaço entre as perguntas */
+    border: 1px solid #dee2e6; /* Adiciona uma borda sutil */
+    border-radius: 5px; /* Cantos arredondados */
+    background-color: #ffffff; /* Fundo padrão branco */
 }
 
-/* Opcional: Remover borda da primeira linha para não ficar estranho */
+/* Zebra Striping: Aplica um fundo cinza claro às linhas pares */
+.js-nested-inline-formset .nested-inline-row:nth-of-type(even) {
+    background-color: #f8f9fa; /* Cinza bem claro (padrão Bootstrap) */
+}
+
+/* Remove margem e borda superior da primeira pergunta para não ficar estranho */
 .js-nested-inline-formset .nested-inline-row:first-of-type {
-    border-top: none;
-    padding-top: 0;
     margin-top: 0;
+    border-top: 1px solid #dee2e6; /* Garante que a primeira tenha borda superior */
 }
 
-/* Opcional: Aumentar a largura do campo de texto da pergunta se TextInput for pequeno */
-.form-row .field-texto_pergunta input[type="text"] {
-    width: 90% !important; /* Força a largura */
+/* --- Ajustes de Alinhamento dos Títulos --- */
+
+/* Esconde os títulos originais que ficam desalinhados */
+.js-nested-inline-formset > h2 + .tabular.inline-related fieldset > table > thead {
+    display: none;
 }
+
+/* Adiciona "pseudo-títulos" usando ::before nos campos da *primeira* linha */
+/* Isso garante que eles fiquem alinhados com os campos */
+.js-nested-inline-formset .nested-inline-row:first-of-type .field-texto_pergunta::before,
+.js-nested-inline-formset .nested-inline-row:first-of-type .field-tipo_resposta::before {
+    content: attr(data-label); /* Pega o texto do label */
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+    color: #6c757d; /* Cor cinza padrão do admin */
+    font-size: 0.9em;
+}
+
+/* Define os textos dos pseudo-títulos */
+.js-nested-inline-formset .nested-inline-row:first-of-type .field-texto_pergunta::before {
+    content: "Texto pergunta";
+}
+.js-nested-inline-formset .nested-inline-row:first-of-type .field-tipo_resposta::before {
+    content: "Tipo resposta";
+}
+
+/* Ajusta a largura do campo de texto da pergunta */
+.form-row .field-texto_pergunta input[type="text"] {
+    width: 95% !important; /* Aumenta um pouco mais a largura */
+}
+
+/* Opcional: Ajusta a largura do dropdown de tipo de resposta */
+.form-row .field-tipo_resposta select {
+    min-width: 150px; /* Garante uma largura mínima */
+}
+
+/* --- Fim das Melhorias --- */
