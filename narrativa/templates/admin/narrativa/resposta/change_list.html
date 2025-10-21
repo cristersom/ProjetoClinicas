@@ -1,11 +1,25 @@
-{% extends "admin/change_list.html" %}
-{% load static %}
+{% extends "jazzmin/change_list.html" %}
+{% load static jazzmin %}
 
+{# Tenta adicionar o botão no local padrão de ações do Jazzmin #}
 {% block object-tools-items %}
   {{ block.super }}
+  {% include "admin/includes/jazzmin_add_button.html" with add_url=add_url only %} {# Mantém o botão Adicionar padrão #}
+
+  {# Nosso botão customizado #}
   <li>
-    <a href="{% url 'admin:narrativa_resposta_resumo_global' %}" class="addlink">
+    <a href="{% url 'admin:narrativa_resposta_resumo_global' %}" class="btn btn-outline-success"> {# Usa classes de botão Bootstrap/Jazzmin #}
+      <i class="fas fa-chart-pie"></i> {# Adiciona um ícone FontAwesome #}
       Relatório Global Comparativo
     </a>
   </li>
-{% endblock %}
+{% endblock object-tools-items %}
+
+{# Fallback: Se o bloco acima não funcionar, tenta adicionar em outro local comum #}
+{% block page_actions %}
+    {{ block.super }}
+    <a href="{% url 'admin:narrativa_resposta_resumo_global' %}" class="btn btn-outline-success">
+      <i class="fas fa-chart-pie"></i>
+      Relatório Global Comparativo
+    </a>
+{% endblock page_actions %}
