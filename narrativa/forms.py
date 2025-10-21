@@ -1,7 +1,7 @@
-# FORÇANDO ATUALIZAÇÃO v132
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Pergunta
+from .models import Usuario, Pergunta # Adicionado Pergunta
 from django import forms
+
 # --- Formulário da Homepage (Original) ---
 class FormHomepage(forms.Form):
     email = forms.EmailField(label=False)
@@ -23,15 +23,18 @@ class CriarContaForm(UserCreationForm):
 
 
 # --- Formulário Customizado para Pergunta no Admin (Novo) ---
+# Obtém as opções originais do model
 PERGUNTA_TIPO_CHOICES = list(Pergunta.TIPOS_RESPOSTA)
 
 class PerguntaAdminForm(forms.ModelForm):
 
+    # Adiciona a opção "Selecione o tipo" ao dropdown
     tipo_resposta = forms.ChoiceField(
         choices=[('', 'Selecione o tipo')] + PERGUNTA_TIPO_CHOICES,
         required=True
     )
 
+    # Adiciona placeholder ao campo de texto da pergunta
     texto_pergunta = forms.CharField(
         widget=forms.TextInput(attrs={
             'placeholder': 'Digite o texto da pergunta aqui...',
@@ -39,6 +42,7 @@ class PerguntaAdminForm(forms.ModelForm):
         }),
         required=True
     )
+
     class Meta:
         model = Pergunta
         fields = '__all__'
