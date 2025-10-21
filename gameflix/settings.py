@@ -1,7 +1,15 @@
-# settings.py
+from pathlib import Path
+import os
+import dj_database_url
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
-    'jazzmin',  # <-- Adicione Jazzmin AQUI, antes de admin
+    'jazzmin',  # Jazzmin adicionado aqui, antes de admin
     'nested_admin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -15,40 +23,103 @@ INSTALLED_APPS = [
     'import_export',
     'cloudinary_storage',
     'cloudinary',
-    # Se você tinha identificado e comentado um tema antigo antes,
-    # pode remover a linha comentada agora.
 ]
 
-# ... (resto das configurações) ...
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'narrativa.middleware.PatientAccessMiddleware',
+]
 
-# --- Configurações Opcionais do Jazzmin (no final do arquivo) ---
+ROOT_URLCONF = 'gameflix.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'], # Garante que a pasta raiz 'templates' é verificada
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'narrativa.context.lista_narrativas_recentes',
+                'narrativa.context.lista_narrativas_emalta',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'gameflix.wsgi.application'
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    )
+}
+
+AUTH_USER_MODEL = "narrativa.usuario"
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# --- Configurações de Internacionalização ---
+LANGUAGE_CODE = 'pt-br'
+TIME_ZONE = 'America/Sao_Paulo'
+USE_I18N = True
+USE_TZ = True # Mantido como True
+
+# --- Configurações de Arquivos Estáticos ---
+STATIC_URL = 'static/' # <-- GARANTIR QUE ESTA LINHA ESTÁ PRESENTE E CORRETA
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# --- Configurações de Arquivos de Mídia ---
+MEDIA_URL = '/media/'
+
+# --- Configurações de Armazenamento (Storage) ---
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
+
+# --- Cloudinary ---
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+
+# --- Outras Configurações Django ---
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_REDIRECT_URL = 'narrativa:narrativas'
+LOGIN_URL = 'narrativa:login'
+
+# --- Crispy Forms ---
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+
+# --- Configurações do Jazzmin (Adicionadas no final) ---
 JAZZMIN_SETTINGS = {
-    # Título da janela do navegador (padrão: "Django admin")
     "site_title": "Administração Clínica",
-
-    # Título na tela de login (padrão: "Django admin")
     "site_header": "Clínica Admin",
-
-    # Logo na tela de login e na barra superior (opcional)
-    # "site_logo": "caminho/para/seu/logo.png", # Precisa estar nos arquivos estáticos
-
-    # Texto "Bem-vindo" (padrão: nome de usuário)
+    # "site_logo": "caminho/para/seu/logo.png",
     "welcome_sign": "Bem-vindo(a) à Administração",
-
-    # Copyright no rodapé
     "copyright": "Minha Clínica Ltd",
-
-    # Links úteis na barra superior
     "topmenu_links": [
-        # Link para a homepage do site (se houver)
         {"name": "Ver Site", "url": "/", "new_window": True},
-
-        # Link para o app Narrativa
         {"app": "narrativa"},
     ],
-
-    # Ícones para os modelos (usando Font Awesome)
-    # https://fontawesome.com/v5/search
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -60,22 +131,20 @@ JAZZMIN_SETTINGS = {
         "narrativa.Pergunta": "fas fa-question-circle",
         "narrativa.Resposta": "fas fa-comment",
         "narrativa.SessaoPaciente": "fas fa-user-clock",
-        "narrativa.Usuario": "fas fa-user-shield", # Modelo customizado
+        "narrativa.Usuario": "fas fa-user-shield",
     },
-    # Ocultar modelos que não precisam ser editados diretamente
     "hide_models": [
-        "narrativa.opcaoresposta", # Editado via inline
+        "narrativa.opcaoresposta",
         "auth.permission",
     ],
 }
 
-# --- Ajustes de UI opcionais ---
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-dark", # Ou "navbar-light", etc.
+    "brand_colour": "navbar-dark",
     "accent": "accent-primary",
     "navbar": "navbar-dark",
     "no_navbar_border": False,
@@ -83,15 +152,15 @@ JAZZMIN_UI_TWEAKS = {
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary", # Ou sidebar-light-*, etc.
+    "sidebar": "sidebar-dark-primary",
     "sidebar_nav_small_text": False,
     "sidebar_disable_expand": False,
     "sidebar_nav_child_indent": False,
     "sidebar_nav_compact_style": False,
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
-    "theme": "default", # Temas: default, cerulean, cosmo, cyborg, darkly, flatly, journal, litera, lumen, lux, materia, minty, pulse, sandstone, simplex, sketchy, slate, solar, spacelab, superhero, united, yeti
-    "dark_mode_theme": "darkly", # Tema a ser usado no modo escuro
+    "theme": "default",
+    "dark_mode_theme": "darkly",
     "button_classes": {
         "primary": "btn-primary",
         "secondary": "btn-secondary",
