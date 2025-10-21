@@ -1,6 +1,7 @@
-# FORÇANDO A ATUALIZAÇÃO
+# FORÇANDO ATUALIZAÇÃO v119 - SALVAR ESTE ARQUIVO
+
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Pergunta # Adicionado Perguntaa
+from .models import Usuario, Pergunta # Adicionado Pergunta
 from django import forms
 
 # --- Formulário da Homepage (Original) ---
