@@ -1,4 +1,4 @@
-# FORÇANDO ATUALIZAÇÃO - ESTE É O ARQUIVO CORRETO (v135)
+# FORÇANDO ATUALIZAÇÃO - v127 - ARQUIVO COMPLETO
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Pergunta
 from django import forms
