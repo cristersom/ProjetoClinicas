@@ -20,11 +20,11 @@ from collections import Counter
 import json
 from django.db.models import Count
 
-# Importar o formulário customizado
+# --- Importação Correta ---
 from .forms import PerguntaAdminForm
 
 
-# ---------------------------
+# --------------------------
 
 
 # --- Filtro de Perfil ---
