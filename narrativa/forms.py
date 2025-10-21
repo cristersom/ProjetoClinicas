@@ -9,7 +9,7 @@ class FormHomepage(forms.Form):
 
 # --- Formulário de Criar Conta (Necessário para views.py) ---
 class CriarContaForm(UserCreationForm):
-    email = forms.EmailField(required=True)
+    email = forms.EmailField(required=True) 
 
     class Meta:
         model = Usuario
