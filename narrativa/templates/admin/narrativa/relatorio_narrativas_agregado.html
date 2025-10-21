@@ -1,10 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "admin/base_site.html" %}
+{% block title %} {{ title }} {% endblock %}
+
+{% block content %}
+<div id="content-main">
+    <h1>{{ title }}</h1>
+
+    {% if narrativa_filtrada %}
+        <p><a href="{% url 'admin:narrativa_narrativa_relatorio_agregado' %}">Ver relatório de todas as narrativas</a></p>
+    {% endif %}
+
+    <div class="module">
+        <h2>Total de Inícios por Narrativa (Perfil)</h2>
+        {% if dados_inicios %}
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        <th>Narrativa (Perfil Inicial)</th>
+                        <th>Número de Sessões Iniciadas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in dados_inicios %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>{{ item.narrativa_perfil__titulo }}</td>
+                            <td>{{ item.total_inicios }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhuma sessão de paciente encontrada {% if narrativa_filtrada %} para esta narrativa {% endif %}.</p>
+        {% endif %}
+    </div>
+
+    {# Mostra a tabela de visualizações apenas se não estiver filtrando uma narrativa específica #}
+    {% if not narrativa_filtrada %}
+    <div class="module">
+        <h2>Visualizações Totais por Narrativa (Contador Admin - Pode ser impreciso)</h2>
+        {% if dados_narrativas %}
+            <table id="result_list">
+                <thead>
+                    <tr>
+                        <th>Narrativa</th>
+                        <th>Visualizações (Admin)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for narrativa in dados_narrativas %}
+                        <tr class="{% cycle 'row1' 'row2' %}">
+                            <td>
+                                {# Link para filtrar o relatório de inícios para esta narrativa #}
+                                <a href="{% url 'admin:narrativa_narrativa_relatorio_agregado' %}?narrativa_id={{ narrativa.id }}">{{ narrativa.titulo }}</a>
+                            </td>
+                            <td>{{ narrativa.visualizacoes }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>Nenhuma narrativa encontrada.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
