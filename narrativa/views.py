@@ -5,22 +5,21 @@ from .forms import CriarContaForm, FormHomepage
 from django.views.generic import ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-# --- IMPORTANTE: NÃO HÁ MAIS @admin.register(Cena) AQUI ---
 
 class Homepage(FormView):
-    template_name = "homepage.html"
-    form_class = FormHomepage
+    template_name = "homepage.html" #
+    form_class = FormHomepage #
 
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('narrativa:narrativas')
+        if request.user.is_authenticated: #
+            return redirect('narrativa:narrativas') #
         else:
             return super().get(request, *args, **kwargs) #
 
     def get_success_url(self):
         email = self.request.POST.get("email") #
         usuarios = Usuario.objects.filter(email=email) #
-        if usuarios:
+        if usuarios: #
             return reverse('narrativa:login') #
         else:
             return reverse('narrativa:criarconta') #
@@ -36,17 +35,26 @@ class Detalhes(LoginRequiredMixin, DetailView):
     model = Narrativa #
 
     def get(self, request, *args, **kwargs):
+        # Adiciona verificação extra de autenticação
+        if not request.user.is_authenticated:
+            return redirect(reverse('narrativa:login') + '?next=' + request.path)
+
         narrativa = self.get_object() #
         narrativa.visualizacoes += 1 #
         narrativa.save() #
         usuario = request.user #
+        # Esta linha agora é segura
         usuario.narrativas_vistas.add(narrativa) #
         return super().get(request, *args, **kwargs) #
 
     def get_context_data(self, **kwargs):
         context = super(Detalhes, self).get_context_data(**kwargs) #
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5] #
-        context["relacionados"] = relacionados #
+        # Verifica se o objeto principal existe antes de buscar relacionados
+        if hasattr(self, 'object') and self.object:
+            relacionados = Narrativa.objects.filter(categoria=self.object.categoria).order_by('-visualizacoes')[:5] #
+            context["relacionados"] = relacionados #
+        else:
+             context["relacionados"] = []
         return context #
 
 
@@ -56,7 +64,7 @@ class Pesquisa(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         termo_pesquisa = self.request.GET.get('query') #
-        if termo_pesquisa:
+        if termo_pesquisa: #
             object_list = self.model.objects.filter(titulo__icontains=termo_pesquisa) #
             return object_list #
         else:
@@ -95,8 +103,12 @@ class PacienteDetalhes(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PacienteDetalhes, self).get_context_data(**kwargs) #
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5] #
-        context["relacionados"] = relacionados #
+        # Verifica se o objeto principal existe antes de buscar relacionados
+        if hasattr(self, 'object') and self.object:
+            relacionados = Narrativa.objects.filter(categoria=self.object.categoria).order_by('-visualizacoes')[:5] #
+            context["relacionados"] = relacionados #
+        else:
+            context["relacionados"] = []
         return context #
 
 
