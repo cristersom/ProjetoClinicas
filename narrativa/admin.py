@@ -20,11 +20,11 @@ from collections import Counter
 import json
 from django.db.models import Count
 
-# --- Importação Correta ---
+# Importar o formulário customizado
 from .forms import PerguntaAdminForm
 
 
-# --------------------------
+# ---------------------------
 
 
 # --- Filtro de Perfil ---
@@ -73,11 +73,12 @@ class CenaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Narrativa)
-class NarrativaAdmin(admin.ModelAdmin):  # Revertido para admin.ModelAdmin
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')
+class NarrativaAdmin(admin.ModelAdmin):  # <-- REVERTIDO para admin.ModelAdmin
+    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial')  # Versão original
     list_filter = ('categoria',)
     search_fields = ('titulo', 'descricao')
     list_select_related = ('cena_inicial',)
+    # --- Relatórios de Narrativa Removidos ---
 
 
 @admin.register(Questionario)
