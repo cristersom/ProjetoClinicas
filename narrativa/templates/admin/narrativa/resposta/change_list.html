@@ -1,19 +1,14 @@
-{% extends "jazzmin/change_list.html" %}
-{% load static jazzmin %}
+{% extends "jazzmin/change_list.html" %} {# Continua estendendo o Jazzmin #}
 
-{# Removemos as tentativas nos blocos object-tools-items e page_actions #}
-
-{% block content %}
-    {# Tentativa: Adicionar o botão ANTES do conteúdo principal da lista #}
-    <div class="mb-3"> {# Margem inferior para separar do conteúdo abaixo #}
-        <a href="{% url 'admin:narrativa_resposta_resumo_global' %}" class="btn btn-outline-success">
-            <i class="fas fa-chart-pie"></i>
-            Relatório Global Comparativo
-        </a>
-        {# Adicionamos o botão "Adicionar" aqui também para consistência, se desejado #}
-        {# {% include "admin/includes/jazzmin_add_button.html" with add_url=add_url only %} #}
+{% block breadcrumbs %}
+    {# Substitui o breadcrumb original por um texto de teste #}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">Início</a> &rsaquo;
+        TESTE DE TEMPLATE CUSTOMIZADO!
     </div>
+{% endblock %}
 
-    {# Renderiza o restante do conteúdo padrão da change_list do Jazzmin #}
-    {{ block.super }}
-{% endblock content %}
+{% block content_title %}
+    {# Substitui o título original por um texto de teste #}
+    <h1>TESTE FUNCIONANDO</h1>
+{% endblock %}
