@@ -7,8 +7,8 @@ from .models import (
 )
 # --- Importações para Exportação ---
 from import_export.admin import ImportExportModelAdmin
-from import_export import resources, fields
-from import_export.widgets import ForeignKeyWidget
+from import_export import resources, fields # Adicionado fields
+from import_export.widgets import ForeignKeyWidget # Adicionado ForeignKeyWidget
 # ------------------------------------
 
 # --- Outras Importações ---
@@ -25,30 +25,29 @@ from .forms import PerguntaAdminForm
 # ---------------------------
 
 
-# --- Resource para Exportação de Narrativa ---
+# --- Resource para Exportação de Narrativa (CORRIGIDO) ---
 class NarrativaResource(resources.ModelResource):
+    # Usa um ForeignKeyWidget para buscar o título da cena inicial
+    cena_inicial_titulo = fields.Field(
+        column_name='Cena Inicial (Título)',
+        attribute='cena_inicial',
+        widget=ForeignKeyWidget(Cena, field='titulo') # Busca o campo 'titulo' do modelo Cena
+    )
     # Campo calculado para contar inícios
-    total_inicios = fields.Field()
+    total_inicios = fields.Field(column_name='Total de Inícios')
 
     class Meta:
         model = Narrativa
-        fields = ('id', 'titulo', 'categoria', 'visualizacoes', 'data_criacao', 'cena_inicial__titulo', 'total_inicios') # Inclui título da cena inicial
+        # Usa o novo campo 'cena_inicial_titulo'
+        fields = ('id', 'titulo', 'categoria', 'visualizacoes', 'data_criacao', 'cena_inicial_titulo', 'total_inicios')
         export_order = fields
 
     # Método para calcular o total de inícios para cada narrativa
     def dehydrate_total_inicios(self, narrativa):
+        # Retorna 0 se não houver inícios
         return SessaoPaciente.objects.filter(narrativa_perfil=narrativa).count()
 
-    # Define o nome da coluna para cena_inicial__titulo
-    def get_export_headers(self):
-        headers = super().get_export_headers()
-        try:
-            # Renomeia o header da coluna da cena inicial
-            idx = headers.index('cena_inicial__titulo')
-            headers[idx] = 'Cena Inicial (Título)'
-        except ValueError:
-            pass # Ignora se a coluna não estiver presente
-        return headers
+    # O método get_export_headers não é mais necessário para renomear a coluna
 # ---------------------------------------------
 
 
@@ -96,8 +95,8 @@ class CenaAdmin(admin.ModelAdmin):
 
 
 @admin.register(Narrativa)
-class NarrativaAdmin(ImportExportModelAdmin): # <-- MUDADO AQUI para incluir exportação
-    resource_class = NarrativaResource # <-- Define o resource para exportação
+class NarrativaAdmin(ImportExportModelAdmin): # Herda de ImportExportModelAdmin
+    resource_class = NarrativaResource # Define o resource para exportação
     list_display = ('titulo', 'categoria', 'visualizacoes', 'data_criacao', 'cena_inicial', 'links_relatorios_narrativa') # Adicionado link
     list_filter = ('categoria',) #
     search_fields = ('titulo', 'descricao') # Adicionado campo de busca
