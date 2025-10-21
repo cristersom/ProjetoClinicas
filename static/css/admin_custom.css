@@ -1,60 +1,76 @@
-/* --- Melhorias no Inline de Perguntas (QuestionarioAdmin) --- */
+/* --- Melhorias no Inline de Perguntas (QuestionarioAdmin - Jazzmin + Nested Admin) --- */
 
-/* Seleciona o container de cada pergunta (linha) dentro do inline */
-.js-nested-inline-formset .nested-inline-row {
-    padding: 20px; /* Adiciona mais espaço interno */
-    margin-top: 15px; /* Mantém o espaço entre as perguntas */
-    border: 1px solid #dee2e6; /* Adiciona uma borda sutil */
-    border-radius: 5px; /* Cantos arredondados */
-    background-color: #ffffff; /* Fundo padrão branco */
+/* Seleciona o container TBODY de cada pergunta (item) */
+.inline-group tbody.djn-item {
+    display: block; /* Garante que padding/margin funcionem bem */
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #ffffff;
 }
 
-/* Zebra Striping: Aplica um fundo cinza claro às linhas pares */
-.js-nested-inline-formset .nested-inline-row:nth-of-type(even) {
-    background-color: #f8f9fa; /* Cinza bem claro (padrão Bootstrap) */
+/* Zebra Striping: Aplica fundo cinza às linhas pares (pares no DOM) */
+.inline-group tbody.djn-item:nth-of-type(even) {
+    background-color: #f8f9fa; /* Cinza bem claro */
 }
 
-/* Remove margem e borda superior da primeira pergunta para não ficar estranho */
-.js-nested-inline-formset .nested-inline-row:first-of-type {
+/* Remove margem superior da primeira pergunta */
+.inline-group tbody.djn-item:first-of-type {
     margin-top: 0;
-    border-top: 1px solid #dee2e6; /* Garante que a primeira tenha borda superior */
+    /* border-top: 1px solid #dee2e6; */ /* A borda normal já serve */
 }
 
 /* --- Ajustes de Alinhamento dos Títulos --- */
 
-/* Esconde os títulos originais que ficam desalinhados */
-.js-nested-inline-formset > h2 + .tabular.inline-related fieldset > table > thead {
+/* Esconde os títulos originais do THEAD */
+.inline-group thead.djn-module.djn-thead {
     display: none;
 }
 
-/* Adiciona "pseudo-títulos" usando ::before nos campos da *primeira* linha */
-/* Isso garante que eles fiquem alinhados com os campos */
-.js-nested-inline-formset .nested-inline-row:first-of-type .field-texto_pergunta::before,
-.js-nested-inline-formset .nested-inline-row:first-of-type .field-tipo_resposta::before {
-    content: attr(data-label); /* Pega o texto do label */
+/* Adiciona "pseudo-títulos" usando ::before nos TDs da *primeira* linha */
+/* O seletor mira o TD dentro da primeira TR, dentro do primeiro TBODY.djn-item */
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.field-texto_pergunta::before,
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.field-tipo_resposta::before,
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.delete::before { /* Adiciona para o "Remover?" */
+    content: attr(data-label); /* Tenta usar data-label se existir */
     font-weight: bold;
     display: block;
     margin-bottom: 5px;
-    color: #6c757d; /* Cor cinza padrão do admin */
-    font-size: 0.9em;
+    color: #495057; /* Cor de texto padrão do Jazzmin */
+    font-size: 0.875rem; /* Tamanho padrão do Jazzmin */
+    text-transform: uppercase; /* Deixa em maiúsculas como o padrão */
+    letter-spacing: 0.5px;
 }
 
-/* Define os textos dos pseudo-títulos */
-.js-nested-inline-formset .nested-inline-row:first-of-type .field-texto_pergunta::before {
+/* Define os textos dos pseudo-títulos explicitamente */
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.field-texto_pergunta::before {
     content: "Texto pergunta";
 }
-.js-nested-inline-formset .nested-inline-row:first-of-type .field-tipo_resposta::before {
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.field-tipo_resposta::before {
     content: "Tipo resposta";
+}
+.inline-group tbody.djn-item:first-of-type tr.djn-tr.form-row > td.delete::before {
+    content: "Remover?"; /* Adiciona título para a coluna de remover */
+    color: transparent; /* Esconde visualmente se não quiser, mas mantém espaço */
+    /* Ou remova este bloco inteiro se não quiser o título "Remover?" */
 }
 
 /* Ajusta a largura do campo de texto da pergunta */
-.form-row .field-texto_pergunta input[type="text"] {
-    width: 95% !important; /* Aumenta um pouco mais a largura */
+td.field-texto_pergunta input[type="text"] {
+    width: 95% !important;
 }
 
-/* Opcional: Ajusta a largura do dropdown de tipo de resposta */
-.form-row .field-tipo_resposta select {
-    min-width: 150px; /* Garante uma largura mínima */
+/* Ajusta a largura do dropdown de tipo de resposta */
+td.field-tipo_resposta select {
+    min-width: 200px !important; /* Aumenta a largura mínima */
+    width: auto; /* Permite que cresça se necessário */
+}
+
+/* Opcional: Alinha o botão "Remove" um pouco melhor se necessário */
+td.delete a.inline-deletelink {
+    margin-top: 25px; /* Ajuste conforme necessário para alinhar com os campos */
+    display: inline-block;
 }
 
 /* --- Fim das Melhorias --- */
