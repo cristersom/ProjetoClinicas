@@ -1,3 +1,4 @@
+# FORÇANDO ATUALIZAÇÃO - v127 - ARQUIVO COMPLETO
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
 from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente
