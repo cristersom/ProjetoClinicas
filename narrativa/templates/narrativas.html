@@ -199,7 +199,6 @@ Narrativas
 </main>
 
 <script>
-    // --- CORREÇÃO APLICADA AQUI ---
     const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
 
     function copyLinkToClipboard() {
@@ -219,7 +218,7 @@ Narrativas
             navigator.share({
                 title: 'Convite para Jornada Interativa',
                 text: 'Olá! Gostaria de te convidar para iniciar uma jornada interativa.',
-                url: linkParaCompartilhar
+                url: linkParaCompartilharr
             });
         }
     }
