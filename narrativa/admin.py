@@ -15,15 +15,27 @@ from django.utils.html import format_html
 from collections import Counter
 import json
 
-# --- Importar o novo formulário ---
+# Importar o formulário customizado
 from .forms import PerguntaAdminForm
 
 
-# ---------------------------------
+# --- Filtro de Perfil ---
+class NarrativaPerfilFilter(admin.SimpleListFilter):
+    title = 'por Perfil (Narrativa)'
+    parameter_name = 'narrativa_perfil'
+
+    def lookups(self, request, model_admin):
+        return [(narrativa.id, narrativa.titulo) for narrativa in Narrativa.objects.all()]
+
+    def queryset(self, request, queryset):
+        if self.value():
+            sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=self.value())
+            lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+            return queryset.filter(session_key__in=lista_de_session_keys)
+        return queryset
 
 
-# ... (Código das classes RespostaResource, NarrativaPerfilFilter, EscolhaInline, OpcaoRespostaInline permanece igual) ...
-
+# --- Classes Inline ---
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -38,7 +50,7 @@ class OpcaoRespostaInline(nested_admin.NestedTabularInline):
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
-    form = PerguntaAdminForm  # <-- Diz ao Inline para usar nosso formulário customizado
+    form = PerguntaAdminForm  # Usa o formulário customizado
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
@@ -63,15 +75,13 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios')
     inlines = [PerguntaInline]
 
-    # --- Adicionar CSS para separação ---
     class Media:
         css = {
-            'all': ('admin_custom.css',)  # Nome do arquivo CSS que criaremos
+            'all': ('admin_custom.css',)
         }
 
-    # ----------------------------------
-
-    # ... (Restante do código do QuestionarioAdmin com get_urls, links_relatorios, resumo_agregado_view, etc. permanece igual) ...
+    # Funções get_urls, links_relatorios, resumo_agregado_view, relatorio_detalhado_view
+    # (Copie-as da versão anterior do arquivo, elas não mudam)
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -101,11 +111,9 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     links_relatorios.short_description = 'Relatórios'
 
-    # --- VIEW DE RESUMO AGREGADO (ATUALIZADA PARA COMPARAÇÃO) ---
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
 
-        # --- LÓGICA DO FILTRO DE COMPARAÇÃO ---
         todos_os_perfis = Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
 
@@ -219,15 +227,40 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 
+# --- Define RespostaResource ANTES de RespostaAdmin ---
+class RespostaResource(resources.ModelResource):
+    questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
+    perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
+
+    class Meta:
+        model = Resposta
+        fields = ('id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',
+                  'data_resposta')
+        export_order = fields
+
+    def dehydrate_perfil_narrativa(self, resposta):
+        try:
+            sessao = SessaoPaciente.objects.get(session_key=resposta.session_key)
+            if sessao.narrativa_perfil:
+                return sessao.narrativa_perfil.titulo
+        except SessaoPaciente.DoesNotExist:
+            return 'Não definido'
+        return 'Não definido'
+
+
+# ----------------------------------------------------
+
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
-    resource_class = RespostaResource
+    resource_class = RespostaResource  # Agora deve encontrar a classe
     list_display = (
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
     list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',)
     search_fields = ('texto_resposta', 'session_key')
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
 
+    # Funções get_urls e resumo_global_view
+    # (Copie-as da versão anterior, elas não mudam)
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -347,4 +380,5 @@ class RespostaAdmin(ImportExportModelAdmin):
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 
+# Registra o usuário customizado
 admin.site.register(Usuario, UserAdmin)
