@@ -1,8 +1,7 @@
-# FORÇANDO ATUALIZAÇÃO - ESTE É O ARQUIVO CORRETO (v125)
+# FORÇANDO ATUALIZAÇÃO v132
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Pergunta
 from django import forms
-
 # --- Formulário da Homepage (Original) ---
 class FormHomepage(forms.Form):
     email = forms.EmailField(label=False)
@@ -40,7 +39,6 @@ class PerguntaAdminForm(forms.ModelForm):
         }),
         required=True
     )
-
     class Meta:
         model = Pergunta
         fields = '__all__'
