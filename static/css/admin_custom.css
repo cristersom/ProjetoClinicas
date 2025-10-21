@@ -1,0 +1,20 @@
+/* Adiciona uma borda superior e um pouco de margem acima de cada linha do inline tabular */
+/* O seletor pode precisar de ajuste dependendo da estrutura exata do Jazzmin/nested-admin */
+
+.js-nested-inline-formset .nested-inline-row {
+    border-top: 2px solid #dee2e6; /* Cor cinza claro, ajuste conforme o tema */
+    padding-top: 15px; /* Espaçamento acima da borda */
+    margin-top: 15px; /* Espaçamento entre as linhas */
+}
+
+/* Opcional: Remover borda da primeira linha para não ficar estranho */
+.js-nested-inline-formset .nested-inline-row:first-of-type {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+/* Opcional: Aumentar a largura do campo de texto da pergunta se TextInput for pequeno */
+.form-row .field-texto_pergunta input[type="text"] {
+    width: 90% !important; /* Força a largura */
+}

@@ -15,44 +15,15 @@ from django.utils.html import format_html
 from collections import Counter
 import json
 
-
-# --- Classes de customização (Exportação e Filtro) ---
-class RespostaResource(resources.ModelResource):
-    questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
-    perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
-
-    class Meta:
-        model = Resposta
-        fields = ('id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',
-                  'data_resposta')
-        export_order = fields
-
-    def dehydrate_perfil_narrativa(self, resposta):
-        try:
-            sessao = SessaoPaciente.objects.get(session_key=resposta.session_key)
-            if sessao.narrativa_perfil:
-                return sessao.narrativa_perfil.titulo
-        except SessaoPaciente.DoesNotExist:
-            return 'Não definido'
-        return 'Não definido'
+# --- Importar o novo formulário ---
+from .forms import PerguntaAdminForm
 
 
-class NarrativaPerfilFilter(admin.SimpleListFilter):
-    title = 'por Perfil (Narrativa)'
-    parameter_name = 'narrativa_perfil'
-
-    def lookups(self, request, model_admin):
-        return [(narrativa.id, narrativa.titulo) for narrativa in Narrativa.objects.all()]
-
-    def queryset(self, request, queryset):
-        if self.value():
-            sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=self.value())
-            lista_de_session_keys = sessoes.values_list('session_key', flat=True)
-            return queryset.filter(session_key__in=lista_de_session_keys)
-        return queryset
+# ---------------------------------
 
 
-# --- Classes Inline ---
+# ... (Código das classes RespostaResource, NarrativaPerfilFilter, EscolhaInline, OpcaoRespostaInline permanece igual) ...
+
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -67,6 +38,7 @@ class OpcaoRespostaInline(nested_admin.NestedTabularInline):
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
+    form = PerguntaAdminForm  # <-- Diz ao Inline para usar nosso formulário customizado
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
@@ -91,6 +63,15 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios')
     inlines = [PerguntaInline]
 
+    # --- Adicionar CSS para separação ---
+    class Media:
+        css = {
+            'all': ('admin_custom.css',)  # Nome do arquivo CSS que criaremos
+        }
+
+    # ----------------------------------
+
+    # ... (Restante do código do QuestionarioAdmin com get_urls, links_relatorios, resumo_agregado_view, etc. permanece igual) ...
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -120,9 +101,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     links_relatorios.short_description = 'Relatórios'
 
+    # --- VIEW DE RESUMO AGREGADO (ATUALIZADA PARA COMPARAÇÃO) ---
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
 
+        # --- LÓGICA DO FILTRO DE COMPARAÇÃO ---
         todos_os_perfis = Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
 
@@ -237,15 +220,13 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 
 @admin.register(Resposta)
-class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
+class RespostaAdmin(ImportExportModelAdmin):
     resource_class = RespostaResource
     list_display = (
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
     list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',)
     search_fields = ('texto_resposta', 'session_key')
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
-
-    # --- INÍCIO DA ADIÇÃO DA VIEW GLOBAL ---
 
     def get_urls(self):
         urls = super().get_urls()
@@ -260,35 +241,28 @@ class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
 
     def resumo_global_view(self, request, *args, **kwargs):
 
-        # --- LÓGICA DOS FILTROS ---
         todos_os_perfis = Narrativa.objects.all()
         todos_os_questionarios = Questionario.objects.all()
 
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
         questionarios_selecionados_ids = request.GET.getlist('questionario_id')
 
-        # Query base de TODAS as respostas
         respostas_base = Resposta.objects.all()
 
-        # Filtro de Questionários
         if questionarios_selecionados_ids and 'all' not in questionarios_selecionados_ids:
             respostas_base = respostas_base.filter(pergunta__questionario_id__in=questionarios_selecionados_ids)
         else:
-            questionarios_selecionados_ids = ['all']  # Default
+            questionarios_selecionados_ids = ['all']
 
-        # Filtro de Perfis
         perfis_a_processar = []
         if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
             perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis (Agregado)'})
-            perfis_selecionados_ids = ['all']  # Default
+            perfis_selecionados_ids = ['all']
         else:
             perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
             for p in perfis_selecionados:
                 perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
 
-        # --- FIM DOS FILTROS ---
-
-        # Busca perguntas relevantes (apenas dos questionários selecionados)
         if 'all' in questionarios_selecionados_ids:
             perguntas = Pergunta.objects.all().order_by('questionario__id', 'id')
         else:
@@ -297,13 +271,10 @@ class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
 
         dados_comparativos = {}
 
-        # O processamento é idêntico ao anterior, mas agora iteramos
-        # sobre as perguntas filtradas e os perfis filtrados.
         for pergunta in perguntas:
 
             dados_comparativos[pergunta.id] = {
                 'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",
-                # Adiciona nome do Q.
                 'pergunta_tipo': pergunta.get_tipo_resposta_display,
                 'pergunta_tipo_raw': pergunta.tipo_resposta,
                 'dados_por_perfil': []
@@ -357,7 +328,6 @@ class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
             **self.admin_site.each_context(request),
             'title': "Relatório Global Comparativo de Respostas",
             'dados_comparativos': dados_comparativos,
-            # Passa os dados dos filtros
             'todos_os_perfis': todos_os_perfis,
             'perfis_selecionados_ids': perfis_selecionados_ids,
             'todos_os_questionarios': todos_os_questionarios,
@@ -365,8 +335,6 @@ class RespostaAdmin(ImportExportModelAdmin):  # ATUALIZADO AQUI
         }
 
         return render(request, 'admin/relatorio_resumo_global.html', context)
-
-    # --- FIM DA ADIÇÃO ---
 
     def questionario_associado(self, obj):
         return obj.pergunta.questionario.titulo
