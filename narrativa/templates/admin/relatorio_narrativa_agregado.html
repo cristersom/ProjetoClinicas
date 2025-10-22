@@ -1,0 +1,169 @@
+{% comment %}
+NOVO ARQUIVO: narrativa/templates/admin/relatorio_narrativa_agregado.html
+{% endcomment %}
+
+{% extends "admin/base_site.html" %}
+{% block title %} {{ title }} {% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Estilos copiados de relatorio_resumo_global.html */
+    .profile-block { 
+        border: 1px solid #eee;
+        padding: 15px;
+        background: #fdfdfd;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .text-response-list { /* */
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background: #f9f9f9;
+        list-style-type: disc;
+        padding-left: 25px;
+    }
+    .filter-form fieldset { /* */
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    .filter-form legend { /* */
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .filter-form .checkbox-grid { /* */
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    .filter-form label { /* */
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div id="content-main">
+  <h1>{{ title }}</h1>
+
+  <div class="module filter-form">
+    <form method="GET" action="" id="global-filter-form">
+      <fieldset>
+        <legend>Filtrar por Questionários</legend>
+        <div class="checkbox-grid">
+            <label>
+                <input type="checkbox" name="questionario_id" value="all"
+                       {% if 'all' in questionarios_selecionados_ids %}checked{% endif %}
+                       id="check-all-questionarios">
+                <strong>Todos os Questionários (relevantes para esta narrativa)</strong>
+            </label>
+            {% for q in todos_os_questionarios %}
+            <label>
+                <input type="checkbox" name="questionario_id" value="{{ q.id }}"
+                       class="questionario-check"
+                       {% if q.id|stringformat:"s" in questionarios_selecionados_ids %}checked{% endif %}>
+                {{ q.titulo }}
+            </label>
+            {% endfor %}
+        </div>
+      </fieldset>
+      <div style="margin-top: 15px;">
+          <input type="submit" value="Filtrar Relatório" class="button default">
+      </div>
+    </form>
+  </div>
+
+  {% for pergunta_id, dados_pergunta in dados_agregados.items %}
+  <div class="module profile-block"> <h2>{{ dados_pergunta.pergunta_texto }}</h2>
+    <p><strong>Total de Respostas:</strong> {{ dados_pergunta.total_respostas }}</p>
+
+    {% if dados_pergunta.pergunta_tipo_raw == "TEXTO" %} <ul class="text-response-list">
+            {% for resposta_txt in dados_pergunta.respostas_texto %}
+                {% if resposta_txt %}
+                    <li>{{ resposta_txt }}</li>
+                {% endif %}
+            {% empty %}
+                <li>Nenhuma resposta.</li>
+            {% endfor %}
+        </ul>
+
+    {% elif dados_pergunta.dados_grafico %} {% if dados_pergunta.total_respostas > 0 %}
+            <div style="width: 100%; max-width: 600px; margin: auto;">
+                <canvas id="grafico-pergunta-{{ pergunta_id }}"></canvas> </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                const ctx_{{ pergunta_id }} = document.getElementById('grafico-pergunta-{{ pergunta_id }}');
+
+                new Chart(ctx_{{ pergunta_id }}, {
+                    type: '{{ dados_pergunta.dados_grafico.tipo_grafico }}',
+                    data: {
+                        labels: {{ dados_pergunta.dados_grafico.labels|safe }},
+                        datasets: [{
+                            label: 'Nº de Respostas',
+                            data: {{ dados_pergunta.dados_grafico.data|safe }},
+                            backgroundColor: [ /* */
+                                'rgba(54, 162, 235, 0.7)',
+                                'rgba(255, 99, 132, 0.7)',
+                                'rgba(255, 206, 86, 0.7)',
+                                'rgba(75, 192, 192, 0.7)',
+                                'rgba(153, 102, 255, 0.7)',
+                                'rgba(255, 159, 64, 0.7)',
+                                'rgba(199, 199, 199, 0.7)'
+                            ]
+                        }]
+                    },
+                    options: { /* */
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                display: '{{ dados_pergunta.dados_grafico.tipo_grafico }}' === 'pie' ? true : false,
+                            }
+                        }
+                    }
+                });
+            });
+            </script>
+        {% else %}
+            <p>Nenhuma resposta encontrada.</p>
+        {% endif %}
+    {% endif %}
+  </div>
+  {% empty %}
+  <p>Nenhum dado encontrado para esta narrativa (com os filtros selecionados).</p>
+  {% endfor %}
+
+</div>
+
+<script>
+// JS para os checkboxes
+document.addEventListener('DOMContentLoaded', (event) => {
+    const checkAllQuestionarios = document.getElementById('check-all-questionarios');
+    const questionarioChecks = document.querySelectorAll('.questionario-check');
+
+    checkAllQuestionarios.addEventListener('change', function() {
+        if (this.checked) {
+            questionarioChecks.forEach(check => { check.checked = false; });
+        }
+    });
+    questionarioChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            if (this.checked) {
+                checkAllQuestionarios.checked = false;
+            }
+        });
+    });
+});
+</script>
+
+{% endblock %}
