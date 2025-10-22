@@ -1,42 +1,179 @@
 {% extends "admin/base_site.html" %}
 {% block title %} {{ title }} {% endblock %}
 
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Estilos copiados de relatorio_resumo_global.html */
+    .chart-container {
+        width: 80%;
+        max-width: 900px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        background: #fff;
+    }
+    .results table {
+      width: 100%;
+    }
+    .filter-form fieldset { /* */
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+    .filter-form legend { /* */
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    .filter-form .checkbox-grid { /* */
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    .filter-form label { /* */
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 <div id="content-main">
   <h1>{{ title }}</h1>
-  <p>Mostrando o percurso de pacientes que iniciaram esta narrativa como sua jornada principal.</p>
 
-  {% for session_key, visitas in dados_do_relatorio.items %}
+  <div class="module filter-form">
+    <form method="GET" action="" id="profile-filter-form">
+      <fieldset>
+        <legend>Filtrar por Perfil do Paciente (definido na 1ª jornada)</legend>
+        <div class="checkbox-grid">
+            <label>
+                <input type="checkbox" name="narrativa_perfil_id" value="all"
+                       {% if 'all' in perfis_selecionados_ids %}checked{% endif %}
+                       id="check-all-profiles">
+                <strong>Todos os Perfis</strong>
+            </label>
+            {% for perfil in todos_os_perfis %}
+            <label>
+                <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}"
+                       class="profile-check"
+                       {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
+                {{ perfil.titulo }} (Perfil)
+            </label>
+            {% endfor %}
+        </div>
+        <div style="margin-top: 15px;">
+            <input type="submit" value="Filtrar Relatório" class="button default">
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  {% if dados_agregados_cenas %}
+
   <div class="module">
-    <h2>Paciente (Sessão: {{ session_key|slice:":8" }}...)</h2>
+    <h2>Visão Geral das Visitas por Cena (Filtrado por Perfil)</h2>
+    <div class="chart-container">
+        <canvas id="graficoVisitasCena"></canvas>
+    </div>
+  </div>
+
+  <div class="module">
+    <h2>Dados Detalhados por Cena (Filtrado por Perfil)</h2>
     <div class="results">
         <table id="result_list">
             <thead>
               <tr>
                 <th class="sortable column-cena">
-                  <div class="text"><a>Cena Visitada</a></div>
+                  <div class="text"><a>Cena</a></div>
                 </th>
-                <th class="sortable column-timestamp">
-                  <div class="text"><a>Horário da Visita</a></div>
+                <th class="sortable column-visitas-totais num">
+                  <div class="text"><a>Total de Visitas</a></div>
+                </th>
+                <th class="sortable column-visitantes-unicos num">
+                  <div class="text"><a>Visitantes Únicos</a></div>
                 </th>
               </tr>
             </thead>
             <tbody>
-                {% for visita in visitas %}
+                {% for dados_cena in dados_agregados_cenas %}
                 <tr class="{% cycle 'row1' 'row2' %}">
-                    <td class="field-cena">{{ visita.cena_visitada.titulo }}</td>
-                    <td class="field-timestamp"><strong>{{ visita.timestamp|date:"d/m/Y H:i:s" }}</strong></td>
+                    <th class="field-cena">{{ dados_cena.cena_titulo }}</th>
+                    <td class="field-visitas-totais num">{{ dados_cena.total_visitas }}</td>
+                    <td class="field-visitantes-unicos num">{{ dados_cena.visitantes_unicos }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
   </div>
-  {% endfor %}
 
-  {% if not dados_do_relatorio %}
-    <p>Ainda não há registros de percurso para os pacientes com este perfil de narrativa.</p>
+  {% else %}
+    <p>Ainda não há registros de visitas para as cenas desta narrativa OU para os perfis selecionados.</p>
   {% endif %}
 
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    // Lógica do Gráfico (como antes)
+    const ctx = document.getElementById('graficoVisitasCena');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ labels_grafico|safe }},
+                datasets: [
+                {
+                    label: 'Total de Visitas',
+                    data: {{ data_visitas_totais|safe }},
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Visitantes Únicos',
+                    data: {{ data_visitantes_unicos|safe }},
+                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }
+            ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top', },
+                    title: { display: true, text: 'Visitas Totais vs. Visitantes Únicos por Cena' }
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
+    }
+
+    // Lógica para os checkboxes de Perfil (similar a outros relatórios)
+    const checkAllProfiles = document.getElementById('check-all-profiles');
+    const profileChecks = document.querySelectorAll('.profile-check');
+
+    checkAllProfiles.addEventListener('change', function() {
+        if (this.checked) {
+            profileChecks.forEach(check => { check.checked = false; });
+        }
+    });
+    profileChecks.forEach(check => {
+        check.addEventListener('change', function() {
+            if (this.checked) {
+                checkAllProfiles.checked = false;
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}
