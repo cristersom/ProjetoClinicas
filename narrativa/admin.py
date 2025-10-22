@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta
+    SessaoPaciente, OpcaoResposta, LogVisitaCena  # ADICIONADO LogVisitaCena
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -71,123 +71,67 @@ class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
     list_filter = ('categoria',)  #
 
-    # --- MÉTODOS ADICIONADOS PARA O RELATÓRIO AGREGADO DA NARRATIVA ---
+    # --- LÓGICA DE RELATÓRIO DE PERCURSO ---
 
     def get_urls(self):
-        """Adiciona a URL customizada para o relatório da narrativa."""
+        """Adiciona a URL customizada para o relatório de percurso."""
         urls = super().get_urls()
         custom_urls = [
             path(
-                '<path:object_id>/resumo_narrativa/',
-                self.admin_site.admin_view(self.resumo_narrativa_view),
-                name='narrativa_narrativa_resumo',  # Novo nome de URL
+                '<path:object_id>/relatorio_percurso/',
+                self.admin_site.admin_view(self.relatorio_percurso_view),
+                name='narrativa_narrativa_percurso',  # URL do percurso
             ),
         ]
         return custom_urls + urls
 
     def links_relatorios(self, obj):
         """Cria o botão na lista de Narrativas."""
-        # obj aqui é uma instância de Narrativa
-        url_resumo = reverse('admin:narrativa_narrativa_resumo', args=[obj.pk])
+        url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
         return format_html(
-            '<a class="button" href="{}">Ver Relatório Agregado</a>',
-            url_resumo
+            '<a class="button" href="{}">Relatório de Percurso</a>',
+            url_percurso
         )
 
-    links_relatorios.short_description = 'Relatório de Respostas'
+    links_relatorios.short_description = 'Relatório de Percurso'
 
-    def resumo_narrativa_view(self, request, object_id, *args, **kwargs):
+    def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         """
-        View que gera o relatório agregado para UMA narrativa específica (perfil).
-        Esta lógica é uma adaptação da 'resumo_global_view'.
+        View que mostra o percurso de cenas visitadas por pacientes 
+        que têm esta narrativa como seu perfil.
         """
-
         # 1. Obter a Narrativa (Perfil) principal
         narrativa_perfil = self.get_object(request, object_id)
 
         # 2. Encontrar todas as sessões de pacientes associadas a este perfil
         sessoes = SessaoPaciente.objects.filter(narrativa_perfil=narrativa_perfil)
-        lista_de_session_keys = sessoes.values_list('session_key', flat=True)  #
+        lista_de_session_keys = sessoes.values_list('session_key', flat=True)
 
-        # 3. Obter todas as respostas dadas por essas sessões
-        respostas_base = Resposta.objects.filter(session_key__in=lista_de_session_keys)
+        # 3. Encontrar todos os logs de visita destes pacientes,
+        #    mas APENAS para cenas que pertencem a ESTA narrativa.
+        visitas = LogVisitaCena.objects.filter(
+            session_key__in=lista_de_session_keys,
+            narrativa_associada=narrativa_perfil
+        ).order_by('session_key', 'timestamp')
 
-        # 4. Lógica de Filtro de Questionário (igual à resumo_global_view)
+        # 4. Agrupar visitas por sessão (paciente)
+        dados_do_relatorio = {}
+        for visita in visitas:
+            if visita.session_key not in dados_do_relatorio:
+                dados_do_relatorio[visita.session_key] = []
+            dados_do_relatorio[visita.session_key].append(visita)
 
-        # Obtém apenas questionários que têm respostas vindas desta narrativa
-        todos_os_questionarios = Questionario.objects.filter(
-            perguntas__respostas__in=respostas_base
-        ).distinct()
-
-        questionarios_selecionados_ids = request.GET.getlist('questionario_id')  #
-
-        if questionarios_selecionados_ids and 'all' not in questionarios_selecionados_ids:  #
-            respostas_base = respostas_base.filter(pergunta__questionario_id__in=questionarios_selecionados_ids)
-            perguntas = Pergunta.objects.filter(
-                questionario_id__in=questionarios_selecionados_ids,
-                respostas__in=respostas_base
-            ).distinct().order_by('questionario__id', 'id')
-        else:
-            questionarios_selecionados_ids = ['all']
-            perguntas = Pergunta.objects.filter(
-                respostas__in=respostas_base
-            ).distinct().order_by('questionario__id', 'id')
-
-        # 5. Agregar os dados (lógica simplificada da resumo_global_view)
-        dados_agregados = {}
-
-        for pergunta in perguntas:
-
-            respostas_pergunta = respostas_base.filter(pergunta=pergunta)
-            total_respostas = respostas_pergunta.count()
-
-            dados_pergunta = {
-                'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",  #
-                'pergunta_tipo_raw': pergunta.tipo_resposta,  #
-                'total_respostas': total_respostas,
-                'dados_grafico': None,
-                'respostas_texto': None
-            }
-
-            if pergunta.tipo_resposta == "TEXTO":  #
-                dados_pergunta['respostas_texto'] = list(respostas_pergunta.values_list('texto_resposta', flat=True))
-
-            elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:  #
-                contador = Counter()  #
-
-                if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":  #
-                    for resp in respostas_pergunta:
-                        opcoes_selecionadas = resp.texto_resposta.split(',')
-                        contador.update(opcoes_selecionadas)
-                else:
-                    lista_de_textos = list(respostas_pergunta.values_list('texto_resposta', flat=True))
-                    contador.update(lista_de_textos)
-
-                labels = list(contador.keys())
-                data = list(contador.values())
-
-                dados_pergunta['dados_grafico'] = {
-                    'labels': json.dumps(labels),
-                    'data': json.dumps(data),
-                    'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'  #
-                }
-
-            dados_agregados[pergunta.id] = dados_pergunta
-
-        # 6. Preparar o contexto para o template
         context = {
             **self.admin_site.each_context(request),
-            'title': f"Relatório Agregado para: {narrativa_perfil.titulo}",
+            'title': f"Relatório de Percurso: {narrativa_perfil.titulo}",
             'narrativa_perfil': narrativa_perfil,
-            'dados_agregados': dados_agregados,
-            'todos_os_questionarios': todos_os_questionarios,
-            'questionarios_selecionados_ids': questionarios_selecionados_ids,
+            'dados_do_relatorio': dados_do_relatorio,  # {session_key: [visita1, visita2], ...}
         }
 
-        # 7. Renderizar o NOVO template (relatorio_narrativa_agregado.html)
-        return render(request, 'admin/relatorio_narrativa_agregado.html', context)
+        # 7. Renderizar o NOVO template de percurso
+        return render(request, 'admin/relatorio_narrativa_percurso.html', context)
 
-    # --- FIM DAS ADIÇÕES ---
+    # --- FIM DAS MODIFICAÇÕES ---
 
 
 @admin.register(Questionario)
@@ -201,7 +145,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             'all': ('css/admin_custom.css',)  #
         }
 
-    # Funções get_urls, links_relatorios, resumo_agregado_view, relatorio_detalhado_view (Originais)
+    # Funções get_urls, links_relatorios, etc. (Originais do Questionario)
     def get_urls(self):
         urls = super().get_urls()  #
         custom_urls = [  #
