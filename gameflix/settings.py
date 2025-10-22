@@ -5,7 +5,11 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+
+# MUDANÇA 1: Default mais seguro para o DEBUG
+# Se a variável de ambiente DEBUG não existir, ele vai assumir 'False'.
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
@@ -91,9 +95,11 @@ STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
+    # MUDANÇA 2: Backend de estáticos otimizado para o Whitenoise
+    # Você já usa o middleware do Whitenoise, então deve usar o storage dele também.
+    # Isso é mais eficiente e corrige erros de arquivos estáticos em produção.
     "staticfiles": {
-        # Alterado para ManifestStaticFilesStorage para forçar atualização de cache
-        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -170,4 +176,29 @@ JAZZMIN_UI_TWEAKS = {
         "danger": "btn-danger",
         "success": "btn-success"
     }
+}
+
+
+# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
+# Isso fará com que os erros 500 (quando DEBUG=False)
+# sejam impressos no log do Heroku.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING', # Captura 'warnings' e 'errors'
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Nível de log do Django
+            'propagate': False,
+        },
+    },
 }
