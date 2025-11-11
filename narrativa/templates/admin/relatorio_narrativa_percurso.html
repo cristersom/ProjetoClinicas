@@ -42,7 +42,7 @@
     /* Para alinhar os botões de filtro e exportação */
     .filter-buttons {
         display: flex;
-        flex-wrap: wrap;
+        flex-wrap: wrap; /* Permite quebrar a linha em telas menores */
         gap: 10px;
         align-items: center;
         margin-top: 15px;
@@ -79,7 +79,7 @@
         <div class="filter-buttons">
             <input type="submit" value="Filtrar Relatório" class="button default">
             {# O 'request.GET.urlencode' preserva os filtros atuais no link de exportação #}
-            <a href="?{{ request.GET.urlencode }}&export=xlsx" class="button">Exportar XLSX</a>
+            <a href="?{{ request.GET.urlencode }}&export=xlsx" class="button">Exportar XLSX</a> {# <-- CORRIGIDO AQUI #}
             <a href="?{{ request.GET.urlencode }}&export=csv" class="button">Exportar CSV</a>
             <a href="?{{ request.GET.urlencode }}&export=json" class="button">Exportar JSON</a>
         </div>

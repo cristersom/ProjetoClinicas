@@ -4,7 +4,6 @@ import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena
-    # Categoria # COMENTADO TEMPORARIAMENTE
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -13,7 +12,7 @@ from import_export import resources
 from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
-from tablib import Dataset
+from tablib import Dataset  # Para exportação avançada
 from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
@@ -23,14 +22,6 @@ from django.db.models.functions import Coalesce
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
-
-
-# --- ADMIN DE CATEGORIA COMENTADO TEMPORARIAMENTE ---
-# @admin.register(Categoria)
-# class CategoriaAdmin(admin.ModelAdmin):
-#     list_display = ('titulo',)
-#     search_fields = ('titulo',)
-# --- FIM DA ADIÇÃO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
@@ -80,9 +71,8 @@ class CenaAdmin(admin.ModelAdmin):
 
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
-    # O list_filter 'categoria' vai falhar, então usamos o 'categoria_str' temporariamente
-    list_display = ('titulo', 'categoria_str', 'data_criacao', 'cena_inicial', 'links_relatorios')
-    list_filter = ('categoria_str',)  # MUDADO DE 'categoria' PARA 'categoria_str'
+    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
+    list_filter = ('categoria',)  #
 
     def get_urls(self):
         urls = super().get_urls()
@@ -152,19 +142,21 @@ class NarrativaAdmin(admin.ModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            # Cria o dataset
             dataset = Dataset()
             dataset.headers = ['Cena', 'Total de Visitas', 'Visitantes Únicos']
             for item in dados_agregados_cenas:
                 dataset.append([item['cena_titulo'], item['total_visitas'], item['visitantes_unicos']])
 
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = dataset.xlsx
+            # Define o tipo de arquivo e os dados
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = dataset.csv
 
@@ -309,14 +301,14 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = export_dataset.xlsx
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 
@@ -511,14 +503,14 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = export_dataset.xlsx
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 
@@ -527,14 +519,15 @@ class RespostaAdmin(ImportExportModelAdmin):
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
-        context = {
-            **self.admin_site.each_context(request),
-            'title': "Relatório Global Comparativo de Respostas",
-            'dados_comparativos': dados_comparativos,
-            'todos_os_perfis': todos_os_perfis,
-            'perfis_selecionados_ids': perfis_selecionados_ids,
-            'todos_os_questionarios': todos_os_questionarios,
-            'questionarios_selecionados_ids': questionarios_selecionados_ids,
+        # 3. Renderizar HTML
+        context = {  #
+            **self.admin_site.each_context(request),  #
+            'title': "Relatório Global Comparativo de Respostas",  #
+            'dados_comparativos': dados_comparativos,  #
+            'todos_os_perfis': todos_os_perfis,  #
+            'perfis_selecionados_ids': perfis_selecionados_ids,  #
+            'todos_os_questionarios': todos_os_questionarios,  #
+            'questionarios_selecionados_ids': questionarios_selecionados_ids,  #
         }
         return render(request, 'admin/relatorio_resumo_global.html', context)  #
 
