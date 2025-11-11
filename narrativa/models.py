@@ -2,36 +2,15 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
-
-# LISTA_CATEGORIAS FOI REMOVIDA DAQUI
-# LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ...
-
-# --- NOVO MODELO ADICIONADO AQUI ---
-class Categoria(models.Model):
-    titulo = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.titulo
-
-    class Meta:
-        verbose_name_plural = "Categorias"
-
-
-# --- FIM DO NOVO MODELO ---
+LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ("TRATAMENTO", "Tratamento"), ("ACOMPANHAMENTO", "Acompanhamento"),
+                    ("REVISÃO", "Revisão"), ("ENCERRAMENTO", "Encerramento"), ("OUTROS", "Outros"))
 
 
 class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
-
-    # --- CAMPO 'categoria' MODIFICADO ---
-    # O CharField foi substituído por um ForeignKey.
-    # null=True e blank=True garantem que as narrativas antigas
-    # (que agora terão uma categoria nula) não quebrem o banco.
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
-    # --- FIM DA MODIFICAÇÃO ---
-
+    categoria = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
     cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
@@ -123,3 +102,15 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
+
+
+# --- NOVO MODELO ADICIONADO NO FINAL ---
+class ConfiguracaoClinica(models.Model):
+    nome = models.CharField(max_length=100, default="Configuração Principal")
+    logo = models.ImageField(upload_to='logo_clinica/', blank=True, null=True, help_text="Faça o upload do logo da clínica aqui.")
+
+    def __str__(self):
+        return "Configurações do Site"
+
+    class Meta:
+        verbose_name_plural = "Configuração do Site"
