@@ -554,3 +554,6 @@ class RespostaAdmin(ImportExportModelAdmin):
 
     session_key_abreviada.short_description = 'Sessão do Paciente'  #
 
+
+# Registra o usuário customizado
+admin.site.register(Usuario, UserAdmin)  #

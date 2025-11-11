@@ -117,3 +117,14 @@ class LogVisitaCena(models.Model):
         ordering = ['session_key', 'timestamp']
 
 
+# --- MODELO LOGO (QUE JÁ ESTÁ NO SEU BD) ---
+class ConfiguracaoClinica(models.Model):
+    nome = models.CharField(max_length=100, default="Configuração Principal")
+    logo = models.ImageField(upload_to='logo_clinica/', blank=True, null=True,
+                             help_text="Faça o upload do logo da clínica aqui.")
+
+    def __str__(self):
+        return "Configurações do Site"
+
+    class Meta:
+        verbose_name_plural = "Configuração do Site"
