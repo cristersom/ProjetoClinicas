@@ -4,7 +4,6 @@ import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena
-    # ConfiguracaoClinica FOI REMOVIDO
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -13,8 +12,8 @@ from import_export import resources
 from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
-from tablib import Dataset
-from django.shortcuts import render, redirect  # Redirect foi REMOVIDO
+from tablib import Dataset  # Para exportação avançada
+from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
 import json
@@ -23,9 +22,6 @@ from django.db.models.functions import Coalesce
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
-
-
-# --- ADMIN DE CONFIGURAÇÃO REMOVIDO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
@@ -76,7 +72,7 @@ class CenaAdmin(admin.ModelAdmin):
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
-    list_filter = ('categoria',)
+    list_filter = ('categoria',)  #
 
     def get_urls(self):
         urls = super().get_urls()
@@ -146,19 +142,21 @@ class NarrativaAdmin(admin.ModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            # Cria o dataset
             dataset = Dataset()
             dataset.headers = ['Cena', 'Total de Visitas', 'Visitantes Únicos']
             for item in dados_agregados_cenas:
                 dataset.append([item['cena_titulo'], item['total_visitas'], item['visitantes_unicos']])
 
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = dataset.xlsx
+            # Define o tipo de arquivo e os dados
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = dataset.csv
 
@@ -186,8 +184,6 @@ class NarrativaAdmin(admin.ModelAdmin):
 
 @admin.register(Questionario)
 class QuestionarioAdmin(nested_admin.NestedModelAdmin):
-    # ... (O resto do seu admin.py continua daqui para baixo) ...
-    # ... (Todo o código de QuestionarioAdmin, RespostaResource, RespostaAdmin, etc.) ...
     list_display = ('titulo', 'cena_associada', 'links_relatorios')  #
     inlines = [PerguntaInline]  #
 
@@ -221,6 +217,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     links_relatorios.short_description = 'Relatórios'  #
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
+        # 1. Obter dados e filtros (lógica original)
         questionario = self.get_object(request, object_id)  #
         todos_os_perfis = Narrativa.objects.all()  #
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')  #
@@ -237,9 +234,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)  #
         dados_comparativos = {}  #
 
+        # Dataset para exportação
         export_dataset = Dataset()
         export_dataset.headers = ['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem']
 
+        # 2. Processar dados (lógica original)
         for pergunta in questionario.perguntas.all():  #
             dados_comparativos[pergunta.id] = {  #
                 'pergunta_texto': pergunta.texto_pergunta,  #
@@ -259,9 +258,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
                 if pergunta.tipo_resposta == "TEXTO":  #
                     dados_grafico_processado = list(respostas_perfil.values_list('texto_resposta', flat=True))  #
+                    # Adiciona ao dataset de exportação
                     for resposta_texto in dados_grafico_processado:
                         export_dataset.append(
                             [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], resposta_texto, 1])
+
                 elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:  #
                     contador = Counter()  #
                     if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":  #
@@ -273,6 +274,8 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     labels = list(contador.keys())  #
                     data = list(contador.values())  #
                     dados_grafico_processado = dict(zip(labels, data))
+
+                    # Adiciona ao dataset de exportação
                     for label, count in dados_grafico_processado.items():
                         export_dataset.append(
                             [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], label, count])
@@ -298,14 +301,14 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = export_dataset.xlsx
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 
@@ -314,17 +317,19 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
-        context = {
-            **self.admin_site.each_context(request),
-            'title': f"Resumo Comparativo: {questionario.titulo}",
-            'questionario': questionario,
-            'dados_comparativos': dados_comparativos,
-            'todos_os_perfis': todos_os_perfis,
-            'perfis_selecionados_ids': perfis_selecionados_ids,
+        # 3. Renderizar HTML (lógica original)
+        context = {  #
+            **self.admin_site.each_context(request),  #
+            'title': f"Resumo Comparativo: {questionario.titulo}",  #
+            'questionario': questionario,  #
+            'dados_comparativos': dados_comparativos,  #
+            'todos_os_perfis': todos_os_perfis,  #
+            'perfis_selecionados_ids': perfis_selecionados_ids,  #
         }
         return render(request, 'admin/relatorio_questionario_agregado.html', context)  #
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
+        # ... (código original desta view, não precisa mexer)
         questionario = self.get_object(request, object_id)  #
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key',
                                                                                           'pergunta__id')  #
@@ -344,6 +349,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
+    # ... (código original desta classe)
     list_display = ('session_key_abreviada', 'narrativa_perfil', 'data_criacao')  #
     list_filter = ('narrativa_perfil',)  #
     readonly_fields = ('session_key', 'narrativa_perfil', 'data_criacao')  #
@@ -356,6 +362,7 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 # --- Define RespostaResource ANTES de RespostaAdmin ---
 class RespostaResource(resources.ModelResource):
+    # ... (código original desta classe)
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')  #
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')  #
 
@@ -380,6 +387,7 @@ class RespostaResource(resources.ModelResource):
 
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
+    # ... (código original desta classe, incluindo resumo_global_view)
     resource_class = RespostaResource  #
     list_display = (  #
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
@@ -399,6 +407,7 @@ class RespostaAdmin(ImportExportModelAdmin):
         return custom_urls + urls  #
 
     def resumo_global_view(self, request, *args, **kwargs):
+        # 1. Obter dados e filtros
         todos_os_perfis = Narrativa.objects.all()  #
         todos_os_questionarios = Questionario.objects.all()  #
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')  #
@@ -427,10 +436,12 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         dados_comparativos = {}  #
 
+        # Dataset para exportação
         export_dataset = Dataset()
         export_dataset.headers = ['Questionário', 'Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente',
                                   'Opção/Resposta', 'Contagem']
 
+        # 2. Processar dados
         for pergunta in perguntas:  #
             dados_comparativos[pergunta.id] = {  #
                 'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",  #
@@ -492,14 +503,14 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:
-            if export_format == 'xlsx':
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-                file_data = export_dataset.xlsx
+        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
+            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
+                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:
+            else:  # Padrão é CSV
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 
