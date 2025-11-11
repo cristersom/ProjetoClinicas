@@ -8,16 +8,14 @@
     /* Estilos para o container de comparação */
     .comparison-container {
         display: flex;
-        flex-wrap: wrap; /* Permite que os perfis quebrem a linha em telas menores */
-        gap: 20px; /* Espaço entre os blocos de perfil */
+        flex-wrap: wrap;
+        gap: 20px;
         justify-content: center;
         width: 100%;
     }
-    /* Estilo para cada bloco de perfil */
-    .profile-block {
-        flex: 1; /* Faz com que os blocos cresçam igualmente */
-        min-width: 300px; /* Largura mínima antes de quebrar a linha */
-        /* Ajuste max-width para mais colunas se necessário, ex: 30% para 3 colunas */
+    .profile-block { /* */
+        flex: 1;
+        min-width: 300px;
         max-width: 45%;
         border: 1px solid #eee;
         padding: 15px;
@@ -25,14 +23,14 @@
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-    .profile-block h3 {
+    .profile-block h3 { /* */
         color: #333;
         font-size: 1.2rem;
         border-bottom: 2px solid #f0f0f0;
         padding-bottom: 5px;
         margin-top: 0;
     }
-    .text-response-list {
+    .text-response-list { /* */
         max-height: 200px;
         overflow-y: auto;
         border: 1px solid #ddd;
@@ -41,27 +39,32 @@
         list-style-type: disc;
         padding-left: 25px;
     }
-    /* Estilos para o formulário de filtro */
-    .filter-form fieldset {
+    .filter-form fieldset { /* */
         border: 1px solid #ccc;
         padding: 15px;
         border-radius: 4px;
     }
-    .filter-form legend {
+    .filter-form legend { /* */
         font-weight: bold;
         font-size: 1.1rem;
     }
-    .filter-form .checkbox-grid {
+    .filter-form .checkbox-grid { /* */
         display: grid;
-        /* Ajuste minmax para mais colunas de checkbox */
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 10px;
     }
-    .filter-form label {
+    .filter-form label { /* */
         display: flex;
         align-items: center;
         gap: 5px;
         cursor: pointer;
+    }
+    /* Para alinhar os botões de filtro e exportação */
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 15px;
     }
 </style>
 {% endblock %}
@@ -89,8 +92,11 @@
             </label>
             {% endfor %}
         </div>
-        <div style="margin-top: 15px;">
+
+        <div class="filter-buttons">
             <input type="submit" value="Comparar" class="button default">
+            {# O 'request.GET.urlencode' preserva os filtros atuais no link de exportação #}
+            <a href="?{{ request.GET.urlencode }}&export=csv" class="button">Exportar CSV</a>
         </div>
       </fieldset>
     </form>
@@ -126,7 +132,6 @@
 
                     <script>
                     document.addEventListener('DOMContentLoaded', (event) => {
-                        // ID ÚNICO
                         const ctx_{{ pergunta_id }}_{{ forloop.counter }} = document.getElementById('grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}');
 
                         new Chart(ctx_{{ pergunta_id }}_{{ forloop.counter }}, {
@@ -154,11 +159,10 @@
                                 plugins: {
                                     legend: {
                                         position: 'top',
-                                        /* Oculta a legenda para gráficos de barras, pois ela é redundante */
                                         display: '{{ dados_perfil.dados_grafico.tipo_grafico }}' === 'pie' ? true : false,
                                     },
                                     title: {
-                                        display: false, /* O título do bloco já diz qual é o perfil */
+                                        display: false,
                                     }
                                 }
                             }
@@ -182,12 +186,12 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
+    // Lógica para os checkboxes de Perfil
     const checkAll = document.getElementById('check-all-profiles');
     const profileChecks = document.querySelectorAll('.profile-check');
 
     checkAll.addEventListener('change', function() {
         if (this.checked) {
-            // Se "Todos" for marcado, desmarca os outros
             profileChecks.forEach(check => {
                 check.checked = false;
             });
@@ -197,7 +201,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
     profileChecks.forEach(check => {
         check.addEventListener('change', function() {
             if (this.checked) {
-                // Se um perfil específico for marcado, desmarca "Todos"
                 checkAll.checked = false;
             }
         });

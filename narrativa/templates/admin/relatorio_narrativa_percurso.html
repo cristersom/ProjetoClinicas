@@ -39,6 +39,13 @@
         gap: 5px;
         cursor: pointer;
     }
+    /* Para alinhar os botões de filtro e exportação */
+    .filter-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 15px;
+    }
 </style>
 {% endblock %}
 
@@ -67,8 +74,11 @@
             </label>
             {% endfor %}
         </div>
-        <div style="margin-top: 15px;">
+
+        <div class="filter-buttons">
             <input type="submit" value="Filtrar Relatório" class="button default">
+            {# O 'request.GET.urlencode' preserva os filtros atuais no link de exportação #}
+            <a href="?{{ request.GET.urlencode }}&export=csv" class="button">Exportar CSV</a>
         </div>
       </fieldset>
     </form>
