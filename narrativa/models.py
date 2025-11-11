@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
+# LISTA_CATEGORIAS VOLTOU AO NORMAL
 LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ("TRATAMENTO", "Tratamento"), ("ACOMPANHAMENTO", "Acompanhamento"),
                     ("REVISÃO", "Revisão"), ("ENCERRAMENTO", "Encerramento"), ("OUTROS", "Outros"))
 
@@ -10,6 +11,7 @@ class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
+    # CAMPO 'categoria' VOLTOU A SER UM CharField
     categoria = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
@@ -91,13 +93,10 @@ class Usuario(AbstractUser):
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
 
 
-# --- NOVO MODELO ADICIONADO NO FINAL ---
 class LogVisitaCena(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
     cena_visitada = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name="visitas")
     timestamp = models.DateTimeField(auto_now_add=True)
-
-    # Adiciona uma referência à narrativa para facilitar as buscas
     narrativa_associada = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name="logs_visita", null=True)
 
     def __str__(self):
