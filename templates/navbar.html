@@ -1,46 +1,44 @@
-{% load static %}
-<nav class="flex text-gray-100 justify-between items-center py-3 px-4 fixed w-full z-50 ">
-        <div class="w-6/12">
-            <a href='/'>
-                {% if logo_url %}
-                    <img src="{{ logo_url }}" alt="logo" class="w-2/12 md:w-2/12">
-                {% endif %}
-            </a>
+    {% load static %}
+    <nav class="flex text-gray-100 justify-between items-center py-3 px-4 fixed w-full z-50 ">
+            <div class="w-6/12">
+              <!--  <a href='/'>
+                <img src="" alt="logo" class="w-2/12 md:w-2/12">
+                </a>-->
             </div>
-        {% if user.is_authenticated %}
-        <div class="w-6/12 flex flex-nowrap justify-end">
-              <div class="mr-2">
-                  <form method="get" action="{% url 'narrativa:pesquisa' %}">
-                      <input class="py-1 px-2 rounded-md text-black" name="query" value="{{ request.GET.query }}" type="text" placeholder="Pesquisar...">
-                      <input type="submit" value="">
-                  </form>
-              </div>
-                {% endif %}
-              <div class="mr-2">
-                  {% if user.is_authenticated %}
-                        <form method="post" action="{% url 'narrativa:logout' %}">
-                        {% csrf_token %}
-                         <button type="submit" class="bg-red-600 py-1 px-3 text-white md:text-lg rounded-md">
-                         Sair
-                         </button>
-                        </form>
-                  {% else %}
-                  <a href="{% url 'narrativa:login' %}" class="">
-                    <button class='bg-red-600 py-1 px-3 text-white md:text-lg rounded-md'>
-                        Login
-                    </button>
-                  </a>
-                  {% endif %}
-              </div>
             {% if user.is_authenticated %}
-                <div class="mr-2">
-                <a href="{% url 'narrativa:perfil' user.pk %}" class="">
-                    <button class='bg-red-600 py-1 px-3 text-white md:text-lg rounded-md'>
-                        Editar Perfil
-                    </button>
-                </a>
-              </div>
-                {% endif %}
-    </div>
+            <div class="w-6/12 flex flex-nowrap justify-end">
+                  <div class="mr-2">
+                      <form method="get" action="{% url 'narrativa:pesquisa' %}">
+                          <input class="py-1 px-2 rounded-md text-black" name="query" value="{{ request.GET.query }}" type="text" placeholder="Pesquisar...">
+                          <input type="submit" value="">
+                      </form>
+                  </div>
+                    {% endif %}
+                  <div class="mr-2">
+                      {% if user.is_authenticated %}
+                            <form method="post" action="{% url 'narrativa:logout' %}">
+                            {% csrf_token %}
+                             <button type="submit" class="bg-red-600 py-1 px-3 text-white md:text-lg rounded-md">
+                             Sair
+                             </button>
+                            </form>
+                      {% else %}
+                      <a href="{% url 'narrativa:login' %}" class="">
+                        <button class='bg-red-600 py-1 px-3 text-white md:text-lg rounded-md'>
+                            Login
+                        </button>
+                      </a>
+                      {% endif %}
+                  </div>
+                {% if user.is_authenticated %}
+                    <div class="mr-2">
+                    <a href="{% url 'narrativa:perfil' user.pk %}" class="">
+                        <button class='bg-red-600 py-1 px-3 text-white md:text-lg rounded-md'>
+                            Editar Perfil
+                        </button>
+                    </a>
+                  </div>
+                    {% endif %}
+        </div>
 
-    </nav>
+        </nav>

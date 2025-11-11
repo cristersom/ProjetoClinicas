@@ -91,10 +91,13 @@ class Usuario(AbstractUser):
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
 
 
+# --- NOVO MODELO ADICIONADO NO FINAL ---
 class LogVisitaCena(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
     cena_visitada = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name="visitas")
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    # Adiciona uma referência à narrativa para facilitar as buscas
     narrativa_associada = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name="logs_visita", null=True)
 
     def __str__(self):
@@ -102,15 +105,3 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
-
-
-# --- NOVO MODELO ADICIONADO NO FINAL ---
-class ConfiguracaoClinica(models.Model):
-    nome = models.CharField(max_length=100, default="Configuração Principal")
-    logo = models.ImageField(upload_to='logo_clinica/', blank=True, null=True, help_text="Faça o upload do logo da clínica aqui.")
-
-    def __str__(self):
-        return "Configurações do Site"
-
-    class Meta:
-        verbose_name_plural = "Configuração do Site"

@@ -55,7 +55,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'narrativa.context.lista_narrativas_recentes',
                 'narrativa.context.lista_narrativas_emalta',
-                'narrativa.context.logo_clinica', # <-- ADICIONADO AQUI
             ],
         },
     },
