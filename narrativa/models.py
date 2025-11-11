@@ -2,45 +2,31 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
-
-# A LISTA_CATEGORIAS FOI REMOVIDA DAQUI
-
-# --- NOVO MODELO ADICIONADO AQUI ---
-class Categoria(models.Model):
-    titulo = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.titulo
-
-    class Meta:
-        verbose_name_plural = "Categorias"
+# Mantemos isso temporariamente para o campo antigo
+LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ("TRATAMENTO", "Tratamento"), ("ACOMPANHAMENTO", "Acompanhamento"),
+                    ("REVISÃO", "Revisão"), ("ENCERRAMENTO", "Encerramento"), ("OUTROS", "Outros"))
 
 
-# --- FIM DO NOVO MODELO ---
+# Categoria e LogVisitaCena AINDA NÃO ESTÃO AQUI
 
 class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
 
-    # --- CAMPO 'categoria' MODIFICADO ---
-    # O campo de texto foi substituído por uma relação (ForeignKey)
-    # Colocamos null=True para permitir que a migração rode sem quebrar
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    # --- CAMPO 'categoria' RENOMEADO ---
+    categoria_str = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     # --- FIM DA MODIFICAÇÃO ---
 
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
     cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
-    # Adicionamos este campo temporário para guardar a categoria antiga (string)
-    # Vamos removê-lo no passo 3.
-    categoria_antiga = models.CharField(max_length=15, null=True, blank=True, editable=False)
-
     def __str__(self): return self.titulo
 
 
 class Cena(models.Model):
+    # ... (resto do modelo Cena como estava)
     narrativa = models.ForeignKey("Narrativa", related_name="cenas", on_delete=models.CASCADE)
     titulo = models.CharField(max_length=100, help_text="Título interno para identificar a cena")
     conteudo_textual = models.TextField(blank=True, null=True, help_text="Texto principal da cena.")
@@ -51,6 +37,7 @@ class Cena(models.Model):
 
 
 class Escolha(models.Model):
+    # ... (resto do modelo Escolha como estava)
     cena_origem = models.ForeignKey(Cena, related_name="escolhas", on_delete=models.CASCADE)
     texto_da_opcao = models.CharField(max_length=255)
     cena_destino = models.ForeignKey(Cena, on_delete=models.SET_NULL, null=True, blank=True,
@@ -62,6 +49,7 @@ class Escolha(models.Model):
 
 
 class Questionario(models.Model):
+    # ... (resto do modelo Questionario como estava)
     cena_associada = models.ForeignKey('Cena', related_name="questionarios", on_delete=models.SET_NULL, null=True,
                                        blank=True, help_text="Cena ao final da qual este questionário será exibido.")
     titulo = models.CharField(max_length=200, help_text="Título do questionário.")
@@ -73,6 +61,7 @@ class Questionario(models.Model):
 
 
 class Pergunta(models.Model):
+    # ... (resto do modelo Pergunta como estava)
     TIPOS_RESPOSTA = (("TEXTO", "Texto Livre"), ("UNICA_ESCOLHA", "Múltipla Escolha (apenas uma resposta)"),
                       ("MULTIPLA_ESCOLHA", "Múltipla Escolha (várias respostas)"),
                       ("ESCALA_5", "Escala de Satisfação (1 a 5)"))
@@ -84,6 +73,7 @@ class Pergunta(models.Model):
 
 
 class OpcaoResposta(models.Model):
+    # ... (resto do modelo OpcaoResposta como estava)
     pergunta = models.ForeignKey(Pergunta, related_name="opcoes", on_delete=models.CASCADE)
     texto = models.CharField(max_length=200)
 
@@ -91,6 +81,7 @@ class OpcaoResposta(models.Model):
 
 
 class Resposta(models.Model):
+    # ... (resto do modelo Resposta como estava)
     pergunta = models.ForeignKey(Pergunta, related_name="respostas", on_delete=models.CASCADE)
     session_key = models.CharField(max_length=40, help_text="ID da sessão do paciente")
     texto_resposta = models.TextField()
@@ -100,6 +91,7 @@ class Resposta(models.Model):
 
 
 class SessaoPaciente(models.Model):
+    # ... (resto do modelo SessaoPaciente como estava)
     session_key = models.CharField(max_length=40, unique=True)
     narrativa_perfil = models.ForeignKey(Narrativa, on_delete=models.SET_NULL, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
@@ -110,10 +102,12 @@ class SessaoPaciente(models.Model):
 
 
 class Usuario(AbstractUser):
+    # ... (resto do modelo Usuario como estava)
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
 
 
 class LogVisitaCena(models.Model):
+    # ... (resto do modelo LogVisitaCena como estava)
     session_key = models.CharField(max_length=40, db_index=True)
     cena_visitada = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name="visitas")
     timestamp = models.DateTimeField(auto_now_add=True)

@@ -3,8 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta, LogVisitaCena,
-    Categoria  # ADICIONADO AQUI
+    SessaoPaciente, OpcaoResposta, LogVisitaCena
+    # Categoria # COMENTADO TEMPORARIAMENTE
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -25,13 +25,11 @@ from django.db.models.functions import Coalesce
 from .forms import PerguntaAdminForm
 
 
-# --- ADICIONADO NOVO ADMIN PARA CATEGORIA ---
-@admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ('titulo',)
-    search_fields = ('titulo',)
-
-
+# --- ADMIN DE CATEGORIA COMENTADO TEMPORARIAMENTE ---
+# @admin.register(Categoria)
+# class CategoriaAdmin(admin.ModelAdmin):
+#     list_display = ('titulo',)
+#     search_fields = ('titulo',)
 # --- FIM DA ADIÇÃO ---
 
 
@@ -82,10 +80,9 @@ class CenaAdmin(admin.ModelAdmin):
 
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
-    list_filter = ('categoria',)  #
-
-    # O list_filter 'categoria' vai se adaptar automaticamente ao ForeignKey
+    # O list_filter 'categoria' vai falhar, então usamos o 'categoria_str' temporariamente
+    list_display = ('titulo', 'categoria_str', 'data_criacao', 'cena_inicial', 'links_relatorios')
+    list_filter = ('categoria_str',)  # MUDADO DE 'categoria' PARA 'categoria_str'
 
     def get_urls(self):
         urls = super().get_urls()
@@ -228,6 +225,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
     links_relatorios.short_description = 'Relatórios'  #
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
+        # 1. Obter dados e filtros (lógica original)
         questionario = self.get_object(request, object_id)  #
         todos_os_perfis = Narrativa.objects.all()  #
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')  #
@@ -244,9 +242,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)  #
         dados_comparativos = {}  #
 
+        # Dataset para exportação
         export_dataset = Dataset()
         export_dataset.headers = ['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem']
 
+        # 2. Processar dados (lógica original)
         for pergunta in questionario.perguntas.all():  #
             dados_comparativos[pergunta.id] = {  #
                 'pergunta_texto': pergunta.texto_pergunta,  #
@@ -266,9 +266,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
                 if pergunta.tipo_resposta == "TEXTO":  #
                     dados_grafico_processado = list(respostas_perfil.values_list('texto_resposta', flat=True))  #
+                    # Adiciona ao dataset de exportação
                     for resposta_texto in dados_grafico_processado:
                         export_dataset.append(
                             [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], resposta_texto, 1])
+
                 elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:  #
                     contador = Counter()  #
                     if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":  #
@@ -280,6 +282,8 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     labels = list(contador.keys())  #
                     data = list(contador.values())  #
                     dados_grafico_processado = dict(zip(labels, data))
+
+                    # Adiciona ao dataset de exportação
                     for label, count in dados_grafico_processado.items():
                         export_dataset.append(
                             [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], label, count])
@@ -321,17 +325,19 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
-        context = {
-            **self.admin_site.each_context(request),
-            'title': f"Resumo Comparativo: {questionario.titulo}",
-            'questionario': questionario,
-            'dados_comparativos': dados_comparativos,
-            'todos_os_perfis': todos_os_perfis,
-            'perfis_selecionados_ids': perfis_selecionados_ids,
+        # 3. Renderizar HTML (lógica original)
+        context = {  #
+            **self.admin_site.each_context(request),  #
+            'title': f"Resumo Comparativo: {questionario.titulo}",  #
+            'questionario': questionario,  #
+            'dados_comparativos': dados_comparativos,  #
+            'todos_os_perfis': todos_os_perfis,  #
+            'perfis_selecionados_ids': perfis_selecionados_ids,  #
         }
         return render(request, 'admin/relatorio_questionario_agregado.html', context)  #
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
+        # ... (código original desta view, não precisa mexer)
         questionario = self.get_object(request, object_id)  #
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key',
                                                                                           'pergunta__id')  #
@@ -351,6 +357,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
+    # ... (código original desta classe)
     list_display = ('session_key_abreviada', 'narrativa_perfil', 'data_criacao')  #
     list_filter = ('narrativa_perfil',)  #
     readonly_fields = ('session_key', 'narrativa_perfil', 'data_criacao')  #
@@ -363,6 +370,7 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 # --- Define RespostaResource ANTES de RespostaAdmin ---
 class RespostaResource(resources.ModelResource):
+    # ... (código original desta classe)
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')  #
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')  #
 
@@ -387,6 +395,7 @@ class RespostaResource(resources.ModelResource):
 
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
+    # ... (código original desta classe, incluindo resumo_global_view)
     resource_class = RespostaResource  #
     list_display = (  #
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
@@ -406,6 +415,7 @@ class RespostaAdmin(ImportExportModelAdmin):
         return custom_urls + urls  #
 
     def resumo_global_view(self, request, *args, **kwargs):
+        # 1. Obter dados e filtros
         todos_os_perfis = Narrativa.objects.all()  #
         todos_os_questionarios = Questionario.objects.all()  #
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')  #
@@ -434,10 +444,12 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         dados_comparativos = {}  #
 
+        # Dataset para exportação
         export_dataset = Dataset()
         export_dataset.headers = ['Questionário', 'Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente',
                                   'Opção/Resposta', 'Contagem']
 
+        # 2. Processar dados
         for pergunta in perguntas:  #
             dados_comparativos[pergunta.id] = {  #
                 'pergunta_texto': f"({pergunta.questionario.titulo}) - {pergunta.texto_pergunta}",  #
