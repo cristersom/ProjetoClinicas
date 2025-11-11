@@ -2,36 +2,17 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
-
-# LISTA_CATEGORIAS FOI REMOVIDA DAQUI
-# LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ...
-
-# --- NOVO MODELO ADICIONADO AQUI ---
-class Categoria(models.Model):
-    titulo = models.CharField(max_length=100, unique=True)
-
-    def __str__(self):
-        return self.titulo
-
-    class Meta:
-        verbose_name_plural = "Categorias"
-
-
-# --- FIM DO NOVO MODELO ---
+# LISTA_CATEGORIAS VOLTOU AO NORMAL
+LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ("TRATAMENTO", "Tratamento"), ("ACOMPANHAMENTO", "Acompanhamento"),
+                    ("REVISÃO", "Revisão"), ("ENCERRAMENTO", "Encerramento"), ("OUTROS", "Outros"))
 
 
 class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
-
-    # --- CAMPO 'categoria' MODIFICADO ---
-    # O CharField foi substituído por um ForeignKey.
-    # Colocamos null=True e blank=True para que os dados antigos
-    # (que não terão uma categoria) não quebrem o banco.
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
-    # --- FIM DA MODIFICAÇÃO ---
-
+    # CAMPO 'categoria' VOLTOU A SER UM CharField
+    categoria = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
     cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')

@@ -3,8 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta, LogVisitaCena,
-    Categoria  # ADICIONADO AQUI
+    SessaoPaciente, OpcaoResposta, LogVisitaCena  # Categoria FOI REMOVIDO
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -23,16 +22,6 @@ from django.db.models.functions import Coalesce
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
-
-
-# --- ADICIONADO NOVO ADMIN PARA CATEGORIA ---
-@admin.register(Categoria)
-class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ('titulo',)
-    search_fields = ('titulo',)
-
-
-# --- FIM DA ADIÇÃO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
@@ -83,7 +72,7 @@ class CenaAdmin(admin.ModelAdmin):
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
-    list_filter = ('categoria',)  # O list_filter 'categoria' vai se adaptar automaticamente ao ForeignKey
+    list_filter = ('categoria',)  # VOLTOU AO NORMAL
 
     def get_urls(self):
         urls = super().get_urls()
