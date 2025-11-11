@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta, LogVisitaCena
+    SessaoPaciente, OpcaoResposta, LogVisitaCena  # ADICIONADO LogVisitaCena
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -12,7 +12,7 @@ from import_export import resources
 from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
-from tablib import Dataset  # Para exportação avançada
+from tablib import Dataset  # ADICIONADO PARA EXPORTAÇÃO AVANÇADA
 from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
@@ -142,21 +142,19 @@ class NarrativaAdmin(admin.ModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
-            # Cria o dataset
+        if export_format in ['csv', 'xlsx', 'json']:
             dataset = Dataset()
             dataset.headers = ['Cena', 'Total de Visitas', 'Visitantes Únicos']
             for item in dados_agregados_cenas:
                 dataset.append([item['cena_titulo'], item['total_visitas'], item['visitantes_unicos']])
 
-            # Define o tipo de arquivo e os dados
-            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
-                file_data = dataset.xlsx  # MUDADO DE .xls PARA .xlsx
+            if export_format == 'xlsx':
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                file_data = dataset.xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = dataset.json
-            else:  # Padrão é CSV
+            else:
                 content_type = 'text/csv'
                 file_data = dataset.csv
 
@@ -301,14 +299,14 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
-            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
-                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
+        if export_format in ['csv', 'xlsx', 'json']:
+            if export_format == 'xlsx':
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                file_data = export_dataset.xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:  # Padrão é CSV
+            else:
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 
@@ -369,8 +367,8 @@ class RespostaResource(resources.ModelResource):
     class Meta:
         model = Resposta  #
         fields = (
-        'id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',  #
-        'data_resposta')
+            'id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',  #
+            'data_resposta')
         export_order = fields  #
 
     def dehydrate_perfil_narrativa(self, resposta):
@@ -503,14 +501,14 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
         export_format = request.GET.get('export')
-        if export_format in ['csv', 'xlsx', 'json']:  # MUDADO DE 'xls' PARA 'xlsx'
-            if export_format == 'xlsx':  # MUDADO DE 'xls' PARA 'xlsx'
-                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'  # CONTENT_TYPE ATUALIZADO
-                file_data = export_dataset.xlsx  # MUDADO DE .xls PARA .xlsx
+        if export_format in ['csv', 'xlsx', 'json']:
+            if export_format == 'xlsx':
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                file_data = export_dataset.xlsx
             elif export_format == 'json':
                 content_type = 'application/json'
                 file_data = export_dataset.json
-            else:  # Padrão é CSV
+            else:
                 content_type = 'text/csv'
                 file_data = export_dataset.csv
 

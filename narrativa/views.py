@@ -124,15 +124,14 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)  #
 
-    # --- MODIFICAÇÃO AQUI ---
-    # Registrar a visita da cena
+    # --- ADICIONADO PARA O RELATÓRIO DE PERCURSO ---
     if request.session.session_key:
         LogVisitaCena.objects.create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             narrativa_associada=cena.narrativa  # Salvamos a narrativa para facilitar o filtro
         )
-    # --- FIM DA MODIFICAÇÃO ---
+    # --- FIM DA ADIÇÃO ---
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))  #

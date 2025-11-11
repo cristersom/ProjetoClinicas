@@ -91,13 +91,11 @@ class Usuario(AbstractUser):
     narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
 
 
-# --- NOVO MODELO ADICIONADO NO FINAL ---
+# --- ADICIONADO PARA O RELATÓRIO DE PERCURSO ---
 class LogVisitaCena(models.Model):
     session_key = models.CharField(max_length=40, db_index=True)
     cena_visitada = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name="visitas")
     timestamp = models.DateTimeField(auto_now_add=True)
-
-    # Adiciona uma referência à narrativa para facilitar as buscas
     narrativa_associada = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name="logs_visita", null=True)
 
     def __str__(self):
