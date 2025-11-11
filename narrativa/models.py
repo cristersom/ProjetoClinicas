@@ -3,7 +3,9 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
 
-# --- MODELO CATEGORIA (QUE ESTÁ FUNCIONANDO) ---
+# LISTA_CATEGORIAS FOI REMOVIDA
+
+# --- MODELO CATEGORIA (QUE JÁ ESTÁ NO SEU BD) ---
 class Categoria(models.Model):
     titulo = models.CharField(max_length=100, unique=True)
 
@@ -19,7 +21,7 @@ class Narrativa(models.Model):
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
 
-    # --- CAMPO 'categoria' COMO FOREIGNKEY (QUE ESTÁ FUNCIONANDO) ---
+    # --- CAMPO 'categoria' COMO FOREIGNKEY (QUE JÁ ESTÁ NO SEU BD) ---
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
 
     visualizacoes = models.IntegerField(default=0)
@@ -113,3 +115,5 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
+
+
