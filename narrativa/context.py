@@ -1,187 +1,29 @@
-from pathlib import Path
-import os
-import dj_database_url
+from .models import Narrativa, ConfiguracaoClinica # Adicionado ConfiguracaoClinica
+import logging # Adicionado para logging
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+# Função 1 (que o log diz estar faltando)
+def lista_narrativas_recentes(request):
+    lista_narrativas = Narrativa.objects.all().order_by('-data_criacao')[0:8]
+    if lista_narrativas:
+        narrativa_destaque = lista_narrativas[0]
+    else:
+        narrativa_destaque = None
+    return {"lista_narrativas_recentes": lista_narrativas, "narrativa_destaque": narrativa_destaque}
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+# Função 2 (que também está no settings.py)
+def lista_narrativas_emalta(request):
+    lista_narrativas = Narrativa.objects.all().order_by('-visualizacoes')[0:8]
+    return {"lista_narrativas_emalta": lista_narrativas}
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
-ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
-
-INSTALLED_APPS = [
-    'jazzmin',  # Jazzmin adicionado aqui, antes de admin
-    'nested_admin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'narrativa',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'import_export',
-    'cloudinary_storage',
-    'cloudinary',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'narrativa.middleware.PatientAccessMiddleware',
-]
-
-ROOT_URLCONF = 'gameflix.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'narrativa.context.lista_narrativas_recentes',
-                'narrativa.context.lista_narrativas_emalta',
-                'narrativa.context.logo_clinica', # <-- ESTA LINHA PRECISA ESTAR AQUI
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'gameflix.wsgi.application'
-
-DATABASES = {
-    'default': dj_database_url.config(
-        # O default=... é ignorado no Heroku, pois ele usa a DATABASE_URL
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-    )
-}
-
-AUTH_USER_MODEL = "narrativa.usuario"
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
-
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_TZ = True
-
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-MEDIA_URL = '/media/'
-
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
-
-CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = 'narrativa:narrativas'
-LOGIN_URL = 'narrativa:login'
-
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
-
-JAZZMIN_SETTINGS = {
-    "site_title": "Administração Clínica",
-    "site_header": "Clínica Admin",
-    "welcome_sign": "Bem-vindo(a) à Administração",
-    "copyright": "Minha Clínica Ltd",
-    "topmenu_links": [
-        {"name": "Ver Site", "url": "/", "new_window": True},
-        {"app": "narrativa"},
-    ],
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "narrativa.Narrativa": "fas fa-book-open",
-        "narrativa.Cena": "fas fa-film",
-        "narrativa.Escolha": "fas fa-code-branch",
-        "narrativa.Questionario": "fas fa-clipboard-list",
-        "narrativa.Pergunta": "fas fa-question-circle",
-        "narrativa.Resposta": "fas fa-comment",
-        "narrativa.SessaoPaciente": "fas fa-user-clock",
-        "narrativa.Usuario": "fas fa-user-shield",
-    },
-    "hide_models": [
-        "narrativa.opcaoresposta",
-        "auth.permission",
-    ],
-}
-
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-dark",
-    "accent": "accent-primary",
-    "navbar": "navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": True,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": "darkly",
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success"
-    }
-}
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            'propagate': False,
-        },
-    },
-}
+# Função 3 (que o log diz estar faltando)
+def logo_clinica(request):
+    try:
+        # Tenta pegar o logo. Cria o objeto de config se for a primeira vez.
+        config, created = ConfiguracaoClinica.objects.get_or_create(id=1)
+        if config.logo:
+            return {'logo_url': config.logo.url}
+    except Exception as e:
+        # Se o banco não estiver migrado (ou outro erro), não quebra o site
+        logging.warning(f"Não foi possível carregar o logo da clínica: {e}")
+        pass
+    return {'logo_url': None}
