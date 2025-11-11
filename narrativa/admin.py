@@ -4,7 +4,7 @@ import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena,
-    Categoria, ConfiguracaoClinica  # ADICIONADO AQUI
+    Categoria  # ADICIONADO AQUI
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -14,7 +14,7 @@ from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
 from tablib import Dataset
-from django.shortcuts import render, redirect  # Redirect foi ADICIONADO
+from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
 import json
@@ -25,31 +25,14 @@ from django.db.models.functions import Coalesce
 from .forms import PerguntaAdminForm
 
 
-# --- ADICIONADO ADMIN PARA CATEGORIA ---
+# --- ADICIONADO NOVO ADMIN PARA CATEGORIA ---
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('titulo',)
     search_fields = ('titulo',)
 
 
-# --- ADICIONADO ADMIN PARA CONFIGURAÇÃO (LOGO) ---
-@admin.register(ConfiguracaoClinica)
-class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'logo')
-
-    # Garante que o usuário não possa adicionar uma nova configuração
-    def has_add_permission(self, request):
-        return False
-
-    # Garante que o usuário não possa deletar a configuração
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-    # Redireciona da lista (que só teria 1 item) direto para a página de edição
-    def changelist_view(self, request, extra_context=None):
-        # Tenta pegar o objeto. Se não existir, cria o primeiro e único.
-        obj, created = self.model.objects.get_or_create(id=1, defaults={'nome': 'Configuração Principal'})
-        return redirect(reverse('admin:narrativa_configuracaoclinica_change', args=[obj.id]))
+# --- FIM DA ADIÇÃO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
