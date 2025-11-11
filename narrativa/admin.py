@@ -3,7 +3,8 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta, LogVisitaCena  # Categoria FOI REMOVIDO
+    SessaoPaciente, OpcaoResposta, LogVisitaCena
+    # ConfiguracaoClinica FOI REMOVIDO
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -13,7 +14,7 @@ from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
 from tablib import Dataset
-from django.shortcuts import render
+from django.shortcuts import render, redirect  # Redirect foi REMOVIDO
 from django.utils.html import format_html
 from collections import Counter
 import json
@@ -22,6 +23,9 @@ from django.db.models.functions import Coalesce
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
+
+
+# --- ADMIN DE CONFIGURAÇÃO REMOVIDO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
@@ -72,7 +76,7 @@ class CenaAdmin(admin.ModelAdmin):
 @admin.register(Narrativa)
 class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
-    list_filter = ('categoria',)  # VOLTOU AO NORMAL
+    list_filter = ('categoria',)
 
     def get_urls(self):
         urls = super().get_urls()

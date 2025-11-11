@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
-# LISTA_CATEGORIAS VOLTOU AO NORMAL
 LISTA_CATEGORIAS = (("BOASVINDAS", "Boas vindas"), ("TRATAMENTO", "Tratamento"), ("ACOMPANHAMENTO", "Acompanhamento"),
                     ("REVISÃO", "Revisão"), ("ENCERRAMENTO", "Encerramento"), ("OUTROS", "Outros"))
 
@@ -11,7 +10,6 @@ class Narrativa(models.Model):
     titulo = models.CharField(max_length=100)
     thumb = models.ImageField(upload_to='thumb_narrativas')
     descricao = models.TextField(max_length=1000)
-    # CAMPO 'categoria' VOLTOU A SER UM CharField
     categoria = models.CharField(max_length=15, choices=LISTA_CATEGORIAS)
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
@@ -104,3 +102,5 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
+
+# O MODELO ConfiguracaoClinica FOI REMOVIDO DAQUI
