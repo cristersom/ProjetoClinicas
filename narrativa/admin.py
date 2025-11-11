@@ -10,8 +10,9 @@ from import_export import resources
 
 # Imports necessários para os relatórios customizados
 from django.urls import path, reverse
-from django.http import HttpResponse  # ADICIONADO PARA EXPORTAR CSV
-import csv  # ADICIONADO PARA EXPORTAR CSV
+from django.http import HttpResponse
+import csv  # Mantido para referência, mas a nova lógica usará tablib
+from tablib import Dataset  # ADICIONADO PARA EXPORTAÇÃO AVANÇADA
 from django.shortcuts import render
 from django.utils.html import format_html
 from collections import Counter
@@ -73,8 +74,6 @@ class NarrativaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
     list_filter = ('categoria',)  #
 
-    # --- LÓGICA DE RELATÓRIO DE PERCURSO COM FILTRO DE PERFIL ---
-
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -98,16 +97,12 @@ class NarrativaAdmin(admin.ModelAdmin):
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         """
         View que mostra dados AGREGADOS do percurso de cenas visitadas
-        e permite EXPORTAR CSV.
+        e permite EXPORTAR em múltiplos formatos (XLS, CSV, JSON).
         """
-        # 1. Obter a Narrativa ATUAL
+        # --- ETAPAS 1-8: Mesma lógica de agregação de dados ---
         narrativa_atual = self.get_object(request, object_id)
-
-        # 2. Obter TODOS os Perfis para o filtro
         todos_os_perfis = Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
-
-        # 3. Filtrar Sessões de Pacientes
         sessoes_filtradas = SessaoPaciente.objects.all()
         if perfis_selecionados_ids and 'all' not in perfis_selecionados_ids:
             perfis_ids_int = [int(pid) for pid in perfis_selecionados_ids if pid.isdigit()]
@@ -115,34 +110,24 @@ class NarrativaAdmin(admin.ModelAdmin):
         else:
             perfis_selecionados_ids = ['all']
         lista_de_session_keys = sessoes_filtradas.values_list('session_key', flat=True)
-
-        # 4. Obter todas as Cenas desta Narrativa ATUAL
         cenas_da_narrativa = Cena.objects.filter(narrativa=narrativa_atual).order_by('id')
-
-        # 5. Base Query para os Logs de Visita
         visitas_base = LogVisitaCena.objects.filter(
             session_key__in=lista_de_session_keys,
             narrativa_associada=narrativa_atual
         )
-
-        # 6. Calcular visitas TOTAIS por cena
         visitas_totais = visitas_base.values('cena_visitada').annotate(
             total_visitas=Coalesce(Count('id'), Value(0))
         ).order_by('cena_visitada')
         mapa_visitas_totais = {item['cena_visitada']: item['total_visitas'] for item in visitas_totais}
-
-        # 7. Calcular visitantes ÚNICOS por cena
         visitantes_unicos = visitas_base.values('cena_visitada').annotate(
             visitantes_unicos=Coalesce(Count('session_key', distinct=True), Value(0))
         ).order_by('cena_visitada')
         mapa_visitantes_unicos = {item['cena_visitada']: item['visitantes_unicos'] for item in visitantes_unicos}
 
-        # 8. Combinar os dados
         dados_agregados_cenas = []
         labels_grafico = []
         data_visitas_totais = []
         data_visitantes_unicos = []
-
         for cena in cenas_da_narrativa:
             total = mapa_visitas_totais.get(cena.id, 0)
             unicos = mapa_visitantes_unicos.get(cena.id, 0)
@@ -155,17 +140,29 @@ class NarrativaAdmin(admin.ModelAdmin):
             data_visitas_totais.append(total)
             data_visitantes_unicos.append(unicos)
 
-        # --- LÓGICA DE EXPORTAÇÃO CSV ADICIONADA ---
-        if request.GET.get('export') == 'csv':
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.csv"'
-
-            writer = csv.writer(response)
-            writer.writerow(['Cena', 'Total de Visitas', 'Visitantes Únicos'])
-
+        # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
+        export_format = request.GET.get('export')
+        if export_format in ['csv', 'xls', 'json']:
+            # Cria o dataset
+            dataset = Dataset()
+            dataset.headers = ['Cena', 'Total de Visitas', 'Visitantes Únicos']
             for item in dados_agregados_cenas:
-                writer.writerow([item['cena_titulo'], item['total_visitas'], item['visitantes_unicos']])
+                dataset.append([item['cena_titulo'], item['total_visitas'], item['visitantes_unicos']])
 
+            # Define o tipo de arquivo e os dados
+            if export_format == 'xls':
+                content_type = 'application/vnd.ms-excel'
+                file_data = dataset.xls
+            elif export_format == 'json':
+                content_type = 'application/json'
+                file_data = dataset.json
+            else:  # Padrão é CSV
+                content_type = 'text/csv'
+                file_data = dataset.csv
+
+            response = HttpResponse(file_data, content_type=content_type)
+            response[
+                'Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.{export_format}"'
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
@@ -237,6 +234,10 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)  #
         dados_comparativos = {}  #
 
+        # Dataset para exportação
+        export_dataset = Dataset()
+        export_dataset.headers = ['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem']
+
         # 2. Processar dados (lógica original)
         for pergunta in questionario.perguntas.all():  #
             dados_comparativos[pergunta.id] = {  #
@@ -253,10 +254,15 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)  #
 
                 total_respostas_perfil = respostas_perfil.count()  #
-                dados_grafico_processado = None  # Para o CSV
+                dados_grafico_processado = None
 
                 if pergunta.tipo_resposta == "TEXTO":  #
                     dados_grafico_processado = list(respostas_perfil.values_list('texto_resposta', flat=True))  #
+                    # Adiciona ao dataset de exportação
+                    for resposta_texto in dados_grafico_processado:
+                        export_dataset.append(
+                            [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], resposta_texto, 1])
+
                 elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:  #
                     contador = Counter()  #
                     if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":  #
@@ -267,12 +273,16 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
                     labels = list(contador.keys())  #
                     data = list(contador.values())  #
-                    dados_grafico_processado = dict(zip(labels, data))  # Salva como dict {label: count}
+                    dados_grafico_processado = dict(zip(labels, data))
+
+                    # Adiciona ao dataset de exportação
+                    for label, count in dados_grafico_processado.items():
+                        export_dataset.append(
+                            [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], label, count])
 
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({  #
                         'perfil_titulo': perfil_info['titulo'],  #
                         'total_respostas': total_respostas_perfil,  #
-                        'dados_grafico_processado': dados_grafico_processado,  # Salva os dados brutos para o CSV
                         'dados_grafico': {  #
                             'labels': json.dumps(labels),  #
                             'data': json.dumps(data),  #
@@ -280,41 +290,30 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                         },
                         'respostas_texto': None  #
                     })
-                    continue  # Pula o append genérico
+                    continue
 
                 dados_comparativos[pergunta.id]['dados_por_perfil'].append({  #
                     'perfil_titulo': perfil_info['titulo'],  #
                     'total_respostas': total_respostas_perfil,  #
                     'dados_grafico': None,  #
                     'respostas_texto': dados_grafico_processado,  #
-                    'dados_grafico_processado': dados_grafico_processado  # Salva os dados brutos para o CSV
                 })
 
-        # --- LÓGICA DE EXPORTAÇÃO CSV ADICIONADA ---
-        if request.GET.get('export') == 'csv':
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = f'resumo_questionario_{questionario.id}.csv'
-            writer = csv.writer(response)
+        # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
+        export_format = request.GET.get('export')
+        if export_format in ['csv', 'xls', 'json']:
+            if export_format == 'xls':
+                content_type = 'application/vnd.ms-excel'
+                file_data = export_dataset.xls
+            elif export_format == 'json':
+                content_type = 'application/json'
+                file_data = export_dataset.json
+            else:  # Padrão é CSV
+                content_type = 'text/csv'
+                file_data = export_dataset.csv
 
-            # Escreve o cabeçalho
-            writer.writerow(['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem'])
-
-            for pergunta_id, dados_pergunta in dados_comparativos.items():
-                pergunta_texto = dados_pergunta['pergunta_texto']
-                pergunta_tipo = dados_pergunta['pergunta_tipo_raw']
-
-                for dados_perfil in dados_pergunta['dados_por_perfil']:
-                    perfil_titulo = dados_perfil['perfil_titulo']
-                    dados_processados = dados_perfil.get('dados_grafico_processado')
-
-                    if pergunta_tipo == "TEXTO":
-                        if dados_processados:
-                            for resposta_texto in dados_processados:
-                                writer.writerow([pergunta_texto, pergunta_tipo, perfil_titulo, resposta_texto, 1])
-                    else:  # Tipos de múltipla escolha
-                        if dados_processados:
-                            for label, count in dados_processados.items():
-                                writer.writerow([pergunta_texto, pergunta_tipo, perfil_titulo, label, count])
+            response = HttpResponse(file_data, content_type=content_type)
+            response['Content-Disposition'] = f'resumo_questionario_{questionario.id}.{export_format}'
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
@@ -330,6 +329,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         return render(request, 'admin/relatorio_questionario_agregado.html', context)  #
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
+        # ... (código original desta view, não precisa mexer)
         questionario = self.get_object(request, object_id)  #
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key',
                                                                                           'pergunta__id')  #
@@ -349,6 +349,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(admin.ModelAdmin):
+    # ... (código original desta classe)
     list_display = ('session_key_abreviada', 'narrativa_perfil', 'data_criacao')  #
     list_filter = ('narrativa_perfil',)  #
     readonly_fields = ('session_key', 'narrativa_perfil', 'data_criacao')  #
@@ -361,6 +362,7 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
 
 # --- Define RespostaResource ANTES de RespostaAdmin ---
 class RespostaResource(resources.ModelResource):
+    # ... (código original desta classe)
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')  #
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')  #
 
@@ -385,6 +387,7 @@ class RespostaResource(resources.ModelResource):
 
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
+    # ... (código original desta classe, incluindo resumo_global_view)
     resource_class = RespostaResource  #
     list_display = (  #
         'id', 'questionario_associado', 'pergunta', 'session_key_abreviada', 'texto_resposta', 'data_resposta')
@@ -392,7 +395,6 @@ class RespostaAdmin(ImportExportModelAdmin):
     search_fields = ('texto_resposta', 'session_key')  #
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')  #
 
-    # Funções get_urls e resumo_global_view (Originais)
     def get_urls(self):
         urls = super().get_urls()  #
         custom_urls = [  #
@@ -434,6 +436,11 @@ class RespostaAdmin(ImportExportModelAdmin):
 
         dados_comparativos = {}  #
 
+        # Dataset para exportação
+        export_dataset = Dataset()
+        export_dataset.headers = ['Questionário', 'Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente',
+                                  'Opção/Resposta', 'Contagem']
+
         # 2. Processar dados
         for pergunta in perguntas:  #
             dados_comparativos[pergunta.id] = {  #
@@ -450,10 +457,14 @@ class RespostaAdmin(ImportExportModelAdmin):
                     respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)  #
 
                 total_respostas_perfil = respostas_perfil.count()  #
-                dados_grafico_processado = None  # Para o CSV
+                dados_grafico_processado = None
 
                 if pergunta.tipo_resposta == "TEXTO":  #
                     dados_grafico_processado = list(respostas_perfil.values_list('texto_resposta', flat=True))  #
+                    for resposta_texto in dados_grafico_processado:
+                        export_dataset.append(
+                            [pergunta.questionario.titulo, pergunta.texto_pergunta, pergunta.tipo_resposta,
+                             perfil_info['titulo'], resposta_texto, 1])
                 elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:  #
                     contador = Counter()  #
                     if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":  #
@@ -464,12 +475,16 @@ class RespostaAdmin(ImportExportModelAdmin):
 
                     labels = list(contador.keys())  #
                     data = list(contador.values())  #
-                    dados_grafico_processado = dict(zip(labels, data))  # Salva como dict {label: count}
+                    dados_grafico_processado = dict(zip(labels, data))
+
+                    for label, count in dados_grafico_processado.items():
+                        export_dataset.append(
+                            [pergunta.questionario.titulo, pergunta.texto_pergunta, pergunta.tipo_resposta,
+                             perfil_info['titulo'], label, count])
 
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({  #
                         'perfil_titulo': perfil_info['titulo'],  #
                         'total_respostas': total_respostas_perfil,  #
-                        'dados_grafico_processado': dados_grafico_processado,  # Salva os dados brutos para o CSV
                         'dados_grafico': {  #
                             'labels': json.dumps(labels),  #
                             'data': json.dumps(data),  #
@@ -477,40 +492,30 @@ class RespostaAdmin(ImportExportModelAdmin):
                         },
                         'respostas_texto': None  #
                     })
-                    continue  # Pula o append genérico
+                    continue
 
                 dados_comparativos[pergunta.id]['dados_por_perfil'].append({  #
                     'perfil_titulo': perfil_info['titulo'],  #
                     'total_respostas': total_respostas_perfil,  #
                     'dados_grafico': None,  #
                     'respostas_texto': dados_grafico_processado,  #
-                    'dados_grafico_processado': dados_grafico_processado  # Salva os dados brutos para o CSV
                 })
 
-        # --- LÓGICA DE EXPORTAÇÃO CSV ADICIONADA ---
-        if request.GET.get('export') == 'csv':
-            response = HttpResponse(content_type='text/csv')
-            response['Content-Disposition'] = f'resumo_global_respostas.csv'
-            writer = csv.writer(response)
+        # --- LÓGICA DE EXPORTAÇÃO AVANÇADA (usando tablib) ---
+        export_format = request.GET.get('export')
+        if export_format in ['csv', 'xls', 'json']:
+            if export_format == 'xls':
+                content_type = 'application/vnd.ms-excel'
+                file_data = export_dataset.xls
+            elif export_format == 'json':
+                content_type = 'application/json'
+                file_data = export_dataset.json
+            else:  # Padrão é CSV
+                content_type = 'text/csv'
+                file_data = export_dataset.csv
 
-            writer.writerow(['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem'])
-
-            for pergunta_id, dados_pergunta in dados_comparativos.items():
-                pergunta_texto = dados_pergunta['pergunta_texto']
-                pergunta_tipo = dados_pergunta['pergunta_tipo_raw']
-
-                for dados_perfil in dados_pergunta['dados_por_perfil']:
-                    perfil_titulo = dados_perfil['perfil_titulo']
-                    dados_processados = dados_perfil.get('dados_grafico_processado')
-
-                    if pergunta_tipo == "TEXTO":
-                        if dados_processados:
-                            for resposta_texto in dados_processados:
-                                writer.writerow([pergunta_texto, pergunta_tipo, perfil_titulo, resposta_texto, 1])
-                    else:  # Tipos de múltipla escolha
-                        if dados_processados:
-                            for label, count in dados_processados.items():
-                                writer.writerow([pergunta_texto, pergunta_tipo, perfil_titulo, label, count])
+            response = HttpResponse(file_data, content_type=content_type)
+            response['Content-Disposition'] = f'resumo_global_respostas.{export_format}'
             return response
         # --- FIM DA LÓGICA DE EXPORTAÇÃO ---
 
