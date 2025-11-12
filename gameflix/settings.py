@@ -96,6 +96,9 @@ STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
+    # MUDANÇA 2: Backend de estáticos otimizado para o Whitenoise
+    # Você já usa o middleware do Whitenoise, então deve usar o storage dele também.
+    # Isso é mais eficiente e corrige erros de arquivos estáticos em produção.
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -116,13 +119,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 # --- Configurações do Jazzmin (ATUALIZADO) ---
 JAZZMIN_SETTINGS = {
-    # Títulos e Cabeçalhos (mantive os seus)
+    # Títulos (mantidos do seu original)
     "site_title": "Administração Clínica",
     "site_header": "Clínica Admin",
     "welcome_sign": "Bem-vindo(a) à Administração",
     "copyright": "Minha Clínica Ltd",
 
-    # Links do Menu Superior (mantive os seus)
+    # Links do Menu Superior (mantidos do seu original)
     "topmenu_links": [
         {"name": "Ver Site", "url": "/", "new_window": True},
         {"app": "narrativa"},
@@ -144,16 +147,22 @@ JAZZMIN_SETTINGS = {
     "apps": {
         "narrativa": "Gestão da Jornada",
     },
+
+    # MUDANÇA 3: Ícones (mantive os seus e adicionei os novos)
     "models": {
-        # Autenticação (mantive os seus ícones)
+        # Ícones que você já tinha (restaurados)
         "auth.User": {"icon": "fas fa-user"},
         "auth.Group": {"icon": "fas fa-users"},
-
-        # App Narrativa (com seus ícones + novos)
         "narrativa.Narrativa": {"icon": "fas fa-book-open"},
         "narrativa.Cena": {"icon": "fas fa-film"},
+        "narrativa.Escolha": {"icon": "fas fa-code-branch"},
         "narrativa.Questionario": {"icon": "fas fa-clipboard-list"},
+        "narrativa.Pergunta": {"icon": "fas fa-question-circle"},
         "narrativa.Resposta": {"icon": "fas fa-comment"},
+        "narrativa.SessaoPaciente": {"icon": "fas fa-user-clock"},
+        "narrativa.Usuario": {"icon": "fas fa-user-shield"},
+
+        # Nossas novas alterações (ícone e nome)
         "narrativa.Categoria": {
             "icon": "fas fa-tags"  # Ícone novo (etiquetas)
         },
@@ -162,11 +171,9 @@ JAZZMIN_SETTINGS = {
             "verbose_name_plural": "Logotipo",  # Renomeado
             "icon": "fas fa-image"                # Ícone novo (imagem)
         },
-        "narrativa.SessaoPaciente": {"icon": "fas fa-user-clock"},
-        "narrativa.Usuario": {"icon": "fas fa-user-shield"},
     },
 
-    # Modelos escondidos (mantive os seus)
+    # Modelos escondidos (mantidos do seu original)
     "hide_models": [
         "narrativa.opcaoresposta",
         "auth.permission",
@@ -174,7 +181,6 @@ JAZZMIN_SETTINGS = {
 }
 
 
-# Tweaks de UI (mantive os seus)
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
@@ -208,7 +214,9 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 
-# Bloco de LOGGING (mantive o seu)
+# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
+# Isso fará com que os erros 500 (quando DEBUG=False)
+# sejam impressos no log do Heroku.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
