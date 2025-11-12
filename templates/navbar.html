@@ -3,7 +3,7 @@
         <div class="w-6/12">
           {% if logo_url %}
             <a href='/'>
-            <img src="{{ logo_url }}" alt="logo" class="h-8 w-auto"> {# Já com seu h-8 #}
+            <img src="{{ logo_url }}" alt="logo" class="h-8 w-auto">
             </a>
           {% endif %}
         </div>
@@ -33,9 +33,9 @@
               </div>
         </div>
         {% else %}
-            {# --- ESTA É A MUDANÇA --- #}
-            {# Só mostra o botão Login se NÃO estiver nas páginas /paciente/ #}
-            {% if not request.path|slice:":9" == "/paciente/" %}
+            {# --- CORREÇÃO AQUI --- #}
+            {# Verifica se a string "/paciente/" NÃO está no path #}
+            {% if "/paciente/" not in request.path %}
             <div class="w-6/12 flex flex-nowrap justify-end">
               <div class="mr-2">
                   <a href="{% url 'narrativa:login' %}" class="">
