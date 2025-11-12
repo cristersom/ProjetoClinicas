@@ -33,17 +33,17 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 
 # --- ADMIN ADICIONADO PARA O LOGO (TEMPORARIAMENTE DESATIVADO) ---
-# @admin.register(ConfiguracaoClinica)
-# class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
-#     list_display = ('logo',)
+ @admin.register(ConfiguracaoClinica)
+ class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
+     list_display = ('logo',)
 
-#     def has_add_permission(self, request):
-#         # Impede a criação de novos objetos se um já existir (pk=1)
-#         return not ConfiguracaoClinica.objects.exists()
+     def has_add_permission(self, request):
+         # Impede a criação de novos objetos se um já existir (pk=1)
+        return not ConfiguracaoClinica.objects.exists()
 
-#     def has_delete_permission(self, request, obj=None):
-#         # Impede a exclusão do objeto de configuração
-#         return False
+    def has_delete_permission(self, request, obj=None):
+         # Impede a exclusão do objeto de configuração
+         return False
 # --- FIM DA ADIÇÃO ---
 
 

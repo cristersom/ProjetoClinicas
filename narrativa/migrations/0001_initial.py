@@ -37,16 +37,6 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='ConfiguracaoClinica',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('logo', models.ImageField(blank=True, help_text='Logo da clínica que aparecerá no navbar', null=True, upload_to='logos/')),
-            ],
-            options={
-                'verbose_name_plural': 'Configuração da Clínica',
-            },
-        ),
-        migrations.CreateModel(
             name='Pergunta',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
