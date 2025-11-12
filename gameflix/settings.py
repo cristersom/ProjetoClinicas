@@ -128,7 +128,7 @@ JAZZMIN_SETTINGS = {
         {"app": "narrativa"},
     ],
 
-    # --- INÍCIO DAS NOSSAS MUDANÇAS ---
+    # --- INÍCIO DAS MUDANÇAS ---
 
     # 1. ORDEM DO MENU
     "order_with_respect_to": [
@@ -150,12 +150,12 @@ JAZZMIN_SETTINGS = {
     # 3. RENOMEAR O MODELO
     "models": {
         "narrativa.ConfiguracaoClinica": {
-            "verbose_name": "Logotipo",
-            "verbose_name_plural": "Logotipo",
+            "verbose_name": "Logotipo",  # Renomeia
+            "verbose_name_plural": "Logotipo",  # Renomeia
         }
     },
 
-    # 4. ÍCONES (Mantive os seus e adicionei os novos)
+    # 4. ÍCONES (Mantive o seu bloco e adicionei 2 linhas)
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -169,12 +169,12 @@ JAZZMIN_SETTINGS = {
         "narrativa.SessaoPaciente": "fas fa-user-clock",
         "narrativa.Usuario": "fas fa-user-shield",
 
-        # Novos ícones:
+        # --- Linhas Adicionadas ---
         "narrativa.Categoria": "fas fa-tags",
         "narrativa.ConfiguracaoClinica": "fas fa-image",
     },
 
-    # --- FIM DAS NOSSAS MUDANÇAS ---
+    # --- FIM DAS MUDANÇAS ---
 
     "hide_models": [
         "narrativa.opcaoresposta",
