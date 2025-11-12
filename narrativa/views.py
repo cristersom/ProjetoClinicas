@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
-# ADICIONADO LogVisitaCena ao import
 from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena
 from .forms import CriarContaForm, FormHomepage
 from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib import admin # <--- 1. IMPORTAR O ADMIN
 
 
 class Homepage(FormView):
@@ -186,6 +186,14 @@ def responder_questionario(request, questionario_id):
 
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin_faq.html"
+
+    # --- 2. ADICIONAR O CONTEXTO DO ADMIN MANUALMENTE ---
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Adiciona o contexto do admin (necessário para o layout do Jazzmin)
+        context.update(admin.site.each_context(self.request))
+        return context
+    # --- FIM DA MUDANÇA ---
 
 class TermosView(TemplateView):
     template_name = "termos.html"
