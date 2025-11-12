@@ -4,7 +4,7 @@ import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena,
-    Categoria, ConfiguracaoClinica  # O import PODE ficar
+    Categoria, ConfiguracaoClinica
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -31,19 +31,18 @@ class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('titulo',)
     search_fields = ('titulo',)
 
+# --- ADMIN ADICIONADO PARA O LOGO ---
+@admin.register(ConfiguracaoClinica)
+class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
+    list_display = ('logo',)
 
-# --- ADMIN ADICIONADO PARA O LOGO (TEMPORARIAMENTE DESATIVADO) ---
- @admin.register(ConfiguracaoClinica)
- class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
-     list_display = ('logo',)
-
-     def has_add_permission(self, request):
-         # Impede a criação de novos objetos se um já existir (pk=1)
+    def has_add_permission(self, request):
+        # Impede a criação de novos objetos se um já existir (pk=1)
         return not ConfiguracaoClinica.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
-         # Impede a exclusão do objeto de configuração
-         return False
+        # Impede a exclusão do objeto de configuração
+        return False
 # --- FIM DA ADIÇÃO ---
 
 
@@ -381,8 +380,8 @@ class RespostaResource(resources.ModelResource):
     class Meta:
         model = Resposta  #
         fields = (
-            'id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',  #
-            'data_resposta')
+        'id', 'session_key', 'perfil_narrativa', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta',  #
+        'data_resposta')
         export_order = fields  #
 
     def dehydrate_perfil_narrativa(self, resposta):

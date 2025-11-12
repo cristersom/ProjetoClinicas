@@ -16,12 +16,12 @@ def lista_narrativas_emalta(request):
 
 
 def dados_clinica(request):
-     try:
-         # Busca a configuração (que sempre será pk=1)
-         config = ConfiguracaoClinica.objects.get(pk=1)
-         if config.logo:
-             return {'logo_url': config.logo.url}
-     except ConfiguracaoClinica.DoesNotExist:
-         pass
+    try:
+        # Busca a configuração (que sempre será pk=1)
+        config = ConfiguracaoClinica.objects.get(pk=1)
+        if config.logo:
+            return {'logo_url': config.logo.url}
+    except ConfiguracaoClinica.DoesNotExist:
+        pass
 
     return {'logo_url': None}
