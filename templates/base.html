@@ -17,6 +17,17 @@
     {% endblock %}
     {% block content %}
     {% endblock %}
+
+    <footer class="text-gray-100 px-5 py-10" style="background-color: #121212;">
+        <ul class="flex justify-between items-center">
+            <li>&copy; 2025</li>
+            <li>
+                <a href="{% url 'narrativa:termos_de_uso' %}" class="hover:underline">Termos de Uso</a> |
+                <a href="{% url 'narrativa:politica_privacidade' %}" class="hover:underline">Política de Privacidade</a>
+            </li>
+            <li>Feito com Python (Django)</li>
+        </ul>
+    </footer>
     <script>
     const nav = document.querySelector('nav')
 

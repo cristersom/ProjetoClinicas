@@ -1,0 +1,33 @@
+{% extends 'admin/base.html' %}
+{% block title %}Ajuda{% endblock %}
+{% block content %}
+<div class="module">
+    <h1>Guia de Ajuda da Administração</h1>
+
+    <h2>Como criar uma nova Jornada (Narrativa)?</h2>
+    <p>1. Vá para "Gestão da Jornada" > "Narrativas" e clique em "Adicionar Narrativa".</p>
+    <p>2. Preencha o título, descrição, e suba uma imagem de capa (thumb).</p>
+    <p>3. Associe uma "Categoria" (ex: "Boas-vindas").</p>
+    <p>4. Salve a narrativa. <strong>Importante:</strong> Você ainda precisa definir a "Cena Inicial".</p>
+
+    <h2>Como criar Cenas e Escolhas?</h2>
+    <p>1. Vá para "Cenas" e clique em "Adicionar Cena".</p>
+    <p>2. Associe a cena à "Narrativa" que você acabou de criar.</p>
+    <p>3. Adicione o conteúdo (texto, link de vídeo do YouTube/Vimeo, ou uma imagem).</p>
+    <p>4. No final da página, em "Escolhas", clique em "Adicionar outra Escolha".</p>
+    <p>5. Defina o "Texto da opção" (o que o paciente vai ler no botão) e a "Cena de destino" (para onde esse botão o levará).</p>
+    <p>6. Salve a cena.</p>
+
+    <h2>Como definir a Cena Inicial?</h2>
+    <p>1. Depois de criar sua primeira cena, volte para a "Narrativa" que você criou.</p>
+    <p>2. No campo "Cena Inicial", selecione a primeira cena que o paciente deve ver.</p>
+    <p>3. Salve. Agora sua jornada está pronta para ser iniciada!</p>
+
+    <h2>Como adicionar um Questionário?</h2>
+    <p>1. Vá para "Questionários" e crie um novo.</p>
+    <p>2. Em "Cena Associada", escolha a cena ao final da qual o questionário deve aparecer.</p>
+    <p>3. Em "Perguntas", adicione suas perguntas. Você pode definir o tipo (texto, escala, múltipla escolha, etc.).</p>
+    <p>4. Se for de múltipla escolha, adicione as "Opções de Resposta" dentro da pergunta.</p>
+    <p>5. (Opcional) Defina uma "Cena de Destino" se o paciente deve ir para uma cena específica após responder.</p>
+</div>
+{% endblock %}
