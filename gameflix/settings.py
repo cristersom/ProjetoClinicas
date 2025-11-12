@@ -31,7 +31,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise ainda é necessário no middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Whitenoise ainda é necessário no middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -46,7 +46,7 @@ ROOT_URLCONF = 'gameflix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'], # Garante que a pasta raiz 'templates' é verificada
+        'DIRS': ['templates'],  # Garante que a pasta raiz 'templates' é verificada
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,8 +85,8 @@ USE_TZ = True
 
 # --- Configurações de Arquivos Estáticos ---
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"] # Diretório onde o collectstatic procura arquivos estáticos customizados
-STATIC_ROOT = BASE_DIR / "staticfiles" # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
+STATICFILES_DIRS = [BASE_DIR / "static"]  # Diretório onde o collectstatic procura arquivos estáticos customizados
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
 
 # --- Configurações de Arquivos de Mídia ---
 MEDIA_URL = '/media/'
@@ -96,9 +96,6 @@ STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # MUDANÇA 2: Backend de estáticos otimizado para o Whitenoise
-    # Você já usa o middleware do Whitenoise, então deve usar o storage dele também.
-    # Isso é mais eficiente e corrige erros de arquivos estáticos em produção.
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -116,8 +113,7 @@ LOGIN_URL = 'narrativa:login'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-
-# --- Configurações do Jazzmin (ATUALIZADO) ---
+# --- Configurações do Jazzmin (ATUALIZADO E CONSOLIDADO) ---
 JAZZMIN_SETTINGS = {
     # Títulos (mantidos do seu original)
     "site_title": "Administração Clínica",
@@ -138,21 +134,23 @@ JAZZMIN_SETTINGS = {
         "narrativa.Questionario",
         "narrativa.Resposta",
         "narrativa.Categoria",
-        "narrativa.ConfiguracaoClinica", # Nome real do modelo
+        "narrativa.ConfiguracaoClinica",  # Nome real do modelo
         "narrativa.SessaoPaciente",
         "narrativa.Usuario",
     ],
 
-    # MUDANÇA 2: Renomear, trocar ícones e agrupar
+    # MUDANÇA 2: Renomear o app
     "apps": {
         "narrativa": "Gestão da Jornada",
     },
 
-    # MUDANÇA 3: Ícones (mantive os seus e adicionei os novos)
+    # MUDANÇA 3: Renomear e definir ÍCONES (tudo num só lugar)
     "models": {
-        # Ícones que você já tinha (restaurados)
+        # Auth
         "auth.User": {"icon": "fas fa-user"},
         "auth.Group": {"icon": "fas fa-users"},
+
+        # App Narrativa (com seus ícones + novos)
         "narrativa.Narrativa": {"icon": "fas fa-book-open"},
         "narrativa.Cena": {"icon": "fas fa-film"},
         "narrativa.Escolha": {"icon": "fas fa-code-branch"},
@@ -162,14 +160,14 @@ JAZZMIN_SETTINGS = {
         "narrativa.SessaoPaciente": {"icon": "fas fa-user-clock"},
         "narrativa.Usuario": {"icon": "fas fa-user-shield"},
 
-        # Nossas novas alterações (ícone e nome)
+        # Nossas novas alterações
         "narrativa.Categoria": {
             "icon": "fas fa-tags"  # Ícone novo (etiquetas)
         },
         "narrativa.ConfiguracaoClinica": {
-            "verbose_name": "Logotipo",            # Renomeado
+            "verbose_name": "Logotipo",  # Renomeado
             "verbose_name_plural": "Logotipo",  # Renomeado
-            "icon": "fas fa-image"                # Ícone novo (imagem)
+            "icon": "fas fa-image"  # Ícone novo (imagem)
         },
     },
 
@@ -179,8 +177,10 @@ JAZZMIN_SETTINGS = {
         "auth.permission",
     ],
 }
+# --- FIM DO BLOCO JAZZMIN_SETTINGS ---
 
 
+# Bloco JAZZMIN_UI_TWEAKS (mantido 100% como o seu original)
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
@@ -213,10 +213,7 @@ JAZZMIN_UI_TWEAKS = {
     }
 }
 
-
-# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
-# Isso fará com que os erros 500 (quando DEBUG=False)
-# sejam impressos no log do Heroku.
+# Bloco de LOGGING (mantido 100% como o seu original)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -227,12 +224,12 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING', # Captura 'warnings' e 'errors'
+        'level': 'WARNING',  # Captura 'warnings' e 'errors'
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Nível de log do Django
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),  # Nível de log do Django
             'propagate': False,
         },
     },
