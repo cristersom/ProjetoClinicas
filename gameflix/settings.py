@@ -31,7 +31,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise ainda é necessário no middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Whitenoise ainda é necessário no middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -46,7 +46,7 @@ ROOT_URLCONF = 'gameflix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'], # Garante que a pasta raiz 'templates' é verificada
+        'DIRS': ['templates'],  # Garante que a pasta raiz 'templates' é verificada
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,8 +85,8 @@ USE_TZ = True
 
 # --- Configurações de Arquivos Estáticos ---
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"] # Diretório onde o collectstatic procura arquivos estáticos customizados
-STATIC_ROOT = BASE_DIR / "staticfiles" # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
+STATICFILES_DIRS = [BASE_DIR / "static"]  # Diretório onde o collectstatic procura arquivos estáticos customizados
+STATIC_ROOT = BASE_DIR / "staticfiles"  # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
 
 # --- Configurações de Arquivos de Mídia ---
 MEDIA_URL = '/media/'
@@ -116,7 +116,6 @@ LOGIN_URL = 'narrativa:login'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-
 # --- Configurações do Jazzmin ---
 JAZZMIN_SETTINGS = {
     "site_title": "Administração Clínica",
@@ -128,6 +127,35 @@ JAZZMIN_SETTINGS = {
         {"name": "Ver Site", "url": "/", "new_window": True},
         {"app": "narrativa"},
     ],
+
+    # --- INÍCIO DAS NOSSAS MUDANÇAS ---
+
+    # 1. ORDEM DO MENU
+    "order_with_respect_to": [
+        "narrativa.Narrativa",
+        "narrativa.Cena",
+        "narrativa.Questionario",
+        "narrativa.Resposta",
+        "narrativa.Categoria",
+        "narrativa.ConfiguracaoClinica",  # Nome real do modelo
+        "narrativa.SessaoPaciente",
+        "narrativa.Usuario",
+    ],
+
+    # 2. RENOMEAR O GRUPO DE APPS
+    "apps": {
+        "narrativa": "Gestão da Jornada",
+    },
+
+    # 3. RENOMEAR O MODELO
+    "models": {
+        "narrativa.ConfiguracaoClinica": {
+            "verbose_name": "Logotipo",
+            "verbose_name_plural": "Logotipo",
+        }
+    },
+
+    # 4. ÍCONES (Mantive os seus e adicionei os novos)
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -140,7 +168,14 @@ JAZZMIN_SETTINGS = {
         "narrativa.Resposta": "fas fa-comment",
         "narrativa.SessaoPaciente": "fas fa-user-clock",
         "narrativa.Usuario": "fas fa-user-shield",
+
+        # Novos ícones:
+        "narrativa.Categoria": "fas fa-tags",
+        "narrativa.ConfiguracaoClinica": "fas fa-image",
     },
+
+    # --- FIM DAS NOSSAS MUDANÇAS ---
+
     "hide_models": [
         "narrativa.opcaoresposta",
         "auth.permission",
@@ -179,7 +214,6 @@ JAZZMIN_UI_TWEAKS = {
     }
 }
 
-
 # MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
 # Isso fará com que os erros 500 (quando DEBUG=False)
 # sejam impressos no log do Heroku.
@@ -193,12 +227,12 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING', # Captura 'warnings' e 'errors'
+        'level': 'WARNING',  # Captura 'warnings' e 'errors'
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Nível de log do Django
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),  # Nível de log do Django
             'propagate': False,
         },
     },
