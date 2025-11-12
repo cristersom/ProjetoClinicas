@@ -96,7 +96,7 @@ Narrativas
             <h2 class="text-6xl font-semibold text-white my-4">
                 Bem-vindo(a)!
             </h2>
-            <p class=" w-11/12 md:w-8/12 font-medium text-white my-4">
+            <p class=" w-11/12 md:w-10/12 font-medium text-white my-4">
                 Vamos começar? Crie sua primeira jornada interativa no botão abaixo.
             </p>
             <div class="flex my-4 space-x-4">
@@ -113,7 +113,7 @@ Narrativas
     </section>
 {% endif %}
 
-
+{% if lista_narrativas_recentes %}
 <section class='bg-primary_black flex justify-center py-10'>
     <div class="p-8 w-10/12 relative" >
         <h2 class="text-gray-200 text-2xl font-medium">
@@ -151,6 +151,9 @@ Narrativas
         </div>
     </div>
 </section>
+{% endif %}
+
+{% if lista_narrativas_emalta %}
 <section class='bg-primary_black flex justify-center py-10'>
     <div class="p-8 w-10/12 relative" >
         <h2 class="text-gray-200 text-2xl font-medium">
@@ -188,7 +191,9 @@ Narrativas
         </div>
     </div>
 </section>
+{% endif %}
 
+{% if request.user.narrativas_vistas.all %}
 <section class='bg-primary_black flex justify-center py-10'>
 <div class="p-8 w-10/12 relative" >
     <h2 class="text-gray-200 text-2xl font-medium">
@@ -226,6 +231,7 @@ Narrativas
     </div>
 </div>
 </section>
+{% endif %}
 
 
 </main>
