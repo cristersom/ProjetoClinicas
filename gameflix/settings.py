@@ -96,9 +96,6 @@ STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # MUDANÇA 2: Backend de estáticos otimizado para o Whitenoise
-    # Você já usa o middleware do Whitenoise, então deve usar o storage dele também.
-    # Isso é mais eficiente e corrige erros de arquivos estáticos em produção.
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -117,36 +114,67 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
 
-# --- Configurações do Jazzmin ---
+# --- Configurações do Jazzmin (ATUALIZADO) ---
 JAZZMIN_SETTINGS = {
+    # Títulos e Cabeçalhos (mantive os seus)
     "site_title": "Administração Clínica",
     "site_header": "Clínica Admin",
-    # "site_logo": "caminho/para/seu/logo.png",
     "welcome_sign": "Bem-vindo(a) à Administração",
     "copyright": "Minha Clínica Ltd",
+
+    # Links do Menu Superior (mantive os seus)
     "topmenu_links": [
         {"name": "Ver Site", "url": "/", "new_window": True},
         {"app": "narrativa"},
     ],
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "narrativa.Narrativa": "fas fa-book-open",
-        "narrativa.Cena": "fas fa-film",
-        "narrativa.Escolha": "fas fa-code-branch",
-        "narrativa.Questionario": "fas fa-clipboard-list",
-        "narrativa.Pergunta": "fas fa-question-circle",
-        "narrativa.Resposta": "fas fa-comment",
-        "narrativa.SessaoPaciente": "fas fa-user-clock",
-        "narrativa.Usuario": "fas fa-user-shield",
+
+    # MUDANÇA 1: Ordem do menu
+    "order_with_respect_to": [
+        "narrativa.Narrativa",
+        "narrativa.Cena",
+        "narrativa.Questionario",
+        "narrativa.Resposta",
+        "narrativa.Categoria",
+        "narrativa.ConfiguracaoClinica", # Nome real do modelo
+        "narrativa.SessaoPaciente",
+        "narrativa.Usuario",
+    ],
+
+    # MUDANÇA 2: Renomear, trocar ícones e agrupar
+    "apps": {
+        "narrativa": "Gestão da Jornada",
     },
+    "models": {
+        # Autenticação (mantive os seus ícones)
+        "auth.User": {"icon": "fas fa-user"},
+        "auth.Group": {"icon": "fas fa-users"},
+
+        # App Narrativa (com seus ícones + novos)
+        "narrativa.Narrativa": {"icon": "fas fa-book-open"},
+        "narrativa.Cena": {"icon": "fas fa-film"},
+        "narrativa.Questionario": {"icon": "fas fa-clipboard-list"},
+        "narrativa.Resposta": {"icon": "fas fa-comment"},
+        "narrativa.Categoria": {
+            "icon": "fas fa-tags"  # Ícone novo (etiquetas)
+        },
+        "narrativa.ConfiguracaoClinica": {
+            "verbose_name": "Logotipo",            # Renomeado
+            "verbose_name_plural": "Logotipo",  # Renomeado
+            "icon": "fas fa-image"                # Ícone novo (imagem)
+        },
+        "narrativa.SessaoPaciente": {"icon": "fas fa-user-clock"},
+        "narrativa.Usuario": {"icon": "fas fa-user-shield"},
+    },
+
+    # Modelos escondidos (mantive os seus)
     "hide_models": [
         "narrativa.opcaoresposta",
         "auth.permission",
     ],
 }
 
+
+# Tweaks de UI (mantive os seus)
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
     "footer_small_text": False,
@@ -180,9 +208,7 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 
-# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
-# Isso fará com que os erros 500 (quando DEBUG=False)
-# sejam impressos no log do Heroku.
+# Bloco de LOGGING (mantive o seu)
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
