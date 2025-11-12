@@ -96,9 +96,6 @@ STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
-    # MUDANÇA 2: Backend de estáticos otimizado para o Whitenoise
-    # Você já usa o middleware do Whitenoise, então deve usar o storage dele também.
-    # Isso é mais eficiente e corrige erros de arquivos estáticos em produção.
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
@@ -120,17 +117,24 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 JAZZMIN_SETTINGS = {
     "site_title": "Administração Clínica",
     "site_header": "Clínica Admin",
-    # "site_logo": "caminho/para/seu/logo.png",
     "welcome_sign": "Bem-vindo(a) à Administração",
     "copyright": "Minha Clínica Ltd",
+
+    # --- MUDANÇA AQUI ---
     "topmenu_links": [
         {"name": "Ver Site", "url": "/", "new_window": True},
         {"app": "narrativa"},
+
+        # Link de Ajuda/FAQ adicionado
+        {
+            "name": "Ajuda",
+            "url": "narrativa:admin_faq",  # Aponta para a rota que já criámos
+            "icon": "fas fa-question-circle",
+            "new_window": True
+        },
     ],
+    # --- FIM DA MUDANÇA ---
 
-    # --- INÍCIO DAS MUDANÇAS ---
-
-    # 1. ORDEM DO MENU
     "order_with_respect_to": [
         "narrativa.Narrativa",
         "narrativa.Cena",
@@ -142,20 +146,17 @@ JAZZMIN_SETTINGS = {
         "narrativa.Usuario",
     ],
 
-    # 2. RENOMEAR O GRUPO DE APPS
     "apps": {
         "narrativa": "Gestão da Jornada",
     },
 
-    # 3. RENOMEAR O MODELO
     "models": {
         "narrativa.ConfiguracaoClinica": {
-            "verbose_name": "Logotipo",  # Renomeia
-            "verbose_name_plural": "Logotipo",  # Renomeia
+            "verbose_name": "Logotipo",
+            "verbose_name_plural": "Logotipo",
         }
     },
 
-    # 4. ÍCONES (Mantive o seu bloco e adicionei 2 linhas)
     "icons": {
         "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
@@ -168,13 +169,9 @@ JAZZMIN_SETTINGS = {
         "narrativa.Resposta": "fas fa-comment",
         "narrativa.SessaoPaciente": "fas fa-user-clock",
         "narrativa.Usuario": "fas fa-user-shield",
-
-        # --- Linhas Adicionadas ---
         "narrativa.Categoria": "fas fa-tags",
         "narrativa.ConfiguracaoClinica": "fas fa-image",
     },
-
-    # --- FIM DAS MUDANÇAS ---
 
     "hide_models": [
         "narrativa.opcaoresposta",
