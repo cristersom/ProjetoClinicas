@@ -41,7 +41,7 @@ Narrativas
 <main class='bg-primary_black min-h-screen w-full'>
 
 {% if narrativa_destaque %}
-    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
+    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover bg-black bg-opacity-75 bg-blend-overlay" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
         <div>
             <h2 class="text-6xl font-semibold text-white my-4">
                 {{ narrativa_destaque.titulo }}
@@ -50,6 +50,15 @@ Narrativas
                 {{ narrativa_destaque.descricao }}
             </p>
             <div class="flex my-4 space-x-4">
+                <a href="{% url 'admin:narrativa_narrativa_add' %}">
+                    <button class="flex items-center bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md" style='color:white;'>
+                        <ion-icon name="add-circle" class="text-2xl"></ion-icon>
+                        <span class="ml-3 font-medium " >
+                            Criar Narrativa
+                        </span>
+                    </button>
+                </a>
+
                 <a href="{% url 'narrativa:detalhes' narrativa_destaque.pk %}">
                     <button class="flex items-center bg-black py-2 px-5 rounded-md" style='color:white;'>
                         <ion-icon name="play" class="text-2xl"></ion-icon>
@@ -82,8 +91,8 @@ Narrativas
         </div>
     </section>
 {% else %}
-    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-center justify-center bg-cover" style="background-image: url('{% static 'images/background.png' %}');">
-        <div class="z-10 h-full py-32 md:py-0 text-gray-100 text-center flex items-center flex-col">
+    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover bg-black bg-opacity-75 bg-blend-overlay" style="background-image: url('{% static 'images/background.png' %}');">
+        <div>
             <h2 class="text-6xl font-semibold text-white my-4">
                 Bem-vindo(a)!
             </h2>
@@ -92,7 +101,7 @@ Narrativas
             </p>
             <div class="flex my-4 space-x-4">
                 <a href="{% url 'admin:narrativa_narrativa_add' %}">
-                    <button class="flex items-center bg-black py-2 px-5 rounded-md" style='color:white;'>
+                    <button class="flex items-center bg-green-600 hover:bg-green-700 text-white py-2 px-5 rounded-md" style='color:white;'>
                         <ion-icon name="add-circle" class="text-2xl"></ion-icon>
                         <span class="ml-3 font-medium " >
                             Criar sua primeira narrativa
@@ -103,6 +112,8 @@ Narrativas
         </div>
     </section>
 {% endif %}
+
+
 <section class='bg-primary_black flex justify-center py-10'>
     <div class="p-8 w-10/12 relative" >
         <h2 class="text-gray-200 text-2xl font-medium">
