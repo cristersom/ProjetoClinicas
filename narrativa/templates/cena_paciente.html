@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block navbar %}
-    {% endblock %} {# Remove a navbar padrão nesta tela #}
+{% block navbar %}{% include 'navbar.html' %}{% endblock %} {# Remove a navbar padrão nesta tela #}
 
 {% block titulo %}
     Jornada Interativa
