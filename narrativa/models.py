@@ -127,7 +127,9 @@ class LogVisitaCena(models.Model):
 # --- MODELO ADICIONADO PARA O LOGO ---
 
 class ConfiguracaoClinica(models.Model):
-    logo = models.ImageField(upload_to='logos/', null=True, blank=True, help_text="Logo da clínica que aparecerá no navbar")
+    # --- MUDANÇA AQUI ---
+    logo = models.ImageField(upload_to='logos/', null=True, blank=True,
+                             help_text="Logo da clínica. Tamanho recomendado: 250x45 pixels.")
 
     def __str__(self):
         return "Configuração da Clínica"
