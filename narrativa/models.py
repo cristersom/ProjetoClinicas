@@ -123,3 +123,19 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
+
+# --- MODELO ADICIONADO PARA O LOGO ---
+
+class ConfiguracaoClinica(models.Model):
+    logo = models.ImageField(upload_to='logos/', null=True, blank=True, help_text="Logo da clínica que aparecerá no navbar")
+
+    def __str__(self):
+        return "Configuração da Clínica"
+
+    def save(self, *args, **kwargs):
+        # Garante que este objeto seja sempre o pk=1
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = "Configuração da Clínica"
