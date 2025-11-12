@@ -4,7 +4,7 @@ import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena,
-    Categoria, ConfiguracaoClinica  # ADICIONADO ConfiguracaoClinica AQUI
+    Categoria, ConfiguracaoClinica  # O import PODE ficar
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
@@ -32,20 +32,18 @@ class CategoriaAdmin(admin.ModelAdmin):
     search_fields = ('titulo',)
 
 
-# --- ADMIN ADICIONADO PARA O LOGO ---
-@admin.register(ConfiguracaoClinica)
-class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
-    list_display = ('logo',)
+# --- ADMIN ADICIONADO PARA O LOGO (TEMPORARIAMENTE DESATIVADO) ---
+# @admin.register(ConfiguracaoClinica)
+# class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
+#     list_display = ('logo',)
 
-    def has_add_permission(self, request):
-        # Impede a criação de novos objetos se um já existir (pk=1)
-        return not ConfiguracaoClinica.objects.exists()
+#     def has_add_permission(self, request):
+#         # Impede a criação de novos objetos se um já existir (pk=1)
+#         return not ConfiguracaoClinica.objects.exists()
 
-    def has_delete_permission(self, request, obj=None):
-        # Impede a exclusão do objeto de configuração
-        return False
-
-
+#     def has_delete_permission(self, request, obj=None):
+#         # Impede a exclusão do objeto de configuração
+#         return False
 # --- FIM DA ADIÇÃO ---
 
 
