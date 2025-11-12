@@ -3,7 +3,7 @@ from django.contrib import messages
 # ADICIONADO LogVisitaCena ao import
 from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena
 from .forms import CriarContaForm, FormHomepage
-from django.views.generic import ListView, DetailView, FormView, UpdateView
+from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -181,3 +181,14 @@ def responder_questionario(request, questionario_id):
         'questionario': questionario  #
     }
     return render(request, 'questionario.html', context)  #
+
+# --- VISTAS ADICIONADAS PARA O FAQ E PÁGINAS LEGAIS ---
+
+class AdminFAQView(LoginRequiredMixin, TemplateView):
+    template_name = "admin_faq.html"
+
+class TermosView(TemplateView):
+    template_name = "termos.html"
+
+class PoliticaView(TemplateView):
+    template_name = "politica.html"

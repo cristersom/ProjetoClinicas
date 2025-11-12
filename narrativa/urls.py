@@ -2,7 +2,10 @@ from django.urls import path, reverse_lazy
 from .views import (
     Narrativas, Homepage, Detalhes, Pesquisa, PerfilView, Criarconta,
     iniciar_jornada_paciente, exibir_cena_paciente, responder_questionario,
-    PacienteNarrativas, PacienteDetalhes
+    PacienteNarrativas, PacienteDetalhes,
+
+    # --- Vistas importadas ---
+    AdminFAQView, TermosView, PoliticaView
 )
 from django.contrib.auth import views as auth_view
 
@@ -26,5 +29,12 @@ urlpatterns = [
     path('logout/', auth_view.LogoutView.as_view(template_name='logout.html'), name='logout'),
     path('perfil/<int:pk>', PerfilView.as_view(), name='perfil'),
     path('criarconta/', Criarconta.as_view(), name='criarconta'),
-    path('mudarsenha/', auth_view.PasswordChangeView.as_view(template_name='perfil.html', success_url=reverse_lazy('narrativa:narrativas')), name='mudarsenha'),
+    path('mudarsenha/', auth_view.PasswordChangeView.as_view(template_name='perfil.html',
+                                                             success_url=reverse_lazy('narrativa:narrativas')),
+         name='mudarsenha'),
+
+    # --- Rotas adicionadas ---
+    path('ajuda-admin/', AdminFAQView.as_view(), name='admin_faq'),
+    path('termos-de-uso/', TermosView.as_view(), name='termos_de_uso'),
+    path('politica-de-privacidade/', PoliticaView.as_view(), name='politica_privacidade'),
 ]
