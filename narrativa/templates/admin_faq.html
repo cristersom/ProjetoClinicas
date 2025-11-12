@@ -1,33 +1,133 @@
 {% extends 'admin/base.html' %}
+{% load static %}
 {% block title %}Ajuda{% endblock %}
+
 {% block content %}
 <div class="module">
     <h1>Guia de Ajuda da Administração</h1>
+    <p>Bem-vindo ao guia de utilizador. Esta plataforma permite criar jornadas interativas (Narrativas) para pacientes, compostas por Cenas, Escolhas e Questionários. Siga os passos abaixo para construir e analisar as suas jornadas.</p>
+</div>
 
-    <h2>Como criar uma nova Jornada (Narrativa)?</h2>
-    <p>1. Vá para "Gestão da Jornada" > "Narrativas" e clique em "Adicionar Narrativa".</p>
-    <p>2. Preencha o título, descrição, e suba uma imagem de capa (thumb).</p>
-    <p>3. Associe uma "Categoria" (ex: "Boas-vindas").</p>
-    <p>4. Salve a narrativa. <strong>Importante:</strong> Você ainda precisa definir a "Cena Inicial".</p>
+<div class="module">
+    <h2>Índice</h2>
+    <ul>
+        <li><a href="#conceitos">1. Conceitos Principais</a></li>
+        <li><a href="#passo-a-passo">2. Guia Rápido: Como Criar uma Jornada Completa</a></li>
+        <li><a href="#questionarios">3. Como funcionam os Questionários?</a></li>
+        <li><a href="#partilha">4. Como Partilhar uma Jornada com Pacientes?</a></li>
+        <li><a href="#relatorios">5. Como Analisar os Relatórios?</a></li>
+        <li><a href="#admin">6. Configurações de Administrador</a></li>
+    </ul>
+</div>
 
-    <h2>Como criar Cenas e Escolhas?</h2>
-    <p>1. Vá para "Cenas" e clique em "Adicionar Cena".</p>
-    <p>2. Associe a cena à "Narrativa" que você acabou de criar.</p>
-    <p>3. Adicione o conteúdo (texto, link de vídeo do YouTube/Vimeo, ou uma imagem).</p>
-    <p>4. No final da página, em "Escolhas", clique em "Adicionar outra Escolha".</p>
-    <p>5. Defina o "Texto da opção" (o que o paciente vai ler no botão) e a "Cena de destino" (para onde esse botão o levará).</p>
-    <p>6. Salve a cena.</p>
+<div class="module" id="conceitos">
+    <h2>1. Conceitos Principais</h2>
+    <dl>
+        <dt><strong>Narrativa</strong></dt>
+        <dd>É a jornada completa. Pense nela como o "filme" ou a "campanha". Ela agrupa todas as Cenas e Questionários.</dd>
 
-    <h2>Como definir a Cena Inicial?</h2>
-    <p>1. Depois de criar sua primeira cena, volte para a "Narrativa" que você criou.</p>
-    <p>2. No campo "Cena Inicial", selecione a primeira cena que o paciente deve ver.</p>
-    <p>3. Salve. Agora sua jornada está pronta para ser iniciada!</p>
+        <dt><strong>Cena</strong></dt>
+        <dd>É cada "página" ou "passo" que o paciente vê. Uma cena pode conter um vídeo, uma imagem, um texto, ou uma combinação dos três.</dd>
 
-    <h2>Como adicionar um Questionário?</h2>
-    <p>1. Vá para "Questionários" e crie um novo.</p>
-    <p>2. Em "Cena Associada", escolha a cena ao final da qual o questionário deve aparecer.</p>
-    <p>3. Em "Perguntas", adicione suas perguntas. Você pode definir o tipo (texto, escala, múltipla escolha, etc.).</p>
-    <p>4. Se for de múltipla escolha, adicione as "Opções de Resposta" dentro da pergunta.</p>
-    <p>5. (Opcional) Defina uma "Cena de Destino" se o paciente deve ir para uma cena específica após responder.</p>
+        <dt><strong>Escolha</strong></dt>
+        <dd>São os botões de navegação que aparecem numa Cena. Cada escolha leva o paciente para outra Cena, criando a interatividade.</dd>
+
+        <dt><strong>Questionário</strong></dt>
+        <dd>Um formulário que pode ser associado a uma Cena. Contém Perguntas de diferentes tipos (texto, escala, múltipla escolha).</dd>
+
+        <dt><strong>Sessão Paciente</strong></dt>
+        <dd>Regista o "perfil" (Narrativa) inicial que um paciente anónimo escolheu. Ajuda a filtrar relatórios.</dd>
+    </dl>
+</div>
+
+<div class="module" id="passo-a-passo">
+    <h2>2. Guia Rápido: Como Criar uma Jornada Completa</h2>
+
+    <h4>Passo 1: Criar uma Categoria (Opcional, mas recomendado)</h4>
+    <p>1. Vá para "Gestão da Jornada" > "Categorias".</p>
+    <p>2. Adicione uma categoria (ex: "Boas-Vindas", "Pesquisa de Satisfação").</p>
+
+    <h4>Passo 2: Criar a Narrativa</h4>
+    <p>1. Vá para "Narrativas" e clique em "Adicionar Narrativa".</p>
+    <p>2. Preencha o Título, Descrição, e suba uma Imagem de Capa (Thumb).</p>
+    <p>3. Associe a "Categoria" que acabou de criar.</p>
+    <p>4. Não se preocupe com a "Cena Inicial" ainda. Salve.</p>
+
+    <h4>Passo 3: Criar as Cenas</h4>
+    <p>1. Vá para "Cenas" e crie todas as cenas da sua história (ex: "Cena 1 - Introdução", "Cena 2 - Caminho A", "Cena 3 - Fim").</p>
+    <p>2. Para cada Cena, associe-a à "Narrativa" correta (criada no Passo 2).</p>
+    <p>3. Adicione o seu conteúdo (link de vídeo do YouTube/Vimeo, imagem ou texto).</p>
+    <p>4. Salve cada cena.</p>
+
+    <h4>Passo 4: Ligar as Cenas com Escolhas</h4>
+    <p>1. Volte para "Cenas" e edite a sua primeira cena ("Cena 1 - Introdução").</p>
+    <p>2. No final da página, em "Escolhas", clique em "Adicionar outra Escolha".</p>
+    <p>3. Em "Texto da opção", escreva o que o botão dirá (ex: "Sim, quero continuar").</p>
+    <p>4. Em "Cena de destino", selecione a cena para onde o paciente deve ir (ex: "Cena 2 - Caminho A").</p>
+    <p>5. Salve. Repita este passo para todas as cenas que tiverem botões.</p>
+
+    <h4>Passo 5: Definir o Ponto de Partida</h4>
+    <p>1. Volte para "Narrativas" e edite a Narrativa que criou no Passo 2.</p>
+    <p>2. Agora, no campo "Cena Inicial", selecione a sua primeira cena (ex: "Cena 1 - Introdução").</p>
+    <p>3. Salve. A sua jornada está pronta!</p>
+</div>
+
+<div class="module" id="questionarios">
+    <h2>3. Como funcionam os Questionários?</h2>
+    <p>Questionários podem ser ligados a qualquer cena.</p>
+    <ol>
+        <li>Vá para "Questionários" e crie um novo.</li>
+        <li><strong>Cena Associada:</strong> Escolha a cena onde este questionário deve aparecer. Ele será mostrado *juntamente* com as Escolhas dessa cena.</li>
+        <li><strong>Perguntas:</strong> Adicione as perguntas. Pode escolher o tipo (Texto Livre, Escala de 1 a 5, etc.).</li>
+        <li><strong>Opções de Resposta:</strong> Se a pergunta for "Única Escolha" ou "Múltipla Escolha", tem de adicionar as opções clicando em "Adicionar outra Opção de Resposta" *dentro* da pergunta.</li>
+        <li><strong>Cena de Destino (Opcional):</strong> Se preenchido, o paciente será levado para esta cena *depois* de submeter o questionário. Se ficar em branco, ele permanece na cena atual (ou pode usar as "Escolhas" normais).</li>
+    </ol>
+</div>
+
+<div class="module" id="partilha">
+    <h2>4. Como Partilhar uma Jornada com Pacientes?</h2>
+    <p>O sistema tem duas formas de partilha:</p>
+
+    <h4>A. Link Geral (Página de Pacientes)</h4>
+    <p>O link `.../paciente/narrativas/` mostra *todas* as narrativas. Útil se quiser que o paciente escolha a jornada. Você pode copiar este link da página `/narrativas/` (na visão de admin).</p>
+
+    <h4>B. Link Direto (Recomendado)</h4>
+    <p>1. Vá para "Narrativas" e clique na narrativa que quer partilhar.</p>
+    <p>2. Na página de "Detalhes" da narrativa, clique no botão <strong>"Copiar Link de Acesso"</strong>.</p>
+    <p>3. Cole este link e envie ao seu paciente. Ele será levado diretamente para o início *daquela* jornada específica.</p>
+</div>
+
+<div class="module" id="relatorios">
+    <h2>5. Como Analisar os Relatórios?</h2>
+    <p>O sistema recolhe dados anónimos e apresenta-os de 3 formas:</p>
+
+    <dl>
+        <dt><strong>Relatório de Percurso (em Narrativas)</strong></dt>
+        <dd>Edite uma Narrativa e clique no botão "Relatório de Percurso". Isto mostra um gráfico de quantas pessoas (Visitantes Únicos) e quantas vezes (Visitas Totais) cada cena dessa narrativa foi vista. Pode filtrar por perfil.</dd>
+
+        <dt><strong>Relatórios de Questionário (em Questionários)</strong></dt>
+        <dd>
+            Edite um Questionário. Tem dois relatórios:
+            <ul>
+                <li><strong>Ver Detalhado:</strong> Mostra as respostas individuais de cada paciente (anónimo).</li>
+                <li><strong>Ver Resumo (Agregado):</strong> Mostra gráficos e listas com o total de respostas para cada opção, permitindo comparar por perfis.</li>
+            </ul>
+        </dd>
+
+        <dt><strong>Respostas (Menu Principal)</strong></dt>
+        <dd>Aqui pode ver *todas* as respostas de *todos* os questionários. Pode filtrar por perfil ou questionário, e exportar tudo para Excel (XLSX) usando o botão "Export" no canto superior direito.</dd>
+    </dl>
+</div>
+
+<div class="module" id="admin">
+    <h2>6. Configurações de Administrador</h2>
+
+    <dl>
+        <dt><strong>Logotipo</strong></dt>
+        <dd>Vá para "Gestão da Jornada" > "Logotipo". Adicione (ou altere) o ficheiro de imagem. Ele aparecerá no topo de todas as páginas.</dd>
+
+        <dt><strong>Usuários</strong></dt>
+        <dd>Aqui pode adicionar outros membros da equipa (outros administradores) ao sistema.</dd>
+    </dl>
 </div>
 {% endblock %}

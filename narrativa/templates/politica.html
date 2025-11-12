@@ -5,28 +5,62 @@
 
 {% block content %}
 <main class="bg-primary_black min-h-screen w-full flex justify-center text-gray-100 p-10">
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-8">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-8 relative">
+
+        <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
+             <a href="#" onclick="window.history.back(); return false;"
+                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
+                title="Voltar à página anterior">
+                 Voltar
+             </a>
+        </div>
         <h1 class="text-3xl font-bold mb-6 text-center">Política de Privacidade</h1>
-        <p class="mb-4">
-            A sua privacidade é importante para nós. Esta política explica como coletamos, usamos e protegemos as suas informações.
+        <p class="mb-4 text-gray-300">
+            A sua privacidade é uma prioridade. Esta política explica quais informações coletamos e como as utilizamos, em conformidade com a Lei Geral de Proteção de Dados (LGPD).
         </p>
 
         <h2 class="text-2xl font-semibold mt-6 mb-3">1. Dados Coletados</h2>
-        <p class="mb-4">
-            Coletamos apenas as informações fornecidas voluntariamente durante o uso das jornadas interativas e questionários. Para pacientes (usuários não logados), os dados são associados a uma chave de sessão anônima e não são ligados à sua identidade.
+
+        <h3 class="text-xl font-medium mt-4 mb-2">Para Pacientes (Utilizadores Anónimos)</h3>
+        <p class="mb-4 text-gray-300">
+            Quando utiliza as jornadas interativas, NÃO recolhemos o seu nome, e-mail, telefone ou qualquer dado de identificação pessoal. A sua participação é anónima. Recolhemos apenas:
+            <ul>
+                <li class="ml-4 mb-2"><strong>Dados de Sessão:</strong> Utilizamos uma "chave de sessão" (através de cookies de sessão) para o identificar anonimamente. Isto permite-nos guardar o seu progresso na jornada e associar as suas respostas a uma sessão única. Esta chave expira quando fecha o navegador.</li>
+                <li class="ml-4 mb-2"><strong>Dados de Resposta:</strong> As respostas que submete nos questionários (texto, seleções, escalas) são armazenadas e associadas apenas a esta chave de sessão anónima.</li>
+                <li class="ml-4 mb-2"><strong>Logs de Percurso:</strong> Registamos quais cenas você visita e quando, para que os administradores possam analisar quais partes da jornada são mais acedidas.</li>
+            </ul>
         </p>
-        <p class="mb-4">
-            Para usuários administradores (logados), coletamos o nome de usuário e e-mail para fins de autenticação.
+
+        <h3 class="text-xl font-medium mt-4 mb-2">Para Administradores (Utilizadores Logados)</h3>
+        <p class="mb-4 text-gray-300">
+            Para criar uma conta de administrador e gerir o conteúdo, recolhemos:
+            <ul>
+                <li class="ml-4 mb-2">Nome de utilizador e E-mail (para login e gestão de conta).</li>
+                <li class="ml-4 mb-2">Nome e Apelido (opcional, para personalização do perfil).</li>
+            </ul>
         </p>
 
         <h2 class="text-2xl font-semibold mt-6 mb-3">2. Uso dos Dados</h2>
-        <p class="mb-4">
-            Os dados anônimos dos questionários são usados exclusivamente para análise estatística e melhoria dos nossos serviços.
+        <p class="mb-4 text-gray-300">
+            Os dados anónimos dos Pacientes são usados exclusivamente para fins estatísticos e de relatório pelos Administradores, permitindo-lhes avaliar a eficácia das jornadas e a satisfação geral.
+        </p>
+        <p class="mb-4 text-gray-300">
+            Os dados dos Administradores são usados apenas para autenticação, segurança da conta e gestão da plataforma.
         </p>
 
-        <h2 class="text-2xl font-semibold mt-6 mb-3">3. Armazenamento e Segurança</h2>
-        <p class="mb-4">
-            [... Insira aqui sua política de armazenamento e segurança...]
+        <h2 class="text-2xl font-semibold mt-6 mb-3">3. Partilha de Dados</h2>
+        <p class="mb-4 text-gray-300">
+            Não vendemos, trocamos ou partilhamos as suas informações pessoais ou os dados anónimos das suas respostas com terceiros. Os dados são acedidos apenas pelos Administradores autorizados desta plataforma.
+        </p>
+
+        <h2 class="text-2xl font-semibold mt-6 mb-3">4. Armazenamento e Segurança</h2>
+        <p class="mb-4 text-gray-300">
+            Utilizamos medidas de segurança robustas para proteger os seus dados. Os uploads de imagens (como o logótipo da clínica e capas das narrativas) são armazenados de forma segura em serviços de nuvem (Cloudinary). As respostas da base de dados são protegidas em servidores seguros (Heroku Postgres).
+        </p>
+
+        <h2 class="text-2xl font-semibold mt-6 mb-3">5. Os Seus Direitos (LGPD)</h2>
+        <p class="mb-4 text-gray-300">
+            Como utilizador Administrador, tem o direito de aceder, corrigir ou eliminar os seus dados pessoais (nome de utilizador, e-mail) através da sua página de "Editar Perfil". Como a participação do Paciente é anónima, não armazenamos dados pessoais que possam ser acedidos ou eliminados.
         </p>
     </div>
 </main>
