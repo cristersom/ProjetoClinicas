@@ -1,20 +1,34 @@
 from django.contrib.auth.forms import UserCreationForm
-from .models import Usuario, Pergunta # Adicionado Pergunta aos imports
+from .models import Usuario, Pergunta
 from django import forms
+from django.utils.html import format_html # Importação necessária para o link
+
 
 # --- Formulário da Homepage (Original) ---
 class FormHomepage(forms.Form):
     email = forms.EmailField(label=False)
 
-# --- Formulário de Criar Conta (Original) ---
+# --- Formulário de Criar Conta (MODIFICADO) ---
 class CriarContaForm(UserCreationForm):
     # Adicionamos email ao formulário de criação de conta
     email = forms.EmailField(required=True)
 
+    # NOVO CAMPO: Checkbox de Aceite dos Termos
+    aceite_termos = forms.BooleanField(
+        # O link será corrigido via JavaScript no template
+        label=format_html(
+            'Aceita nossos <a href="{}" target="_blank">termos de uso e política de privacidade</a>?',
+            '/termos/'
+        ),
+        required=True,
+        error_messages={'required': 'Você deve aceitar os termos de uso para criar uma conta.'}
+    )
+
     class Meta:
         model = Usuario
         # Incluímos 'email' nos campos a serem exibidos e salvos
-        fields = ('username', 'email') # Removido password1 e password2 daqui, UserCreationForm cuida disso
+        # O campo 'aceite_termos' NÃO vai aqui, pois não é um campo do modelo Usuario.
+        fields = ('username', 'email')
 
     # Garante que o email seja salvo
     def save(self, commit=True):

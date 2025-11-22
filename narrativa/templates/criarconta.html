@@ -29,7 +29,14 @@ Criar Conta
                 </fieldset>
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
             </form>
-
+            <script>
+                // Acha o link injetado pelo crispy-forms no label do campo de aceite
+                const termosLink = document.querySelector('label[for="id_aceite_termos"] a');
+                if (termosLink) {
+                    // Substitui o href estático pelo URL dinâmico do Django
+                    termosLink.href = "{% url 'narrativa:termos_de_uso' %}";
+                }
+            </script>
         </div>
     </header>
 

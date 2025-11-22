@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termo de Uso - Sistema Gamificado de Clínica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-blue-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-2xl">
+        <div class="text-center mb-6">
+            <h1 id="termoTitulo" class="text-2xl sm:text-3xl font-bold text-blue-800">Termos de Uso e Política de Privacidade</h1>
+        </div>
+
+        <div id="termoTexto" class="prose max-w-none h-64 overflow-y-auto bg-gray-50 p-4 rounded-lg border border-gray-200 text-gray-700 mb-6">
+            Carregando termos...
+        </div>
+
+        <div class="flex items-center mb-6">
+            <input id="agreeCheckbox" type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+            <label for="agreeCheckbox" class="ml-3 block text-sm font-medium text-gray-800">
+                Li e concordo com os termos de uso e a política de privacidade.
+            </label>
+        </div>
+
+        <div class="text-center">
+            <button id="acceptBtn" disabled class="w-full sm:w-auto bg-blue-600 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                Aceitar e Continuar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tituloEl = document.getElementById('termoTitulo');
+            const textoEl = document.getElementById('termoTexto');
+            const checkbox = document.getElementById('agreeCheckbox');
+            const acceptBtn = document.getElementById('acceptBtn');
+
+            // --- FUNÇÃO PARA OBTER O TOKEN CSRF ---
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.startsWith(name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+            // --- FIM CSRF ---
+
+            // Carrega o texto do termo (Mantemos o fallback, mas em um sistema real isso viria de um Model)
+            const config = JSON.parse(localStorage.getItem('termoDeUsoConfig'));
+
+            if (config && config.title && config.text) {
+                tituloEl.textContent = config.title;
+                textoEl.innerHTML = config.text.split('\n').map(p => `<p>${p}</p>`).join('');
+            } else {
+                tituloEl.textContent = 'Termos de Uso e Política de Privacidade';
+                const defaultText = `Bem-vindo(a) ao nosso sistema de cuidado gamificado.\n\nPara aprimorar continuamente nossos serviços e sua experiência, coletamos dados de forma ANÔNIMA durante sua interação. Essas informações são usadas exclusivamente para análises estatísticas e melhorias internas, como otimização de narrativas e personalização de jornadas.\n\nNenhum dado pessoal que possa identificá-lo(a) diretamente é armazenado ou compartilhado. Nosso compromisso está alinhado com a Lei Geral de Proteção de Dados Pessoais (LGPD), Lei nº 13.709/2018, garantindo sua privacidade e segurança.\n\nAo prosseguir, você concorda com a coleta e uso desses dados anônimos para os fins descritos acima.`;
+                textoEl.innerHTML = defaultText.split('\n').map(p => `<p>${p}</p>`).join('');
+            }
+
+            // Habilita/desabilita o botão de aceite
+            checkbox.addEventListener('change', () => {
+                acceptBtn.disabled = !checkbox.checked;
+            });
+
+            // Ação ao clicar em aceitar (FAZ UM POST PARA O DJANGO)
+            acceptBtn.addEventListener('click', () => {
+                if (checkbox.checked) {
+                    // Prepara o formulário dinâmico para o POST
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    // Submete para a URL atual, que é tratada por LerTermosView
+                    form.action = window.location.href;
+
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = csrftoken;
+                    form.appendChild(csrfInput);
+
+                    const aceiteInput = document.createElement('input');
+                    aceiteInput.type = 'hidden';
+                    aceiteInput.name = 'aceite';
+                    aceiteInput.value = 'true';
+                    form.appendChild(aceiteInput);
+
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
