@@ -18,10 +18,12 @@ Nossas Jornadas
       grid-template-columns: 100% 100%;
       overflow: hidden;
     }
+    .item {
+        transition: 250ms all;
+    }
     .item:hover {
-      transform: scale(1.2);
+      transform: scale(1.1);
       z-index: 10;
-      transition: 250ms all;
     }
     .arrow__btn {
       display: flex;
@@ -63,11 +65,17 @@ Nossas Jornadas
         <div class="wrapper">
           <section id="section1jornada" class="flex flex-nowrap items-center justify-center space-x-8">
             <a href="#section2jornada" class="arrow__btn text-6xl page">‹</a>
-            {% for narrativa in lista_narrativas_emalta %} {# Replicando a lista 'em alta' #}
+            {% for narrativa in lista_narrativas_emalta %}
             {% if forloop.counter < 5 %}
-                <div class="item h-64 w-1/4 m-4">
+                {# --- CARD MODIFICADO: Imagem + Título --- #}
+                <div class="item w-1/4 m-4">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                        <div class="h-48 w-full relative">
+                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                        </div>
                     </a>
                 </div>
             {% endif %}
@@ -79,9 +87,14 @@ Nossas Jornadas
                 <a href="#section1jornada" class="arrow__btn text-6xl">‹</a>
                     {% for narrativa in lista_narrativas_emalta %}
                     {% if forloop.counter > 4 %}
-                        <div class="item h-64 w-1/4 m-4">
+                        <div class="item w-1/4 m-4">
                             <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                                <div class="h-48 w-full relative">
+                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                                </div>
+                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                                </div>
                             </a>
                         </div>
                     {% endif %}
@@ -105,9 +118,14 @@ Nossas Jornadas
             <a href="#section2" class="arrow__btn text-6xl page">‹</a>
             {% for narrativa in lista_narrativas_recentes %}
             {% if forloop.counter < 5 %}
-                <div class="item h-64 w-1/4 m-4">
+                <div class="item w-1/4 m-4">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                        <div class="h-48 w-full relative">
+                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                        </div>
                     </a>
                 </div>
             {% endif %}
@@ -119,9 +137,14 @@ Nossas Jornadas
                 <a href="#section1" class="arrow__btn text-6xl">‹</a>
                     {% for narrativa in lista_narrativas_recentes %}
                     {% if forloop.counter > 4 %}
-                        <div class="item h-64 w-1/4 m-4">
+                        <div class="item w-1/4 m-4">
                             <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                                <div class="h-48 w-full relative">
+                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                                </div>
+                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                                </div>
                             </a>
                         </div>
                     {% endif %}
@@ -145,9 +168,14 @@ Nossas Jornadas
             <a href="#section2emalta" class="arrow__btn text-6xl page">‹</a>
             {% for narrativa in lista_narrativas_emalta %}
             {% if forloop.counter < 5 %}
-                <div class="item h-64 w-1/4 m-4">
+                <div class="item w-1/4 m-4">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                        <div class="h-48 w-full relative">
+                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                        </div>
+                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                        </div>
                     </a>
                 </div>
             {% endif %}
@@ -159,9 +187,14 @@ Nossas Jornadas
                 <a href="#section1emalta" class="arrow__btn text-6xl">‹</a>
                     {% for narrativa in lista_narrativas_emalta %}
                     {% if forloop.counter > 4 %}
-                        <div class="item h-64 w-1/4 m-4">
+                        <div class="item w-1/4 m-4">
                             <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <img src="{{ narrativa.thumb.url }}" class="rounded-md w-full h-full object-cover">
+                                <div class="h-48 w-full relative">
+                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                                </div>
+                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
+                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                                </div>
                             </a>
                         </div>
                     {% endif %}
