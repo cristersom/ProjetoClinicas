@@ -5,23 +5,24 @@ from .forms import CriarContaForm, FormHomepage
 from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import admin
+from django.conf import settings  # Importa settings para usar a chave de sessão
 
-# Nova chave de sessão para rastrear o aceite dos termos
-TERMOS_ACEITOS_KEY = 'termos_aceitos'
+# Pega a chave de settings para consistência
+TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
-# --- VIEWS CORRIGIDAS PARA O FLUXO DE TERMOS E PACIENTE ---
+# --- VIEWS RELACIONADAS AOS TERMOS ---
 
 class LerTermosView(TemplateView):
     """View que exibe e processa o aceite dos Termos de Uso do Paciente."""
     template_name = "ler_termos.html"
 
     def get(self, request, *args, **kwargs):
-        # Se os termos JÁ foram aceitos, redireciona para a lista de narrativas
+        # AQUI, o middleware GARANTE que só chegaremos se o termo NÃO foi aceito.
+        # Portanto, só precisamos checar se JÁ FOI ACEITO (para redirecionamento manual ou admin).
         if request.session.get(TERMOS_ACEITOS_KEY, False):
             return redirect('narrativa:paciente_narrativas')
 
-        # Se os termos NÃO foram aceitos, apenas renderiza a tela.
         self.narrativa_pk = kwargs.get('narrativa_pk')
         return super().get(request, *args, **kwargs)
 
@@ -37,7 +38,8 @@ class LerTermosView(TemplateView):
 
             # Redireciona para o destino
             if self.narrativa_pk:
-                return redirect('narrativa:iniciar_jornada_paciente', narrativa_id=self.narrativa_pk)
+                return redirect('narrativa:exibir_cena_paciente',
+                                cena_id=self.narrativa_pk)  # O PK é o ID da Cena/Narrativa para onde queremos voltar
             else:
                 return redirect('narrativa:paciente_narrativas')
 
@@ -127,11 +129,11 @@ class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
 
-    def get(self, request, *args, **kwargs):
-        # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
-        if not request.session.get(TERMOS_ACEITOS_KEY, False):
-            return redirect('narrativa:ler_termos')
-        return super().get(request, *args, **kwargs)
+    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
+    # def get(self, request, *args, **kwargs):
+    #     if not request.session.get(TERMOS_ACEITOS_KEY, False):
+    #         return redirect('narrativa:ler_termos')
+    #     return super().get(request, *args, **kwargs)
 
 
 class PacienteDetalhes(DetailView):
@@ -148,20 +150,19 @@ class PacienteDetalhes(DetailView):
     def post(self, request, *args, **kwargs):
         narrativa = self.get_object()
 
-        # REDIRECIONA PARA ACEITE COM PK DE RETORNO
-        if not request.session.get(TERMOS_ACEITOS_KEY, False):
-            return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa.pk)
+        # REMOVIDO: O middleware agora faz a verificação do termo para a rota de destino.
+        # if not request.session.get(TERMOS_ACEITOS_KEY, False):
+        #     return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa.pk)
 
-        # Se os termos já estiverem aceitos, continua a iniciar a jornada
         return iniciar_jornada_paciente(request, narrativa.pk)
 
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # REDIRECIONA PARA ACEITE COM PK DE RETORNO
-    if not request.session.get(TERMOS_ACEITOS_KEY, False):
-        return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa_id)
+    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
+    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
+    #     return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa_id)
 
     if not request.session.session_key:
         request.session.create()
@@ -182,9 +183,9 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
 
-    # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
-    if not request.session.get(TERMOS_ACEITOS_KEY, False):
-        return redirect('narrativa:ler_termos')
+    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
+    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
+    #     return redirect('narrativa:ler_termos')
 
     # --- ADICIONADO PARA O RELATÓRIO DE PERCURSO ---
     if request.session.session_key:
@@ -216,9 +217,9 @@ def exibir_cena_paciente(request, cena_id):
 def responder_questionario(request, questionario_id):
     questionario = get_object_or_404(Questionario, pk=questionario_id)
 
-    # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
-    if not request.session.get(TERMOS_ACEITOS_KEY, False):
-        return redirect('narrativa:ler_termos')
+    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
+    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
+    #     return redirect('narrativa:ler_termos')
 
     if request.method == "POST":
         if not request.session.session_key:
@@ -255,13 +256,10 @@ def responder_questionario(request, questionario_id):
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin_faq.html"
 
-    # --- 2. ADICIONAR O CONTEXTO DO ADMIN MANUALMENTE ---
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Adiciona o contexto do admin (necessário para o layout do Jazzmin)
         context.update(admin.site.each_context(self.request))
         return context
-    # --- FIM DA MUDANÇA ---
 
 
 class TermosView(TemplateView):
