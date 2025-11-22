@@ -212,18 +212,17 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         ]
         return custom_urls + urls
 
-    # --- REVERTIDO: Removemos o botão verde extra ---
+    # --- CORREÇÃO 1: Adicionado margin-right para separar os botões visualmente ---
     def links_relatorios(self, obj):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<a class="button" href="{}">Ver Detalhado</a>&nbsp;'
+            '<a class="button" style="margin-right: 10px;" href="{}">Ver Detalhado</a>'
             '<a class="button" href="{}">Ver Resumo</a>',
             url_detalhe, url_resumo)
 
     links_relatorios.short_description = 'Relatórios'
 
-    # --- LÓGICA ALTERADA AQUI PARA PIVOTAR OS DADOS ---
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
         todos_os_perfis = Narrativa.objects.all()
@@ -251,15 +250,12 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
         export_format = request.GET.get('export')
 
-        # --- LÓGICA DE EXPORTAÇÃO PIVOTADA (1 LINHA = 1 PACIENTE) ---
-        if export_format == 'xlsx':
-            # 1. Preparar os dados pivotados
+        # --- LÓGICA DE EXPORTAÇÃO PIVOTADA (Expandida para CSV e JSON) ---
+        if export_format in ['xlsx', 'csv', 'json']:
+            # 1. Preparar os dados comuns para todos os formatos
             perguntas_ordenadas = questionario.perguntas.all().order_by('id')
 
-            # Dicionário para agrupar: { session_key: { 'data':..., 'respostas': { id_pergunta: texto } } }
             dados_sessao = {}
-
-            # Mapa de Sessão -> Nome do Perfil
             mapa_perfis = {s.session_key: (s.narrativa_perfil.titulo if s.narrativa_perfil else "Indefinido") for s in
                            sessoes_filtradas}
 
@@ -271,53 +267,87 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                         'data': resp.data_resposta.strftime('%d/%m/%Y %H:%M'),
                         'respostas_dict': {}
                     }
-                # Se for multipla escolha, concatena ou substitui (dependendo da lógica, aqui sobrescreve ou mantem string)
                 dados_sessao[key]['respostas_dict'][resp.pergunta.id] = resp.texto_resposta
 
-            # 2. Criar o Excel com OpenPyXL
-            workbook = openpyxl.Workbook()
-            worksheet = workbook.active
-            worksheet.title = "Dados Consolidados"
+            # === EXPORTAÇÃO XLSX ===
+            if export_format == 'xlsx':
+                workbook = openpyxl.Workbook()
+                worksheet = workbook.active
+                worksheet.title = "Dados Consolidados"
 
-            # Cabeçalho
-            headers = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
-            for p in perguntas_ordenadas:
-                headers.append(p.texto_pergunta)
-
-            worksheet.append(headers)
-
-            # Estilo Negrito no Header
-            for cell in worksheet[1]:
-                cell.font = openpyxl.styles.Font(bold=True)
-
-            # Linhas
-            for session_key, dados in dados_sessao.items():
-                row = [
-                    session_key[:8] + "...",
-                    dados['perfil'],
-                    dados['data']
-                ]
+                headers = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
                 for p in perguntas_ordenadas:
-                    # Pega a resposta para esta pergunta nesta sessão, ou vazio
-                    row.append(dados['respostas_dict'].get(p.id, ""))
-                worksheet.append(row)
+                    headers.append(p.texto_pergunta)
 
-            # Ajuste de largura (opcional)
-            for column_cells in worksheet.columns:
-                length = max(len(str(cell.value) if cell.value else "") for cell in column_cells)
-                if length > 50: length = 50
-                worksheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 2
+                worksheet.append(headers)
 
-            response = HttpResponse(
-                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            )
-            response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.xlsx"'
-            workbook.save(response)
-            return response
+                for cell in worksheet[1]:
+                    cell.font = openpyxl.styles.Font(bold=True)
+
+                for session_key, dados in dados_sessao.items():
+                    row = [session_key[:8] + "...", dados['perfil'], dados['data']]
+                    for p in perguntas_ordenadas:
+                        row.append(dados['respostas_dict'].get(p.id, ""))
+                    worksheet.append(row)
+
+                # Ajuste de largura
+                for column_cells in worksheet.columns:
+                    length = max(len(str(cell.value) if cell.value else "") for cell in column_cells)
+                    if length > 50: length = 50
+                    worksheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 2
+
+                response = HttpResponse(
+                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.xlsx"'
+                workbook.save(response)
+                return response
+
+            # === EXPORTAÇÃO CSV (CORREÇÃO 2) ===
+            elif export_format == 'csv':
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.csv"'
+
+                writer = csv.writer(response)
+
+                # Cabeçalho
+                header_row = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
+                for p in perguntas_ordenadas:
+                    header_row.append(p.texto_pergunta)
+                writer.writerow(header_row)
+
+                # Linhas
+                for session_key, dados in dados_sessao.items():
+                    row = [session_key[:8] + "...", dados['perfil'], dados['data']]
+                    for p in perguntas_ordenadas:
+                        row.append(dados['respostas_dict'].get(p.id, ""))
+                    writer.writerow(row)
+
+                return response
+
+            # === EXPORTAÇÃO JSON (CORREÇÃO 2) ===
+            elif export_format == 'json':
+                json_data = []
+                for session_key, dados in dados_sessao.items():
+                    item = {
+                        "sessao_id": session_key[:8] + "...",
+                        "perfil": dados['perfil'],
+                        "data": dados['data'],
+                        "respostas": {}
+                    }
+                    for p in perguntas_ordenadas:
+                        item["respostas"][p.texto_pergunta] = dados['respostas_dict'].get(p.id, "")
+                    json_data.append(item)
+
+                response = HttpResponse(
+                    json.dumps(json_data, indent=4, ensure_ascii=False),
+                    content_type='application/json'
+                )
+                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.json"'
+                return response
 
         # --- FIM DA LÓGICA PIVOTADA ---
 
-        # (Mantém a lógica original apenas para visualização na TELA HTML abaixo)
+        # Renderização normal da página HTML (se não houver export)
         dados_comparativos = {}
         for pergunta in questionario.perguntas.all():
             dados_comparativos[pergunta.id] = {
@@ -368,9 +398,6 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     'dados_grafico': None,
                     'respostas_texto': dados_grafico_processado,
                 })
-
-        # Se cair aqui e não for XLSX, mantém o comportamento padrão (apenas exibe HTML)
-        # Se você quiser pivotar o CSV também, teria que implementar lógica similar ao XLSX acima
 
         context = {
             **self.admin_site.each_context(request),
