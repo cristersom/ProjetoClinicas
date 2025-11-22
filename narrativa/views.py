@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
 from django.contrib import messages
-from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena
+from .models import Narrativa, Usuario, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena, \
+    ConfiguracaoClinica
 from .forms import CriarContaForm, FormHomepage
 from django.views.generic import ListView, DetailView, FormView, UpdateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import admin
-from django.conf import settings  # Importa settings para usar a chave de sessão
+from django.conf import settings
+from django.db.models import Count, Value
 
 # Pega a chave de settings para consistência
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
@@ -18,8 +20,6 @@ class LerTermosView(TemplateView):
     template_name = "ler_termos.html"
 
     def get(self, request, *args, **kwargs):
-        # AQUI, o middleware GARANTE que só chegaremos se o termo NÃO foi aceito.
-        # Portanto, só precisamos checar se JÁ FOI ACEITO (para redirecionamento manual ou admin).
         if request.session.get(TERMOS_ACEITOS_KEY, False):
             return redirect('narrativa:paciente_narrativas')
 
@@ -27,23 +27,18 @@ class LerTermosView(TemplateView):
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # Processa o aceite
         aceite = request.POST.get('aceite', 'false').lower() == 'true'
         self.narrativa_pk = kwargs.get('narrativa_pk')
 
         if aceite:
-            # Marca o aceite na sessão do navegador
             request.session[TERMOS_ACEITOS_KEY] = True
             messages.success(request, "Termos aceitos com sucesso! Bem-vindo(a) à sua jornada.")
 
-            # Redireciona para o destino
             if self.narrativa_pk:
-                return redirect('narrativa:exibir_cena_paciente',
-                                cena_id=self.narrativa_pk)  # O PK é o ID da Cena/Narrativa para onde queremos voltar
+                return redirect('narrativa:exibir_cena_paciente', cena_id=self.narrativa_pk)
             else:
                 return redirect('narrativa:paciente_narrativas')
 
-        # Se houver POST sem aceite (não deve ocorrer com o JS), redireciona para a tela inicial
         return redirect('narrativa:ler_termos')
 
 
@@ -85,8 +80,7 @@ class Detalhes(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(Detalhes, self).get_context_data(**kwargs)
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[
-                       0:5]
+        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
         context["relacionados"] = relacionados
         return context
 
@@ -129,12 +123,6 @@ class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
 
-    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
-    # def get(self, request, *args, **kwargs):
-    #     if not request.session.get(TERMOS_ACEITOS_KEY, False):
-    #         return redirect('narrativa:ler_termos')
-    #     return super().get(request, *args, **kwargs)
-
 
 class PacienteDetalhes(DetailView):
     template_name = "paciente_detalhes.html"
@@ -142,27 +130,17 @@ class PacienteDetalhes(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PacienteDetalhes, self).get_context_data(**kwargs)
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[
-                       0:5]
+        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
         context["relacionados"] = relacionados
         return context
 
     def post(self, request, *args, **kwargs):
         narrativa = self.get_object()
-
-        # REMOVIDO: O middleware agora faz a verificação do termo para a rota de destino.
-        # if not request.session.get(TERMOS_ACEITOS_KEY, False):
-        #     return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa.pk)
-
         return iniciar_jornada_paciente(request, narrativa.pk)
 
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
-
-    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
-    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
-    #     return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa_id)
 
     if not request.session.session_key:
         request.session.create()
@@ -183,18 +161,12 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
 
-    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
-    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
-    #     return redirect('narrativa:ler_termos')
-
-    # --- ADICIONADO PARA O RELATÓRIO DE PERCURSO ---
     if request.session.session_key:
         LogVisitaCena.objects.create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             narrativa_associada=cena.narrativa
         )
-    # --- FIM DA ADIÇÃO ---
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
@@ -216,10 +188,6 @@ def exibir_cena_paciente(request, cena_id):
 
 def responder_questionario(request, questionario_id):
     questionario = get_object_or_404(Questionario, pk=questionario_id)
-
-    # REMOVIDO: O middleware agora faz a verificação do termo para esta rota.
-    # if not request.session.get(TERMOS_ACEITOS_KEY, False):
-    #     return redirect('narrativa:ler_termos')
 
     if request.method == "POST":
         if not request.session.session_key:
@@ -268,3 +236,69 @@ class TermosView(TemplateView):
 
 class PoliticaView(TemplateView):
     template_name = "politica.html"
+
+
+# --- NOVA VIEW: Perfil de Sessão (Feedback ao Paciente) ---
+def perfil_sessao_view(request, narrativa_id):
+    # 1. Garante que existe uma sessão
+    session_key = request.session.session_key
+    if not session_key:
+        return redirect('narrativa:ler_termos')
+
+    # 2. Recupera a narrativa atual
+    narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
+
+    # 3. Tenta recuperar o Perfil da Sessão
+    try:
+        sessao_paciente = SessaoPaciente.objects.get(session_key=session_key)
+        # O perfil é o título da narrativa que definiu a sessão (ex: "Casal Hétero")
+        nome_perfil = sessao_paciente.narrativa_perfil.titulo if sessao_paciente.narrativa_perfil else "Visitante"
+    except SessaoPaciente.DoesNotExist:
+        nome_perfil = "Visitante"
+
+    # 4. CÁLCULO DE PROGRESSO DA NARRATIVA (Cenas)
+    # Total de cenas desta narrativa
+    total_cenas = Cena.objects.filter(narrativa=narrativa_atual).count()
+
+    # Cenas visitadas nesta sessão para esta narrativa
+    cenas_visitadas = LogVisitaCena.objects.filter(
+        session_key=session_key,
+        narrativa_associada=narrativa_atual
+    ).values('cena_visitada').distinct().count()
+
+    progresso_cenas_pct = 0
+    if total_cenas > 0:
+        progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
+        if progresso_cenas_pct > 100: progresso_cenas_pct = 100
+
+    # 5. CÁLCULO DE PROGRESSO DE PESQUISA (Perguntas)
+    total_perguntas = Pergunta.objects.filter(
+        questionario__cena_associada__narrativa=narrativa_atual
+    ).count()
+
+    perguntas_respondidas = Resposta.objects.filter(
+        session_key=session_key,
+        pergunta__questionario__cena_associada__narrativa=narrativa_atual
+    ).values('pergunta').distinct().count()
+
+    progresso_pesquisa_pct = 0
+    if total_perguntas > 0:
+        progresso_pesquisa_pct = int((perguntas_respondidas / total_perguntas) * 100)
+        if progresso_pesquisa_pct > 100: progresso_pesquisa_pct = 100
+
+    context = {
+        'narrativa': narrativa_atual,
+        'nome_perfil': nome_perfil,
+
+        'cenas_visitadas': cenas_visitadas,
+        'total_cenas': total_cenas,
+        'progresso_cenas_pct': progresso_cenas_pct,
+
+        'perguntas_respondidas': perguntas_respondidas,
+        'total_perguntas': total_perguntas,
+        'progresso_pesquisa_pct': progresso_pesquisa_pct,
+
+        'concluiu_narrativa': progresso_cenas_pct >= 100,
+    }
+
+    return render(request, 'perfil_sessao.html', context)
