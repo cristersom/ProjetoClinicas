@@ -1,133 +1,217 @@
-{% extends 'admin/base_site.html' %} {# <--- ESTA É A LINHA CORRIGIDA #}
+{% extends 'admin/base_site.html' %}
 {% load static %}
-{% block title %}Ajuda{% endblock %}
+
+{% block title %}Ajuda e Onboarding{% endblock %}
+
+{% block extrahead %}
+<style>
+    /* Estilos para o Manual de Onboarding */
+    .help-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .concept-card {
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .concept-title {
+        font-size: 1.5rem;
+        color: #417690; /* Cor do Django Admin */
+        margin-bottom: 15px;
+        border-bottom: 2px solid #f5f5f5;
+        padding-bottom: 10px;
+    }
+
+    /* Diagrama de Hierarquia */
+    .hierarchy-diagram {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        overflow-x: auto;
+        padding: 20px 0;
+    }
+
+    .h-box {
+        border-radius: 6px;
+        padding: 15px;
+        color: white;
+        min-width: 180px;
+        text-align: center;
+        position: relative;
+    }
+
+    .h-narrativa { background-color: #417690; } /* Azul Django */
+    .h-cena { background-color: #28a745; } /* Verde */
+    .h-quest { background-color: #ffc107; color: #333; } /* Amarelo */
+
+    .arrow-right {
+        font-size: 2rem;
+        color: #ccc;
+        align-self: center;
+    }
+
+    /* Passo a Passo Timeline */
+    .step-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .step-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+        align-items: flex-start;
+    }
+
+    .step-number {
+        background: #417690;
+        color: white;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        flex-shrink: 0;
+    }
+
+    .step-content h4 {
+        margin: 0 0 5px 0;
+        color: #333;
+        font-size: 1.1rem;
+    }
+
+    .step-content p {
+        margin: 0;
+        color: #666;
+        line-height: 1.5;
+    }
+
+    .alert-box {
+        background-color: #e8f4f8;
+        border-left: 5px solid #417690;
+        padding: 15px;
+        margin: 20px 0;
+        color: #2c3e50;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="module">
-    <h1>Guia de Ajuda da Administração</h1>
-    <p>Bem-vindo ao guia de utilizador. Esta plataforma permite criar jornadas interativas (Narrativas) para pacientes, compostas por Cenas, Escolhas e Questionários. Siga os passos abaixo para construir e analisar as suas jornadas.</p>
-</div>
+<div class="help-container">
 
-<div class="module">
-    <h2>Índice</h2>
-    <ul>
-        <li><a href="#conceitos">1. Conceitos Principais</a></li>
-        <li><a href="#passo-a-passo">2. Guia Rápido: Como Criar uma Jornada Completa</a></li>
-        <li><a href="#questionarios">3. Como funcionam os Questionários?</a></li>
-        <li><a href="#partilha">4. Como Partilhar uma Jornada com Pacientes?</a></li>
-        <li><a href="#relatorios">5. Como Analisar os Relatórios?</a></li>
-        <li><a href="#admin">6. Configurações de Administrador</a></li>
-    </ul>
-</div>
+    <h1>Manual de Criação de Jornadas</h1>
+    <p class="quiet">Entenda como estruturar suas histórias clínicas e pesquisas de forma lógica.</p>
 
-<div class="module" id="conceitos">
-    <h2>1. Conceitos Principais</h2>
-    <dl>
-        <dt><strong>Narrativa</strong></dt>
-        <dd>É a jornada completa. Pense nela como o "filme" ou a "campanha". Ela agrupa todas as Cenas e Questionários.</dd>
+    <div class="concept-card">
+        <h2 class="concept-title">1. A Hierarquia do Sistema</h2>
+        <p>Para facilitar o entendimento, imagine que estamos escrevendo um <strong>Livro Interativo</strong>:</p>
 
-        <dt><strong>Cena</strong></dt>
-        <dd>É cada "página" ou "passo" que o paciente vê. Uma cena pode conter um vídeo, uma imagem, um texto, ou uma combinação dos três.</dd>
+        <div class="hierarchy-diagram">
+            <div class="h-box h-narrativa">
+                <strong>1º Nível: Narrativa</strong>
+                <br><small>(O Livro)</small>
+                <p style="font-size: 0.8rem; margin-top:5px;">É a capa, o título e a categoria. Ela agrupa todo o resto.</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div class="h-box h-cena">
+                <strong>2º Nível: Cenas</strong>
+                <br><small>(As Páginas)</small>
+                <p style="font-size: 0.8rem; margin-top:5px;">Cada tela que o paciente vê (Vídeo, Texto ou Imagem). Uma narrativa tem várias cenas.</p>
+            </div>
+            <div class="arrow-right">→</div>
+            <div class="h-box h-quest">
+                <strong>3º Nível: Conteúdo</strong>
+                <br><small>(A Interação)</small>
+                <p style="font-size: 0.8rem; margin-top:5px;">Questionários (Pesquisas) ou Escolhas (Botões) que ficam dentro de uma cena.</p>
+            </div>
+        </div>
+    </div>
 
-        <dt><strong>Escolha</strong></dt>
-        <dd>São os botões de navegação que aparecem numa Cena. Cada escolha leva o paciente para outra Cena, criando a interatividade.</dd>
+    <div class="concept-card">
+        <h2 class="concept-title">2. O Fluxo de Criação (Importante!)</h2>
 
-        <dt><strong>Questionário</strong></dt>
-        <dd>Um formulário que pode ser associado a uma Cena. Contém Perguntas de diferentes tipos (texto, escala, múltipla escolha).</dd>
+        <div class="alert-box">
+            <strong>💡 Dica de Ouro:</strong> Você não consegue conectar duas coisas se uma delas ainda não existe.
+            <br>
+            Por isso, o processo exige um <strong>"Vai e Volta"</strong>: Primeiro criamos a estrutura, depois voltamos para ligar os pontos.
+        </div>
 
-        <dt><strong>Sessão Paciente</strong></dt>
-        <dd>Regista o "perfil" (Narrativa) inicial que um paciente anónimo escolheu. Ajuda a filtrar relatórios.</dd>
-    </dl>
-</div>
+        <ul class="step-list">
+            <li class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>Crie a "Casca" da Narrativa</h4>
+                    <p>Vá em <strong>Narrativas > Adicionar</strong>. Preencha o Título, a Descrição e a Categoria. <br>
+                    <strong>Atenção:</strong> Deixe o campo <em>"Cena Inicial"</em> em branco por enquanto (pois você ainda não criou as cenas). Apenas salve.</p>
+                </div>
+            </li>
 
-<div class="module" id="passo-a-passo">
-    <h2>2. Guia Rápido: Como Criar uma Jornada Completa</h2>
+            <li class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>Crie todas as Cenas</h4>
+                    <p>Vá em <strong>Cenas > Adicionar</strong>. Crie todas as cenas da sua história (Ex: Cena 1, Cena 2, Cena Final).<br>
+                    Em cada uma, no campo <em>"Narrativa"</em>, selecione a narrativa que você criou no Passo 1.</p>
+                </div>
+            </li>
 
-    <h4>Passo 1: Criar uma Categoria (Opcional, mas recomendado)</h4>
-    <p>1. Vá para "Gestão da Jornada" > "Categorias".</p>
-    <p>2. Adicione uma categoria (ex: "Boas-Vindas", "Pesquisa de Satisfação").</p>
+            <li class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>(Opcional) Crie os Questionários</h4>
+                    <p>Se alguma cena tiver pesquisa, vá em <strong>Questionários > Adicionar</strong>.<br>
+                    No campo <em>"Cena Associada"</em>, selecione a cena onde a pesquisa deve aparecer. Adicione as perguntas e salve.</p>
+                </div>
+            </li>
 
-    <h4>Passo 2: Criar a Narrativa</h4>
-    <p>1. Vá para "Narrativas" e clique em "Adicionar Narrativa".</p>
-    <p>2. Preencha o Título, Descrição, e suba uma Imagem de Capa (Thumb).</p>
-    <p>3. Associe a "Categoria" que acabou de criar.</p>
-    <p>4. Não se preocupe com a "Cena Inicial" ainda. Salve.</p>
+            <li class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>A VOLTA: Ligar os Pontos (Cena Inicial)</h4>
+                    <p>Agora que as cenas existem, <strong>volte para editar sua Narrativa</strong> (do Passo 1).<br>
+                    Agora sim, você pode selecionar qual é a <em>"Cena Inicial"</em> no campo correspondente. Salve novamente.</p>
+                </div>
+            </li>
 
-    <h4>Passo 3: Criar as Cenas</h4>
-    <p>1. Vá para "Cenas" e crie todas as cenas da sua história (ex: "Cena 1 - Introdução", "Cena 2 - Caminho A", "Cena 3 - Fim").</p>
-    <p>2. Para cada Cena, associe-a à "Narrativa" correta (criada no Passo 2).</p>
-    <p>3. Adicione o seu conteúdo (link de vídeo do YouTube/Vimeo, imagem ou texto).</p>
-    <p>4. Salve cada cena.</p>
+            <li class="step-item">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h4>A VOLTA: Ligar os Caminhos (Escolhas)</h4>
+                    <p>Volte para editar suas <strong>Cenas</strong>. Agora você pode adicionar <em>"Escolhas"</em> (botões).<br>
+                    Como todas as cenas já foram criadas no Passo 2, você conseguirá selecionar para qual <em>"Cena de Destino"</em> cada botão deve levar.</p>
+                </div>
+            </li>
+        </ul>
+    </div>
 
-    <h4>Passo 4: Ligar as Cenas com Escolhas</h4>
-    <p>1. Volte para "Cenas" e edite a sua primeira cena ("Cena 1 - Introdução").</p>
-    <p>2. No final da página, em "Escolhas", clique em "Adicionar outra Escolha".</p>
-    <p>3. Em "Texto da opção", escreva o que o botão dirá (ex: "Sim, quero continuar").</p>
-    <p>4. Em "Cena de destino", selecione a cena para onde o paciente deve ir (ex: "Cena 2 - Caminho A").</p>
-    <p>5. Salve. Repita este passo para todas as cenas que tiverem botões.</p>
+    <div class="concept-card">
+        <h2 class="concept-title">3. Perguntas Frequentes</h2>
 
-    <h4>Passo 5: Definir o Ponto de Partida</h4>
-    <p>1. Volte para "Narrativas" e edite a Narrativa que criou no Passo 2.</p>
-    <p>2. Agora, no campo "Cena Inicial", selecione a sua primeira cena (ex: "Cena 1 - Introdução").</p>
-    <p>3. Salve. A sua jornada está pronta!</p>
-</div>
+        <details style="margin-bottom: 10px; cursor: pointer;">
+            <summary style="font-weight: bold; color: #417690;">Por que não consigo escolher a Cena de Destino?</summary>
+            <p style="padding: 10px; color: #555;">Provavelmente porque você ainda não criou a cena para onde quer mandar o paciente. Salve a cena atual, vá criar a próxima cena, e depois volte para editar a atual e adicionar o botão.</p>
+        </details>
 
-<div class="module" id="questionarios">
-    <h2>3. Como funcionam os Questionários?</h2>
-    <p>Questionários podem ser ligados a qualquer cena.</p>
-    <ol>
-        <li>Vá para "Questionários" e crie um novo.</li>
-        <li><strong>Cena Associada:</strong> Escolha a cena onde este questionário deve aparecer. Ele será mostrado *juntamente* com as Escolhas dessa cena.</li>
-        <li><strong>Perguntas:</strong> Adicione as perguntas. Pode escolher o tipo (Texto Livre, Escala de 1 a 5, etc.).</li>
-        <li><strong>Opções de Resposta:</strong> Se a pergunta for "Única Escolha" ou "Múltipla Escolha", tem de adicionar as opções clicando em "Adicionar outra Opção de Resposta" *dentro* da pergunta.</li>
-        <li><strong>Cena de Destino (Opcional):</strong> Se preenchido, o paciente será levado para esta cena *depois* de submeter o questionário. Se ficar em branco, ele permanece na cena atual (ou pode usar as "Escolhas" normais).</li>
-    </ol>
-</div>
+        <details style="margin-bottom: 10px; cursor: pointer;">
+            <summary style="font-weight: bold; color: #417690;">Como compartilho com o paciente?</summary>
+            <p style="padding: 10px; color: #555;">Na lista de Narrativas, clique no nome da narrativa. Na tela de detalhes (Dashboard), há um botão cinza <strong>"Copiar Link de Acesso"</strong>. Envie esse link para o paciente.</p>
+        </details>
 
-<div class="module" id="partilha">
-    <h2>4. Como Partilhar uma Jornada com Pacientes?</h2>
-    <p>O sistema tem duas formas de partilha:</p>
+        <details style="margin-bottom: 10px; cursor: pointer;">
+            <summary style="font-weight: bold; color: #417690;">Onde vejo as respostas?</summary>
+            <p style="padding: 10px; color: #555;">Vá na aba <strong>Questionários</strong>. Na lista, ao lado de cada questionário, existem botões para "Ver Detalhado" (respostas individuais) ou "Ver Resumo" (gráficos e totais).</p>
+        </details>
+    </div>
 
-    <h4>A. Link Geral (Página de Pacientes)</h4>
-    <p>O link `.../paciente/narrativas/` mostra *todas* as narrativas. Útil se quiser que o paciente escolha a jornada. Você pode copiar este link da página `/narrativas/` (na visão de admin).</p>
-
-    <h4>B. Link Direto (Recomendado)</h4>
-    <p>1. Vá para "Narrativas" e clique na narrativa que quer partilhar.</p>
-    <p>2. Na página de "Detalhes" da narrativa, clique no botão <strong>"Copiar Link de Acesso"</strong>.</p>
-    <p>3. Cole este link e envie ao seu paciente. Ele será levado diretamente para o início *daquela* jornada específica.</p>
-</div>
-
-<div class="module" id="relatorios">
-    <h2>5. Como Analisar os Relatórios?</h2>
-    <p>O sistema recolhe dados anónimos e apresenta-os de 3 formas:</p>
-
-    <dl>
-        <dt><strong>Relatório de Percurso (em Narrativas)</strong></dt>
-        <dd>Edite uma Narrativa e clique no botão "Relatório de Percurso". Isto mostra um gráfico de quantas pessoas (Visitantes Únicos) e quantas vezes (Visitas Totais) cada cena dessa narrativa foi vista. Pode filtrar por perfil.</dd>
-
-        <dt><strong>Relatórios de Questionário (em Questionários)</strong></dt>
-        <dd>
-            Edite um Questionário. Tem dois relatórios:
-            <ul>
-                <li><strong>Ver Detalhado:</strong> Mostra as respostas individuais de cada paciente (anónimo).</li>
-                <li><strong>Ver Resumo (Agregado):</strong> Mostra gráficos e listas com o total de respostas para cada opção, permitindo comparar por perfis.</li>
-            </ul>
-        </dd>
-
-        <dt><strong>Respostas (Menu Principal)</strong></dt>
-        <dd>Aqui pode ver *todas* as respostas de *todos* os questionários. Pode filtrar por perfil ou questionário, e exportar tudo para Excel (XLSX) usando o botão "Export" no canto superior direito.</dd>
-    </dl>
-</div>
-
-<div class="module" id="admin">
-    <h2>6. Configurações de Administrador</h2>
-
-    <dl>
-        <dt><strong>Logotipo</strong></dt>
-        <dd>Vá para "Gestão da Jornada" > "Logotipo". Adicione (ou altere) o ficheiro de imagem. Ele aparecerá no topo de todas as páginas.</dd>
-
-        <dt><strong>Usuários</strong></dt>
-        <dd>Aqui pode adicionar outros membros da equipa (outros administradores) ao sistema.</dd>
-    </dl>
 </div>
 {% endblock %}
