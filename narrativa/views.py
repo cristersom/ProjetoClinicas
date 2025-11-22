@@ -150,6 +150,7 @@ def iniciar_jornada_paciente(request, narrativa_id):
         session_key=session_key
     )
 
+    # FORÇA O REGISTRO DO PERFIL (Se não tiver, coloca este)
     if created or not sessao.narrativa_perfil:
         sessao.narrativa_perfil = narrativa
         sessao.save()
@@ -168,12 +169,14 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
 
     if request.session.session_key:
+        # Garante Log
         LogVisitaCena.objects.get_or_create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             defaults={'narrativa_associada': cena.narrativa}
         )
 
+        # Garante Perfil (caso entre direto na cena)
         sessao, created = SessaoPaciente.objects.get_or_create(
             session_key=request.session.session_key
         )
@@ -259,6 +262,7 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
+# --- VIEW DE PERFIL ---
 def perfil_sessao_view(request, narrativa_id):
     session_key = request.session.session_key
     if not session_key:
@@ -266,16 +270,20 @@ def perfil_sessao_view(request, narrativa_id):
 
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
+    # Busca ou Cria Sessão
     sessao_paciente, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
+    # AUTO-CORREÇÃO: Se o perfil estiver vazio, preenche com a narrativa atual
     if not sessao_paciente.narrativa_perfil:
         sessao_paciente.narrativa_perfil = narrativa_atual
         sessao_paciente.save()
 
+    # Pega o título (Aqui não tem como ser 'Visitante', pois foi forçado acima)
     nome_perfil = sessao_paciente.narrativa_perfil.titulo
 
+    # 1. LÓGICA CUMULATIVA (Baseada em Logs)
     ids_narrativas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key
     ).values_list('narrativa_associada', flat=True).distinct()
@@ -318,9 +326,7 @@ def perfil_sessao_view(request, narrativa_id):
     return render(request, 'perfil_sessao.html', context)
 
 
-# --- DASHBOARD ADMINISTRATIVO ---
 class DashboardView(LoginRequiredMixin, TemplateView):
-    # --- MUDANÇA AQUI: Caminho do template atualizado ---
     template_name = "admin/dashboard.html"
 
     def get_context_data(self, **kwargs):
