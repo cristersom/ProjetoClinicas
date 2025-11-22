@@ -15,37 +15,36 @@ Criar Conta
     /* Estilos essenciais */
     .form-text, .invalid-feedback {
         color: white !important;
-        /* GARANTE ALINHAMENTO ESQUERDO DO TEXTO DE AJUDA */
+        /* GARANTE ALINHAMENTO ESQUERDO E POSICIONAMENTO CENTRAL */
         text-align: left !important;
-        width: 90%; /* Permite usar a largura do input para o texto de validação */
-        margin: 0 auto 10px auto !important; /* Centraliza o bloco de texto de ajuda */
-        padding: 0; /* Remove padding extra */
+        width: 90%;
+        margin: 0 auto 10px auto !important; /* Centraliza o bloco de texto */
         display: block;
+        padding: 0;
     }
 
-    /* CORREÇÃO CHAVE: Remove a centralização de texto do formulário e define a largura máxima */
+    /* CORREÇÃO CHAVE: Define a largura máxima do formulário e centraliza como bloco */
     .z-10 form {
         text-align: left;
-        max-width: 450px;
+        max-width: 450px; /* Largura fixa para centralização limpa */
         margin-left: auto;
         margin-right: auto;
         padding: 0 15px;
     }
 
-    /* CORREÇÃO 1: CENTRALIZAÇÃO DOS LABELS E INPUTS */
+    /* ALINHAMENTO DE LABELS E INPUTS */
 
-    /* Centraliza visualmente o texto da Label (e da Legend) */
-    .form-group label:not(.form-check-label),
-    .z-10 fieldset legend {
+    /* Centraliza visualmente o texto da Label e o Input */
+    .control-label,
+    .form-group label:not(.form-check-label) {
         text-align: left !important;
-        width: 90%; /* Define a largura para alinhamento com o input */
+        width: 90%; /* Deve herdar a largura do input para alinhamento */
         margin-left: auto !important;
         margin-right: auto !important;
-        /* Corrige o alinhamento visual do label */
-        padding-left: 0 !important;
+        display: block;
     }
 
-    /* OBRIGATÓRIO: Força a legenda a ser totalmente centralizada */
+    /* Força a legenda do fieldset a ser centralizada */
     .z-10 fieldset legend {
         text-align: center !important;
     }
@@ -55,11 +54,11 @@ Criar Conta
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
         width: 90% !important;
-        margin: 0 auto 10px auto !important;
+        margin: 0 auto 10px auto !important; /* Centraliza o input */
         display: block;
     }
 
-    /* CORREÇÃO 2: Checkbox (Aceite) - Impede quebra de linha e alinha */
+    /* CORREÇÃO 3: Checkbox (Aceite) - Garante alinhamento e fonte menor */
     .form-group .form-check {
         padding-top: 15px;
         margin-bottom: 25px;
@@ -69,7 +68,12 @@ Criar Conta
         width: 95%;
         margin-left: auto;
         margin-right: auto;
-        font-size: 0.9rem;
+        font-size: 0.9rem; /* Diminui a fonte para evitar quebra de linha */
+        white-space: nowrap;
+    }
+    .form-group .form-check label {
+        font-weight: normal !important;
+        /* Força a quebra de linha a ser impedida */
         white-space: nowrap;
     }
 
