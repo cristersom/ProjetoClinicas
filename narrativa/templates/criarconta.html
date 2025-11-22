@@ -15,6 +15,26 @@ Criar Conta
     .form-text, .invalid-feedback {
         color: white !important;
     }
+    /* NOVO: Estilo para corrigir o espaçamento do checkbox no Bootstrap/Crispy */
+    .form-group .form-check {
+        padding-top: 10px; /* Adiciona um espaço acima do checkbox */
+        margin-bottom: 10px; /* Garante que o rótulo e o checkbox fiquem juntos */
+        text-align: left;
+        display: flex; /* Permite alinhar a caixa e o texto */
+        align-items: center; /* Alinha verticalmente */
+        padding-left: 1.5em; /* Ajusta o padding para a caixa */
+    }
+    .form-group .form-check .form-check-input {
+        margin-left: -1.5em; /* Posiciona a caixa corretamente */
+    }
+    .form-group .form-check label {
+        margin-left: 0.5em; /* Pequeno espaço entre a caixa e o texto */
+    }
+    /* NOVO: Estilo para negrito e sublinhado no link */
+    .termos-link {
+        font-weight: bold;
+        text-decoration: underline;
+    }
 </style>
 {% endblock %}
 
@@ -30,11 +50,20 @@ Criar Conta
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
             </form>
             <script>
-                // Acha o link injetado pelo crispy-forms no label do campo de aceite
-                const termosLink = document.querySelector('label[for="id_aceite_termos"] a');
-                if (termosLink) {
-                    // Substitui o href estático pelo URL dinâmico do Django
-                    termosLink.href = "{% url 'narrativa:termos_de_uso' %}";
+                // Acha o label e o link injetado pelo crispy-forms
+                const label = document.querySelector('label[for="id_aceite_termos"]');
+                const termosLink = label ? label.querySelector('a') : null;
+
+                if (label && termosLink) {
+                    // Texto Original: Aceita nossos <a href="/termos/">termos de uso e política de privacidade</a>?
+
+                    // 1. Cria a nova estrutura com links separados
+                    const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
+                    const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
+
+                    label.innerHTML = `Aceita nossos
+                        <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
+                        <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
                 }
             </script>
         </div>
