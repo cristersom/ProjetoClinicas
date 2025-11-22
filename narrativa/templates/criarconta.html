@@ -14,29 +14,20 @@ Criar Conta
 <style>
     /* Estilos essenciais */
 
-    /* Largura de Referência: O input usa 90% de largura dentro do bloco centralizado. */
-
-    /* CORREÇÃO 1: ALINHAMENTO DE TEXTOS DE AJUDA */
+    /* ALINHAMENTO GERAL (Todos os elementos de 95% de largura) */
     .form-text, .invalid-feedback {
         color: white !important;
-        /* Alinhamento de bloco (90% centralizado) */
-        width: 90%;
-        margin: 0 auto 10px auto !important;
-
-        /* Alinhamento interno de texto */
         text-align: left !important;
+        width: 95% !important; /* Aumenta a largura para 95% */
+        margin: 0 auto 10px auto !important;
         display: block;
         padding: 0;
-
-        /* NOVO: Impede a quebra de linha forçando o texto a ser nowrap */
-        white-space: normal;
-        font-size: 0.9rem; /* Mantém a fonte menor */
     }
 
     /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
     .z-10 form {
         text-align: left;
-        max-width: 400px;
+        max-width: 500px; /* Aumenta a largura máxima para acomodar o texto em uma linha */
         width: 100%;
         margin-left: auto;
         margin-right: auto;
@@ -45,78 +36,68 @@ Criar Conta
 
     /* ALINHAMENTO DE LABELS E INPUTS */
 
-    /* Centraliza visualmente o bloco da Label (90% centralizado) */
     .control-label,
     .form-group label:not(.form-check-label) {
         text-align: left !important;
-        width: 90%;
+        width: 95% !important; /* Força a largura para 95% */
         margin: 0 auto 5px auto !important; /* Centraliza o bloco da label */
-        padding: 0 !important;
         display: block;
+        padding: 0 !important;
     }
 
-    /* ALINHAMENTO DO INPUT: Garante 90% de largura e centralização visual */
+    /* ALINHAMENTO DO INPUT: Garante 95% de largura e centralização visual */
     .z-10 input[type="text"],
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
-        width: 90% !important; /* Ocupa 90% do bloco */
+        width: 95% !important; /* Ocupa 95% do bloco */
         margin: 0 auto 10px auto !important; /* Centraliza o input */
         display: block;
     }
 
-    /* CORREÇÃO 2: TÍTULO H1, LEGEND (Linha) E BOTÃO - Força o alinhamento de 90% */
-
-    /* Alinha o Título H1 (fora do fieldset) */
+    /* CORREÇÃO 1: TÍTULO H1 - Acomoda em uma linha e alinha ao topo */
     .z-10 h1 {
         text-align: center !important;
-        width: 90%; /* Limita a largura do bloco de texto para 90% */
-        margin: 0 auto 20px auto !important;
+        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA */
+        width: auto;
+        max-width: 95%; /* Garante que não estoure */
+        margin: 0 auto 20px auto !important; /* Centraliza o bloco do título */
         padding: 0;
     }
 
-    /* Linha Divisória (Legend) */
+    /* CORREÇÃO 2: LEGEND/LINHA DIVISÓRIA - REMOVIDA DA VISUALIZAÇÃO */
     .z-10 fieldset legend {
-        text-align: left !important;
-        width: 90%; /* Limita a linha (border-bottom) para 90% */
-        margin: 0 auto 1rem auto !important; /* Centraliza o bloco da linha */
-        padding: 0;
-        border-bottom: 1px solid #dee2e6; /* Garante que a borda seja usada */
+        /* Remove a linha divisória e o espaçamento gerado por ela */
+        border-bottom: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 0; /* Garante que não ocupe espaço */
+        overflow: hidden;
     }
 
     /* CORREÇÃO 3: BOTÃO CRIAR CONTA - Mesma largura do Input */
     .z-10 button[type="submit"] {
-        width: 90% !important;
+        width: 95% !important;
         margin: 10px auto 0 auto !important; /* Centraliza o botão */
         display: block;
     }
 
-    /* CORREÇÃO 4: Checkbox (Aceite) - Mesma largura do Input e espaçamento */
+    /* CORREÇÃO 4: Checkbox (Aceite) - Impede quebra de linha e alinha */
     .form-group .form-check {
         padding-top: 15px;
         margin-bottom: 25px;
         text-align: left;
         display: flex;
-        align-items: center; /* Alinha no meio para não ficar colado no topo */
-        width: 90%; /* Limita o bloco para 90% */
+        align-items: center;
+        width: 95%; /* Limita o bloco para 95% */
         margin: 15px auto 25px auto !important; /* Centraliza o bloco do checkbox */
         padding-left: 0 !important;
-
-        /* NOVO: Aumenta o espaçamento do label sem afetar o bloco */
-        line-height: 1.2;
-    }
-
-    /* Garante espaçamento entre checkbox e texto */
-    .form-group .form-check .form-check-input {
-        margin-right: 0.5em;
-        margin-top: 0; /* Alinha o checkbox verticalmente com o centro do texto */
-        margin-left: 0;
     }
 
     .form-group .form-check label {
         font-weight: normal !important;
-        font-size: 0.9rem; /* Mantém a fonte menor */
-        /* Permite quebra, mas a largura de 90% deve evitar na maioria das telas */
-        white-space: normal;
+        font-size: 0.9rem;
+        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA NO TEXTO DO CHECKBOX */
+        margin-top: 0;
     }
 
     /* Estilo para negrito e sublinhado no link */
@@ -138,18 +119,18 @@ Criar Conta
 {% block content %}
     <header class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay showcase border-gray-600 border-b-8 flex justify-center items-center bg-no-repeat"  style="background-image: url('{% static 'images/background.png' %}');">
         <div class="z-10 h-full py-32 md:py-0 text-gray-100 flex justify-center items-center flex-col p-5">
-            {# O TÍTULO AGORA É UM H1 COM LARGURA DE 90% CENTRALIZADO #}
+            {# TÍTULO AGORA É UM H1 COM LARGURA DE 95% CENTRALIZADO #}
             <h1 class="text-3xl font-bold">Crie uma conta para continuar</h1>
 
             <form method="post">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    {# LEGEND VAZIA APENAS PARA FORÇAR A LINHA DIVISÓRIA COM LARGURA DE 90% #}
+                    {# LEGEND AGORA ESTÁ OCULTA (DISPLY: NONE NO CSS) #}
                     <legend class="border-bottom mb-4"></legend>
 
                     {{ form|crispy }}
                 </fieldset>
-                {# BOTÃO FORÇADO PARA 90% #}
+                {# BOTÃO FORÇADO PARA 95% #}
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
             </form>
             <script>
@@ -167,10 +148,10 @@ Criar Conta
                         <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
                 }
 
-                // Garante que a linha da legend seja visível se o conteúdo estiver vazio
+                // MANTIDO: Garante que a linha da legend seja totalmente removida
                 const legendEl = document.querySelector('fieldset legend');
-                if (legendEl && legendEl.innerHTML.trim() === '') {
-                     legendEl.innerHTML = '&nbsp;';
+                if (legendEl) {
+                     legendEl.innerHTML = '';
                 }
             </script>
         </div>
