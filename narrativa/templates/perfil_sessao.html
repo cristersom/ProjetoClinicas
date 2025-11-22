@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Resumo da Sessão{% endblock %}
+{% block titulo %}Seu Progresso Geral{% endblock %}
 
-{% block navbar %}{% endblock %} {# Sem navbar para manter foco #}
+{% block navbar %}{% endblock %}
 
 {% block head %}
 <style>
@@ -72,22 +72,22 @@
     <div class="w-full md:w-8/12 lg:w-6/12 gameflix-card relative">
 
         <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold mb-2">Resumo da Sessão</h1>
+            <h1 class="text-3xl font-bold mb-2">Progresso da Sessão</h1>
             <p class="text-gray-400">
-                Você pausou a jornada: <span class="text-white font-semibold">{{ narrativa.titulo }}</span>
+                Você está atualmente na jornada: <span class="text-white font-semibold">{{ narrativa.titulo }}</span>
             </p>
         </div>
 
         <div class="mb-8 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center">
-            <h2 class="text-lg text-gray-400 mb-1">Perfil Identificado</h2>
+            <h2 class="text-lg text-gray-400 mb-1">Perfil da Sessão</h2>
             <p class="text-2xl font-bold text-blue-400">{{ nome_perfil }}</p>
-            <p class="text-xs text-gray-500 mt-2">Definido com base na sua escolha inicial de jornada.</p>
+            <p class="text-xs text-gray-500 mt-2">Definido com base na sua primeira escolha.</p>
         </div>
 
         <div class="space-y-6 mb-8">
             <div>
                 <div class="flex justify-between text-sm font-medium text-gray-300">
-                    <span>Jornada Percorrida (Cenas)</span>
+                    <span>Total de Cenas Visitadas (Acumulado)</span>
                     <span>{{ cenas_visitadas }} de {{ total_cenas }}</span>
                 </div>
                 <div class="progress-container">
@@ -99,7 +99,7 @@
 
             <div>
                 <div class="flex justify-between text-sm font-medium text-gray-300">
-                    <span>Questionários Respondidos</span>
+                    <span>Total de Questionários Respondidos</span>
                     <span>{{ questionarios_respondidos }} de {{ total_questionarios }}</span>
                 </div>
                 <div class="progress-container">
@@ -113,12 +113,12 @@
         <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
             <a href="{% url 'narrativa:paciente_narrativas' %}" class="w-full md:w-auto">
                 <button class="btn-action btn-exit w-full">
-                    Sair para Menu
+                    Menu de Jornadas
                 </button>
             </a>
 
             <button onclick="window.history.back()" class="btn-action btn-resume w-full md:w-auto">
-                Voltar para Jornada
+                Continuar Jornada
             </button>
         </div>
 
