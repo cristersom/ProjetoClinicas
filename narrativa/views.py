@@ -9,14 +9,12 @@ from django.contrib import admin
 from django.conf import settings
 from django.db.models import Count, Value
 
-# Pega a chave de settings para consistência
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
 # --- VIEWS RELACIONADAS AOS TERMOS ---
 
 class LerTermosView(TemplateView):
-    """View que exibe e processa o aceite dos Termos de Uso do Paciente."""
     template_name = "ler_termos.html"
 
     def get(self, request, *args, **kwargs):
@@ -161,12 +159,18 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
 
+    # --- CORREÇÃO 1: Garante sessão para que o Log não falhe ---
+    if not request.session.session_key:
+        request.session.create()
+
+    # Agora é seguro criar o log
     if request.session.session_key:
         LogVisitaCena.objects.create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             narrativa_associada=cena.narrativa
         )
+    # -----------------------------------------------------------
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
@@ -238,29 +242,22 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- NOVA VIEW: Perfil de Sessão (Feedback ao Paciente) ---
+# --- CORREÇÃO 2: Lógica atualizada para Questionários ---
 def perfil_sessao_view(request, narrativa_id):
-    # 1. Garante que existe uma sessão
     session_key = request.session.session_key
     if not session_key:
         return redirect('narrativa:ler_termos')
 
-    # 2. Recupera a narrativa atual
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # 3. Tenta recuperar o Perfil da Sessão
     try:
         sessao_paciente = SessaoPaciente.objects.get(session_key=session_key)
-        # O perfil é o título da narrativa que definiu a sessão (ex: "Casal Hétero")
         nome_perfil = sessao_paciente.narrativa_perfil.titulo if sessao_paciente.narrativa_perfil else "Visitante"
     except SessaoPaciente.DoesNotExist:
         nome_perfil = "Visitante"
 
-    # 4. CÁLCULO DE PROGRESSO DA NARRATIVA (Cenas)
-    # Total de cenas desta narrativa
+    # Cenas
     total_cenas = Cena.objects.filter(narrativa=narrativa_atual).count()
-
-    # Cenas visitadas nesta sessão para esta narrativa
     cenas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key,
         narrativa_associada=narrativa_atual
@@ -271,20 +268,24 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
-    # 5. CÁLCULO DE PROGRESSO DE PESQUISA (Perguntas)
-    total_perguntas = Pergunta.objects.filter(
-        questionario__cena_associada__narrativa=narrativa_atual
+    # --- MUDANÇA DE LÓGICA: De Perguntas para Questionários ---
+
+    # Total de Questionários na Narrativa
+    total_questionarios = Questionario.objects.filter(
+        cena_associada__narrativa=narrativa_atual
     ).count()
 
-    perguntas_respondidas = Resposta.objects.filter(
+    # Questionários Respondidos:
+    # Conta quantos IDs de 'questionario' distintos aparecem nas Respostas dessa sessão
+    questionarios_respondidos = Resposta.objects.filter(
         session_key=session_key,
         pergunta__questionario__cena_associada__narrativa=narrativa_atual
-    ).values('pergunta').distinct().count()
+    ).values('pergunta__questionario').distinct().count()
 
-    progresso_pesquisa_pct = 0
-    if total_perguntas > 0:
-        progresso_pesquisa_pct = int((perguntas_respondidas / total_perguntas) * 100)
-        if progresso_pesquisa_pct > 100: progresso_pesquisa_pct = 100
+    progresso_questionarios_pct = 0
+    if total_questionarios > 0:
+        progresso_questionarios_pct = int((questionarios_respondidos / total_questionarios) * 100)
+        if progresso_questionarios_pct > 100: progresso_questionarios_pct = 100
 
     context = {
         'narrativa': narrativa_atual,
@@ -294,9 +295,10 @@ def perfil_sessao_view(request, narrativa_id):
         'total_cenas': total_cenas,
         'progresso_cenas_pct': progresso_cenas_pct,
 
-        'perguntas_respondidas': perguntas_respondidas,
-        'total_perguntas': total_perguntas,
-        'progresso_pesquisa_pct': progresso_pesquisa_pct,
+        # Variáveis atualizadas para o template
+        'questionarios_respondidos': questionarios_respondidos,
+        'total_questionarios': total_questionarios,
+        'progresso_questionarios_pct': progresso_questionarios_pct,
 
         'concluiu_narrativa': progresso_cenas_pct >= 100,
     }
