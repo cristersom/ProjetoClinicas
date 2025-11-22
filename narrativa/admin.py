@@ -212,13 +212,13 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         ]
         return custom_urls + urls
 
-    # --- CORREÇÃO 1: Adicionado margin-right para separar os botões visualmente ---
+    # --- MUDANÇA AQUI: display: block para quebrar linha ---
     def links_relatorios(self, obj):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<a class="button" style="margin-right: 10px;" href="{}">Ver Detalhado</a>'
-            '<a class="button" href="{}">Ver Resumo</a>',
+            '<a class="button" style="display: block; margin-bottom: 5px; text-align: center;" href="{}">Ver Detalhado</a>'
+            '<a class="button" style="display: block; text-align: center;" href="{}">Ver Resumo</a>',
             url_detalhe, url_resumo)
 
     links_relatorios.short_description = 'Relatórios'
@@ -250,9 +250,8 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
         export_format = request.GET.get('export')
 
-        # --- LÓGICA DE EXPORTAÇÃO PIVOTADA (Expandida para CSV e JSON) ---
+        # --- LÓGICA DE EXPORTAÇÃO PIVOTADA (XLSX, CSV, JSON) ---
         if export_format in ['xlsx', 'csv', 'json']:
-            # 1. Preparar os dados comuns para todos os formatos
             perguntas_ordenadas = questionario.perguntas.all().order_by('id')
 
             dados_sessao = {}
@@ -302,20 +301,17 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                 workbook.save(response)
                 return response
 
-            # === EXPORTAÇÃO CSV (CORREÇÃO 2) ===
+            # === EXPORTAÇÃO CSV ===
             elif export_format == 'csv':
                 response = HttpResponse(content_type='text/csv')
                 response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.csv"'
 
                 writer = csv.writer(response)
-
-                # Cabeçalho
                 header_row = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
                 for p in perguntas_ordenadas:
                     header_row.append(p.texto_pergunta)
                 writer.writerow(header_row)
 
-                # Linhas
                 for session_key, dados in dados_sessao.items():
                     row = [session_key[:8] + "...", dados['perfil'], dados['data']]
                     for p in perguntas_ordenadas:
@@ -324,7 +320,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
                 return response
 
-            # === EXPORTAÇÃO JSON (CORREÇÃO 2) ===
+            # === EXPORTAÇÃO JSON ===
             elif export_format == 'json':
                 json_data = []
                 for session_key, dados in dados_sessao.items():
@@ -345,9 +341,7 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                 response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.json"'
                 return response
 
-        # --- FIM DA LÓGICA PIVOTADA ---
-
-        # Renderização normal da página HTML (se não houver export)
+        # Renderização normal da página HTML (Resumo)
         dados_comparativos = {}
         for pergunta in questionario.perguntas.all():
             dados_comparativos[pergunta.id] = {
