@@ -13,35 +13,36 @@ Criar Conta
 {% block head %}
 <style>
     /* Estilos essenciais */
-
+    
     /* Largura de Referência: Todos os elementos visuais usarão 90% de largura centralizada. */
-
+    
     /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
     .z-10 form {
-        text-align: left;
-        max-width: 450px;
+        text-align: left; 
+        max-width: 450px; /* Largura base do container do formulário */
         width: 100%;
         margin-left: auto;
         margin-right: auto;
-        padding: 0 15px;
+        padding: 0 15px; 
     }
-
+    
     /* CORREÇÃO 1: TÍTULO H1 - Alinhamento, Largura e Fonte (Ajuste Final) */
     .z-10 h1 {
-        text-align: left !important;
+        text-align: center !important; /* Centraliza o texto dentro do bloco H1 */
         width: 90%; /* Limita a largura do bloco do título para 90% */
         margin: 0 auto 20px auto !important; /* Centraliza o bloco, adiciona margem inferior */
         padding: 0;
-        white-space: nowrap; /* MANTÉM EM UMA LINHA */
-        font-size: 2rem; /* REDUZ O TAMANHO DA FONTE (De 3xl para 2xl/3xl) */
+        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA */
+        font-size: 1.5rem; /* REDUÇÃO AGRESSIVA DA FONTE (Para caber em uma linha) */
+        font-weight: bold;
     }
-
+    
     /* ALINHAMENTO DE LABELS, INPUTS E TEXTOS DE AJUDA */
-
-    /* Garante que todos os textos (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
+    
+    /* Garante que todos os blocos de texto (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
     .control-label,
     .form-group label:not(.form-check-label),
-    .form-text,
+    .form-text, 
     .invalid-feedback {
         color: white !important; /* Cor de fonte resolvida */
         text-align: left !important;
@@ -50,65 +51,65 @@ Criar Conta
         display: block;
         padding: 0;
         margin-top: 0;
-        margin-bottom: 5px;
+        margin-bottom: 5px; 
         font-size: 0.9rem;
-        white-space: normal !important;
+        white-space: normal !important; 
     }
-
+    
     /* Input field */
     .z-10 input[type="text"],
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
-        width: 90% !important;
+        width: 90% !important; 
         margin: 0 auto 10px auto !important; /* Centraliza o input (90%) */
         display: block;
     }
-
+    
     /* Linha Divisória (Legend): OCULTA */
     .z-10 fieldset legend {
         border-bottom: none !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 0;
+        height: 0; 
         overflow: hidden;
     }
-
-    /* Checkbox (Aceite) */
+    
+    /* Checkbox (Aceite) - Alinha e Corrige Spacing */
     .form-group .form-check {
-        padding-top: 15px;
-        margin-bottom: 25px;
+        padding-top: 15px; 
+        margin-bottom: 25px; 
         text-align: left;
-        display: flex;
-        align-items: center;
+        display: flex; 
+        align-items: center; 
         width: 90%; /* Centralizado em 90% */
-        margin: 15px auto 25px auto !important;
-        padding-left: 0 !important;
+        margin: 15px auto 25px auto !important; 
+        padding-left: 0 !important; 
     }
-
+    
     .form-group .form-check label {
         font-weight: normal !important;
-        font-size: 0.9rem;
+        font-size: 0.9rem; 
         white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA DO TEXTO DO CHECKBOX */
         margin-left: 0.5em; /* Espaçamento entre box e texto */
     }
-
+    
     /* BOTÃO CRIAR CONTA - Mesma largura do Input */
     .z-10 button[type="submit"] {
         width: 90% !important;
-        margin: 10px auto 0 auto !important;
+        margin: 10px auto 0 auto !important; 
         display: block;
     }
-
+    
     /* Estilo para negrito e sublinhado no link */
     .termos-link {
         font-weight: bold;
         text-decoration: underline;
-        color: #dc2626 !important;
+        color: #dc2626 !important; 
     }
-
+    
     /* Padding vertical no container principal */
     .z-10.h-full {
-        padding-top: 50px !important;
+        padding-top: 50px !important; 
         padding-bottom: 50px !important;
     }
 
@@ -120,13 +121,13 @@ Criar Conta
         <div class="z-10 h-full py-32 md:py-0 text-gray-100 flex justify-center items-center flex-col p-5">
             {# TÍTULO AGORA É UM H1 COM LARGURA DE 90% CENTRALIZADO #}
             <h1 class="text-3xl font-bold">Crie uma conta para continuar</h1>
-
+            
             <form method="post">
                 {% csrf_token %}
                 <fieldset class="form-group">
                     {# LEGEND OCULTA #}
                     <legend class="border-bottom mb-4"></legend>
-
+                    
                     {{ form|crispy }}
                 </fieldset>
                 {# BOTÃO FORÇADO PARA 90% #}
@@ -142,11 +143,11 @@ Criar Conta
                     const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
 
                     // Reconstroi o HTML do label com os dois links formatados
-                    label.innerHTML = `Aceita nossos
-                        <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
+                    label.innerHTML = `Aceita nossos 
+                        <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e 
                         <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
                 }
-
+                
                 // Garante que a linha da legend seja totalmente removida
                 const legendEl = document.querySelector('fieldset legend');
                 if (legendEl) {
