@@ -1,239 +1,82 @@
-from pathlib import Path
-import os
-import dj_database_url
+from django.shortcuts import redirect
+from django.urls import reverse
+from django.conf import settings  # Importa settings para usar a chave de sessão
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get('SECRET_KEY')
+class PatientAccessMiddleware:
+    """
+    Controla o acesso de usuários não logados e impõe a tela de aceite de termos
+    para todas as rotas do fluxo do paciente.
+    """
 
-# MUDANÇA 1: Default mais seguro para o DEBUG
-# Se a variável de ambiente DEBUG não existir, ele vai assumir 'False'.
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+    def __init__(self, get_response):
+        self.get_response = get_response
 
-ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
+    def __call__(self, request):
+        # 1. Se o usuário for um Admin (logado), permite o acesso a TUDO.
+        if request.user.is_authenticated:
+            return self.get_response(request)
 
-INSTALLED_APPS = [
-    'jazzmin', # Jazzmin adicionado aqui, antes de admin
-    'nested_admin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'narrativa',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'import_export',
-    'cloudinary_storage',
-    'cloudinary',
-]
+        path = request.path
+        # Pega a chave de settings para consistência
+        TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Whitenoise ainda é necessário no middleware
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'narrativa.middleware.PatientAccessMiddleware',
-]
+        # Rotas permitidas para anônimos, que não devem ser redirecionadas para o aceite
+        try:
+            allowed_paths = [
+                reverse('narrativa:login'),
+                reverse('narrativa:criarconta'),
+                reverse('narrativa:homepage'),
+                reverse('narrativa:termos_de_uso'),
+                reverse('narrativa:politica_privacidade'),
+                reverse('narrativa:ler_termos'),  # A rota de aceite base
+            ]
+            # URLs base para as quais precisamos extrair o ID
+            cena_base_url = reverse('narrativa:exibir_cena_paciente', args=[0])[:-2]
+            questionario_base_url = reverse('narrativa:responder_questionario', args=[0])[:-2]
+        except Exception:
+            # Fallback para evitar erro na inicialização
+            allowed_paths = ['/login/', '/criarconta/', '/', '/termos/', '/politica/', '/ler_termos/']
+            cena_base_url = '/paciente/cena/'
+            questionario_base_url = '/paciente/questionario/'
 
-ROOT_URLCONF = 'gameflix.urls'
+        # Prefixes permitidos que não são da área do paciente (como estáticos e admin)
+        allowed_prefixes_non_patient = ['/media/', '/static/', '/admin/']
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'], # Garante que a pasta raiz 'templates' é verificada
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'narrativa.context.lista_narrativas_recentes',
-                'narrativa.context.lista_narrativas_emalta',
-                'narrativa.context.dados_clinica',
-            ],
-        },
-    },
-]
+        is_patient_area_url = path.startswith('/paciente/')
 
-WSGI_APPLICATION = 'gameflix.wsgi.application'
+        # 2. SE NÃO ESTÁ LOGADO:
+        if is_patient_area_url or (path not in allowed_paths and not any(
+                path.startswith(prefix) for prefix in allowed_prefixes_non_patient)):
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
-    )
-}
+            # Checa se os termos foram aceitos na sessão
+            if not request.session.get(TERMOS_ACEITOS_KEY, False):
 
-AUTH_USER_MODEL = "narrativa.usuario"
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
+                # --- Lógica para redirecionar para a tela de aceite com o PK (para retorno) ---
 
-# --- Configurações de Internacionalização ---
-LANGUAGE_CODE = 'pt-br'
-TIME_ZONE = 'America/Sao_Paulo'
-USE_I18N = True
-USE_TZ = True
+                # 2.1: Se a rota for a própria rota de aceite (/ler_termos/ ou /ler_termos/pk/)
+                if path.startswith(reverse('narrativa:ler_termos')):
+                    return self.get_response(request)
 
-# --- Configurações de Arquivos Estáticos ---
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"] # Diretório onde o collectstatic procura arquivos estáticos customizados
-STATIC_ROOT = BASE_DIR / "staticfiles" # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
+                # 2.2: Se o paciente acessou diretamente uma cena ou questionário (que possui PK)
+                if path.startswith(cena_base_url) or path.startswith(questionario_base_url):
 
-# --- Configurações de Arquivos de Mídia ---
-MEDIA_URL = '/media/'
+                    try:
+                        # Extrai o PK (ID) da URL (assumindo que o ID é o penúltimo segmento: /paciente/cena/ID/)
+                        parts = path.strip('/').split('/')
+                        obj_id = int(parts[-1])  # O ID deve ser o último elemento após o strip('/')
 
-# --- Configurações de Armazenamento (Storage) ---
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
+                        # Usa a rota ler_termos_pk para retornar ao fluxo daquela cena/questionário
+                        return redirect('narrativa:ler_termos_pk', narrativa_pk=obj_id)
+                    except (ValueError, IndexError):
+                        # Se não conseguir extrair o ID, cai para o redirecionamento padrão
+                        pass  # Continua para a próxima linha
 
-# --- Cloudinary ---
-CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+                # 2.3: Para acesso a /paciente/narrativas/ ou rotas sem ID
+                return redirect('narrativa:ler_termos')
 
-# --- Outras Configurações Django ---
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_REDIRECT_URL = 'narrativa:narrativas'
-LOGIN_URL = 'narrativa:login'
+            # 3. Se os termos foram aceitos, permite o acesso
+            return self.get_response(request)
 
-# --- Crispy Forms ---
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
-
-# --- Variável de sessão para aceite de termos (NOVO) ---
-TERMOS_ACEITOS_KEY = 'termos_aceitos'
-
-# --- Configurações do Jazzmin ---
-JAZZMIN_SETTINGS = {
-    "site_title": "Administração Clínica",
-    "site_header": "Clínica Admin",
-    "welcome_sign": "Bem-vindo(a) à Administração",
-    "copyright": "Minha Clínica Ltd",
-
-    # --- MUDANÇA AQUI ---
-    "topmenu_links": [
-        {"name": "Ver Site", "url": "/", "new_window": True},
-        {"app": "narrativa"},
-
-        # Link de Ajuda/FAQ adicionado
-        {
-            "name": "Ajuda",
-            "url": "narrativa:admin_faq", # Aponta para a rota que já criámos
-            "icon": "fas fa-question-circle",
-            "new_window": True
-        },
-    ],
-    # --- FIM DA MUDANÇA ---
-
-    "order_with_respect_to": [
-        "narrativa.Narrativa",
-        "narrativa.Cena",
-        "narrativa.Questionario",
-        "narrativa.Resposta",
-        "narrativa.Categoria",
-        "narrativa.ConfiguracaoClinica", # Nome real do modelo
-        "narrativa.SessaoPaciente",
-        "narrativa.Usuario",
-    ],
-
-    "apps": {
-        "narrativa": "Gestão da Jornada",
-    },
-
-    "models": {
-        "narrativa.ConfiguracaoClinica": {
-            "verbose_name": "Logotipo",
-            "verbose_name_plural": "Logotipo",
-        }
-    },
-
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "narrativa.Narrativa": "fas fa-book-open",
-        "narrativa.Cena": "fas fa-film",
-        "narrativa.Escolha": "fas fa-code-branch",
-        "narrativa.Questionario": "fas fa-clipboard-list",
-        "narrativa.Pergunta": "fas fa-question-circle",
-        "narrativa.Resposta": "fas fa-comment",
-        "narrativa.SessaoPaciente": "fas fa-user-clock",
-        "narrativa.Usuario": "fas fa-user-shield",
-        "narrativa.Categoria": "fas fa-tags",
-        "narrativa.ConfiguracaoClinica": "fas fa-image",
-    },
-
-    "hide_models": [
-        "narrativa.opcaoresposta",
-        "auth.permission",
-    ],
-}
-
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-dark",
-    "accent": "accent-primary",
-    "navbar": "navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": True,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-primary",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "default",
-    "dark_mode_theme": "darkly",
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success"
-    }
-}
-
-# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
-# Isso fará com que os erros 500 (quando DEBUG=False)
-# sejam impressos no log do Heroku.
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'WARNING', # Captura 'warnings' e 'errors'
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Nível de log do Django
-            'propagate': False,
-        },
-    },
-}
+        # 4. Se não está logado e está em uma rota permitida (login, home, termos, estáticos), permite.
+        return self.get_response(request)
