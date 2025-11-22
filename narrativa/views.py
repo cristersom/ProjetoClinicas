@@ -10,23 +10,23 @@ from django.contrib import admin
 TERMOS_ACEITOS_KEY = 'termos_aceitos'
 
 
-# --- NOVAS VIEWS PARA O FLUXO DE TERMOS ---
+# --- VIEWS CORRIGIDAS PARA O FLUXO DE TERMOS E PACIENTE ---
 
 class LerTermosView(TemplateView):
     """View que exibe e processa o aceite dos Termos de Uso do Paciente."""
     template_name = "ler_termos.html"
 
     def get(self, request, *args, **kwargs):
-        # Se os termos já foram aceitos, redireciona para a lista de narrativas
+        # Se os termos JÁ foram aceitos, redireciona para a lista de narrativas
         if request.session.get(TERMOS_ACEITOS_KEY, False):
             return redirect('narrativa:paciente_narrativas')
 
-        # O PK é opcional e usado apenas para redirecionar após o aceite
+        # Se os termos NÃO foram aceitos, apenas renderiza a tela.
         self.narrativa_pk = kwargs.get('narrativa_pk')
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        # Verifica se o aceite foi enviado via POST
+        # Processa o aceite
         aceite = request.POST.get('aceite', 'false').lower() == 'true'
         self.narrativa_pk = kwargs.get('narrativa_pk')
 
@@ -35,19 +35,14 @@ class LerTermosView(TemplateView):
             request.session[TERMOS_ACEITOS_KEY] = True
             messages.success(request, "Termos aceitos com sucesso! Bem-vindo(a) à sua jornada.")
 
-            # Redireciona para onde o paciente estava tentando ir
+            # Redireciona para o destino
             if self.narrativa_pk:
-                # Se estava tentando iniciar uma jornada específica, vai para a view de inicio
                 return redirect('narrativa:iniciar_jornada_paciente', narrativa_id=self.narrativa_pk)
             else:
-                # Caso contrário, vai para a lista de narrativas
                 return redirect('narrativa:paciente_narrativas')
 
-        # Se houver POST sem aceite (segurança)
+        # Se houver POST sem aceite (não deve ocorrer com o JS), redireciona para a tela inicial
         return redirect('narrativa:ler_termos')
-
-
-# --- FIM DAS NOVAS VIEWS ---
 
 
 class Homepage(FormView):
@@ -132,8 +127,8 @@ class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
 
-    # NOVO: Verifica termos antes de exibir a lista de narrativas
     def get(self, request, *args, **kwargs):
+        # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
         if not request.session.get(TERMOS_ACEITOS_KEY, False):
             return redirect('narrativa:ler_termos')
         return super().get(request, *args, **kwargs)
@@ -150,23 +145,21 @@ class PacienteDetalhes(DetailView):
         context["relacionados"] = relacionados
         return context
 
-    # NOVO: Método POST para capturar o clique em 'Iniciar Jornada'
     def post(self, request, *args, **kwargs):
         narrativa = self.get_object()
 
-        # Se os termos não foram aceitos, redireciona para a tela de aceite,
-        # passando o PK da narrativa para retorno (ler_termos_pk)
+        # REDIRECIONA PARA ACEITE COM PK DE RETORNO
         if not request.session.get(TERMOS_ACEITOS_KEY, False):
             return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa.pk)
 
-        # Se os termos já estiverem aceitos, chama a função de iniciar a jornada
+        # Se os termos já estiverem aceitos, continua a iniciar a jornada
         return iniciar_jornada_paciente(request, narrativa.pk)
 
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # NOVO: Se os termos não foram aceitos, redireciona para a tela de aceite.
+    # REDIRECIONA PARA ACEITE COM PK DE RETORNO
     if not request.session.get(TERMOS_ACEITOS_KEY, False):
         return redirect('narrativa:ler_termos_pk', narrativa_pk=narrativa_id)
 
@@ -189,7 +182,7 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
 
-    # NOVO: Garante que os termos foram aceitos antes de permitir a visualização
+    # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
     if not request.session.get(TERMOS_ACEITOS_KEY, False):
         return redirect('narrativa:ler_termos')
 
@@ -223,7 +216,7 @@ def exibir_cena_paciente(request, cena_id):
 def responder_questionario(request, questionario_id):
     questionario = get_object_or_404(Questionario, pk=questionario_id)
 
-    # NOVO: Garante que os termos foram aceitos antes de permitir a resposta
+    # REDIRECIONA SE OS TERMOS NÃO FOREM ACEITOS
     if not request.session.get(TERMOS_ACEITOS_KEY, False):
         return redirect('narrativa:ler_termos')
 
@@ -262,10 +255,13 @@ def responder_questionario(request, questionario_id):
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin_faq.html"
 
+    # --- 2. ADICIONAR O CONTEXTO DO ADMIN MANUALMENTE ---
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # Adiciona o contexto do admin (necessário para o layout do Jazzmin)
         context.update(admin.site.each_context(self.request))
         return context
+    # --- FIM DA MUDANÇA ---
 
 
 class TermosView(TemplateView):
