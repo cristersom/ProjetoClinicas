@@ -61,6 +61,15 @@ Aceite de Termos e Privacidade
 
     <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6">
 
+        {# BOTÃO VOLTAR: Funciona via histórico do navegador #}
+        <div class="absolute top-4 left-4 z-10">
+             <a href="#" onclick="window.history.back(); return false;"
+                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold py-1 px-3 rounded transition duration-300"
+                title="Voltar à página anterior">
+                 &larr; Voltar
+             </a>
+        </div>
+
         <h1 class="text-3xl font-bold mb-6 text-center">Termos de Uso e Política de Privacidade</h1>
         <p class="text-center text-gray-400 mb-4">
             Para prosseguir com a jornada, você precisa aceitar os termos e políticas da clínica.
@@ -79,23 +88,29 @@ Aceite de Termos e Privacidade
         </div>
 
         <div class="text-center">
+            {# O formulário dinâmico no script irá adicionar o CSRF e o campo 'aceite' #}
             <button id="acceptBtn" disabled class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 ease-in-out disabled:bg-gray-700 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-red-300">
                 Aceitar e Continuar
             </button>
         </div>
     </div>
 </main>
+{# Inclui um CSRF token escondido que o JS pode ler #}
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const termoTextoEl = document.getElementById('termoTexto');
     const checkbox = document.getElementById('agreeCheckbox');
     const acceptBtn = document.getElementById('acceptBtn');
-    
-    // URL para buscar o conteúdo dos termos cadastrados pelo admin
+
     const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
-    
-    // Função para buscar o conteúdo HTML da página de termos
+
+    // --- LÓGICA CORRIGIDA: Obtém o token CSRF ---
+    const csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+    const csrftoken = csrfTokenInput ? csrfTokenInput.value : '';
+    // --- FIM DA LÓGICA CORRIGIDA ---
+
     function fetchTermos() {
         fetch(termosUrl)
             .then(response => {
@@ -105,54 +120,52 @@ document.addEventListener('DOMContentLoaded', () => {
                 return response.text();
             })
             .then(html => {
-                // 1. Criar um elemento temporário para parsear o HTML
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
 
-                // 2. Localizar o bloco de conteúdo principal dentro do HTML (baseado na estrutura do seu termos.html)
-                // Seu termos.html usa: <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-8 relative">
-                const contentDiv = doc.querySelector('.w-full.md\\:w-8\\/12.lg\\:w-6\\/12');
+                // Localiza o bloco de conteúdo principal
+                // Usa um seletor mais robusto, mirando a div interna que contém o texto legal
+                const mainContent = doc.querySelector('main .w-full.md\\:w-8\\/12.lg\\:w-6\\/12');
 
-                if (contentDiv) {
-                    // Remove o botão "Voltar" do topo e o título H1 (já temos um)
-                    const title = contentDiv.querySelector('h1');
+                if (mainContent) {
+                    // Remove elementos de navegação e título duplicados
+                    const title = mainContent.querySelector('h1');
                     if (title) title.remove();
-                    const backButton = contentDiv.querySelector('.absolute.top-2.right-2');
+                    const backButton = mainContent.querySelector('.absolute');
                     if (backButton) backButton.remove();
 
-                    // Insere o conteúdo restante no elemento termoTexto
-                    termoTextoEl.innerHTML = contentDiv.innerHTML;
-                    termoTextoEl.classList.add('prose', 'prose-invert', 'max-w-none'); 
+                    termoTextoEl.innerHTML = mainContent.innerHTML;
+                    termoTextoEl.classList.add('prose', 'prose-invert', 'max-w-none');
 
                 } else {
-                    termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Erro: Não foi possível localizar o conteúdo dos termos na página de destino.</p>';
+                    termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Erro: Conteúdo dos termos não encontrado na página de destino. Verifique o template termos.html.</p>';
                 }
             })
             .catch(error => {
-                console.error(error);
-                termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Falha ao buscar os termos. Verifique o console ou a configuração da URL.</p>';
+                console.error('Falha na busca dos termos:', error);
+                termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Falha ao buscar os termos. Verifique o console ou a URL.</p>';
             });
     }
 
-    // Habilita/desabilita o botão de aceite
     checkbox.addEventListener('change', () => {
         acceptBtn.disabled = !checkbox.checked;
     });
 
-    // Ação ao clicar em aceitar (faz um POST para o Django)
+    // AÇÃO CORRIGIDA: Submete o aceite com o token CSRF
     acceptBtn.addEventListener('click', () => {
         if (checkbox.checked) {
-            // Usa o POST dinâmico para submeter o aceite, como ajustado antes
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = window.location.href; 
-            
+            form.action = window.location.href;
+
+            // Adiciona o token CSRF
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = 'csrfmiddlewaretoken';
-            csrfInput.value = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            csrfInput.value = csrftoken;
             form.appendChild(csrfInput);
 
+            // Adiciona o campo de aceite
             const aceiteInput = document.createElement('input');
             aceiteInput.type = 'hidden';
             aceiteInput.name = 'aceite';

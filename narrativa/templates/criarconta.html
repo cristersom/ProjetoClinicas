@@ -12,39 +12,67 @@ Criar Conta
 
 {% block head %}
 <style>
+    /* Estilos originais */
     .form-text, .invalid-feedback {
         color: white !important;
     }
-    /* NOVO: Estilo para corrigir o espaçamento do checkbox no Bootstrap/Crispy */
+
+    /* CORREÇÃO 1: Corrige o espaçamento e alinhamento do checkbox */
     .form-group .form-check {
-        padding-top: 10px; /* Adiciona um espaço acima do checkbox */
-        margin-bottom: 10px; /* Garante que o rótulo e o checkbox fiquem juntos */
+        padding-top: 10px;
+        margin-bottom: 10px;
         text-align: left;
-        display: flex; /* Permite alinhar a caixa e o texto */
-        align-items: center; /* Alinha verticalmente */
-        padding-left: 1.5em; /* Ajusta o padding para a caixa */
+        display: flex;
+        align-items: center;
+        padding-left: 1.5em;
     }
     .form-group .form-check .form-check-input {
-        margin-left: -1.5em; /* Posiciona a caixa corretamente */
+        margin-left: -1.5em;
     }
     .form-group .form-check label {
-        margin-left: 0.5em; /* Pequeno espaço entre a caixa e o texto */
+        margin-left: 0.5em;
     }
-    /* NOVO: Estilo para negrito e sublinhado no link */
+    /* Estilo para negrito e sublinhado no link */
     .termos-link {
         font-weight: bold;
         text-decoration: underline;
+        color: #dc2626 !important; /* Cor vermelha para destacar link */
     }
+
+    /* CORREÇÃO 2: Alinha as labels e inputs à esquerda dentro do formulário */
+    .z-10 form {
+        text-align: left; /* Alinha labels e campos */
+        width: 100%; /* Garante que a div form use a largura total */
+    }
+    .z-10 fieldset {
+        /* Garante que o conteúdo dentro do fieldset não seja centralizado */
+        text-align: left;
+    }
+
+    /* CORREÇÃO 3: Diminui a largura dos inputs para mantê-los centralizados (visual) */
+    .z-10 input[type="text"],
+    .z-10 input[type="email"],
+    .z-10 input[type="password"] {
+        width: 90% !important;
+        margin: auto !important; /* Centraliza inputs menores dentro do form block */
+    }
+
+    /* CORREÇÃO 4: Adiciona padding vertical ao container de conteúdo */
+    .z-10.h-full {
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
+    }
+
 </style>
 {% endblock %}
 
 {% block content %}
     <header class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay showcase border-gray-600 border-b-8 flex justify-center items-center bg-no-repeat"  style="background-image: url('{% static 'images/background.png' %}');">
         <div class="z-10 h-full py-32 md:py-0 text-gray-100 text-center flex items-center flex-col">
-            <form method="post">
+            <form method="post" class="w-11/12 md:w-8/12 lg:w-5/12">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4">Crie uma conta para continuar</legend>
+                    <legend class="border-bottom mb-4 text-center">Crie uma conta para continuar</legend>
                     {{ form|crispy }}
                 </fieldset>
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
@@ -55,8 +83,6 @@ Criar Conta
                 const termosLink = label ? label.querySelector('a') : null;
 
                 if (label && termosLink) {
-                    // Texto Original: Aceita nossos <a href="/termos/">termos de uso e política de privacidade</a>?
-
                     // 1. Cria a nova estrutura com links separados
                     const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
                     const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
