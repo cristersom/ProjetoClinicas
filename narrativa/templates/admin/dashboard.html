@@ -10,12 +10,11 @@
     .dashboard-container {
         padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        /* Impede que o container vaze horizontalmente */
         max-width: 100%;
-        overflow-x: hidden;
+        overflow-x: hidden; /* Garante que nada vaze a tela */
     }
 
-    /* Grid de KPIs */
+    /* --- KPIs --- */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -49,7 +48,7 @@
         margin: 10px 0;
     }
 
-    /* Grid de Gráficos */
+    /* --- GRÁFICOS --- */
     .charts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -62,15 +61,12 @@
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        /* CORREÇÃO 1: Altura fixa para evitar crescimento infinito */
-        height: 400px;
-        position: relative; /* Necessário para o Chart.js */
-    }
 
-    .chart-container-inner {
-        position: relative;
-        height: 320px; /* Altura específica para o canvas */
-        width: 100%;
+        /* CORREÇÃO CRUCIAL PARA O BUG DO SCROLL */
+        min-width: 0; /* Impede o item do grid de crescer infinitamente */
+        height: 450px; /* Altura fixa para o cartão */
+        display: flex;
+        flex-direction: column;
     }
 
     .chart-card h2 {
@@ -80,21 +76,31 @@
         border-bottom: 1px solid #eee;
         padding-bottom: 10px;
         margin-bottom: 15px;
+        flex-shrink: 0; /* Título não encolhe */
     }
 
-    /* Tabela Recente */
+    /* Container interno que segura o Canvas */
+    .chart-wrapper {
+        position: relative;
+        flex-grow: 1; /* Ocupa o resto do cartão */
+        width: 100%;
+        height: 0; /* Truque para forçar o Chart.js a respeitar o pai */
+        min-height: 300px;
+    }
+
+    /* --- TABELA --- */
     .table-card {
         background: white;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        overflow-x: auto; /* Scroll horizontal apenas na tabela se necessário */
+        overflow-x: auto;
     }
 
     .table-card table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 600px; /* Garante largura mínima legível */
+        min-width: 600px;
     }
 
     .table-card th {
@@ -144,13 +150,13 @@
     <div class="charts-grid">
         <div class="chart-card">
             <h2>Acessos por Dia (Últimos 7 dias)</h2>
-            <div class="chart-container-inner">
+            <div class="chart-wrapper">
                 <canvas id="chartAcessos"></canvas>
             </div>
         </div>
         <div class="chart-card">
             <h2>Top 5 Narrativas Mais Vistas</h2>
-            <div class="chart-container-inner">
+            <div class="chart-wrapper">
                 <canvas id="chartTopNarrativas"></canvas>
             </div>
         </div>
@@ -187,10 +193,10 @@
 </div>
 
 <script>
-    // Configuração comum para responsividade
-    const chartOptions = {
+    // Configuração global para garantir responsividade sem estourar
+    const commonOptions = {
         responsive: true,
-        maintainAspectRatio: false, // Importante: permite preencher a div pai
+        maintainAspectRatio: false,
     };
 
     const ctxAcessos = document.getElementById('chartAcessos');
@@ -207,7 +213,7 @@
                 tension: 0.3
             }]
         },
-        options: chartOptions
+        options: commonOptions
     });
 
     const ctxTop = document.getElementById('chartTopNarrativas');
@@ -224,7 +230,7 @@
             }]
         },
         options: {
-            ...chartOptions,
+            ...commonOptions,
             indexAxis: 'y', // Barra horizontal
         }
     });
