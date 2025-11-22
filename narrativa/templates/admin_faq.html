@@ -1,215 +1,271 @@
 {% extends 'admin/base_site.html' %}
 {% load static %}
 
-{% block title %}Ajuda e Onboarding{% endblock %}
+{% block title %}Como Criar Jornadas{% endblock %}
 
 {% block extrahead %}
 <style>
-    /* Estilos para o Manual de Onboarding */
-    .help-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 20px;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    /* Reset e Base */
+    .onboarding-container {
+        max-width: 900px;
+        margin: 40px auto;
+        font-family: 'Roboto', 'Segoe UI', sans-serif;
+        color: #333;
+        line-height: 1.6;
     }
 
+    .intro-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    .intro-header h1 {
+        font-size: 2.2rem;
+        color: #444;
+        margin-bottom: 10px;
+        font-weight: 300;
+    }
+    .intro-header p {
+        font-size: 1.1rem;
+        color: #666;
+    }
+
+    /* Card de Conceito */
     .concept-card {
         background: #fff;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-bottom: 40px;
+        border-left: 5px solid #417690; /* Azul Django */
     }
 
     .concept-title {
-        font-size: 1.5rem;
-        color: #417690; /* Cor do Django Admin */
-        margin-bottom: 15px;
-        border-bottom: 2px solid #f5f5f5;
-        padding-bottom: 10px;
-    }
-
-    /* Diagrama de Hierarquia */
-    .hierarchy-diagram {
-        display: flex;
-        align-items: flex-start;
-        gap: 20px;
-        overflow-x: auto;
-        padding: 20px 0;
-    }
-
-    .h-box {
-        border-radius: 6px;
-        padding: 15px;
-        color: white;
-        min-width: 180px;
-        text-align: center;
-        position: relative;
-    }
-
-    .h-narrativa { background-color: #417690; } /* Azul Django */
-    .h-cena { background-color: #28a745; } /* Verde */
-    .h-quest { background-color: #ffc107; color: #333; } /* Amarelo */
-
-    .arrow-right {
-        font-size: 2rem;
-        color: #ccc;
-        align-self: center;
-    }
-
-    /* Passo a Passo Timeline */
-    .step-list {
-        list-style: none;
-        padding: 0;
-    }
-
-    .step-item {
-        display: flex;
-        gap: 20px;
+        font-size: 1.4rem;
+        color: #2c3e50;
         margin-bottom: 20px;
-        align-items: flex-start;
+        font-weight: 600;
     }
 
-    .step-number {
+    /* Diagrama Visual Simplificado */
+    .flow-diagram {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .flow-item {
+        text-align: center;
+        flex: 1;
+        min-width: 120px;
+    }
+    .flow-icon {
+        font-size: 2rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+    .flow-arrow {
+        color: #bbb;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+    .flow-text strong { display: block; color: #417690; }
+    .flow-text small { color: #777; }
+
+    /* Timeline Vertical (O Pulo do Gato) */
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+        margin-top: 20px;
+    }
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10px;
+        bottom: 0;
+        width: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+    }
+
+    .timeline-step {
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -43px;
+        top: 0;
+        width: 30px;
+        height: 30px;
         background: #417690;
         color: white;
-        width: 35px;
-        height: 35px;
         border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        text-align: center;
+        line-height: 30px;
         font-weight: bold;
-        flex-shrink: 0;
+        box-shadow: 0 0 0 4px #fff; /* Borda branca para separar da linha */
     }
 
-    .step-content h4 {
-        margin: 0 0 5px 0;
+    .timeline-content h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.2rem;
         color: #333;
-        font-size: 1.1rem;
     }
 
-    .step-content p {
+    .timeline-content p {
+        margin: 0;
+        color: #555;
+    }
+
+    .highlight-box {
+        background-color: #fff3cd;
+        border: 1px solid #ffeeba;
+        color: #856404;
+        padding: 15px;
+        border-radius: 6px;
+        margin-top: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Acordeão para Dúvidas */
+    details {
+        background: #fff;
+        margin-bottom: 10px;
+        border-radius: 6px;
+        border: 1px solid #eee;
+        overflow: hidden;
+    }
+    details summary {
+        padding: 15px;
+        cursor: pointer;
+        background: #fdfdfd;
+        font-weight: 600;
+        color: #555;
+        list-style: none; /* Remove triângulo padrão em alguns browsers */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    details summary::after {
+        content: '+';
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    details[open] summary::after {
+        content: '-';
+    }
+    details p {
+        padding: 15px;
+        border-top: 1px solid #eee;
         margin: 0;
         color: #666;
-        line-height: 1.5;
     }
 
-    .alert-box {
-        background-color: #e8f4f8;
-        border-left: 5px solid #417690;
-        padding: 15px;
-        margin: 20px 0;
-        color: #2c3e50;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="help-container">
+<div class="onboarding-container">
 
-    <h1>Manual de Criação de Jornadas</h1>
-    <p class="quiet">Entenda como estruturar suas histórias clínicas e pesquisas de forma lógica.</p>
+    <div class="intro-header">
+        <h1>Como Criar suas Jornadas</h1>
+        <p>Um guia prático para estruturar suas histórias e pesquisas sem confusão.</p>
+    </div>
 
     <div class="concept-card">
-        <h2 class="concept-title">1. A Hierarquia do Sistema</h2>
-        <p>Para facilitar o entendimento, imagine que estamos escrevendo um <strong>Livro Interativo</strong>:</p>
+        <h2 class="concept-title">Primeiro, entenda a Estrutura</h2>
+        <p style="margin-bottom: 20px;">O sistema funciona como um livro interativo. Para que tudo funcione, precisamos respeitar esta hierarquia:</p>
 
-        <div class="hierarchy-diagram">
-            <div class="h-box h-narrativa">
-                <strong>1º Nível: Narrativa</strong>
-                <br><small>(O Livro)</small>
-                <p style="font-size: 0.8rem; margin-top:5px;">É a capa, o título e a categoria. Ela agrupa todo o resto.</p>
+        <div class="flow-diagram">
+            <div class="flow-item">
+                <span class="flow-icon">📚</span>
+                <div class="flow-text">
+                    <strong>1. Narrativa</strong>
+                    <small>A "Capa" da história</small>
+                </div>
             </div>
-            <div class="arrow-right">→</div>
-            <div class="h-box h-cena">
-                <strong>2º Nível: Cenas</strong>
-                <br><small>(As Páginas)</small>
-                <p style="font-size: 0.8rem; margin-top:5px;">Cada tela que o paciente vê (Vídeo, Texto ou Imagem). Uma narrativa tem várias cenas.</p>
+            <div class="flow-arrow">→</div>
+            <div class="flow-item">
+                <span class="flow-icon">🎬</span>
+                <div class="flow-text">
+                    <strong>2. Cenas</strong>
+                    <small>As "Páginas" (conteúdo)</small>
+                </div>
             </div>
-            <div class="arrow-right">→</div>
-            <div class="h-box h-quest">
-                <strong>3º Nível: Conteúdo</strong>
-                <br><small>(A Interação)</small>
-                <p style="font-size: 0.8rem; margin-top:5px;">Questionários (Pesquisas) ou Escolhas (Botões) que ficam dentro de uma cena.</p>
+            <div class="flow-arrow">→</div>
+            <div class="flow-item">
+                <span class="flow-icon">❓</span>
+                <div class="flow-text">
+                    <strong>3. Interação</strong>
+                    <small>Botões e Perguntas</small>
+                </div>
             </div>
         </div>
     </div>
 
     <div class="concept-card">
-        <h2 class="concept-title">2. O Fluxo de Criação (Importante!)</h2>
+        <h2 class="concept-title">O Fluxo de Trabalho "Vai e Volta"</h2>
+        <p>Muitas pessoas travam aqui: <em>"Como eu vinculo uma cena se ela ainda não existe?"</em>. <br>O segredo é <strong>criar primeiro, conectar depois</strong>.</p>
 
-        <div class="alert-box">
-            <strong>💡 Dica de Ouro:</strong> Você não consegue conectar duas coisas se uma delas ainda não existe.
-            <br>
-            Por isso, o processo exige um <strong>"Vai e Volta"</strong>: Primeiro criamos a estrutura, depois voltamos para ligar os pontos.
+        <div class="timeline">
+
+            <div class="timeline-step">
+                <div class="timeline-marker">1</div>
+                <div class="timeline-content">
+                    <h3>Crie a "Casca" da Narrativa</h3>
+                    <p>Vá em <strong>Narrativas > Adicionar</strong>. Dê um título, suba a imagem de capa e defina a categoria.</p>
+                    <div class="highlight-box">
+                        <strong>⚠️ Importante:</strong> Deixe o campo "Cena Inicial" <strong>em branco</strong> por enquanto. Apenas clique em SALVAR.
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-marker">2</div>
+                <div class="timeline-content">
+                    <h3>Crie todas as Cenas</h3>
+                    <p>Agora vá em <strong>Cenas > Adicionar</strong>. Crie todas as telas que você planejou (Ex: Introdução, Pergunta 1, Final).</p>
+                    <p>Em cada cena, apenas selecione a Narrativa que você criou no passo 1. <strong>Salve cada uma.</strong></p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-marker">3</div>
+                <div class="timeline-content">
+                    <h3>Agora sim: Faça as Conexões (A Volta)</h3>
+                    <p>Agora que as peças existem, podemos ligar os fios:</p>
+                    <ul style="margin-top: 10px; padding-left: 20px; color: #555;">
+                        <li style="margin-bottom: 8px;"><strong>Defina o Início:</strong> Volte na sua Narrativa e agora selecione a "Cena Inicial".</li>
+                        <li><strong>Crie os Botões:</strong> Volte nas Cenas, e lá embaixo adicione as "Escolhas". Agora o sistema vai listar as cenas de destino porque elas já existem!</li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
-
-        <ul class="step-list">
-            <li class="step-item">
-                <div class="step-number">1</div>
-                <div class="step-content">
-                    <h4>Crie a "Casca" da Narrativa</h4>
-                    <p>Vá em <strong>Narrativas > Adicionar</strong>. Preencha o Título, a Descrição e a Categoria. <br>
-                    <strong>Atenção:</strong> Deixe o campo <em>"Cena Inicial"</em> em branco por enquanto (pois você ainda não criou as cenas). Apenas salve.</p>
-                </div>
-            </li>
-
-            <li class="step-item">
-                <div class="step-number">2</div>
-                <div class="step-content">
-                    <h4>Crie todas as Cenas</h4>
-                    <p>Vá em <strong>Cenas > Adicionar</strong>. Crie todas as cenas da sua história (Ex: Cena 1, Cena 2, Cena Final).<br>
-                    Em cada uma, no campo <em>"Narrativa"</em>, selecione a narrativa que você criou no Passo 1.</p>
-                </div>
-            </li>
-
-            <li class="step-item">
-                <div class="step-number">3</div>
-                <div class="step-content">
-                    <h4>(Opcional) Crie os Questionários</h4>
-                    <p>Se alguma cena tiver pesquisa, vá em <strong>Questionários > Adicionar</strong>.<br>
-                    No campo <em>"Cena Associada"</em>, selecione a cena onde a pesquisa deve aparecer. Adicione as perguntas e salve.</p>
-                </div>
-            </li>
-
-            <li class="step-item">
-                <div class="step-number">4</div>
-                <div class="step-content">
-                    <h4>A VOLTA: Ligar os Pontos (Cena Inicial)</h4>
-                    <p>Agora que as cenas existem, <strong>volte para editar sua Narrativa</strong> (do Passo 1).<br>
-                    Agora sim, você pode selecionar qual é a <em>"Cena Inicial"</em> no campo correspondente. Salve novamente.</p>
-                </div>
-            </li>
-
-            <li class="step-item">
-                <div class="step-number">5</div>
-                <div class="step-content">
-                    <h4>A VOLTA: Ligar os Caminhos (Escolhas)</h4>
-                    <p>Volte para editar suas <strong>Cenas</strong>. Agora você pode adicionar <em>"Escolhas"</em> (botões).<br>
-                    Como todas as cenas já foram criadas no Passo 2, você conseguirá selecionar para qual <em>"Cena de Destino"</em> cada botão deve levar.</p>
-                </div>
-            </li>
-        </ul>
     </div>
 
-    <div class="concept-card">
-        <h2 class="concept-title">3. Perguntas Frequentes</h2>
+    <div class="concept-card" style="border-left-color: #28a745;">
+        <h2 class="concept-title">Dúvidas Rápidas</h2>
 
-        <details style="margin-bottom: 10px; cursor: pointer;">
-            <summary style="font-weight: bold; color: #417690;">Por que não consigo escolher a Cena de Destino?</summary>
-            <p style="padding: 10px; color: #555;">Provavelmente porque você ainda não criou a cena para onde quer mandar o paciente. Salve a cena atual, vá criar a próxima cena, e depois volte para editar a atual e adicionar o botão.</p>
+        <details>
+            <summary>Criei a Narrativa, mas não consigo pôr a Cena Inicial.</summary>
+            <p>Isso é normal! Você primeiro cria a Narrativa (salva), depois cria as Cenas, e só depois volta na Narrativa para dizer qual daquelas cenas é a primeira.</p>
         </details>
 
-        <details style="margin-bottom: 10px; cursor: pointer;">
-            <summary style="font-weight: bold; color: #417690;">Como compartilho com o paciente?</summary>
-            <p style="padding: 10px; color: #555;">Na lista de Narrativas, clique no nome da narrativa. Na tela de detalhes (Dashboard), há um botão cinza <strong>"Copiar Link de Acesso"</strong>. Envie esse link para o paciente.</p>
+        <details>
+            <summary>Como crio uma pesquisa dentro da cena?</summary>
+            <p>Vá em <strong>Questionários > Adicionar</strong>. Crie as perguntas e, no campo "Cena Associada", escolha onde esse formulário deve aparecer.</p>
         </details>
 
-        <details style="margin-bottom: 10px; cursor: pointer;">
-            <summary style="font-weight: bold; color: #417690;">Onde vejo as respostas?</summary>
-            <p style="padding: 10px; color: #555;">Vá na aba <strong>Questionários</strong>. Na lista, ao lado de cada questionário, existem botões para "Ver Detalhado" (respostas individuais) ou "Ver Resumo" (gráficos e totais).</p>
+        <details>
+            <summary>Onde pego o link para enviar ao paciente?</summary>
+            <p>Na lista de Narrativas, clique no nome da sua jornada. Vai abrir uma tela de detalhes (Dashboard). Lá tem um botão cinza chamado <strong>"Copiar Link de Acesso"</strong>.</p>
         </details>
     </div>
 
