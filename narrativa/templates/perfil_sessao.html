@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block navbar %}{% endblock %}
+
+{% block titulo %}
+Seu Perfil de Sessão
+{% endblock %}
+
+{% block head %}
+<style>
+    /* Estilos do base.html/Tailwind são primários, mas mantemos o CSS do protótipo para o layout interno */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f7fafc; /* Tailwind bg-gray-100 */
+        margin: 0;
+        display: flex; 
+        min-height: 100vh;
+        color: #34495e; 
+    }
+    .sidebar {
+        width: 200px;
+        background-color: #1a5276; /* Azul escuro da identidade */
+        color: #ecf0f1;
+        padding: 20px 10px;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.15);
+        flex-shrink: 0;
+    }
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #ecf0f1;
+        font-size: 1.6em;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        padding-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        gap: 8px;
+    }
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+    }
+    .sidebar ul li {
+        margin-bottom: 8px;
+    }
+    .sidebar ul li a {
+        color: #ecf0f1;
+        text-decoration: none;
+        padding: 10px 12px;
+        display: block;
+        border-radius: 6px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+        font-size: 0.95em;
+    }
+    .sidebar ul li a:hover,
+    .sidebar ul li a.active {
+        background-color: #2196f3; /* Azul principal da identidade no hover/ativo */
+        color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .main-content { 
+        flex-grow: 1;
+        padding: 25px;
+        background-color: #ffffff; 
+        border-radius: 8px;
+        margin: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        flex-direction: column; 
+    }
+
+    .profile-container {
+        padding: 30px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 650px; 
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin: 0; 
+        overflow-y: auto;
+        text-align: center; 
+    }
+    .header-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column; 
+        align-items: center;
+        margin-bottom: 25px;
+        border-bottom: 1px solid #e0f2f7;
+        padding-bottom: 15px;
+    }
+    .header-section h1 {
+        color: #1a5276;
+        font-size: 2em;
+        margin: 0 0 5px 0;
+    }
+    .header-section p {
+        font-size: 1em;
+        color: #555;
+        margin: 0;
+    }
+    .profile-info {
+        margin-bottom: 25px;
+    }
+    .profile-info h2 {
+        color: #34495e;
+        font-size: 1.5em;
+        margin-top: 0;
+        margin-bottom: 15px;
+        border-bottom: 1px dashed #e0f2f7;
+        padding-bottom: 8px;
+    }
+    .info-badges {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        flex-wrap: wrap;
+    }
+    .info-badge {
+        background-color: #cceeff;
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 0.9em;
+        color: #1a5276;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .info-badge span {
+        font-size: 1.2em; 
+    }
+
+    .progress-summary-card {
+        background-color: #f8fbfd;
+        border: 1px solid #b3e0ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        text-align: center;
+    }
+    .progress-summary-card h3 {
+        color: #1a5276;
+        font-size: 1.2em;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .progress-summary-item {
+        margin-bottom: 15px;
+    }
+    .progress-summary-item p {
+        font-size: 1em;
+        color: #555;
+        margin-bottom: 8px;
+    }
+    .progress-bar-container {
+        width: 80%;
+        height: 15px;
+        background-color: #ddd;
+        border-radius: 7px;
+        overflow: hidden;
+        margin: 0 auto; 
+    }
+    .progress-fill {
+        height: 100%;
+        width: 0%; 
+        background-color: #28a745;
+        border-radius: 7px;
+    }
+    .collaboration-message {
+        margin-top: 25px;
+        font-size: 1.05em;
+        color: #34495e;
+        font-weight: 500;
+    }
+    .collaboration-message strong {
+        color: #2196f3;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    .button-group button {
+        background-color: #2196f3;
+        color: #fff;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        font-weight: bold;
+    }
+    .button-group button:hover {
+        background-color: #1976d2;
+        transform: translateY(-2px);
+    }
+    .button-group .back-button {
+        background-color: #6c757d;
+    }
+    .button-group .back-button:hover {
+        background-color: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="profile-container">
+        
+        {% if sessao %}
+        <div class="header-section">
+            <h1 id="mainTitle">Sua Jornada de Cuidado</h1>
+            <p id="welcomeMessage">Olá! Bem-vindo(a) à sua sessão (ID: {{ sessao.session_key|slice:":8" }}...).</p>
+        </div>
+
+        <div class="profile-info">
+            <h2>Seu Perfil de Jogador</h2>
+            <p>Sua primeira escolha (Perfil) o identifica como: **<strong id="motivationalProfile">{{ perfil_nome }}</strong>**.</p>
+            <p><small>Este perfil é definido pela primeira narrativa que você acessou.</small></p>
+            
+            <div class="info-badges">
+                {% for selo in selos_conquistados %}
+                <div class="info-badge">
+                    <span role="img" aria-label="icone">{{ selo.icone }}</span> {{ selo.nome }}
+                </div>
+                {% empty %}
+                 <div class="info-badge">
+                    <span role="img" aria-label="iniciar">🚀</span> Inicie uma jornada para conquistar selos!
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>Progresso da Sua Sessão</h2>
+            <div class="progress-summary-card">
+                <h3>Continue avançando em sua jornada!</h3>
+                <div class="progress-summary-item">
+                    <p>Narrativas Concluídas: 
+                        <strong id="narrativeProgressText">
+                            {{ total_narrativas_completas }} de {{ total_narrativas_acessadas }} acessadas
+                        </strong>
+                    </p>
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="narrativeProgressBar" style="width: {% if total_narrativas_acessadas > 0 %}{{ total_narrativas_completas|divisibleby:total_narrativas_acessadas|mul:100 }}{% else %}0{% endif %}%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-summary-item">
+                    <p>Pesquisas (Questionários) Respondidas: 
+                        <strong id="surveysProgressText">
+                            {{ pesquisas_respondidas }} de {{ pesquisas_disponiveis }} disponíveis
+                        </strong>
+                    </p>
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="surveysProgressBar" style="width: {{ progresso_geral_percentual }}%;"></div>
+                    </div>
+                </div>
+                <p class="collaboration-message">Sua participação faz a diferença! As contribuições **dos pacientes** já nos ajudaram a **otimizar o tempo de espera** da clínica.</p>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="button" class="back-button" onclick="window.history.back()">Voltar</button>
+            <a href="{% url 'narrativa:paciente_narrativas' %}">
+                <button type="button" class="option-button">Continuar Jornada</button>
+            </a>
+        </div>
+        {% else %}
+        <div class="header-section">
+             <h1 id="mainTitle">Sessão não Iniciada</h1>
+             <p id="welcomeMessage">Por favor, inicie uma jornada para ver o seu perfil de progresso.</p>
+        </div>
+        <div class="button-group">
+            <button type="button" class="back-button" onclick="window.history.back()">Voltar</button>
+            <a href="{% url 'narrativa:paciente_narrativas' %}">
+                <button type="button" class="option-button">Explorar Jornadas</button>
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
