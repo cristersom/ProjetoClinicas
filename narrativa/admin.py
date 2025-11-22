@@ -20,6 +20,8 @@ from collections import Counter
 import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
+import openpyxl  # Biblioteca para gerar Excel nativo
+from openpyxl.utils import get_column_letter
 
 # Importar o formulário customizado
 from .forms import PerguntaAdminForm
@@ -222,18 +224,103 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                 self.admin_site.admin_view(self.relatorio_detalhado_view),
                 name='narrativa_questionario_relatorio_detalhe',
             ),
+            # NOVA ROTA PARA EXPORTAÇÃO PIVOTADA
+            path(
+                '<path:object_id>/exportar_tabela/',
+                self.admin_site.admin_view(self.exportar_tabela_analise_view),
+                name='narrativa_questionario_exportar_tabela',
+            ),
         ]
         return custom_urls + urls
 
     def links_relatorios(self, obj):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
-        return format_html(
-            '<a class="button" href="{}">Ver Detalhado (por Paciente)</a>&nbsp;'
-            '<a class="button" href="{}">Ver Resumo (Agregado)</a>',
-            url_detalhe, url_resumo)
+        url_export = reverse('admin:narrativa_questionario_exportar_tabela', args=[obj.pk])
 
-    links_relatorios.short_description = 'Relatórios'
+        return format_html(
+            '<a class="button" href="{}">Ver Detalhado</a>&nbsp;'
+            '<a class="button" href="{}">Ver Resumo</a>&nbsp;'
+            '<a class="button" style="background-color:#28a745;" href="{}">Exportar Tabela (Excel)</a>',
+            url_detalhe, url_resumo, url_export)
+
+    links_relatorios.short_description = 'Relatórios e Exportação'
+
+    # --- NOVA FUNÇÃO PARA GERAR EXCEL PIVOTADO (1 Linha = 1 Paciente) ---
+    def exportar_tabela_analise_view(self, request, object_id, *args, **kwargs):
+        questionario = self.get_object(request, object_id)
+        perguntas = questionario.perguntas.all().order_by('id')
+
+        # Recupera todas as respostas deste questionário
+        respostas = Resposta.objects.filter(pergunta__questionario=questionario).select_related('pergunta')
+
+        # Agrupa respostas por sessão
+        # Estrutura: dados[session_key] = { 'data': datetime, 'respostas': { pergunta_id: texto } }
+        dados_sessao = {}
+
+        # Para recuperar o perfil (Narrativa) do paciente, precisamos buscar as Sessoes
+        session_keys = respostas.values_list('session_key', flat=True).distinct()
+        sessoes_paciente = SessaoPaciente.objects.filter(session_key__in=session_keys).select_related(
+            'narrativa_perfil')
+        mapa_perfis = {s.session_key: (s.narrativa_perfil.titulo if s.narrativa_perfil else "Indefinido") for s in
+                       sessoes_paciente}
+
+        for resp in respostas:
+            key = resp.session_key
+            if key not in dados_sessao:
+                dados_sessao[key] = {
+                    'perfil': mapa_perfis.get(key, "Visitante"),
+                    'data': resp.data_resposta.strftime('%d/%m/%Y %H:%M'),
+                    'respostas_dict': {}
+                }
+            # Guarda a resposta mapeada pelo ID da pergunta
+            dados_sessao[key]['respostas_dict'][resp.pergunta.id] = resp.texto_resposta
+
+        # --- GERAÇÃO DO EXCEL COM OPENPYXL ---
+        workbook = openpyxl.Workbook()
+        worksheet = workbook.active
+        worksheet.title = "Respostas Consolidadas"
+
+        # 1. Cabeçalho
+        headers = ["Sessão (ID)", "Perfil do Paciente", "Data da Última Resposta"]
+        for p in perguntas:
+            headers.append(p.texto_pergunta)
+
+        worksheet.append(headers)
+
+        # Estiliza o cabeçalho (Negrito)
+        for cell in worksheet[1]:
+            cell.font = openpyxl.styles.Font(bold=True)
+
+        # 2. Linhas de Dados
+        for session_key, dados in dados_sessao.items():
+            row = [
+                session_key[:8] + "...",  # ID da sessão abreviado
+                dados['perfil'],
+                dados['data']
+            ]
+
+            # Para cada pergunta (coluna), busca a resposta correspondente nesta sessão
+            for p in perguntas:
+                resposta_texto = dados['respostas_dict'].get(p.id, "")  # Vazio se não respondeu
+                row.append(resposta_texto)
+
+            worksheet.append(row)
+
+        # Ajuste automático de largura das colunas (opcional, mas bom para UX)
+        for column_cells in worksheet.columns:
+            length = max(len(str(cell.value) if cell.value else "") for cell in column_cells)
+            if length > 50: length = 50  # Limite máximo
+            worksheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 2
+
+        # Prepara a resposta HTTP
+        response = HttpResponse(
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+        response['Content-Disposition'] = f'attachment; filename="analise_questionario_{questionario.id}.xlsx"'
+
+        workbook.save(response)
+        return response
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
