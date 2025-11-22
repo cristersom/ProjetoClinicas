@@ -1,27 +1,83 @@
 {% extends 'base.html' %}
+
+{% block navbar %}{% include 'navbar.html' %}{% endblock %}
+
 {% block titulo %}
-Pesquisa
+    Detalhes da Jornada
 {% endblock %}
 
 {% block content %}
-    <main class='bg-primary_black min-h-screen w-full'>
-        <section class='bg-primary_black  min-h-screen flex justify-center py-10'>
-            <div class="p-8 w-10/12 relative" >
-                <h2 class="text-gray-200 text-2xl font-medium">
-                    Resultados da Busca
-                </h2>
-                <div class="flex flex-wrap items-center min-w-full movie_lis">
-                    {% for narrativa in object_list %}
-                    <div class="m-4 bg-blue-500 overflow-hidden flex-shrink-0 rounded-md cursor-pointer h-64 w-96">
-                        <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                                <img src="{{ narrativa.thumb.url }}" class="object-cover w-full h-full " alt="">
-                        </a>
-                        </div>
-                    {% endfor %}
-                </div>
-
-
+<main class='bg-primary_black min-h-screen w-full'>
+    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover bg-black bg-opacity-75 bg-blend-overlay" style="background-image: url('{{ object.thumb.url }}');">
+        <div>
+            <h2 class="text-6xl font-semibold text-white my-4">
+                {{ object.titulo }}
+            </h2>
+            <p class="text-white w-11/12 md:w-5/12 font-medium my-4">
+                {{ object.descricao|slice:"150" }}...
+            </p>
+            <div class="flex my-4">
+                <form method="post" action="{% url 'narrativa:paciente_detalhes' pk=object.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="flex items-center bg-white py-2 px-5 rounded-md" style='color:black;'>
+                        <ion-icon name="play" class="text-2xl"></ion-icon>
+                        <span class="ml-3 font-medium">
+                            Iniciar Jornada
+                        </span>
+                    </button>
+                </form>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+
+    <section class='bg-primary_black flex justify-center py-10'>
+        <div class="p-8 w-10/12 relative" >
+            <h2 class="text-gray-200 text-3xl font-medium">
+                Descrição
+            </h2>
+            <div class="flex justify-left items-center min-w-full movie_lis">
+                <p class="text-gray-100 text-lg">
+                    {{ object.descricao }}
+                </p>
+            </div>
+
+            <div style='margin-top:2rem;margin-bottom:2rem;'>
+                <h2 class="text-gray-200 text-3xl font-medium">
+                    Cenas
+                </h2>
+                {% for cena in object.cenas.all %}
+                    <h3 class='text-lg text-gray-200 hover:text-white'>
+                        <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}">
+                            <p>Iniciar pela Cena {{ forloop.counter }}: {{ cena.titulo }}</p>
+                        </a>
+                    </h3>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class='bg-primary_black flex justify-center py-10'>
+        <div class="p-8 w-10/12 relative" >
+            <h2 class="text-gray-200 text-2xl font-medium">
+                Jornadas Relacionadas
+            </h2>
+            <div class="flex flex-wrap items-center min-w-full movie_lis">
+            {% for narrativa_relacionada in relacionados %}
+                {# --- CARD ATUALIZADO (COM TÍTULO) --- #}
+                <div class="m-4 flex-shrink-0 w-96 cursor-pointer hover:scale-105 transition-transform duration-200">
+                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa_relacionada.pk %}">
+                        <div class="h-48 w-full relative">
+                            <img src="{{ narrativa_relacionada.thumb.url}}" class="rounded-t-md w-full h-full object-cover" alt="{{ narrativa_relacionada.titulo }}">
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-b-md text-center border border-gray-700 border-t-0">
+                            <p class="text-white text-sm font-bold truncate">{{ narrativa_relacionada.titulo }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </section>
+
+</main>
 {% endblock %}

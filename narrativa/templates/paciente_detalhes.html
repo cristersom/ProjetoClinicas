@@ -63,9 +63,15 @@
             </h2>
             <div class="flex flex-wrap items-center min-w-full movie_lis">
             {% for narrativa_relacionada in relacionados %}
-                <div class="m-4 bg-blue-500 overflow-hidden flex-shrink-0 rounded-md cursor-pointer h-64 w-96">
+                {# --- CARD ATUALIZADO (COM TÍTULO) --- #}
+                <div class="m-4 flex-shrink-0 w-96 cursor-pointer hover:scale-105 transition-transform duration-200">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa_relacionada.pk %}">
-                        <img src="{{ narrativa_relacionada.thumb.url}}" class="object-cover w-full h-full " alt="">
+                        <div class="h-48 w-full relative">
+                            <img src="{{ narrativa_relacionada.thumb.url}}" class="rounded-t-md w-full h-full object-cover" alt="{{ narrativa_relacionada.titulo }}">
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-b-md text-center border border-gray-700 border-t-0">
+                            <p class="text-white text-sm font-bold truncate">{{ narrativa_relacionada.titulo }}</p>
+                        </div>
                     </a>
                 </div>
             {% endfor %}
