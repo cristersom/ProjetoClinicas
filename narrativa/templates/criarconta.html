@@ -26,71 +26,83 @@ Criar Conta
         padding: 0 15px; 
     }
     
-    /* CORREÇÃO 1: TÍTULO H1 - Alinhamento, Largura e Fonte (Ajuste Final) */
+    /* TÍTULO H1 - Alinhamento e Largura */
     .z-10 h1 {
-        text-align: center !important; /* Centraliza o texto dentro do bloco H1 */
-        width: 90%; /* Limita a largura do bloco do título para 90% */
-        margin: 0 auto 20px auto !important; /* Centraliza o bloco, adiciona margem inferior */
+        text-align: center !important;
+        width: 90%;
+        margin: 0 auto 20px auto !important;
         padding: 0;
-        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA */
-        font-size: 1.5rem; /* REDUÇÃO AGRESSIVA DA FONTE (Para caber em uma linha) */
+        white-space: nowrap;
+        font-size: 1.5rem;
         font-weight: bold;
     }
-    
+
     /* ALINHAMENTO DE LABELS, INPUTS E TEXTOS DE AJUDA */
-    
+
     /* Garante que todos os blocos de texto (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
     .control-label,
     .form-group label:not(.form-check-label),
-    .form-text, 
+    .form-text,
     .invalid-feedback {
-        color: white !important; /* Cor de fonte resolvida */
+        color: white !important;
         text-align: left !important;
         width: 90%;
         margin: 0 auto 5px auto !important; /* Centraliza o bloco */
         display: block;
         padding: 0;
         margin-top: 0;
-        margin-bottom: 5px; 
+        margin-bottom: 5px;
         font-size: 0.9rem;
-        white-space: normal !important; 
+        white-space: normal !important;
     }
-    
+
     /* Input field */
     .z-10 input[type="text"],
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
-        width: 90% !important; 
+        width: 90% !important;
         margin: 0 auto 10px auto !important; /* Centraliza o input (90%) */
         display: block;
     }
-    
+
     /* Linha Divisória (Legend): OCULTA */
     .z-10 fieldset legend {
         border-bottom: none !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 0; 
+        height: 0;
         overflow: hidden;
     }
-    
-    /* Checkbox (Aceite) - Alinha e Corrige Spacing */
+
+    /* CORREÇÃO CRÍTICA DO CHECKBOX */
     .form-group .form-check {
-        padding-top: 15px; 
-        margin-bottom: 25px; 
+        /* O container do form-check precisa ser centralizado primeiro */
+        width: 90%; /* Limita o bloco para 90% */
+        margin: 15px auto 25px auto !important; /* CENTRALIZA o bloco do checkbox */
+
+        padding-top: 15px;
+        padding-bottom: 25px;
         text-align: left;
-        display: flex; 
-        align-items: center; 
-        width: 90%; /* Centralizado em 90% */
-        margin: 15px auto 25px auto !important; 
-        padding-left: 0 !important; 
+        display: flex;
+        align-items: center;
+
+        /* NOVO: Remove o padding-left padrão do Bootstrap que estava causando o extravasamento */
+        padding-left: 0 !important;
     }
-    
+
+    /* Ajusta o checkbox e o label dentro do form-check */
+    .form-group .form-check .form-check-input {
+        margin-right: 0.5em; /* Espaçamento entre box e texto */
+        margin-top: 0;
+        /* NOVO: Remove a margem negativa que estava sendo aplicada em alguns browsers */
+        margin-left: 0;
+    }
+
     .form-group .form-check label {
         font-weight: normal !important;
-        font-size: 0.9rem; 
-        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA DO TEXTO DO CHECKBOX */
-        margin-left: 0.5em; /* Espaçamento entre box e texto */
+        font-size: 0.9rem;
+        white-space: nowrap;
+        margin-left: 0.5em; /* Espaçamento entre box e texto (complementa o margin-right do input) */
     }
     
     /* BOTÃO CRIAR CONTA - Mesma largura do Input */
