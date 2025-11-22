@@ -15,60 +15,67 @@ Criar Conta
     /* Estilos essenciais */
     .form-text, .invalid-feedback {
         color: white !important;
-        /* Garante que o texto de ajuda fique à esquerda */
+        /* GARANTE ALINHAMENTO ESQUERDO DO TEXTO DE AJUDA */
         text-align: left !important;
-        width: 90%; /* Ajusta a largura para o texto de validação */
-        margin: auto; /* Centraliza o texto de validação sob o input */
+        width: 100%; /* Permite usar toda a largura do container */
+        margin: 0 !important; /* Remove qualquer margem indesejada */
+        padding: 0 5%; /* Adiciona um padding para alinhar com o input de 90% */
     }
 
-    /* CORREÇÃO CHAVE: Remove a centralização de texto do formulário */
+    /* CORREÇÃO CHAVE: Remove a centralização de texto do formulário e define a largura máxima */
     .z-10 form {
         text-align: left;
-        /* Define uma largura máxima para o formulário e centraliza-o como um bloco */
         max-width: 450px;
         margin-left: auto;
         margin-right: auto;
+        /* Adiciona padding horizontal para evitar que o formulário grude nas laterais do container */
+        padding: 0 15px;
     }
 
-    /* Ajusta a largura dos inputs e centraliza-os visualmente */
+    /* ALINHAMENTO DO INPUT: Garante 90% de largura e centralização visual */
     .z-10 input[type="text"],
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
-        /* Define a largura para dar espaço nas laterais */
         width: 90% !important;
-        margin-left: 0 !important; /* Remove margem automática à esquerda do input */
-        margin-right: 0 !important;
+        margin: 0 auto 10px auto !important; /* Centraliza o input e adiciona margem inferior */
+        display: block;
     }
 
-    /* Corrige o espaçamento vertical e garante que o campo de aceite fique à esquerda */
+    /* CORREÇÃO 1: Título alinhado à esquerda, mas centralizado no bloco */
+    .z-10 fieldset legend {
+        text-align: left !important;
+        width: 90%; /* Limita a largura para alinhar com os inputs */
+        margin: auto; /* Centraliza o bloco da legenda */
+        margin-bottom: 1rem !important;
+    }
+
+    /* CORREÇÃO 2: Checkbox (Aceite) - Impede quebra de linha e alinha */
     .form-group .form-check {
         padding-top: 15px;
-        margin-bottom: 25px; /* Mais espaço para o botão 'Criar Conta' */
+        margin-bottom: 25px;
         text-align: left;
         display: flex;
         align-items: center;
-        width: 90%; /* Limita a largura do checkbox container */
-        margin-left: auto; /* Centraliza o container do checkbox */
+        width: 95%; /* Aumenta a largura para tentar manter em uma linha */
+        margin-left: auto;
         margin-right: auto;
-    }
-    .form-group .form-check .form-check-input {
-        /* Estilo padrão do Bootstrap 5, mantido */
-    }
-    .form-group .form-check label {
-        margin-left: 0.5em;
-        font-weight: normal !important; /* Suaviza o negrito padrão do label */
+        /* DIMINUI A FONTE DO TEXTO DE ACEITE */
+        font-size: 0.9rem;
+        /* Garante que o texto dentro do label não quebre (opcional, dependente do tamanho final) */
+        white-space: nowrap;
     }
 
     /* Estilo para negrito e sublinhado no link */
     .termos-link {
         font-weight: bold;
         text-decoration: underline;
-        color: #dc2626 !important; /* Red 600 */
+        color: #dc2626 !important;
     }
 
-    /* Corrige a legenda para ficar centralizada (como antes) */
-    .z-10 fieldset legend {
-        text-align: center;
+    /* Corrige o padding vertical do container principal */
+    .z-10.h-full {
+        padding-top: 50px !important;
+        padding-bottom: 50px !important;
     }
 
 </style>
