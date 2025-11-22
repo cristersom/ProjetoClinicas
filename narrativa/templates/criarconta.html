@@ -12,49 +12,46 @@ Criar Conta
 
 {% block head %}
 <style>
-    /* CORREÇÃO 1: COR DE FONTE - Garante que todas as labels e textos sejam brancos. */
-    .control-label,
-    .form-text,
-    .invalid-feedback,
-    .form-group label {
-        color: white !important;
-    }
+    /* Estilos essenciais */
 
     /* Largura de Referência: Todos os elementos visuais usarão 90% de largura centralizada. */
 
     /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
     .z-10 form {
         text-align: left;
-        max-width: 450px; /* Largura base do container do formulário */
+        max-width: 450px;
         width: 100%;
         margin-left: auto;
         margin-right: auto;
         padding: 0 15px;
     }
 
-    /* CORREÇÃO 2: TÍTULO H1 - Alinhamento e Largura */
+    /* CORREÇÃO 1: TÍTULO H1 - Alinhamento, Largura e Fonte (Ajuste Final) */
     .z-10 h1 {
-        text-align: center !important; /* MANTÉM CENTRALIZADO NO CONTAINER PAI */
-        white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA DO TÍTULO */
-        width: 100%; /* Permite que o texto se estenda no bloco centralizado */
-        margin: 0 auto 20px auto !important;
+        text-align: left !important;
+        width: 90%; /* Limita a largura do bloco do título para 90% */
+        margin: 0 auto 20px auto !important; /* Centraliza o bloco, adiciona margem inferior */
         padding: 0;
+        white-space: nowrap; /* MANTÉM EM UMA LINHA */
+        font-size: 2rem; /* REDUZ O TAMANHO DA FONTE (De 3xl para 2xl/3xl) */
     }
 
     /* ALINHAMENTO DE LABELS, INPUTS E TEXTOS DE AJUDA */
 
-    /* Garante que todos os blocos de texto (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
+    /* Garante que todos os textos (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
     .control-label,
     .form-group label:not(.form-check-label),
     .form-text,
     .invalid-feedback {
+        color: white !important; /* Cor de fonte resolvida */
         text-align: left !important;
         width: 90%;
         margin: 0 auto 5px auto !important; /* Centraliza o bloco */
         display: block;
         padding: 0;
         margin-top: 0;
-        /* Redefine a fonte para não forçar quebra (white-space: normal no form-text) */
+        margin-bottom: 5px;
+        font-size: 0.9rem;
         white-space: normal !important;
     }
 
@@ -76,7 +73,7 @@ Criar Conta
         overflow: hidden;
     }
 
-    /* CORREÇÃO 3: Checkbox (Aceite) - Alinha e Corrige Spacing */
+    /* Checkbox (Aceite) */
     .form-group .form-check {
         padding-top: 15px;
         margin-bottom: 25px;
@@ -84,27 +81,18 @@ Criar Conta
         display: flex;
         align-items: center;
         width: 90%; /* Centralizado em 90% */
-        margin: 15px auto 25px auto !important; /* Centraliza o bloco */
-
-        /* CORREÇÃO CHAVE: Remove padding-left herdado do Bootstrap no form-check */
+        margin: 15px auto 25px auto !important;
         padding-left: 0 !important;
-    }
-
-    /* Corrige o alinhamento e espaçamento do INPUT real do checkbox */
-    .form-group .form-check .form-check-input {
-        margin-right: 0.5em; /* Espaçamento entre box e texto */
-        margin-top: 0;
-        margin-left: 0; /* Garante que comece na margem esquerda de 90% */
     }
 
     .form-group .form-check label {
         font-weight: normal !important;
         font-size: 0.9rem;
         white-space: nowrap; /* IMPEDE A QUEBRA DE LINHA DO TEXTO DO CHECKBOX */
-        margin-left: 0; /* Remove margem dupla de label */
+        margin-left: 0.5em; /* Espaçamento entre box e texto */
     }
 
-    /* CORREÇÃO 4: BOTÃO CRIAR CONTA - Mesma largura do Input */
+    /* BOTÃO CRIAR CONTA - Mesma largura do Input */
     .z-10 button[type="submit"] {
         width: 90% !important;
         margin: 10px auto 0 auto !important;
@@ -136,7 +124,7 @@ Criar Conta
             <form method="post">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    {# LEGEND VAZIA E OCULTA #}
+                    {# LEGEND OCULTA #}
                     <legend class="border-bottom mb-4"></legend>
 
                     {{ form|crispy }}
