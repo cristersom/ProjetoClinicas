@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block navbar %}{% endblock %} {# Remove a navbar padrão nesta tela #}
+{% block navbar %}{% endblock %} {# Remove a navbar padrão nesta tela para imersão #}
 
 {% block titulo %}
     Jornada Interativa
@@ -12,13 +12,16 @@
 
     <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6 relative">
 
+        {# --- MUDANÇA AQUI: Botão Sair agora leva para o Perfil de Sessão --- #}
         <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
-             <a href="#" onclick="window.history.back(); return false;"
+             <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}"
                 class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
-                title="Sair desta jornada e voltar para a lista">
-                 Sair
+                title="Ver perfil da sessão e sair">
+                 Sair / Perfil
              </a>
         </div>
+        {# ------------------------------------------------------------------ #}
+
         <h1 class="text-3xl font-bold mb-4 text-center">{{ cena.titulo }}</h1>
 
         {# Barra de Progresso #}
@@ -50,13 +53,13 @@
             </p>
         {% endif %}
 
-        {# --- MODIFICAÇÃO DE ORDEM E COR --- #}
-
+        {# Bloco de Decisão #}
         <div class="border-t border-gray-700 pt-4">
 
+            {# 1. Questionários (Prioridade Alta) #}
             {% for questionario in cena.questionarios.all %}
                 <div class="text-center {% if not forloop.first %}mt-4{% endif %}">
-                    {% if forloop.first %} {# Mostra o título só uma vez #}
+                    {% if forloop.first %}
                     <h2 class="text-xl font-semibold mb-3">Pesquisa Rápida</h2>
                     {% endif %}
                     <div class="bg-gray-800 p-4 rounded-md">
@@ -68,19 +71,19 @@
                     </div>
                 </div>
             {% endfor %}
-            {# 2. Escolhas (AGORA VEM DEPOIS E EM AZUL) #}
+
+            {# 2. Escolhas de Navegação #}
             {% if cena.escolhas.all %}
-                {# Adiciona um separador se o questionário também foi exibido #}
                 <div class="{% if cena.questionarios.all %}mt-6 border-t border-gray-700 pt-4{% endif %}">
                     <h2 class="text-xl font-semibold mb-3">Suas opções:</h2>
                     <div class="flex flex-col space-y-3">
                         {% for escolha in cena.escolhas.all %}
-                            {% if escolha.cena_destino %} {# Verifica se há um destino #}
+                            {% if escolha.cena_destino %}
                             <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}"
-                               class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"> {# COR MUDADA PARA AZUL #}
+                               class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300">
                                 {{ escolha.texto_da_opcao }}
                             </a>
-                            {% else %} {# Se não houver destino, leva de volta à lista #}
+                            {% else %}
                              <a href="{% url 'narrativa:paciente_narrativas' %}" class="block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300">
                                 {{ escolha.texto_da_opcao }} (Finalizar)
                             </a>
@@ -90,6 +93,7 @@
                 </div>
             {% endif %}
 
+            {# 3. Caso não haja nada (Fim da linha) #}
             {% if not cena.escolhas.all and not cena.questionarios.all %}
                  <div class="text-center mt-6">
                     <p class="text-gray-400">Esta é a cena final da jornada.</p>
@@ -98,7 +102,7 @@
                     </a>
                 </div>
             {% endif %}
-            </div>
-    </div> {# Fecha o card principal #}
+        </div>
+    </div>
 </main>
 {% endblock %}
