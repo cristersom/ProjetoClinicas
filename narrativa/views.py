@@ -142,10 +142,16 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    SessaoPaciente.objects.get_or_create(
-        session_key=session_key,
-        defaults={'narrativa_perfil': narrativa}
+    # --- CORREÇÃO 1: Garante que o perfil seja gravado mesmo se a sessão já existir ---
+    sessao, created = SessaoPaciente.objects.get_or_create(
+        session_key=session_key
     )
+
+    # Se acabou de criar OU se existe mas não tem perfil definido: define agora.
+    if created or not sessao.narrativa_perfil:
+        sessao.narrativa_perfil = narrativa
+        sessao.save()
+    # ----------------------------------------------------------------------------------
 
     if not narrativa.cena_inicial:
         messages.warning(request, f"A jornada '{narrativa.titulo}' ainda não está pronta para ser iniciada.")
@@ -161,12 +167,21 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
 
     if request.session.session_key:
-        # O Log deve ser criado ou atualizado para garantir que a cena atual conte
+        # 1. Garante log da visita
         LogVisitaCena.objects.get_or_create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             defaults={'narrativa_associada': cena.narrativa}
         )
+
+        # --- CORREÇÃO 2: Garante perfil se o usuário caiu de paraquedas na cena ---
+        sessao, created = SessaoPaciente.objects.get_or_create(
+            session_key=request.session.session_key
+        )
+        if created or not sessao.narrativa_perfil:
+            sessao.narrativa_perfil = cena.narrativa
+            sessao.save()
+        # -------------------------------------------------------------------------
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
@@ -193,6 +208,14 @@ def responder_questionario(request, questionario_id):
         if not request.session.session_key:
             request.session.create()
         session_key = request.session.session_key
+
+        # Garante perfil também ao responder questionário (segurança extra)
+        sessao, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
+        if created or not sessao.narrativa_perfil:
+            # Tenta pegar da narrativa da cena associada
+            if questionario.cena_associada:
+                sessao.narrativa_perfil = questionario.cena_associada.narrativa
+                sessao.save()
 
         for pergunta in questionario.perguntas.all():
             texto_resposta = None
@@ -246,24 +269,27 @@ def perfil_sessao_view(request, narrativa_id):
     if not session_key:
         return redirect('narrativa:ler_termos')
 
-    # A narrativa_id serve apenas para voltar ao contexto se o usuário quiser "Retomar"
-    # Mas os cálculos agora serão GLOBAIS da sessão.
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    try:
-        sessao_paciente = SessaoPaciente.objects.get(session_key=session_key)
-        nome_perfil = sessao_paciente.narrativa_perfil.titulo if sessao_paciente.narrativa_perfil else "Visitante"
-    except SessaoPaciente.DoesNotExist:
-        nome_perfil = "Visitante"
+    # --- CORREÇÃO 3: Lógica robusta para garantir o nome do perfil ---
+    sessao_paciente, created = SessaoPaciente.objects.get_or_create(
+        session_key=session_key
+    )
 
-    # --- LÓGICA CUMULATIVA ---
+    # Se ainda estiver vazio, assume a narrativa atual como o perfil
+    if not sessao_paciente.narrativa_perfil:
+        sessao_paciente.narrativa_perfil = narrativa_atual
+        sessao_paciente.save()
+
+    nome_perfil = sessao_paciente.narrativa_perfil.titulo
+    # ----------------------------------------------------------------
 
     # 1. Descobre QUAIS narrativas o usuário já tocou (visitou alguma cena)
     ids_narrativas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key
     ).values_list('narrativa_associada', flat=True).distinct()
 
-    # 2. CÁLCULO DE CENAS (Soma de todas as narrativas envolvidas)
+    # 2. CÁLCULO DE CENAS
     total_cenas = Cena.objects.filter(narrativa__id__in=ids_narrativas_visitadas).count()
 
     cenas_visitadas = LogVisitaCena.objects.filter(
@@ -275,8 +301,7 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
-    # 3. CÁLCULO DE QUESTIONÁRIOS (Soma de todos os questionários das narrativas envolvidas)
-    # Importante: Filtramos questionários que estão associados às Cenas dessas narrativas.
+    # 3. CÁLCULO DE QUESTIONÁRIOS
     total_questionarios = Questionario.objects.filter(
         cena_associada__narrativa__id__in=ids_narrativas_visitadas
     ).count()
