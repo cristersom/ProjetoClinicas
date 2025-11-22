@@ -15,18 +15,20 @@ Criar Conta
     /* Estilos essenciais */
     .form-text, .invalid-feedback {
         color: white !important;
-        /* GARANTE ALINHAMENTO ESQUERDO E POSICIONAMENTO CENTRAL */
+        /* ALINHA TEXTO DE AJUDA À ESQUERDA E MANTÉM LARGURA TOTAL DO BLOCO CENTRAL */
         text-align: left !important;
-        width: 90%;
-        margin: 0 auto 10px auto !important; /* Centraliza o bloco de texto */
+        width: 100%;
+        margin: 0 0 10px 0 !important; /* Remove margem automática, alinha à esquerda */
         display: block;
         padding: 0;
+        font-size: 0.9rem; /* Consistente com o texto de aceite */
     }
 
-    /* CORREÇÃO CHAVE: Define a largura máxima do formulário e centraliza como bloco */
+    /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
     .z-10 form {
         text-align: left;
-        max-width: 450px; /* Largura fixa para centralização limpa */
+        max-width: 400px; /* Reduz ligeiramente a largura total para melhor visual */
+        width: 100%;
         margin-left: auto;
         margin-right: auto;
         padding: 0 15px;
@@ -38,48 +40,54 @@ Criar Conta
     .control-label,
     .form-group label:not(.form-check-label) {
         text-align: left !important;
-        width: 90%; /* Deve herdar a largura do input para alinhamento */
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
         display: block;
     }
 
-    /* Força a legenda do fieldset a ser centralizada */
+    /* CORREÇÃO: Alinha o título principal do fieldset à esquerda e limita a linha divisória */
     .z-10 fieldset legend {
-        text-align: center !important;
+        text-align: left !important;
+        /* Garante que a linha divisória (border-bottom) não ultrapasse a largura do form */
+        border-bottom: 1px solid #dee2e6;
+        width: 100%;
+        margin-bottom: 1rem !important;
+        padding: 0 !important;
     }
 
-    /* ALINHAMENTO DO INPUT: Garante 90% de largura e centralização visual */
+    /* ALINHAMENTO DO INPUT: Garante 100% de largura dentro do bloco central */
     .z-10 input[type="text"],
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
-        width: 90% !important;
-        margin: 0 auto 10px auto !important; /* Centraliza o input */
+        width: 100% !important; /* Ocupa a largura total do bloco de 400px */
+        margin: 0 0 10px 0 !important; /* Alinha à esquerda */
         display: block;
     }
 
-    /* CORREÇÃO 3: Checkbox (Aceite) - Garante alinhamento e fonte menor */
+    /* CORREÇÃO BOTÃO CRIAR CONTA: Força a largura de 100% */
+    .z-10 button[type="submit"] {
+        width: 100% !important;
+    }
+
+    /* CORREÇÃO 4: Checkbox (Aceite) */
     .form-group .form-check {
         padding-top: 15px;
         margin-bottom: 25px;
         text-align: left;
         display: flex;
-        align-items: center;
-        width: 95%;
-        margin-left: auto;
-        margin-right: auto;
-        font-size: 0.9rem; /* Diminui a fonte para evitar quebra de linha */
-        white-space: nowrap;
+        align-items: flex-start; /* Alinha o texto na verticalmente */
+        width: 100%;
+        margin: 15px 0 25px 0 !important; /* Alinha à esquerda */
+        font-size: 0.9rem;
+        white-space: nowrap; /* Mantém em uma linha */
+        padding-left: 0 !important; /* Remove padding lateral que causa deslocamento */
     }
 
-    /* NOVO AJUSTE: Garante espaçamento entre o checkbox e o texto. */
+    /* Garante espaçamento entre checkbox e texto */
     .form-group .form-check .form-check-input {
-        margin-right: 0.5em; /* Adiciona um espaço à direita do checkbox */
-    }
-
-    .form-group .form-check label {
-        font-weight: normal !important;
-        white-space: nowrap;
+        margin-right: 0.5em;
+        margin-top: 0.25em; /* Ajusta o checkbox para o topo */
     }
 
     /* Estilo para negrito e sublinhado no link */
@@ -89,7 +97,14 @@ Criar Conta
         color: #dc2626 !important;
     }
 
-    /* Corrige o padding vertical do container principal */
+    /* TÍTULO H1: Centralizado visualmente no topo */
+    .z-10 h1 {
+        text-align: center !important;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    /* Padding vertical no container principal */
     .z-10.h-full {
         padding-top: 50px !important;
         padding-bottom: 50px !important;
@@ -101,10 +116,15 @@ Criar Conta
 {% block content %}
     <header class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay showcase border-gray-600 border-b-8 flex justify-center items-center bg-no-repeat"  style="background-image: url('{% static 'images/background.png' %}');">
         <div class="z-10 h-full py-32 md:py-0 text-gray-100 flex justify-center items-center flex-col p-5">
+            {# TÍTULO DA PÁGINA (fora do fieldset para não ter a linha embaixo) #}
+            <h1 class="text-3xl font-bold">Crie uma conta para continuar</h1>
+
             <form method="post">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4">Crie uma conta para continuar</legend>
+                    {# REMOVEMOS O TEXTO DAQUI: A tag legend deve ficar vazia para forçar a linha #}
+                    <legend class="border-bottom mb-4"></legend>
+
                     {{ form|crispy }}
                 </fieldset>
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
@@ -122,6 +142,14 @@ Criar Conta
                     label.innerHTML = `Aceita nossos
                         <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
                         <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
+                }
+
+                // MUDANÇA: Movemos o texto "Crie uma conta para continuar" para o H1 acima
+                // Mas a tag <legend> ainda precisa de algo para o browser não a remover.
+                // Colocamos um espaço em branco se o browser ainda precisar de texto.
+                const legendEl = document.querySelector('fieldset legend');
+                if (legendEl && legendEl.innerHTML.trim() === '') {
+                     legendEl.innerHTML = '&nbsp;';
                 }
             </script>
         </div>
