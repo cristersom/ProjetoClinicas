@@ -12,55 +12,63 @@ Criar Conta
 
 {% block head %}
 <style>
-    /* Estilos originais */
+    /* Estilos essenciais */
     .form-text, .invalid-feedback {
         color: white !important;
+        /* Garante que o texto de ajuda fique à esquerda */
+        text-align: left !important;
+        width: 90%; /* Ajusta a largura para o texto de validação */
+        margin: auto; /* Centraliza o texto de validação sob o input */
     }
 
-    /* CORREÇÃO 1: Corrige o espaçamento e alinhamento do checkbox */
+    /* CORREÇÃO CHAVE: Remove a centralização de texto do formulário */
+    .z-10 form {
+        text-align: left;
+        /* Define uma largura máxima para o formulário e centraliza-o como um bloco */
+        max-width: 450px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Ajusta a largura dos inputs e centraliza-os visualmente */
+    .z-10 input[type="text"],
+    .z-10 input[type="email"],
+    .z-10 input[type="password"] {
+        /* Define a largura para dar espaço nas laterais */
+        width: 90% !important;
+        margin-left: 0 !important; /* Remove margem automática à esquerda do input */
+        margin-right: 0 !important;
+    }
+
+    /* Corrige o espaçamento vertical e garante que o campo de aceite fique à esquerda */
     .form-group .form-check {
-        padding-top: 10px;
-        margin-bottom: 10px;
+        padding-top: 15px;
+        margin-bottom: 25px; /* Mais espaço para o botão 'Criar Conta' */
         text-align: left;
         display: flex;
         align-items: center;
-        padding-left: 1.5em;
+        width: 90%; /* Limita a largura do checkbox container */
+        margin-left: auto; /* Centraliza o container do checkbox */
+        margin-right: auto;
     }
     .form-group .form-check .form-check-input {
-        margin-left: -1.5em;
+        /* Estilo padrão do Bootstrap 5, mantido */
     }
     .form-group .form-check label {
         margin-left: 0.5em;
+        font-weight: normal !important; /* Suaviza o negrito padrão do label */
     }
+
     /* Estilo para negrito e sublinhado no link */
     .termos-link {
         font-weight: bold;
         text-decoration: underline;
-        color: #dc2626 !important; /* Cor vermelha para destacar link */
+        color: #dc2626 !important; /* Red 600 */
     }
 
-    /* CORREÇÃO 2: Alinha as labels e inputs à esquerda dentro do formulário */
-    .z-10 form {
-        text-align: left; /* Alinha labels e campos */
-        width: 100%; /* Garante que a div form use a largura total */
-    }
-    .z-10 fieldset {
-        /* Garante que o conteúdo dentro do fieldset não seja centralizado */
-        text-align: left;
-    }
-
-    /* CORREÇÃO 3: Diminui a largura dos inputs para mantê-los centralizados (visual) */
-    .z-10 input[type="text"],
-    .z-10 input[type="email"],
-    .z-10 input[type="password"] {
-        width: 90% !important;
-        margin: auto !important; /* Centraliza inputs menores dentro do form block */
-    }
-
-    /* CORREÇÃO 4: Adiciona padding vertical ao container de conteúdo */
-    .z-10.h-full {
-        padding-top: 50px !important;
-        padding-bottom: 50px !important;
+    /* Corrige a legenda para ficar centralizada (como antes) */
+    .z-10 fieldset legend {
+        text-align: center;
     }
 
 </style>
@@ -68,11 +76,11 @@ Criar Conta
 
 {% block content %}
     <header class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay showcase border-gray-600 border-b-8 flex justify-center items-center bg-no-repeat"  style="background-image: url('{% static 'images/background.png' %}');">
-        <div class="z-10 h-full py-32 md:py-0 text-gray-100 text-center flex items-center flex-col">
-            <form method="post" class="w-11/12 md:w-8/12 lg:w-5/12">
+        <div class="z-10 h-full py-32 md:py-0 text-gray-100 flex justify-center items-center flex-col p-5">
+            <form method="post">
                 {% csrf_token %}
                 <fieldset class="form-group">
-                    <legend class="border-bottom mb-4 text-center">Crie uma conta para continuar</legend>
+                    <legend class="border-bottom mb-4">Crie uma conta para continuar</legend>
                     {{ form|crispy }}
                 </fieldset>
                 <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
@@ -83,10 +91,10 @@ Criar Conta
                 const termosLink = label ? label.querySelector('a') : null;
 
                 if (label && termosLink) {
-                    // 1. Cria a nova estrutura com links separados
                     const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
                     const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
 
+                    // Reconstroi o HTML do label com os dois links formatados
                     label.innerHTML = `Aceita nossos
                         <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
                         <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
