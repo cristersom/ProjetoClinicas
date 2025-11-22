@@ -17,9 +17,10 @@ Criar Conta
         color: white !important;
         /* GARANTE ALINHAMENTO ESQUERDO DO TEXTO DE AJUDA */
         text-align: left !important;
-        width: 100%; /* Permite usar toda a largura do container */
-        margin: 0 !important; /* Remove qualquer margem indesejada */
-        padding: 0 5%; /* Adiciona um padding para alinhar com o input de 90% */
+        width: 90%; /* Permite usar a largura do input para o texto de validação */
+        margin: 0 auto 10px auto !important; /* Centraliza o bloco de texto de ajuda */
+        padding: 0; /* Remove padding extra */
+        display: block;
     }
 
     /* CORREÇÃO CHAVE: Remove a centralização de texto do formulário e define a largura máxima */
@@ -28,8 +29,25 @@ Criar Conta
         max-width: 450px;
         margin-left: auto;
         margin-right: auto;
-        /* Adiciona padding horizontal para evitar que o formulário grude nas laterais do container */
         padding: 0 15px;
+    }
+
+    /* CORREÇÃO 1: CENTRALIZAÇÃO DOS LABELS E INPUTS */
+
+    /* Centraliza visualmente o texto da Label (e da Legend) */
+    .form-group label:not(.form-check-label),
+    .z-10 fieldset legend {
+        text-align: left !important;
+        width: 90%; /* Define a largura para alinhamento com o input */
+        margin-left: auto !important;
+        margin-right: auto !important;
+        /* Corrige o alinhamento visual do label */
+        padding-left: 0 !important;
+    }
+
+    /* OBRIGATÓRIO: Força a legenda a ser totalmente centralizada */
+    .z-10 fieldset legend {
+        text-align: center !important;
     }
 
     /* ALINHAMENTO DO INPUT: Garante 90% de largura e centralização visual */
@@ -37,16 +55,8 @@ Criar Conta
     .z-10 input[type="email"],
     .z-10 input[type="password"] {
         width: 90% !important;
-        margin: 0 auto 10px auto !important; /* Centraliza o input e adiciona margem inferior */
+        margin: 0 auto 10px auto !important;
         display: block;
-    }
-
-    /* CORREÇÃO 1: Título alinhado à esquerda, mas centralizado no bloco */
-    .z-10 fieldset legend {
-        text-align: left !important;
-        width: 90%; /* Limita a largura para alinhar com os inputs */
-        margin: auto; /* Centraliza o bloco da legenda */
-        margin-bottom: 1rem !important;
     }
 
     /* CORREÇÃO 2: Checkbox (Aceite) - Impede quebra de linha e alinha */
@@ -56,12 +66,10 @@ Criar Conta
         text-align: left;
         display: flex;
         align-items: center;
-        width: 95%; /* Aumenta a largura para tentar manter em uma linha */
+        width: 95%;
         margin-left: auto;
         margin-right: auto;
-        /* DIMINUI A FONTE DO TEXTO DE ACEITE */
         font-size: 0.9rem;
-        /* Garante que o texto dentro do label não quebre (opcional, dependente do tamanho final) */
         white-space: nowrap;
     }
 
