@@ -12,8 +12,6 @@ from django.db.models import Count, Value
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
-# --- VIEWS RELACIONADAS AOS TERMOS ---
-
 class LerTermosView(TemplateView):
     template_name = "ler_termos.html"
 
@@ -144,6 +142,7 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
+    # Mantém a lógica: O perfil é definido pela PRIMEIRA narrativa que o paciente acessa.
     SessaoPaciente.objects.get_or_create(
         session_key=session_key,
         defaults={'narrativa_perfil': narrativa}
@@ -159,18 +158,16 @@ def iniciar_jornada_paciente(request, narrativa_id):
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
 
-    # --- CORREÇÃO 1: Garante sessão para que o Log não falhe ---
     if not request.session.session_key:
         request.session.create()
 
-    # Agora é seguro criar o log
+    # Cria o log garantindo que a narrativa_associada esteja correta
     if request.session.session_key:
         LogVisitaCena.objects.create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             narrativa_associada=cena.narrativa
         )
-    # -----------------------------------------------------------
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
@@ -197,18 +194,29 @@ def responder_questionario(request, questionario_id):
         if not request.session.session_key:
             request.session.create()
         session_key = request.session.session_key
+
+        # Flag para saber se o usuário respondeu algo
+        respondeu_algo = False
+
         for pergunta in questionario.perguntas.all():
+            texto_resposta = None
             if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
                 respostas = request.POST.getlist(f'pergunta_{pergunta.id}')
-                texto_resposta = ",".join(respostas)
+                if respostas:
+                    texto_resposta = ",".join(respostas)
             else:
                 texto_resposta = request.POST.get(f'pergunta_{pergunta.id}')
+
             if texto_resposta:
+                respondeu_algo = True
                 Resposta.objects.create(
                     pergunta=pergunta,
                     session_key=session_key,
                     texto_resposta=texto_resposta
                 )
+
+        # IMPORTANTE: Se o usuário submeteu, mas não respondeu nada (campos vazios),
+        # ainda assim o fluxo deve seguir, mas a contagem de "respondido" depende de haver registros em Resposta.
 
         if questionario.cena_destino:
             return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
@@ -223,7 +231,7 @@ def responder_questionario(request, questionario_id):
     return render(request, 'questionario.html', context)
 
 
-# --- VISTAS ADICIONADAS PARA O FAQ E PÁGINAS LEGAIS ---
+# --- VISTAS DE SUPORTE ---
 
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin_faq.html"
@@ -242,7 +250,7 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- CORREÇÃO 2: Lógica atualizada para Questionários ---
+# --- VIEW DE PERFIL CORRIGIDA ---
 def perfil_sessao_view(request, narrativa_id):
     session_key = request.session.session_key
     if not session_key:
@@ -250,17 +258,19 @@ def perfil_sessao_view(request, narrativa_id):
 
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
+    # Recupera o perfil (que é fixo da primeira narrativa visitada nesta sessão)
     try:
         sessao_paciente = SessaoPaciente.objects.get(session_key=session_key)
         nome_perfil = sessao_paciente.narrativa_perfil.titulo if sessao_paciente.narrativa_perfil else "Visitante"
     except SessaoPaciente.DoesNotExist:
         nome_perfil = "Visitante"
 
-    # Cenas
+    # 1. CÁLCULO DE CENAS (Estritamente da narrativa atual)
     total_cenas = Cena.objects.filter(narrativa=narrativa_atual).count()
+
     cenas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key,
-        narrativa_associada=narrativa_atual
+        narrativa_associada=narrativa_atual  # Filtro crucial
     ).values('cena_visitada').distinct().count()
 
     progresso_cenas_pct = 0
@@ -268,15 +278,12 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
-    # --- MUDANÇA DE LÓGICA: De Perguntas para Questionários ---
-
-    # Total de Questionários na Narrativa
+    # 2. CÁLCULO DE QUESTIONÁRIOS (Estritamente da narrativa atual)
     total_questionarios = Questionario.objects.filter(
         cena_associada__narrativa=narrativa_atual
     ).count()
 
-    # Questionários Respondidos:
-    # Conta quantos IDs de 'questionario' distintos aparecem nas Respostas dessa sessão
+    # Conta questionários que tiveram pelo menos UMA resposta salva nesta sessão
     questionarios_respondidos = Resposta.objects.filter(
         session_key=session_key,
         pergunta__questionario__cena_associada__narrativa=narrativa_atual
@@ -295,12 +302,9 @@ def perfil_sessao_view(request, narrativa_id):
         'total_cenas': total_cenas,
         'progresso_cenas_pct': progresso_cenas_pct,
 
-        # Variáveis atualizadas para o template
         'questionarios_respondidos': questionarios_respondidos,
         'total_questionarios': total_questionarios,
         'progresso_questionarios_pct': progresso_questionarios_pct,
-
-        'concluiu_narrativa': progresso_cenas_pct >= 100,
     }
 
     return render(request, 'perfil_sessao.html', context)
