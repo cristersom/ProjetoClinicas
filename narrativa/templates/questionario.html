@@ -39,9 +39,20 @@
 {% block content %}
 <main class="bg-primary_black min-h-screen w-full flex justify-center items-center text-gray-100 p-4">
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6 relative">
 
-        <h1 class="text-3xl font-bold mb-6 text-center">{{ questionario.titulo }}</h1>
+        {# --- NOVO: Botão Sair / Perfil adicionado aqui --- #}
+        <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
+             <a href="{% url 'narrativa:perfil_sessao' narrativa_id=questionario.cena_associada.narrativa.id %}"
+                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
+                title="Ver perfil da sessão e sair">
+                 Sair / Perfil
+             </a>
+        </div>
+        {# ----------------------------------------------- #}
+
+        {# Adicionado padding px-16 para evitar colisão com o botão #}
+        <h1 class="text-3xl font-bold mb-6 text-center px-4 md:px-16">{{ questionario.titulo }}</h1>
 
         <form method="POST">
             {% csrf_token %}

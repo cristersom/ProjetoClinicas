@@ -12,7 +12,7 @@
 
     <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6 relative">
 
-        {# --- MUDANÇA AQUI: Botão Sair agora leva para o Perfil de Sessão --- #}
+        {# Botão Sair / Perfil #}
         <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
              <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}"
                 class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
@@ -20,9 +20,11 @@
                  Sair / Perfil
              </a>
         </div>
-        {# ------------------------------------------------------------------ #}
 
-        <h1 class="text-3xl font-bold mb-4 text-center">{{ cena.titulo }}</h1>
+        {# TÍTULO CORRIGIDO: Adicionado padding lateral (px-4 md:px-24) para não encostar no botão #}
+        <h1 class="text-3xl font-bold mb-4 text-center px-4 md:px-24">
+            {{ cena.titulo }}
+        </h1>
 
         {# Barra de Progresso #}
         {% if total_cenas > 0 %}
@@ -56,7 +58,7 @@
         {# Bloco de Decisão #}
         <div class="border-t border-gray-700 pt-4">
 
-            {# 1. Questionários (Prioridade Alta) #}
+            {# 1. Questionários #}
             {% for questionario in cena.questionarios.all %}
                 <div class="text-center {% if not forloop.first %}mt-4{% endif %}">
                     {% if forloop.first %}
@@ -93,7 +95,7 @@
                 </div>
             {% endif %}
 
-            {# 3. Caso não haja nada (Fim da linha) #}
+            {# 3. Caso final #}
             {% if not cena.escolhas.all and not cena.questionarios.all %}
                  <div class="text-center mt-6">
                     <p class="text-gray-400">Esta é a cena final da jornada.</p>
