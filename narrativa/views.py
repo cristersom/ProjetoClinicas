@@ -146,11 +146,12 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
+    # Garante a criação da sessão e atribuição do perfil
     sessao, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # FORÇA O REGISTRO DO PERFIL (Se não tiver, coloca este)
+    # Se acabou de criar OU se existe mas não tem perfil: define agora.
     if created or not sessao.narrativa_perfil:
         sessao.narrativa_perfil = narrativa
         sessao.save()
@@ -169,14 +170,14 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
 
     if request.session.session_key:
-        # Garante Log
+        # Garante o log da visita
         LogVisitaCena.objects.get_or_create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             defaults={'narrativa_associada': cena.narrativa}
         )
 
-        # Garante Perfil (caso entre direto na cena)
+        # Garante o perfil caso o usuário tenha entrado direto na cena
         sessao, created = SessaoPaciente.objects.get_or_create(
             session_key=request.session.session_key
         )
@@ -210,6 +211,7 @@ def responder_questionario(request, questionario_id):
             request.session.create()
         session_key = request.session.session_key
 
+        # Garante sessão/perfil ao responder
         sessao, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
         if created or not sessao.narrativa_perfil:
             if questionario.cena_associada:
@@ -262,7 +264,7 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- VIEW DE PERFIL ---
+# --- VIEW DE PERFIL (FEEDBACK AO PACIENTE) ---
 def perfil_sessao_view(request, narrativa_id):
     session_key = request.session.session_key
     if not session_key:
@@ -270,24 +272,24 @@ def perfil_sessao_view(request, narrativa_id):
 
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # Busca ou Cria Sessão
+    # Busca ou cria sessão
     sessao_paciente, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # AUTO-CORREÇÃO: Se o perfil estiver vazio, preenche com a narrativa atual
+    # Se o perfil estiver vazio, preenche com a narrativa atual (correção de bug "Visitante")
     if not sessao_paciente.narrativa_perfil:
         sessao_paciente.narrativa_perfil = narrativa_atual
         sessao_paciente.save()
 
-    # Pega o título (Aqui não tem como ser 'Visitante', pois foi forçado acima)
     nome_perfil = sessao_paciente.narrativa_perfil.titulo
 
-    # 1. LÓGICA CUMULATIVA (Baseada em Logs)
+    # 1. LÓGICA CUMULATIVA (Baseada em todas as narrativas visitadas nesta sessão)
     ids_narrativas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key
     ).values_list('narrativa_associada', flat=True).distinct()
 
+    # 2. Cálculo de Cenas
     total_cenas = Cena.objects.filter(narrativa__id__in=ids_narrativas_visitadas).count()
 
     cenas_visitadas = LogVisitaCena.objects.filter(
@@ -299,6 +301,7 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
+    # 3. Cálculo de Questionários
     total_questionarios = Questionario.objects.filter(
         cena_associada__narrativa__id__in=ids_narrativas_visitadas
     ).count()
@@ -326,6 +329,7 @@ def perfil_sessao_view(request, narrativa_id):
     return render(request, 'perfil_sessao.html', context)
 
 
+# --- DASHBOARD ADMINISTRATIVO ---
 class DashboardView(LoginRequiredMixin, TemplateView):
     template_name = "admin/dashboard.html"
 
@@ -333,31 +337,40 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context.update(admin.site.each_context(self.request))
 
+        # KPIs
         total_sessoes = SessaoPaciente.objects.count()
         total_respostas = Resposta.objects.count()
         total_narrativas = Narrativa.objects.count()
 
         cenas_finais_ids = Cena.objects.filter(escolhas__isnull=True).values_list('id', flat=True)
-
         sessoes_finalizadas = LogVisitaCena.objects.filter(
             cena_visitada__id__in=cenas_finais_ids
         ).values('session_key').distinct().count()
 
-        sete_dias_atras = timezone.now() - timedelta(days=7)
-        acessos_diarios = LogVisitaCena.objects.filter(timestamp__gte=sete_dias_atras) \
+        # Gráfico 1: Acessos (30 dias)
+        trinta_dias_atras = timezone.now() - timedelta(days=30)
+        acessos_diarios = LogVisitaCena.objects.filter(timestamp__gte=trinta_dias_atras) \
             .annotate(dia=TruncDay('timestamp')) \
             .values('dia') \
             .annotate(total=Count('id')) \
             .order_by('dia')
 
-        labels_dias = [item['dia'].strftime('%d/%m') for item in acessos_diarios]
-        data_acessos = [item['total'] for item in acessos_diarios]
+        # Tratamento para listas vazias
+        if acessos_diarios:
+            labels_dias = [item['dia'].strftime('%d/%m') for item in acessos_diarios]
+            data_acessos = [item['total'] for item in acessos_diarios]
+        else:
+            labels_dias = []
+            data_acessos = []
 
+        # Gráfico 2: Top 5 Narrativas
         top_narrativas = Narrativa.objects.order_by('-visualizacoes')[:5]
-        labels_top = [n.titulo for n in top_narrativas]
-        data_top = [n.visualizacoes for n in top_narrativas]
-
-        ultimas_respostas = Resposta.objects.select_related('pergunta__questionario').order_by('-data_resposta')[:10]
+        if top_narrativas:
+            labels_top = [n.titulo for n in top_narrativas]
+            data_top = [n.visualizacoes for n in top_narrativas]
+        else:
+            labels_top = []
+            data_top = []
 
         context.update({
             'kpi_sessoes': total_sessoes,
@@ -368,6 +381,5 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'chart_dias_data': json.dumps(data_acessos),
             'chart_top_labels': json.dumps(labels_top),
             'chart_top_data': json.dumps(data_top),
-            'ultimas_respostas': ultimas_respostas,
         })
         return context

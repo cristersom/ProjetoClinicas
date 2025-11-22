@@ -11,10 +11,10 @@
         padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         max-width: 100%;
-        overflow-x: hidden; /* Garante que nada vaze a tela */
+        overflow-x: hidden;
     }
 
-    /* --- KPIs --- */
+    /* KPIs */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -48,7 +48,7 @@
         margin: 10px 0;
     }
 
-    /* --- GRÁFICOS --- */
+    /* Gráficos */
     .charts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -61,10 +61,8 @@
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-
-        /* CORREÇÃO CRUCIAL PARA O BUG DO SCROLL */
-        min-width: 0; /* Impede o item do grid de crescer infinitamente */
-        height: 450px; /* Altura fixa para o cartão */
+        min-width: 0;
+        height: 450px;
         display: flex;
         flex-direction: column;
     }
@@ -76,45 +74,15 @@
         border-bottom: 1px solid #eee;
         padding-bottom: 10px;
         margin-bottom: 15px;
-        flex-shrink: 0; /* Título não encolhe */
+        flex-shrink: 0;
     }
 
-    /* Container interno que segura o Canvas */
     .chart-wrapper {
         position: relative;
-        flex-grow: 1; /* Ocupa o resto do cartão */
+        flex-grow: 1;
         width: 100%;
-        height: 0; /* Truque para forçar o Chart.js a respeitar o pai */
+        height: 0;
         min-height: 300px;
-    }
-
-    /* --- TABELA --- */
-    .table-card {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        overflow-x: auto;
-    }
-
-    .table-card table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 600px;
-    }
-
-    .table-card th {
-        text-align: left;
-        padding: 12px;
-        background: #f8f9fa;
-        color: #666;
-        font-weight: 600;
-    }
-
-    .table-card td {
-        padding: 12px;
-        border-bottom: 1px solid #eee;
-        color: #444;
     }
 </style>
 {% endblock %}
@@ -149,7 +117,7 @@
 
     <div class="charts-grid">
         <div class="chart-card">
-            <h2>Acessos por Dia (Últimos 7 dias)</h2>
+            <h2>Acessos por Dia (Últimos 30 dias)</h2>
             <div class="chart-wrapper">
                 <canvas id="chartAcessos"></canvas>
             </div>
@@ -162,43 +130,24 @@
         </div>
     </div>
 
-    <div class="table-card">
-        <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #444;">Últimas Respostas Recebidas</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Data/Hora</th>
-                    <th>Questionário</th>
-                    <th>Pergunta</th>
-                    <th>Resposta</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for resposta in ultimas_respostas %}
-                <tr>
-                    <td>{{ resposta.data_resposta|date:"d/m H:i" }}</td>
-                    <td>{{ resposta.pergunta.questionario.titulo }}</td>
-                    <td>{{ resposta.pergunta.texto_pergunta|truncatechars:40 }}</td>
-                    <td><strong>{{ resposta.texto_resposta|truncatechars:50 }}</strong></td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" style="text-align: center; padding: 20px;">Nenhuma atividade recente encontrada.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
 <script>
-    // Configuração global para garantir responsividade sem estourar
+    // Configuração global
     const commonOptions = {
         responsive: true,
         maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true, // Garante que o eixo comece no 0
+                ticks: {
+                    stepSize: 1 // Garante números inteiros
+                }
+            }
+        }
     };
 
+    // Gráfico 1
     const ctxAcessos = document.getElementById('chartAcessos');
     new Chart(ctxAcessos, {
         type: 'line',
@@ -210,12 +159,14 @@
                 borderColor: '#417690',
                 backgroundColor: 'rgba(65, 118, 144, 0.1)',
                 fill: true,
-                tension: 0.3
+                tension: 0.3,
+                pointRadius: 5 // Aumenta o ponto para ficar visível mesmo se for só 1
             }]
         },
         options: commonOptions
     });
 
+    // Gráfico 2 (Barra Horizontal)
     const ctxTop = document.getElementById('chartTopNarrativas');
     new Chart(ctxTop, {
         type: 'bar',
@@ -231,7 +182,7 @@
         },
         options: {
             ...commonOptions,
-            indexAxis: 'y', // Barra horizontal
+            indexAxis: 'y',
         }
     });
 </script>
