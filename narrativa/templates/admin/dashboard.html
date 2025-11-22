@@ -10,26 +10,30 @@
     .dashboard-container {
         padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        /* Impede que o container vaze horizontalmente */
+        max-width: 100%;
+        overflow-x: hidden;
     }
-    
+
+    /* Grid de KPIs */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
     }
-    
+
     .kpi-card {
         background: white;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        border-left: 4px solid #417690; /* Cor Django */
+        border-left: 4px solid #417690;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
     }
-    
+
     .kpi-card h3 {
         margin: 0;
         font-size: 0.9rem;
@@ -37,28 +41,38 @@
         text-transform: uppercase;
         font-weight: 600;
     }
-    
+
     .kpi-card .value {
         font-size: 2.5rem;
         font-weight: bold;
         color: #333;
         margin: 10px 0;
     }
-    
+
+    /* Grid de Gráficos */
     .charts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
     }
-    
+
     .chart-card {
         background: white;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        /* CORREÇÃO 1: Altura fixa para evitar crescimento infinito */
+        height: 400px;
+        position: relative; /* Necessário para o Chart.js */
     }
-    
+
+    .chart-container-inner {
+        position: relative;
+        height: 320px; /* Altura específica para o canvas */
+        width: 100%;
+    }
+
     .chart-card h2 {
         margin-top: 0;
         font-size: 1.2rem;
@@ -68,18 +82,21 @@
         margin-bottom: 15px;
     }
 
+    /* Tabela Recente */
     .table-card {
         background: white;
         border-radius: 8px;
         padding: 20px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        overflow-x: auto; /* Scroll horizontal apenas na tabela se necessário */
     }
-    
+
     .table-card table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 600px; /* Garante largura mínima legível */
     }
-    
+
     .table-card th {
         text-align: left;
         padding: 12px;
@@ -87,7 +104,7 @@
         color: #666;
         font-weight: 600;
     }
-    
+
     .table-card td {
         padding: 12px;
         border-bottom: 1px solid #eee;
@@ -98,7 +115,7 @@
 
 {% block content %}
 <div class="dashboard-container">
-    
+
     <h1 style="margin-bottom: 20px; font-size: 1.8rem; color: #333;">Visão Geral do Sistema</h1>
 
     <div class="kpi-grid">
@@ -127,11 +144,15 @@
     <div class="charts-grid">
         <div class="chart-card">
             <h2>Acessos por Dia (Últimos 7 dias)</h2>
-            <canvas id="chartAcessos"></canvas>
+            <div class="chart-container-inner">
+                <canvas id="chartAcessos"></canvas>
+            </div>
         </div>
         <div class="chart-card">
             <h2>Top 5 Narrativas Mais Vistas</h2>
-            <canvas id="chartTopNarrativas"></canvas>
+            <div class="chart-container-inner">
+                <canvas id="chartTopNarrativas"></canvas>
+            </div>
         </div>
     </div>
 
@@ -166,6 +187,12 @@
 </div>
 
 <script>
+    // Configuração comum para responsividade
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false, // Importante: permite preencher a div pai
+    };
+
     const ctxAcessos = document.getElementById('chartAcessos');
     new Chart(ctxAcessos, {
         type: 'line',
@@ -180,7 +207,7 @@
                 tension: 0.3
             }]
         },
-        options: { responsive: true, maintainAspectRatio: false }
+        options: chartOptions
     });
 
     const ctxTop = document.getElementById('chartTopNarrativas');
@@ -196,10 +223,9 @@
                 ]
             }]
         },
-        options: { 
-            responsive: true, 
-            indexAxis: 'y',
-            maintainAspectRatio: false 
+        options: {
+            ...chartOptions,
+            indexAxis: 'y', // Barra horizontal
         }
     });
 </script>
