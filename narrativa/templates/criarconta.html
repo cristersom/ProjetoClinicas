@@ -13,37 +13,46 @@ Criar Conta
 {% block head %}
 <style>
     /* Estilos essenciais */
+
+    /* Largura de Referência: O input usa 90% de largura dentro do bloco centralizado. */
+
+    /* CORREÇÃO 1: ALINHAMENTO DE TEXTOS DE AJUDA */
     .form-text, .invalid-feedback {
         color: white !important;
-        /* ALINHA TEXTO DE AJUDA À ESQUERDA E POSICIONAMENTO CENTRAL */
-        text-align: left !important;
+        /* Alinhamento de bloco (90% centralizado) */
         width: 90%;
-        margin: 0 auto 10px auto !important; /* Centraliza o bloco de texto, 90% */
+        margin: 0 auto 10px auto !important;
+
+        /* Alinhamento interno de texto */
+        text-align: left !important;
         display: block;
         padding: 0;
+
+        /* NOVO: Impede a quebra de linha forçando o texto a ser nowrap */
+        white-space: normal;
+        font-size: 0.9rem; /* Mantém a fonte menor */
     }
 
-    /* CORREÇÃO CHAVE: Define a largura máxima do formulário e centraliza como bloco */
+    /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
     .z-10 form {
         text-align: left;
-        max-width: 400px; /* Largura fixa do container do formulário */
+        max-width: 400px;
         width: 100%;
         margin-left: auto;
         margin-right: auto;
         padding: 0 15px;
     }
 
-    /* CORREÇÃO 1: ALINHAMENTO GERAL (Labels, Inputs, Textos) */
+    /* ALINHAMENTO DE LABELS E INPUTS */
 
-    /* Centraliza visualmente o texto da Label */
+    /* Centraliza visualmente o bloco da Label (90% centralizado) */
     .control-label,
     .form-group label:not(.form-check-label) {
         text-align: left !important;
-        width: 90%; /* Força a largura para 90% */
-        margin-left: auto !important;
-        margin-right: auto !important;
+        width: 90%;
+        margin: 0 auto 5px auto !important; /* Centraliza o bloco da label */
+        padding: 0 !important;
         display: block;
-        padding: 0;
     }
 
     /* ALINHAMENTO DO INPUT: Garante 90% de largura e centralização visual */
@@ -56,18 +65,22 @@ Criar Conta
     }
 
     /* CORREÇÃO 2: TÍTULO H1, LEGEND (Linha) E BOTÃO - Força o alinhamento de 90% */
+
+    /* Alinha o Título H1 (fora do fieldset) */
     .z-10 h1 {
         text-align: center !important;
         width: 90%; /* Limita a largura do bloco de texto para 90% */
-        margin: 0 auto 10px auto !important; /* Centraliza o bloco */
+        margin: 0 auto 20px auto !important;
         padding: 0;
     }
 
+    /* Linha Divisória (Legend) */
     .z-10 fieldset legend {
         text-align: left !important;
         width: 90%; /* Limita a linha (border-bottom) para 90% */
         margin: 0 auto 1rem auto !important; /* Centraliza o bloco da linha */
         padding: 0;
+        border-bottom: 1px solid #dee2e6; /* Garante que a borda seja usada */
     }
 
     /* CORREÇÃO 3: BOTÃO CRIAR CONTA - Mesma largura do Input */
@@ -77,25 +90,33 @@ Criar Conta
         display: block;
     }
 
-    /* CORREÇÃO 4: Checkbox (Aceite) - Mesma largura do Input */
+    /* CORREÇÃO 4: Checkbox (Aceite) - Mesma largura do Input e espaçamento */
     .form-group .form-check {
         padding-top: 15px;
         margin-bottom: 25px;
         text-align: left;
         display: flex;
-        align-items: flex-start;
+        align-items: center; /* Alinha no meio para não ficar colado no topo */
         width: 90%; /* Limita o bloco para 90% */
         margin: 15px auto 25px auto !important; /* Centraliza o bloco do checkbox */
-        font-size: 0.9rem;
         padding-left: 0 !important;
+
+        /* NOVO: Aumenta o espaçamento do label sem afetar o bloco */
+        line-height: 1.2;
     }
 
     /* Garante espaçamento entre checkbox e texto */
     .form-group .form-check .form-check-input {
         margin-right: 0.5em;
-        margin-top: 0.25em;
-        /* Tenta alinhar o checkbox para a esquerda do bloco de 90% */
-        margin-left: -0.5em;
+        margin-top: 0; /* Alinha o checkbox verticalmente com o centro do texto */
+        margin-left: 0;
+    }
+
+    .form-group .form-check label {
+        font-weight: normal !important;
+        font-size: 0.9rem; /* Mantém a fonte menor */
+        /* Permite quebra, mas a largura de 90% deve evitar na maioria das telas */
+        white-space: normal;
     }
 
     /* Estilo para negrito e sublinhado no link */
