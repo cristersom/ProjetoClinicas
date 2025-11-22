@@ -8,6 +8,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import admin
 from django.conf import settings
 from django.db.models import Count, Value
+from django.db.models.functions import TruncDay
+from django.utils import timezone
+from datetime import timedelta
+import json
 
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
@@ -142,16 +146,13 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # --- CORREÇÃO 1: Garante que o perfil seja gravado mesmo se a sessão já existir ---
     sessao, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # Se acabou de criar OU se existe mas não tem perfil definido: define agora.
     if created or not sessao.narrativa_perfil:
         sessao.narrativa_perfil = narrativa
         sessao.save()
-    # ----------------------------------------------------------------------------------
 
     if not narrativa.cena_inicial:
         messages.warning(request, f"A jornada '{narrativa.titulo}' ainda não está pronta para ser iniciada.")
@@ -167,21 +168,18 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
 
     if request.session.session_key:
-        # 1. Garante log da visita
         LogVisitaCena.objects.get_or_create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             defaults={'narrativa_associada': cena.narrativa}
         )
 
-        # --- CORREÇÃO 2: Garante perfil se o usuário caiu de paraquedas na cena ---
         sessao, created = SessaoPaciente.objects.get_or_create(
             session_key=request.session.session_key
         )
         if created or not sessao.narrativa_perfil:
             sessao.narrativa_perfil = cena.narrativa
             sessao.save()
-        # -------------------------------------------------------------------------
 
     try:
         todas_cenas = list(cena.narrativa.cenas.all().order_by('id'))
@@ -209,10 +207,8 @@ def responder_questionario(request, questionario_id):
             request.session.create()
         session_key = request.session.session_key
 
-        # Garante perfil também ao responder questionário (segurança extra)
         sessao, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
         if created or not sessao.narrativa_perfil:
-            # Tenta pegar da narrativa da cena associada
             if questionario.cena_associada:
                 sessao.narrativa_perfil = questionario.cena_associada.narrativa
                 sessao.save()
@@ -263,7 +259,6 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- VIEW DE PERFIL: MODO CUMULATIVO ---
 def perfil_sessao_view(request, narrativa_id):
     session_key = request.session.session_key
     if not session_key:
@@ -271,25 +266,20 @@ def perfil_sessao_view(request, narrativa_id):
 
     narrativa_atual = get_object_or_404(Narrativa, pk=narrativa_id)
 
-    # --- CORREÇÃO 3: Lógica robusta para garantir o nome do perfil ---
     sessao_paciente, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # Se ainda estiver vazio, assume a narrativa atual como o perfil
     if not sessao_paciente.narrativa_perfil:
         sessao_paciente.narrativa_perfil = narrativa_atual
         sessao_paciente.save()
 
     nome_perfil = sessao_paciente.narrativa_perfil.titulo
-    # ----------------------------------------------------------------
 
-    # 1. Descobre QUAIS narrativas o usuário já tocou (visitou alguma cena)
     ids_narrativas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key
     ).values_list('narrativa_associada', flat=True).distinct()
 
-    # 2. CÁLCULO DE CENAS
     total_cenas = Cena.objects.filter(narrativa__id__in=ids_narrativas_visitadas).count()
 
     cenas_visitadas = LogVisitaCena.objects.filter(
@@ -301,7 +291,6 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
-    # 3. CÁLCULO DE QUESTIONÁRIOS
     total_questionarios = Questionario.objects.filter(
         cena_associada__narrativa__id__in=ids_narrativas_visitadas
     ).count()
@@ -318,14 +307,61 @@ def perfil_sessao_view(request, narrativa_id):
     context = {
         'narrativa': narrativa_atual,
         'nome_perfil': nome_perfil,
-
         'cenas_visitadas': cenas_visitadas,
         'total_cenas': total_cenas,
         'progresso_cenas_pct': progresso_cenas_pct,
-
         'questionarios_respondidos': questionarios_respondidos,
         'total_questionarios': total_questionarios,
         'progresso_questionarios_pct': progresso_questionarios_pct,
     }
 
     return render(request, 'perfil_sessao.html', context)
+
+
+# --- DASHBOARD ADMINISTRATIVO ---
+class DashboardView(LoginRequiredMixin, TemplateView):
+    # --- MUDANÇA AQUI: Caminho do template atualizado ---
+    template_name = "admin/dashboard.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(admin.site.each_context(self.request))
+
+        total_sessoes = SessaoPaciente.objects.count()
+        total_respostas = Resposta.objects.count()
+        total_narrativas = Narrativa.objects.count()
+
+        cenas_finais_ids = Cena.objects.filter(escolhas__isnull=True).values_list('id', flat=True)
+
+        sessoes_finalizadas = LogVisitaCena.objects.filter(
+            cena_visitada__id__in=cenas_finais_ids
+        ).values('session_key').distinct().count()
+
+        sete_dias_atras = timezone.now() - timedelta(days=7)
+        acessos_diarios = LogVisitaCena.objects.filter(timestamp__gte=sete_dias_atras) \
+            .annotate(dia=TruncDay('timestamp')) \
+            .values('dia') \
+            .annotate(total=Count('id')) \
+            .order_by('dia')
+
+        labels_dias = [item['dia'].strftime('%d/%m') for item in acessos_diarios]
+        data_acessos = [item['total'] for item in acessos_diarios]
+
+        top_narrativas = Narrativa.objects.order_by('-visualizacoes')[:5]
+        labels_top = [n.titulo for n in top_narrativas]
+        data_top = [n.visualizacoes for n in top_narrativas]
+
+        ultimas_respostas = Resposta.objects.select_related('pergunta__questionario').order_by('-data_resposta')[:10]
+
+        context.update({
+            'kpi_sessoes': total_sessoes,
+            'kpi_respostas': total_respostas,
+            'kpi_finalizadas': sessoes_finalizadas,
+            'kpi_narrativas': total_narrativas,
+            'chart_dias_labels': json.dumps(labels_dias),
+            'chart_dias_data': json.dumps(data_acessos),
+            'chart_top_labels': json.dumps(labels_top),
+            'chart_top_data': json.dumps(data_top),
+            'ultimas_respostas': ultimas_respostas,
+        })
+        return context

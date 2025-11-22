@@ -6,14 +6,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
-# MUDANÇA 1: Default mais seguro para o DEBUG
-# Se a variável de ambiente DEBUG não existir, ele vai assumir 'False'.
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['127.0.0.1', '.herokuapp.com']
 
 INSTALLED_APPS = [
-    'jazzmin',  # Jazzmin adicionado aqui, antes de admin
+    'jazzmin',
     'nested_admin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,7 +29,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Whitenoise ainda é necessário no middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -46,7 +44,7 @@ ROOT_URLCONF = 'gameflix.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],  # Garante que a pasta raiz 'templates' é verificada
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -77,21 +75,17 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# --- Configurações de Internacionalização ---
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- Configurações de Arquivos Estáticos ---
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]  # Diretório onde o collectstatic procura arquivos estáticos customizados
-STATIC_ROOT = BASE_DIR / "staticfiles"  # Diretório onde o collectstatic COLOCA TODOS os arquivos para produção
+STATICFILES_DIRS = [BASE_DIR / "static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# --- Configurações de Arquivos de Mídia ---
 MEDIA_URL = '/media/'
 
-# --- Configurações de Armazenamento (Storage) ---
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -101,39 +95,39 @@ STORAGES = {
     },
 }
 
-# --- Cloudinary ---
 CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
 
-# --- Outras Configurações Django ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGIN_URL = 'narrativa:login'
 
-# --- Crispy Forms ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-# --- Configurações do Jazzmin ---
 JAZZMIN_SETTINGS = {
     "site_title": "Administração Clínica",
     "site_header": "Clínica Admin",
     "welcome_sign": "Bem-vindo(a) à Administração",
     "copyright": "Minha Clínica Ltd",
 
-    # --- MUDANÇA AQUI ---
     "topmenu_links": [
         {"name": "Ver Site", "url": "/", "new_window": True},
-        {"app": "narrativa"},
 
-        # Link de Ajuda/FAQ adicionado
+        # --- LINK NOVO: DASHBOARD ---
+        {
+            "name": "Dashboard",
+            "url": "narrativa:dashboard_admin",
+            "icon": "fas fa-tachometer-alt"
+        },
+
+        {"app": "narrativa"},
         {
             "name": "Ajuda",
-            "url": "narrativa:admin_faq",  # Aponta para a rota que já criámos
+            "url": "narrativa:admin_faq",
             "icon": "fas fa-question-circle",
             "new_window": True
         },
     ],
-    # --- FIM DA MUDANÇA ---
 
     "order_with_respect_to": [
         "narrativa.Narrativa",
@@ -141,7 +135,7 @@ JAZZMIN_SETTINGS = {
         "narrativa.Questionario",
         "narrativa.Resposta",
         "narrativa.Categoria",
-        "narrativa.ConfiguracaoClinica",  # Nome real do modelo
+        "narrativa.ConfiguracaoClinica",
         "narrativa.SessaoPaciente",
         "narrativa.Usuario",
     ],
@@ -211,9 +205,6 @@ JAZZMIN_UI_TWEAKS = {
     }
 }
 
-# MUDANÇA 3: Bloco de LOGGING (O MAIS IMPORTANTE)
-# Isso fará com que os erros 500 (quando DEBUG=False)
-# sejam impressos no log do Heroku.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -224,12 +215,12 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'WARNING',  # Captura 'warnings' e 'errors'
+        'level': 'WARNING',
     },
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),  # Nível de log do Django
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
     },

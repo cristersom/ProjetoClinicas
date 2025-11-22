@@ -20,6 +20,9 @@ urlpatterns = [
     path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
     path('ajuda/', views.AdminFAQView.as_view(), name='admin_faq'),
 
+    # --- ROTA NOVA DO DASHBOARD ---
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard_admin'),
+
     # --- Fluxo de Aceite de Termos (Middleware) ---
     path('ler_termos/', views.LerTermosView.as_view(), name='ler_termos'),
     path('ler_termos/<int:narrativa_pk>/', views.LerTermosView.as_view(), name='ler_termos_pk'),
@@ -30,7 +33,5 @@ urlpatterns = [
     path('paciente/iniciar/<int:narrativa_id>/', views.iniciar_jornada_paciente, name='iniciar_jornada_paciente'),
     path('paciente/cena/<int:cena_id>/', views.exibir_cena_paciente, name='exibir_cena_paciente'),
     path('paciente/questionario/<int:questionario_id>/', views.responder_questionario, name='responder_questionario'),
-
-    # --- NOVA ROTA: Perfil de Sessão (Feedback) ---
     path('paciente/perfil/<int:narrativa_id>/', views.perfil_sessao_view, name='perfil_sessao'),
 ]
