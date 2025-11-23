@@ -19,46 +19,52 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="min-h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-center justify-center"
+    <section class="relative w-full flex items-end
+                    bg-no-repeat
+                    bg-contain bg-top h-[60vh]
+                    md:bg-cover md:bg-fixed md:bg-center md:h-screen"
              style="background-image: url('{% static 'images/background.png' %}');">
 
-        <div class="absolute inset-0 bg-black bg-opacity-75 bg-blend-overlay"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/60 to-gray-900 md:hidden"></div>
 
-        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto relative">
-            <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block">
+        <div class="hidden md:block absolute inset-0 bg-black bg-opacity-75 bg-blend-overlay"></div>
+
+        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto relative pb-12 md:pb-0 md:h-full md:flex md:flex-col md:justify-center">
+            <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-2 md:mb-4 block shadow-black drop-shadow-md">
                 Bem-vindo à Clínica Interativa
             </span>
-            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
+            <h1 class="font-bold text-3xl md:text-6xl text-white mb-4 md:mb-6 leading-tight drop-shadow-xl">
                 Sua saúde, <br>sua jornada.
             </h1>
-            <h3 class="text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto">
+            <h3 class="hidden md:block text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto">
                 Selecione uma das narrativas abaixo para iniciar seu acompanhamento personalizado.
             </h3>
 
-            <div class="animate-bounce text-gray-400 mt-8">
+            <div class="hidden md:block animate-bounce text-gray-400 mt-8">
                 <ion-icon name="arrow-down-outline" class="text-4xl"></ion-icon>
             </div>
         </div>
     </section>
 
     {% if lista_narrativas_emalta %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20'>
-        <div class="flex items-center mb-8 pr-4">
-            <h2 class="text-white text-xl md:text-2xl font-semibold mr-4 whitespace-nowrap">Escolha sua Jornada</h2>
+    <section class='bg-gray-900 py-10 md:py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 md:-mt-10 md:rounded-t-3xl md:shadow-2xl'>
+        <div class="flex items-center mb-6 md:mb-8 pr-4">
+            <h2 class="text-white text-lg md:text-2xl font-semibold mr-3 md:mr-4 whitespace-nowrap">Escolha sua Jornada</h2>
             <div class="h-px flex-1 bg-gray-800"></div>
         </div>
 
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_emalta %}
-                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
+                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 md:mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
                         <div class="aspect-[4/3] w-full overflow-hidden relative">
                             <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
                         </div>
-                        <div class="p-5">
-                            <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
-                                <ion-icon name="play-circle-outline" class="mr-1 text-base"></ion-icon> Iniciar
+                        <div class="p-4 md:p-5">
+                            <p class="text-white font-bold truncate text-base md:text-lg">{{ narrativa.titulo }}</p>
+                            <p class="text-teal-400 text-[10px] md:text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
+                                <ion-icon name="play-circle-outline" class="mr-1 text-sm md:text-base"></ion-icon> Iniciar
                             </p>
                         </div>
                     </a>
@@ -69,19 +75,19 @@
     {% endif %}
 
     {% if lista_narrativas_recentes %}
-    <section class='bg-gray-900 py-10 pl-4 md:pl-12 pb-20'>
-        <h2 class="text-gray-400 text-lg md:text-xl font-semibold mb-6 uppercase tracking-wider">Novidades</h2>
+    <section class='bg-gray-900 py-8 md:py-10 pl-4 md:pl-12 pb-20'>
+        <h2 class="text-gray-400 text-base md:text-xl font-semibold mb-4 md:mb-6 uppercase tracking-wider">Novidades</h2>
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_recentes %}
-                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
+                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 md:mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
                         <div class="aspect-[4/3] w-full overflow-hidden relative">
                             <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
                         </div>
-                        <div class="p-5">
-                            <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
-                                <ion-icon name="play-circle-outline" class="mr-1 text-base"></ion-icon> Iniciar
+                        <div class="p-4 md:p-5">
+                            <p class="text-white font-bold truncate text-base md:text-lg">{{ narrativa.titulo }}</p>
+                            <p class="text-teal-400 text-[10px] md:text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
+                                <ion-icon name="play-circle-outline" class="mr-1 text-sm md:text-base"></ion-icon> Iniciar
                             </p>
                         </div>
                     </a>
