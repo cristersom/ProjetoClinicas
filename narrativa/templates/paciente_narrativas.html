@@ -19,10 +19,10 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full'>
 
-    <section class="min-h-[85vh] relative bg-no-repeat bg-cover bg-center flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
+    <section class="min-h-screen relative bg-no-repeat bg-cover bg-center flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
 
-        <div class="z-10 w-full px-6 pb-20 md:pb-24 md:px-12 max-w-4xl">
+        <div class="z-10 w-full px-6 pb-20 md:pb-32 md:px-12 max-w-4xl">
             <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block">Bem-vindo à Clínica Interativa</span>
             <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
                 Sua saúde, <br>sua jornada.
@@ -63,13 +63,14 @@
         <h2 class="text-white text-xl font-semibold mb-6 text-gray-400">Novidades</h2>
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_recentes %}
-                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-md border border-gray-700">
+                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="aspect-video w-full overflow-hidden">
-                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="aspect-[4/3] w-full overflow-hidden">
+                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
                         </div>
                         <div class="p-4">
-                            <p class="text-gray-200 font-semibold truncate">{{ narrativa.titulo }}</p>
+                            <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
+                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-1">Iniciar Jornada</p>
                         </div>
                     </a>
                 </div>
