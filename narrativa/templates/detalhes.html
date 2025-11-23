@@ -4,18 +4,19 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="relative w-full flex flex-col justify-end
-                    /* Mobile: Imagem Real (não corta) */
-                    md:bg-cover md:bg-center md:bg-fixed md:h-screen"
-             style="/* Desktop apenas: */ background-image: url('{{ object.thumb.url }}');">
+    <section class="relative w-full flex flex-col justify-end">
 
-        <img src="{{ object.thumb.url }}" alt="{{ object.titulo }}" class="w-full h-auto object-contain md:hidden">
+        <div class="md:hidden w-full relative">
+            <img src="{{ object.thumb.url }}" alt="{{ object.titulo }}" class="w-full h-auto block">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+        </div>
 
-        <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
+        <div class="hidden md:block absolute inset-0 bg-cover bg-center bg-fixed"
+             style="background-image: url('{{ object.thumb.url }}'); height: 100vh;">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+        </div>
 
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent md:hidden"></div>
-
-        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-40 -mt-20 md:mt-0">
+        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-32 md:min-h-screen md:flex md:flex-col md:justify-end -mt-20 md:mt-0">
             <div class="max-w-4xl">
                 <span class="bg-teal-600 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded uppercase tracking-wide mb-2 md:mb-4 inline-block shadow-lg border border-teal-500">
                     Gestão de Narrativa
@@ -35,23 +36,18 @@
                             <span>Preview</span>
                         </button>
                     </a>
-
                     <button onclick="copyLinkToClipboard()" class="flex-1 md:flex-none flex justify-center items-center bg-gray-800/80 hover:bg-gray-700 backdrop-blur-md text-white border border-gray-500 py-3 px-6 rounded-full font-bold transition shadow-lg text-sm md:text-base">
-                        <ion-icon name="link" class="text-xl mr-2"></ion-icon>
-                        <span>Copiar</span>
+                        <ion-icon name="link" class="text-xl mr-2"></ion-icon> <span>Copiar</span>
                     </button>
-
                     <button onclick="shareLink()" id="share-button" class="hidden flex-1 md:flex-none flex justify-center items-center bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-full font-bold transition shadow-lg text-sm md:text-base">
-                        <ion-icon name="share-social" class="text-xl mr-2"></ion-icon>
-                        <span>Enviar</span>
+                        <ion-icon name="share-social" class="text-xl mr-2"></ion-icon> <span>Enviar</span>
                     </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class='bg-gray-900 py-10 md:py-16 px-4 md:px-12 border-t border-gray-800 relative z-20 md:-mt-12 md:rounded-t-[2.5rem] md:shadow-[0_-10px_40px_rgba(0,0,0,0.6)]'>
-
+    <section class='bg-gray-900 py-10 md:py-16 px-4 md:px-12 border-t border-gray-800 relative z-10'>
         <div class="max-w-6xl mx-auto">
 
             <div class="mb-10 md:mb-12 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
@@ -97,7 +93,7 @@
                 <div class="flex overflow-x-auto pb-8 gap-4 md:gap-6 scrollbar-hide">
                     {% for rel in relacionados %}
                     <a href="{% url 'narrativa:detalhes' rel.pk %}" class="flex-shrink-0 w-64 md:w-72 group relative">
-                        <div class="aspect-video rounded-2xl overflow-hidden mb-3 relative border border-gray-700 group-hover:border-teal-500/50 transition-all">
+                        <div class="aspect-video rounded-2xl overflow-hidden mb-3 relative border border-gray-700 group-hover:border-teal-500/50 transition-all shadow-lg">
                             <img src="{{ rel.thumb.url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 opacity-80 group-hover:opacity-100">
                         </div>
                         <p class="text-gray-200 text-base md:text-lg font-bold group-hover:text-white truncate transition-colors">{{ rel.titulo }}</p>
@@ -106,14 +102,20 @@
                 </div>
             </div>
             {% endif %}
-
         </div>
     </section>
 </main>
+
 <script>
     const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
-    function copyLinkToClipboard() { navigator.clipboard.writeText(linkParaCompartilhar).then(() => alert('Link copiado!')); }
-    function shareLink() { if(navigator.share) navigator.share({title:'{{ object.titulo }}', url: linkParaCompartilhar}); }
+    function copyLinkToClipboard() {
+        navigator.clipboard.writeText(linkParaCompartilhar).then(() => { alert('Link copiado!'); });
+    }
+    function shareLink() {
+        if(navigator.share) {
+            navigator.share({title:'{{ object.titulo }}', url: linkParaCompartilhar});
+        }
+    }
     if(navigator.share) document.getElementById('share-button').classList.remove('hidden');
 </script>
 {% endblock %}

@@ -5,18 +5,19 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="relative w-full flex flex-col justify-end
-                    /* Mobile: Imagem Real (não corta) */
-                    md:bg-cover md:bg-center md:bg-fixed md:h-screen"
-             style="/* Desktop apenas: */ background-image: url('{{ object.thumb.url }}');">
+    <section class="relative w-full flex flex-col justify-end">
 
-        <img src="{{ object.thumb.url }}" alt="{{ object.titulo }}" class="w-full h-auto object-contain md:hidden">
+        <div class="md:hidden w-full relative">
+            <img src="{{ object.thumb.url }}" alt="{{ object.titulo }}" class="w-full h-auto block">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent"></div>
+        </div>
 
-        <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
+        <div class="hidden md:block absolute inset-0 bg-cover bg-center bg-fixed"
+             style="background-image: url('{{ object.thumb.url }}'); height: 100vh;">
+            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent"></div>
+        </div>
 
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent md:hidden"></div>
-
-        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-32 -mt-20 md:mt-0">
+        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-32 md:min-h-screen md:flex md:flex-col md:justify-end -mt-20 md:mt-0">
             <div class="max-w-3xl">
                 <span class="bg-teal-600 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded uppercase tracking-wide mb-3 inline-block shadow-lg border border-teal-500">
                     Jornada Clínica
@@ -39,10 +40,6 @@
                 </form>
             </div>
         </div>
-
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-white/80 hidden md:block z-20">
-            <ion-icon name="chevron-down-outline" class="text-4xl drop-shadow-lg"></ion-icon>
-        </div>
     </section>
 
     <section class='bg-gray-900 py-10 px-4 md:px-12 border-t border-gray-800 relative z-10'>
@@ -55,29 +52,27 @@
                 </p>
             </div>
 
-            <div class="mb-12">
-                <h2 class="text-white text-lg md:text-2xl font-semibold mb-6 flex items-center">
-                    <ion-icon name="map-outline" class="mr-3 text-teal-500"></ion-icon>
-                    O que você vai encontrar:
-                </h2>
+            <h2 class="text-white text-lg md:text-2xl font-semibold mb-6 flex items-center">
+                <ion-icon name="map-outline" class="mr-3 text-teal-500"></ion-icon>
+                O que você vai encontrar:
+            </h2>
 
-                <div class="grid gap-3 md:grid-cols-2">
-                    {% for cena in object.cenas.all %}
-                    <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" class="group block">
-                        <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center transition-all duration-200 hover:bg-gray-750 hover:border-teal-500/50 hover:shadow-lg">
-                            <span class="bg-gray-700 text-gray-300 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm mr-4 group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
-                                {{ forloop.counter }}
+            <div class="grid gap-3 md:grid-cols-2">
+                {% for cena in object.cenas.all %}
+                <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" class="group block">
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center transition-all duration-200 hover:bg-gray-750 hover:border-teal-500/50 hover:shadow-lg">
+                        <span class="bg-gray-700 text-gray-300 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm mr-4 group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
+                            {{ forloop.counter }}
+                        </span>
+                        <div class="flex-1 min-w-0">
+                            <span class="text-gray-200 font-medium text-base md:text-lg group-hover:text-white transition-colors block truncate">
+                                {{ cena.titulo }}
                             </span>
-                            <div class="flex-1 min-w-0">
-                                <span class="text-gray-200 font-medium text-base md:text-lg group-hover:text-white transition-colors block truncate">
-                                    {{ cena.titulo }}
-                                </span>
-                            </div>
-                            <ion-icon name="arrow-forward" class="text-gray-500 text-xl group-hover:text-teal-400 ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
                         </div>
-                    </a>
-                    {% endfor %}
-                </div>
+                        <ion-icon name="arrow-forward" class="text-gray-500 text-xl group-hover:text-teal-400 ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
         </div>
     </section>
