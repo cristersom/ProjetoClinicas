@@ -19,10 +19,10 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full'>
 
-    <section class="min-h-screen relative bg-no-repeat bg-cover bg-center flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
+    <section class="h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
 
-        <div class="z-10 w-full px-6 pb-20 md:pb-32 md:px-12 max-w-4xl">
+        <div class="z-10 w-full px-6 pb-24 md:pb-32 md:px-12 max-w-4xl">
             <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block">Bem-vindo à Clínica Interativa</span>
             <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
                 Sua saúde, <br>sua jornada.
@@ -31,10 +31,14 @@
                 Selecione uma das narrativas abaixo para iniciar seu acompanhamento personalizado.
             </h3>
         </div>
+
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-gray-400 hidden md:block">
+            <ion-icon name="chevron-down-outline" class="text-3xl"></ion-icon>
+        </div>
     </section>
 
     {% if lista_narrativas_emalta %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative -mt-10 rounded-t-3xl z-20'>
+    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20'>
         <div class="flex items-center mb-6">
             <h2 class="text-white text-2xl font-semibold mr-3">Escolha sua Jornada</h2>
             <div class="h-px flex-1 bg-gray-800 mr-8"></div>
