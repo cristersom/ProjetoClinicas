@@ -1,123 +1,51 @@
 {% extends 'base.html' %}
 {% load static %}
-
-{% block titulo %}Seu Progresso Geral{% endblock %}
-
+{% block titulo %}Resumo{% endblock %}
 {% block navbar %}{% endblock %}
 
-{% block head %}
-<style>
-    /* Identidade Visual Gameflix (Dark Mode) */
-    .gameflix-card {
-        background-color: #1f2937; /* gray-800 */
-        border: 1px solid #374151; /* gray-700 */
-        color: #f3f4f6; /* gray-100 */
-        border-radius: 0.5rem;
-        padding: 2rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    }
-
-    .progress-container {
-        background-color: #111827; /* gray-900 */
-        border-radius: 9999px;
-        height: 1.25rem;
-        width: 100%;
-        overflow: hidden;
-        margin-top: 0.5rem;
-        border: 1px solid #374151;
-    }
-
-    .progress-bar {
-        height: 100%;
-        transition: width 0.5s ease-in-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.75rem;
-        font-weight: bold;
-        color: white;
-    }
-
-    .btn-action {
-        transition: all 0.3s;
-        font-weight: 600;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.375rem;
-        text-align: center;
-        display: inline-block;
-        cursor: pointer;
-    }
-
-    .btn-resume {
-        background-color: #dc2626; /* red-600 */
-        color: white;
-    }
-    .btn-resume:hover {
-        background-color: #b91c1c; /* red-700 */
-    }
-
-    .btn-exit {
-        background-color: #4b5563; /* gray-600 */
-        color: white;
-    }
-    .btn-exit:hover {
-        background-color: #374151; /* gray-700 */
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<main class="bg-primary_black min-h-screen w-full flex justify-center items-center p-4">
+<main class="min-h-screen w-full flex justify-center items-center p-4 bg-gray-900">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8">
 
-    <div class="w-full md:w-8/12 lg:w-6/12 gameflix-card relative">
-
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold mb-2">Progresso da Sessão</h1>
-            <p class="text-gray-400">
-                Você está atualmente na jornada: <span class="text-white font-semibold">{{ narrativa.titulo }}</span>
-            </p>
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold mb-2 text-white">Resumo da Sessão</h1>
+            <p class="text-gray-400">Você pausou a jornada: <span class="text-teal-400 font-semibold">{{ narrativa.titulo }}</span></p>
         </div>
 
-        <div class="mb-8 p-4 bg-gray-900 rounded-lg border border-gray-700 text-center">
-            <h2 class="text-lg text-gray-400 mb-1">Perfil da Sessão</h2>
-            <p class="text-2xl font-bold text-blue-400">{{ nome_perfil }}</p>
-            <p class="text-xs text-gray-500 mt-2">Definido com base na sua primeira escolha.</p>
+        <div class="mb-10 p-6 bg-gray-900/50 rounded-lg border border-gray-700 text-center">
+            <h2 class="text-sm text-gray-500 uppercase tracking-wider mb-2">Perfil Identificado</h2>
+            <p class="text-3xl font-bold text-white">{{ nome_perfil }}</p>
         </div>
 
-        <div class="space-y-6 mb-8">
+        <div class="space-y-8 mb-10">
             <div>
-                <div class="flex justify-between text-sm font-medium text-gray-300">
-                    <span>Total de Cenas Visitadas (Acumulado)</span>
-                    <span>{{ cenas_visitadas }} de {{ total_cenas }}</span>
+                <div class="flex justify-between text-sm font-medium text-gray-400 mb-2">
+                    <span>Cenas Visitadas</span>
+                    <span>{{ cenas_visitadas }} / {{ total_cenas }}</span>
                 </div>
-                <div class="progress-container">
-                    <div class="progress-bar bg-green-600" style="width: {{ progresso_cenas_pct }}%;">
-                        {{ progresso_cenas_pct }}%
-                    </div>
+                <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-teal-500 rounded-full transition-all duration-1000" style="width: {{ progresso_cenas_pct }}%;"></div>
                 </div>
             </div>
 
             <div>
-                <div class="flex justify-between text-sm font-medium text-gray-300">
-                    <span>Total de Questionários Respondidos</span>
-                    <span>{{ questionarios_respondidos }} de {{ total_questionarios }}</span>
+                <div class="flex justify-between text-sm font-medium text-gray-400 mb-2">
+                    <span>Questionários</span>
+                    <span>{{ questionarios_respondidos }} / {{ total_questionarios }}</span>
                 </div>
-                <div class="progress-container">
-                    <div class="progress-bar bg-blue-600" style="width: {{ progresso_questionarios_pct }}%;">
-                        {{ progresso_questionarios_pct }}%
-                    </div>
+                <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: {{ progresso_questionarios_pct }}%;"></div>
                 </div>
             </div>
         </div>
 
-        <div class="flex flex-col md:flex-row gap-4 justify-center mt-8">
+        <div class="flex flex-col md:flex-row gap-4 justify-center">
             <a href="{% url 'narrativa:paciente_narrativas' %}" class="w-full md:w-auto">
-                <button class="btn-action btn-exit w-full">
-                    Menu de Jornadas
+                <button class="w-full py-3 px-6 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition">
+                    Menu Principal
                 </button>
             </a>
-
-            <button onclick="window.history.back()" class="btn-action btn-resume w-full md:w-auto">
+            <button onclick="window.history.back()" class="w-full md:w-auto py-3 px-6 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-bold transition shadow-lg">
                 Continuar Jornada
             </button>
         </div>

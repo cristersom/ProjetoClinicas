@@ -1,68 +1,48 @@
 {% extends 'base.html' %}
 {% block titulo %}Política de Privacidade{% endblock %}
-
 {% block navbar %}{% endblock %}
 
 {% block content %}
-<main class="bg-primary_black min-h-screen w-full flex justify-center text-gray-100 p-10">
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-8 relative">
+<main class="bg-gray-900 min-h-screen w-full flex justify-center text-gray-100 p-6 md:p-10">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8 relative">
 
-        {# BOTÃO VOLTAR: Usa window.history.back() #}
-        <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
+        <div class="absolute top-4 right-4 z-10">
              <a href="#" onclick="window.history.back(); return false;"
-                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
-                title="Voltar à página anterior">
-                 Voltar
+                class="inline-flex items-center bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-300">
+                 <ion-icon name="arrow-back" class="mr-2"></ion-icon> Voltar
              </a>
         </div>
-        <h1 class="text-3xl font-bold mb-6 text-center">Política de Privacidade</h1>
-        <p class="mb-4 text-gray-300">
+
+        <h1 class="text-3xl font-bold mb-8 text-center text-teal-400">Política de Privacidade</h1>
+        <p class="mb-6 text-gray-300 leading-relaxed">
             A sua privacidade é uma prioridade. Esta política explica quais informações coletamos e como as utilizamos, em conformidade com a Lei Geral de Proteção de Dados (LGPD).
         </p>
 
-        <h2 class="text-2xl font-semibold mt-6 mb-3">1. Dados Coletados</h2>
+        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">1. Dados Coletados</h2>
 
-        <h3 class="text-xl font-medium mt-4 mb-2">Para Pacientes (Utilizadores Anónimos)</h3>
-        <p class="mb-4 text-gray-300">
-            Quando utiliza as jornadas interativas, NÃO recolhemos o seu nome, e-mail, telefone ou qualquer dado de identificação pessoal. A sua participação é anónima. Recolhemos apenas:
-            <ul>
-                <li class="ml-4 mb-2"><strong>Dados de Sessão:</strong> Utilizamos uma "chave de sessão" (através de cookies de sessão) para o identificar anonimamente. Isto permite-nos guardar o seu progresso na jornada e associar as suas respostas a uma sessão única. Esta chave expira quando fecha o navegador.</li>
-                <li class="ml-4 mb-2"><strong>Dados de Resposta:</strong> As respostas que submete nos questionários (texto, seleções, escalas) são armazenadas e associadas apenas a esta chave de sessão anónima.</li>
-                <li class="ml-4 mb-2"><strong>Logs de Percurso:</strong> Registamos quais cenas você visita e quando, para que os administradores possam analisar quais partes da jornada são mais acedidas.</li>
+        <h3 class="text-lg font-medium mt-4 mb-2 text-teal-500">Para Pacientes (Utilizadores Anónimos)</h3>
+        <div class="text-gray-300 leading-relaxed mb-4">
+            NÃO recolhemos o seu nome, e-mail ou telefone. A sua participação é anónima. Recolhemos apenas:
+            <ul class="list-disc list-inside mt-2 space-y-2 ml-2">
+                <li><strong class="text-white">Dados de Sessão:</strong> Chave temporária para guardar o progresso.</li>
+                <li><strong class="text-white">Respostas:</strong> Dados inseridos nos questionários.</li>
+                <li><strong class="text-white">Logs de Percurso:</strong> Cenas visitadas para fins estatísticos.</li>
             </ul>
+        </div>
+
+        <h3 class="text-lg font-medium mt-4 mb-2 text-teal-500">Para Administradores</h3>
+        <p class="mb-4 text-gray-300">
+            Recolhemos Nome de utilizador e E-mail para gestão da conta e segurança do acesso.
         </p>
 
-        <h3 class="text-xl font-medium mt-4 mb-2">Para Administradores (Utilizadores Logados)</h3>
-        <p class="mb-4 text-gray-300">
-            Para criar uma conta de administrador e gerir o conteúdo, recolhemos:
-            <ul>
-                <li class="ml-4 mb-2">Nome de utilizador e E-mail (para login e gestão de conta).</li>
-                <li class="ml-4 mb-2">Nome e Apelido (opcional, para personalização do perfil).</li>
-            </ul>
+        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">2. Segurança</h2>
+        <p class="mb-4 text-gray-300 leading-relaxed">
+            Utilizamos medidas de segurança robustas. Uploads são protegidos (Cloudinary) e o banco de dados é criptografado em repouso (Postgres).
         </p>
 
-        <h2 class="text-2xl font-semibold mt-6 mb-3">2. Uso dos Dados</h2>
-        <p class="mb-4 text-gray-300">
-            Os dados anónimos dos Pacientes são usados exclusivamente para fins estatísticos e de relatório pelos Administradores, permitindo-lhes avaliar a eficácia das jornadas e a satisfação geral.
-        </p>
-        <p class="mb-4 text-gray-300">
-            Os dados dos Administradores são usados apenas para autenticação, segurança da conta e gestão da plataforma.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">3. Partilha de Dados</h2>
-        <p class="mb-4 text-gray-300">
-            Não vendemos, trocamos ou partilhamos as suas informações pessoais ou os dados anónimos das suas respostas com terceiros. Os dados são acedidos apenas pelos Administradores autorizados desta plataforma.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">4. Armazenamento e Segurança</h2>
-        <p class="mb-4 text-gray-300">
-            Utilizamos medidas de segurança robustas para proteger os seus dados. Os uploads de imagens (como o logótipo da clínica e capas das narrativas) são armazenados de forma segura em serviços de nuvem (Cloudinary). As respostas da base de dados são protegidas em servidores seguros (Heroku Postgres).
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">5. Os Seus Direitos (LGPD)</h2>
-        <p class="mb-4 text-gray-300">
-            Como utilizador Administrador, tem o direito de aceder, corrigir ou eliminar os seus dados pessoais (nome de utilizador, e-mail) através da sua página de "Editar Perfil". Como a participação do Paciente é anónima, não armazenamos dados pessoais que possam ser acedidos ou eliminados.
-        </p>
+        <div class="mt-8 p-4 bg-gray-700/50 rounded-lg text-sm text-gray-400 text-center">
+            Última atualização: Novembro de 2025
+        </div>
     </div>
 </main>
 {% endblock %}

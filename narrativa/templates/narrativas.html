@@ -1,120 +1,74 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Narrativas{% endblock %}
+{% block titulo %}Gestão de Narrativas{% endblock %}
 
 {% block head %}
 <style>
-    /* ... (estilos do scroll mobile mantidos) ... */
     html { scroll-behavior: smooth; }
     .mobile-scroll-container {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 20px;
+        display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; -webkit-overflow-scrolling: touch;
     }
     .mobile-scroll-container::-webkit-scrollbar { display: none; }
-    .narrativa-card {
-        flex-shrink: 0;
-        scroll-snap-align: start;
-        transition: transform 0.3s;
-    }
+    .narrativa-card { flex-shrink: 0; scroll-snap-align: start; transition: transform 0.3s; }
     .narrativa-card:hover { transform: scale(1.02); }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class='bg-primary_black min-h-screen w-full'>
+<main class='bg-gray-900 min-h-screen w-full'>
 
-{# --- HERO SECTION --- #}
+{# HERO #}
 {% if narrativa_destaque %}
     <section class="h-[70vh] md:h-screen relative bg-no-repeat flex items-end bg-cover bg-center" style="background-image: url('{{ narrativa_destaque.thumb.url }}');">
-        <div class="bg-gradient-to-t from-black via-black/70 to-transparent w-full p-6 md:p-12 pb-20 md:pb-12">
-            <h2 class="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-md leading-tight">
-                {{ narrativa_destaque.titulo }}
-            </h2>
-            <p class="w-full md:w-5/12 text-base md:text-lg font-medium text-gray-200 mb-6 line-clamp-3 drop-shadow">
-                {{ narrativa_destaque.descricao }}
-            </p>
-            <div class="flex flex-col md:flex-row gap-3 flex-wrap">
-                 <a href="{% url 'admin:narrativa_narrativa_add' %}" class="w-full md:w-auto">
-                    <button class="flex justify-center items-center bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md">
-                        <ion-icon name="add-circle" class="text-xl mr-2"></ion-icon>
-                        Criar Narrativa
+        <div class="bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent w-full p-6 md:p-12 pb-20 md:pb-12">
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">{{ narrativa_destaque.titulo }}</h2>
+            <p class="w-full md:w-5/12 text-lg text-gray-200 mb-6 line-clamp-3 drop-shadow">{{ narrativa_destaque.descricao }}</p>
+
+            <div class="flex flex-col md:flex-row gap-3">
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="w-full md:w-auto">
+                    <button class="flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-lg border border-teal-500">
+                        <ion-icon name="add-circle" class="text-xl mr-2"></ion-icon> Criar Narrativa
                     </button>
                 </a>
-                 <a href="{% url 'narrativa:detalhes' narrativa_destaque.pk %}" class="w-full md:w-auto">
-                    <button class="flex justify-center items-center bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border border-white/50 py-3 px-6 rounded-md font-bold w-full md:w-auto transition">
-                        <ion-icon name="play" class="text-xl mr-2"></ion-icon>
-                        Detalhes
+                <a href="{% url 'narrativa:detalhes' narrativa_destaque.pk %}" class="w-full md:w-auto">
+                    <button class="flex justify-center items-center bg-white/20 hover:bg-white/30 backdrop-blur-md text-white border border-white/40 py-3 px-6 rounded-md font-bold w-full md:w-auto transition">
+                        <ion-icon name="settings" class="text-xl mr-2"></ion-icon> Gerenciar
                     </button>
                 </a>
-
-                <button id="copy-button" onclick="copyLinkToClipboard()" class="flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md">
-                    <ion-icon name="clipboard-outline" class="text-xl mr-2"></ion-icon>
-                    <span id="copy-button-text">Copiar Link</span>
-                </button>
-
-                <button id="share-button" onclick="shareLink()" class="flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md" style="display: none;">
-                    <ion-icon name="share-social-outline" class="text-xl mr-2"></ion-icon>
-                    Encaminhar
-                </button>
             </div>
         </div>
     </section>
 {% else %}
     <section class="h-[70vh] md:h-screen relative bg-no-repeat flex items-end bg-cover bg-center" style="background-image: url('{% static 'images/background.png' %}');">
-        <div class="bg-gradient-to-t from-black via-black/70 to-transparent w-full p-6 md:p-12 pb-20 md:pb-12">
-            <h2 class="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-md">Bem-vindo(a)!</h2>
-            <p class="w-full md:w-8/12 text-lg text-gray-200 mb-6 drop-shadow">Vamos começar? Crie sua primeira jornada interativa.</p>
+        <div class="bg-gradient-to-t from-gray-900 via-gray-900/70 to-transparent w-full p-6 md:p-12 pb-20 md:pb-12">
+            <h2 class="text-4xl md:text-6xl font-bold text-white mb-4">Painel Administrativo</h2>
             <a href="{% url 'admin:narrativa_narrativa_add' %}">
-                <button class="bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md font-bold shadow-lg transition">
-                    <ion-icon name="add-circle" class="text-xl mr-2 align-middle"></ion-icon>
-                    Criar Narrativa
+                <button class="bg-teal-600 hover:bg-teal-700 text-white py-3 px-6 rounded-md font-bold shadow-lg">
+                    <ion-icon name="add-circle" class="text-xl mr-2 align-middle"></ion-icon> Criar Primeira Narrativa
                 </button>
             </a>
         </div>
     </section>
 {% endif %}
 
-{# --- LISTAS (Sem mudanças de cor necessárias, usam cinza escuro) --- #}
+{# LISTAS #}
 {% if lista_narrativas_recentes %}
-<section class='bg-primary_black py-10 pl-4 md:pl-12'>
-    <h2 class="text-gray-100 text-2xl font-semibold mb-4 tracking-wide">Novo</h2>
+<section class='bg-gray-900 py-10 pl-4 md:pl-12'>
+    <h2 class="text-white text-2xl font-semibold mb-4 border-l-4 border-teal-500 pl-3">Recentes</h2>
     <div class="mobile-scroll-container">
         {% for narrativa in lista_narrativas_recentes %}
-            <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 relative group rounded-lg overflow-hidden shadow-lg">
+            <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                 <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
                     <div class="aspect-video w-full overflow-hidden relative">
-                         <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all z-10"></div>
-                        <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                        <div class="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white backdrop-blur-sm">
+                            <ion-icon name="eye" class="mr-1 align-middle"></ion-icon>{{ narrativa.visualizacoes }}
+                        </div>
                     </div>
-                    <div class="bg-gray-800 p-4 border-t border-gray-700 relative z-20">
+                    <div class="bg-gray-800 p-4 relative z-20">
                         <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                         <p class="text-gray-400 text-sm truncate">{{ narrativa.categoria.titulo|default:"Geral" }}</p>
-                    </div>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
-</section>
-{% endif %}
-
-{% if lista_narrativas_emalta %}
-<section class='bg-primary_black py-10 pl-4 md:pl-12 mb-12'>
-    <h2 class="text-gray-100 text-2xl font-semibold mb-4 tracking-wide">Em Alta</h2>
-    <div class="mobile-scroll-container">
-        {% for narrativa in lista_narrativas_emalta %}
-            <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 relative group rounded-lg overflow-hidden shadow-lg">
-                <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                    <div class="aspect-video w-full overflow-hidden relative">
-                        <div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all z-10"></div>
-                        <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
-                    </div>
-                    <div class="bg-gray-800 p-4 border-t border-gray-700 relative z-20">
-                        <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                        <p class="text-gray-400 text-sm truncate">{{ narrativa.categoria.titulo|default:"Geral" }}</p>
+                        <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-1">Gerenciar</p>
                     </div>
                 </a>
             </div>
@@ -124,28 +78,4 @@
 {% endif %}
 
 </main>
-
-<script>
-    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
-    function copyLinkToClipboard() {
-        navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
-            const buttonText = document.getElementById('copy-button-text');
-            const originalText = buttonText.innerText;
-            buttonText.innerText = 'Copiado!';
-            setTimeout(function() {
-                buttonText.innerText = originalText;
-            }, 2000);
-        }, function(err) { console.error('Erro ao copiar: ', err); });
-    }
-    function shareLink() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Jornada Interativa', text: 'Acesse nossa jornada interativa.', url: linkParaCompartilhar
-            });
-        }
-    }
-    document.addEventListener("DOMContentLoaded", function() {
-        if (navigator.share) { document.getElementById('share-button').style.display = 'flex'; }
-    });
-</script>
 {% endblock %}

@@ -16,6 +16,7 @@ import json
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
+# --- FLUXO DE ACEITE DE TERMOS ---
 class LerTermosView(TemplateView):
     template_name = "ler_termos.html"
 
@@ -42,6 +43,7 @@ class LerTermosView(TemplateView):
         return redirect('narrativa:ler_termos')
 
 
+# --- PÁGINAS PÚBLICAS E DE AUTENTICAÇÃO ---
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
@@ -61,6 +63,19 @@ class Homepage(FormView):
             return reverse('narrativa:criarconta')
 
 
+class Criarconta(FormView):
+    template_name = "criarconta.html"
+    form_class = CriarContaForm
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('narrativa:login')
+
+
+# --- ÁREA LOGADA (ADMIN/CRIADOR) ---
 class Narrativas(LoginRequiredMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
@@ -107,18 +122,7 @@ class PerfilView(LoginRequiredMixin, UpdateView):
         return reverse('narrativa:narrativas')
 
 
-class Criarconta(FormView):
-    template_name = "criarconta.html"
-    form_class = CriarContaForm
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('narrativa:login')
-
-
+# --- ÁREA DO PACIENTE (JORNADA) ---
 class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
@@ -146,12 +150,12 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # Garante a criação da sessão e atribuição do perfil
+    # Busca ou cria a sessão do paciente
     sessao, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # Se acabou de criar OU se existe mas não tem perfil: define agora.
+    # GARANTIA DE PERFIL: Se acabou de criar OU se o perfil está vazio, define agora.
     if created or not sessao.narrativa_perfil:
         sessao.narrativa_perfil = narrativa
         sessao.save()
@@ -170,14 +174,14 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
 
     if request.session.session_key:
-        # Garante o log da visita
+        # 1. Garante o log da visita nesta cena
         LogVisitaCena.objects.get_or_create(
             session_key=request.session.session_key,
             cena_visitada=cena,
             defaults={'narrativa_associada': cena.narrativa}
         )
 
-        # Garante o perfil caso o usuário tenha entrado direto na cena
+        # 2. Garante o perfil caso o usuário tenha entrado direto pelo link da cena
         sessao, created = SessaoPaciente.objects.get_or_create(
             session_key=request.session.session_key
         )
@@ -211,7 +215,7 @@ def responder_questionario(request, questionario_id):
             request.session.create()
         session_key = request.session.session_key
 
-        # Garante sessão/perfil ao responder
+        # Garante sessão e perfil ao responder (segurança extra)
         sessao, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
         if created or not sessao.narrativa_perfil:
             if questionario.cena_associada:
@@ -247,8 +251,9 @@ def responder_questionario(request, questionario_id):
     return render(request, 'questionario.html', context)
 
 
+# --- PÁGINAS DE SUPORTE ---
 class AdminFAQView(LoginRequiredMixin, TemplateView):
-    template_name = "admin_faq.html"
+    template_name = "admin/faq.html"  # Caminho atualizado para admin/
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -264,7 +269,7 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- VIEW DE PERFIL (FEEDBACK AO PACIENTE) ---
+# --- VIEW DE PERFIL: FEEDBACK CUMULATIVO ---
 def perfil_sessao_view(request, narrativa_id):
     session_key = request.session.session_key
     if not session_key:
@@ -277,19 +282,20 @@ def perfil_sessao_view(request, narrativa_id):
         session_key=session_key
     )
 
-    # Se o perfil estiver vazio, preenche com a narrativa atual (correção de bug "Visitante")
+    # AUTO-CORREÇÃO: Se o perfil estiver vazio, preenche com a narrativa atual
     if not sessao_paciente.narrativa_perfil:
         sessao_paciente.narrativa_perfil = narrativa_atual
         sessao_paciente.save()
 
+    # Pega o título do perfil
     nome_perfil = sessao_paciente.narrativa_perfil.titulo
 
-    # 1. LÓGICA CUMULATIVA (Baseada em todas as narrativas visitadas nesta sessão)
+    # 1. LÓGICA CUMULATIVA: Identifica TODAS as narrativas tocadas nesta sessão
     ids_narrativas_visitadas = LogVisitaCena.objects.filter(
         session_key=session_key
     ).values_list('narrativa_associada', flat=True).distinct()
 
-    # 2. Cálculo de Cenas
+    # 2. CÁLCULO DE CENAS (Soma de todas as narrativas visitadas)
     total_cenas = Cena.objects.filter(narrativa__id__in=ids_narrativas_visitadas).count()
 
     cenas_visitadas = LogVisitaCena.objects.filter(
@@ -301,7 +307,7 @@ def perfil_sessao_view(request, narrativa_id):
         progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100)
         if progresso_cenas_pct > 100: progresso_cenas_pct = 100
 
-    # 3. Cálculo de Questionários
+    # 3. CÁLCULO DE QUESTIONÁRIOS (Soma de todas as narrativas visitadas)
     total_questionarios = Questionario.objects.filter(
         cena_associada__narrativa__id__in=ids_narrativas_visitadas
     ).count()
@@ -331,23 +337,24 @@ def perfil_sessao_view(request, narrativa_id):
 
 # --- DASHBOARD ADMINISTRATIVO ---
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = "admin/dashboard.html"
+    template_name = "admin/dashboard.html"  # Caminho atualizado para admin/
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(admin.site.each_context(self.request))
 
-        # KPIs
+        # KPIs Gerais
         total_sessoes = SessaoPaciente.objects.count()
         total_respostas = Resposta.objects.count()
         total_narrativas = Narrativa.objects.count()
 
+        # KPI: Jornadas Finalizadas (Cenas sem saída)
         cenas_finais_ids = Cena.objects.filter(escolhas__isnull=True).values_list('id', flat=True)
         sessoes_finalizadas = LogVisitaCena.objects.filter(
             cena_visitada__id__in=cenas_finais_ids
         ).values('session_key').distinct().count()
 
-        # Gráfico 1: Acessos (30 dias)
+        # GRÁFICO 1: Acessos por Dia (Últimos 30 dias)
         trinta_dias_atras = timezone.now() - timedelta(days=30)
         acessos_diarios = LogVisitaCena.objects.filter(timestamp__gte=trinta_dias_atras) \
             .annotate(dia=TruncDay('timestamp')) \
@@ -355,7 +362,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             .annotate(total=Count('id')) \
             .order_by('dia')
 
-        # Tratamento para listas vazias
         if acessos_diarios:
             labels_dias = [item['dia'].strftime('%d/%m') for item in acessos_diarios]
             data_acessos = [item['total'] for item in acessos_diarios]
@@ -363,7 +369,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             labels_dias = []
             data_acessos = []
 
-        # Gráfico 2: Top 5 Narrativas
+        # GRÁFICO 2: Top 5 Narrativas
         top_narrativas = Narrativa.objects.order_by('-visualizacoes')[:5]
         if top_narrativas:
             labels_top = [n.titulo for n in top_narrativas]

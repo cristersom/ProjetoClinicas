@@ -1,171 +1,85 @@
 {% extends 'base.html' %}
-
-{% block navbar %}
-    {% endblock %}
-
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block titulo %}
-Criar Conta
-{% endblock %}
+{% block titulo %}Criar Conta{% endblock %}
 
 {% block head %}
 <style>
-    /* Estilos essenciais */
-    
-    /* Largura de Referência: Todos os elementos visuais usarão 90% de largura centralizada. */
-    
-    /* CORREÇÃO CHAVE: Define a largura e centraliza o formulário como bloco */
-    .z-10 form {
-        text-align: left; 
-        max-width: 450px; /* Largura base do container do formulário */
+    /* Estilização Dark para inputs */
+    .form-group label { color: #d1d5db; font-weight: 500; margin-bottom: 0.5rem; display: block; }
+    .form-control {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        color: #fff !important;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
         width: 100%;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 0 15px; 
     }
-    
-    /* TÍTULO H1 - Alinhamento e Largura */
-    .z-10 h1 {
-        width: 85%;
-        margin: 0 auto 20px auto !important;
-        padding: 0;
-        white-space: nowrap;
-        font-size: 1.5rem;
-        font-weight: bold;
+    .form-control:focus {
+        border-color: #0d9488 !important;
+        box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important;
     }
+    /* Help text do Django (senha fraca etc) */
+    .form-text, .help-block { color: #9ca3af !important; font-size: 0.85rem; }
 
-    /* ALINHAMENTO DE LABELS, INPUTS E TEXTOS DE AJUDA */
-
-    /* Garante que todos os blocos de texto (labels e ajuda) usem 90% de largura e sejam CENTRALIZADOS */
-    .control-label,
-    .form-group label:not(.form-check-label),
-    .form-text,
-    .invalid-feedback {
-        color: white !important;
-        text-align: left !important;
-        width: 90%;
-        margin: 0 auto 5px auto !important; /* Centraliza o bloco */
-        display: block;
-        padding: 0;
-        margin-top: 0;
-        margin-bottom: 5px;
-        font-size: 0.9rem;
-        white-space: normal !important;
+    /* Checkbox customizado */
+    .form-check { display: flex; align-items: flex-start; padding-left: 0; margin-top: 1rem; }
+    .form-check-input {
+        background-color: #374151; border-color: #4b5563;
+        width: 1.2em; height: 1.2em; margin-right: 0.5em; margin-top: 0.2em;
     }
+    .form-check-input:checked { background-color: #0d9488; border-color: #0d9488; }
+    .form-check-label { color: #d1d5db; font-size: 0.95rem; }
 
-    /* Input field */
-    .z-10 input[type="text"],
-    .z-10 input[type="email"],
-    .z-10 input[type="password"] {
-        width: 90% !important;
-        margin: 0 auto 10px auto !important; /* Centraliza o input (90%) */
-        display: block;
-    }
-
-    /* Linha Divisória (Legend): OCULTA */
-    .z-10 fieldset legend {
-        border-bottom: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        height: 0;
-        overflow: hidden;
-    }
-
-    /* CORREÇÃO CRÍTICA DO CHECKBOX */
-    .form-group .form-check {
-        /* O container do form-check precisa ser centralizado primeiro */
-        width: 90%; /* Limita o bloco para 90% */
-        margin: 15px auto 25px auto !important; /* CENTRALIZA o bloco do checkbox */
-
-        padding-top: 15px;
-        padding-bottom: 25px;
-        text-align: left;
-        display: flex;
-        align-items: center;
-
-        /* NOVO: Remove o padding-left padrão do Bootstrap que estava causando o extravasamento */
-        padding-left: 0 !important;
-    }
-
-    /* Ajusta o checkbox e o label dentro do form-check */
-    .form-group .form-check .form-check-input {
-        margin-right: 0.5em; /* Espaçamento entre box e texto */
-        margin-top: 0;
-        /* NOVO: Remove a margem negativa que estava sendo aplicada em alguns browsers */
-        margin-left: 0;
-    }
-
-    .form-group .form-check label {
-        font-weight: normal !important;
-        font-size: 0.9rem;
-        white-space: nowrap;
-        margin-left: 0.5em; /* Espaçamento entre box e texto (complementa o margin-right do input) */
-    }
-    
-    /* BOTÃO CRIAR CONTA - Mesma largura do Input */
-    .z-10 button[type="submit"] {
-        width: 90% !important;
-        margin: 10px auto 0 auto !important; 
-        display: block;
-    }
-    
-    /* Estilo para negrito e sublinhado no link */
-    .termos-link {
-        font-weight: bold;
-        text-decoration: underline;
-        color: #dc2626 !important; 
-    }
-    
-    /* Padding vertical no container principal */
-    .z-10.h-full {
-        padding-top: 50px !important; 
-        padding-bottom: 50px !important;
-    }
-
+    /* Link dos termos dentro do label */
+    .termos-link { color: #2dd4bf !important; text-decoration: underline; font-weight: bold; }
+    .termos-link:hover { color: #5eead4 !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-    <header class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay showcase border-gray-600 border-b-8 flex justify-center items-center bg-no-repeat"  style="background-image: url('{% static 'images/background.png' %}');">
-        <div class="z-10 h-full py-32 md:py-0 text-gray-100 flex justify-center items-center flex-col p-5">
-            {# TÍTULO AGORA É UM H1 COM LARGURA DE 90% CENTRALIZADO #}
-            <h1 class="text-3xl font-bold">Crie uma conta para continuar</h1>
-            
-            <form method="post">
-                {% csrf_token %}
-                <fieldset class="form-group">
-                    {# LEGEND OCULTA #}
-                    <legend class="border-bottom mb-4"></legend>
-                    
-                    {{ form|crispy }}
-                </fieldset>
-                {# BOTÃO FORÇADO PARA 90% #}
-                <button class="bg-red-600 py-1 px-3 text-white w-full md:text-lg rounded-md" type="submit">Criar Conta</button>
-            </form>
-            <script>
-                // Acha o label e o link injetado pelo crispy-forms
-                const label = document.querySelector('label[for="id_aceite_termos"]');
-                const termosLink = label ? label.querySelector('a') : null;
+    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-10" style="background-image: url('{% static 'images/background.png' %}');">
+        <div class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm"></div>
 
-                if (label && termosLink) {
-                    const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
-                    const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
+        <div class="z-10 w-full max-w-lg px-4">
+            <div class="bg-gray-800/90 border border-gray-700 p-8 rounded-2xl shadow-2xl">
 
-                    // Reconstroi o HTML do label com os dois links formatados
-                    label.innerHTML = `Aceita nossos 
-                        <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e 
-                        <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
-                }
-                
-                // Garante que a linha da legend seja totalmente removida
-                const legendEl = document.querySelector('fieldset legend');
-                if (legendEl) {
-                     legendEl.innerHTML = '';
-                }
-            </script>
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
+                    <p class="text-gray-400 text-sm mt-2">Junte-se à plataforma de narrativas clínicas</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <fieldset class="form-group">
+                        {{ form|crispy }}
+                    </fieldset>
+
+                    <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg mt-4 text-lg" type="submit">
+                        Registrar
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center border-t border-gray-700 pt-4">
+                    <p class="text-gray-400 text-sm">Já tem uma conta?
+                        <a href="{% url 'narrativa:login' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition">Fazer Login</a>
+                    </p>
+                </div>
+            </div>
         </div>
     </header>
 
-    {% endblock %}
+    <script>
+        // Script para injetar os links de Termos e Privacidade no Label do Checkbox
+        const label = document.querySelector('label[for="id_aceite_termos"]');
+        if (label) {
+            const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
+            const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
+
+            label.innerHTML = `Aceita nossos
+                <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
+                <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
+        }
+    </script>
+{% endblock %}

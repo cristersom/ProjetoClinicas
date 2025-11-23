@@ -1,0 +1,130 @@
+{% extends 'admin/base_site.html' %}
+{% load static %}
+
+{% block title %}Como Criar Jornadas{% endblock %}
+
+{% block extrahead %}
+<style>
+    /* Reset e Base */
+    .onboarding-container {
+        max-width: 900px; margin: 40px auto; font-family: 'Roboto', 'Segoe UI', sans-serif; color: #333; line-height: 1.6;
+    }
+    .intro-header { text-align: center; margin-bottom: 50px; }
+    .intro-header h1 { font-size: 2.2rem; color: #444; margin-bottom: 10px; font-weight: 300; }
+
+    /* Card de Conceito */
+    .concept-card {
+        background: #fff; border-radius: 12px; padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px;
+        border-left: 5px solid #0d9488; /* TEAL-600 */
+    }
+    .concept-title { font-size: 1.4rem; color: #115e59; /* Teal Escuro */ margin-bottom: 20px; font-weight: 600; }
+
+    /* Diagrama Visual */
+    .flow-diagram {
+        display: flex; justify-content: space-between; align-items: center;
+        background: #f0fdfa; /* Teal bem claro */
+        padding: 20px; border-radius: 8px; flex-wrap: wrap; gap: 10px; border: 1px solid #ccfbf1;
+    }
+    .flow-item { text-align: center; flex: 1; min-width: 120px; }
+    .flow-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
+    .flow-text strong { display: block; color: #0f766e; } /* Teal-700 */
+    .flow-text small { color: #555; }
+
+    /* Timeline Vertical */
+    .timeline { position: relative; padding-left: 30px; margin-top: 20px; }
+    .timeline::before {
+        content: ''; position: absolute; left: 0; top: 10px; bottom: 0; width: 4px; background: #e9ecef; border-radius: 2px;
+    }
+    .timeline-step { position: relative; margin-bottom: 40px; }
+    .timeline-marker {
+        position: absolute; left: -43px; top: 0; width: 30px; height: 30px;
+        background: #0d9488; /* TEAL */
+        color: white; border-radius: 50%; text-align: center; line-height: 30px; font-weight: bold;
+        box-shadow: 0 0 0 4px #fff;
+    }
+    .timeline-content h3 { margin: 0 0 10px 0; font-size: 1.2rem; color: #333; }
+
+    .highlight-box {
+        background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404;
+        padding: 15px; border-radius: 6px; margin-top: 10px; font-size: 0.9rem;
+    }
+
+    /* Acordeão */
+    details { background: #fff; margin-bottom: 10px; border-radius: 6px; border: 1px solid #eee; }
+    details summary {
+        padding: 15px; cursor: pointer; background: #fdfdfd; font-weight: 600; color: #0f766e; /* Teal Text */
+        display: flex; justify-content: space-between; align-items: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="onboarding-container">
+    <div class="intro-header">
+        <h1>Manual de Criação</h1>
+        <p>Guia rápido para configurar suas narrativas clínicas.</p>
+    </div>
+
+    <div class="concept-card">
+        <h2 class="concept-title">Entenda a Estrutura</h2>
+        <div class="flow-diagram">
+            <div class="flow-item">
+                <span class="flow-icon">📚</span>
+                <div class="flow-text"><strong>1. Narrativa</strong><small>O "Livro"</small></div>
+            </div>
+            <div class="flow-item text-teal-300">→</div>
+            <div class="flow-item">
+                <span class="flow-icon">🎬</span>
+                <div class="flow-text"><strong>2. Cenas</strong><small>As "Páginas"</small></div>
+            </div>
+            <div class="flow-item text-teal-300">→</div>
+            <div class="flow-item">
+                <span class="flow-icon">❓</span>
+                <div class="flow-text"><strong>3. Interação</strong><small>Perguntas/Botões</small></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="concept-card">
+        <h2 class="concept-title">O Fluxo "Vai e Volta"</h2>
+        <div class="timeline">
+            <div class="timeline-step">
+                <div class="timeline-marker">1</div>
+                <div class="timeline-content">
+                    <h3>Crie a "Casca" da Narrativa</h3>
+                    <p>Vá em <strong>Narrativas > Adicionar</strong>. Preencha título e capa.</p>
+                    <div class="highlight-box">⚠️ Deixe "Cena Inicial" em branco agora. Salve.</div>
+                </div>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-marker">2</div>
+                <div class="timeline-content">
+                    <h3>Crie todas as Cenas</h3>
+                    <p>Vá em <strong>Cenas > Adicionar</strong>. Crie as telas e aponte para a Narrativa do passo 1.</p>
+                </div>
+            </div>
+            <div class="timeline-step">
+                <div class="timeline-marker">3</div>
+                <div class="timeline-content">
+                    <h3>Faça as Conexões (A Volta)</h3>
+                    <p>Agora volte na <strong>Narrativa</strong> para definir a "Cena Inicial".</p>
+                    <p>Volte nas <strong>Cenas</strong> para criar os botões de "Escolha" que ligam umas às outras.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="concept-card" style="border-left-color: #f59e0b;">
+        <h2 class="concept-title" style="color: #b45309;">Dúvidas Frequentes</h2>
+        <details>
+            <summary>Como compartilho com o paciente?</summary>
+            <p style="padding: 15px; color:#666;">Vá em Narrativas > Detalhes. Use o botão cinza <strong>"Copiar Link"</strong>.</p>
+        </details>
+        <details>
+            <summary>Onde vejo os resultados?</summary>
+            <p style="padding: 15px; color:#666;">No menu lateral, clique em <strong>Dashboard</strong> para ver gráficos gerais, ou em <strong>Questionários > Ver Resumo</strong> para dados específicos.</p>
+        </details>
+    </div>
+</div>
+{% endblock %}

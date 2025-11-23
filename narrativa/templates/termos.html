@@ -1,60 +1,37 @@
 {% extends 'base.html' %}
 {% block titulo %}Termos de Uso{% endblock %}
-
 {% block navbar %}{% endblock %}
 
 {% block content %}
-<main class="bg-primary_black min-h-screen w-full flex justify-center text-gray-100 p-10">
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-8 relative">
+<main class="bg-gray-900 min-h-screen w-full flex justify-center text-gray-100 p-6 md:p-10">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8 relative">
 
-        {# BOTÃO VOLTAR: Usa window.history.back() #}
-        <div class="absolute top-2 right-2 md:top-4 md:right-4 z-10">
+        <div class="absolute top-4 right-4 z-10">
              <a href="#" onclick="window.history.back(); return false;"
-                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
-                title="Voltar à página anterior">
-                 Voltar
+                class="inline-flex items-center bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-300">
+                 <ion-icon name="arrow-back" class="mr-2"></ion-icon> Voltar
              </a>
         </div>
-        <h1 class="text-3xl font-bold mb-6 text-center">Termos de Uso</h1>
-        <p class="mb-4 text-gray-300">
-            Bem-vindo à nossa plataforma de jornadas interativas. Ao aceder e utilizar este serviço, você (o "Utilizador") concorda em cumprir e aceitar os seguintes termos e condições de uso.
+
+        <h1 class="text-3xl font-bold mb-8 text-center text-teal-400">Termos de Uso</h1>
+        <p class="mb-6 text-gray-300 leading-relaxed">
+            Bem-vindo à nossa plataforma de jornadas interativas. Ao utilizar este serviço, você concorda com os termos abaixo.
         </p>
 
-        <h2 class="text-2xl font-semibold mt-6 mb-3">1. Definição dos Utilizadores</h2>
+        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">1. Definição dos Utilizadores</h2>
+        <ul class="list-disc list-inside text-gray-300 space-y-2 mb-4">
+            <li><strong class="text-teal-500">Administradores:</strong> Utilizadores autenticados que gerem o conteúdo.</li>
+            <li><strong class="text-teal-500">Pacientes:</strong> Utilizadores anónimos que consomem as jornadas.</li>
+        </ul>
+
+        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">2. Responsabilidades</h2>
         <p class="mb-4 text-gray-300">
-            Esta plataforma serve dois tipos de utilizadores:
-            <ul>
-                <li class="ml-4 mb-2"><strong>Administradores:</strong> Utilizadores autenticados (logados) que possuem autoridade para criar, editar, gerir e analisar o conteúdo das Narrativas, Cenas, Questionários e Relatórios.</li>
-                <li class="ml-4 mb-2"><strong>Pacientes:</strong> Utilizadores não autenticados (anónimos) que acedem à plataforma através de links específicos para consumir as Narrativas interativas e submeter respostas aos Questionários.</li>
-            </ul>
+            O Paciente concorda em fornecer informações honestas nas respostas dos questionários. A participação é voluntária e pode ser interrompida a qualquer momento.
         </p>
 
-        <h2 class="text-2xl font-semibold mt-6 mb-3">2. Conduta e Responsabilidades</h2>
+        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">3. Dados</h2>
         <p class="mb-4 text-gray-300">
-            O Administrador é inteiramente responsável pelo conteúdo (textos, vídeos, imagens, perguntas) que insere na plataforma, garantindo que não viola direitos de autor ou quaisquer leis aplicáveis.
-        </p>
-        <p class="mb-4 text-gray-300">
-            O Paciente concorda em fornecer informações honestas nas respostas dos questionários. A sua participação é voluntária.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">3. Propriedade Intelectual</h2>
-        <p class="mb-4 text-gray-300">
-            Todo o conteúdo criado pelos Administradores na plataforma (Narrativas, Cenas, etc.) é de propriedade do Administrador ou da entidade clínica que ele representa.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">4. Coleta e Uso de Dados</h2>
-        <p class="mb-4 text-gray-300">
-            A plataforma recolhe dados de utilização e respostas. A nossa <a href="{% url 'narrativa:politica_privacidade' %}" class="text-blue-400 hover:underline">Política de Privacidade</a> detalha extensivamente como estes dados são recolhidos, processados e protegidos.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">5. Limitação de Responsabilidade</h2>
-        <p class="mb-4 text-gray-300">
-            Esta plataforma é fornecida "como está". Não garantimos que o serviço será ininterrupto ou livre de erros. O Administrador concorda em usar o serviço por sua conta e risco, e é responsável por qualquer informação ou conselho transmitido através das Narrativas.
-        </p>
-
-        <h2 class="text-2xl font-semibold mt-6 mb-3">6. Modificações dos Termos</h2>
-        <p class="mb-4 text-gray-300">
-            Reservamo-nos o direito de modificar estes termos a qualquer momento. Quaisquer alterações serão publicadas nesta página.
+            A plataforma recolhe dados estatísticos. Consulte nossa <a href="{% url 'narrativa:politica_privacidade' %}" class="text-teal-400 hover:text-teal-300 underline">Política de Privacidade</a> para detalhes.
         </p>
     </div>
 </main>
