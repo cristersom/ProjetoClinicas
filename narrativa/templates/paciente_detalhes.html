@@ -1,75 +1,68 @@
 {% extends 'base.html' %}
-{% load static %}
-{% load crispy_forms_tags %}
-
-{% block titulo %}Bem-vindo{% endblock %}
-
-{% block head %}
-<style>
-    #id_email {
-        width:100%; flex:1; color:#000; padding: 12px; border-radius: 0.375rem 0 0 0.375rem; border: none;
-    }
-    #id_email:focus { outline: none; ring: 2px solid #0d9488; }
-</style>
-{% endblock %}
+{% block navbar %}{% include 'navbar.html' %}{% endblock %}
+{% block titulo %}Detalhes da Jornada{% endblock %}
 
 {% block content %}
-    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative" style="background-image: url('{% static 'images/background.png' %}');">
-        <div class="absolute inset-0 bg-gray-900/80"></div> <div class="z-10 container mx-auto px-4 text-center mt-16 md:mt-0">
-            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight drop-shadow-xl">
-                Narrativas clínicas e <span class="text-teal-400">pesquisas de satisfação</span>,<br> tudo em um só lugar.
-            </h1>
-            <h3 class="text-lg md:text-2xl text-gray-300 mb-10 font-light">
-                Crie onde quiser. Aplique quando quiser.
-            </h3>
+<main class='bg-gray-900 min-h-screen w-full'>
 
-            <div class="w-full max-w-lg mx-auto">
-                <form method="post" class="flex shadow-2xl">
+    <section class="min-h-[60vh] relative bg-no-repeat flex items-end bg-cover bg-center" style="background-image: url('{{ object.thumb.url }}');">
+        <div class="bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent w-full p-6 md:p-12 pb-12">
+            <div class="max-w-3xl">
+                <span class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded uppercase tracking-wide mb-3 inline-block">Jornada Clínica</span>
+                <h2 class="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                    {{ object.titulo }}
+                </h2>
+                <p class="text-gray-300 text-sm md:text-lg mb-8 line-clamp-3">
+                    {{ object.descricao }}
+                </p>
+
+                <form method="post" action="{% url 'narrativa:paciente_detalhes' pk=object.pk %}">
                     {% csrf_token %}
-                    {{ form.email }}
-                    <button class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-r-md text-lg transition-colors flex items-center" type="submit">
-                        <span>Acessar</span>
-                        <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
+                    <button type="submit" class="flex items-center bg-white hover:bg-teal-50 text-teal-900 font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+                        <ion-icon name="play-circle" class="text-2xl mr-2 text-teal-600"></ion-icon>
+                        <span>Iniciar Jornada</span>
                     </button>
                 </form>
-                <p class="text-gray-400 text-sm mt-3">Digite seu e-mail para iniciar ou criar uma conta.</p>
             </div>
         </div>
-    </header>
+    </section>
 
-    <section class='flex flex-col md:flex-row items-center bg-gray-900 py-16 border-b border-gray-800'>
-        <div class="w-full md:w-1/2 p-8 md:p-16 text-center md:text-left">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Inicie Jornadas</h2>
-            <p class="text-lg text-gray-400 leading-relaxed">
-                Conduza seus pacientes por caminhos interativos desenhados para informar e acolher.
+    <section class='bg-gray-900 py-10 px-4 md:px-12'>
+        <div class="max-w-4xl">
+            <h2 class="text-white text-2xl font-semibold mb-4 border-b border-gray-800 pb-2">Sobre esta jornada</h2>
+            <p class="text-gray-400 text-base md:text-lg leading-relaxed mb-12">
+                {{ object.descricao }}
             </p>
-        </div>
-        <div class='w-full md:w-1/2 flex justify-center p-8'>
-            <img src="{% static 'images/jornada.png' %}" class="w-3/4 rounded-xl shadow-2xl opacity-90 hover:opacity-100 transition" alt="Jornada">
+
+            <h2 class="text-white text-xl font-semibold mb-4">O que você vai encontrar:</h2>
+            <div class="grid gap-3 md:grid-cols-2">
+                {% for cena in object.cenas.all %}
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 flex items-center">
+                    <span class="bg-gray-700 text-gray-300 h-8 w-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">{{ forloop.counter }}</span>
+                    <span class="text-gray-200">{{ cena.titulo }}</span>
+                </div>
+                {% empty %}
+                <p class="text-gray-500">Nenhuma cena cadastrada ainda.</p>
+                {% endfor %}
+            </div>
         </div>
     </section>
 
-    <section class='flex flex-col-reverse md:flex-row items-center bg-gray-800 py-16 border-b border-gray-700'>
-        <div class='w-full md:w-1/2 flex justify-center p-8'>
-            <img src="{% static 'images/tratamentos.png' %}" class="w-3/4 rounded-xl shadow-2xl opacity-90 hover:opacity-100 transition" alt="Tratamentos">
-        </div>
-        <div class="w-full md:w-1/2 p-8 md:p-16 text-center md:text-left">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Acompanhe Tratamentos</h2>
-            <p class="text-lg text-gray-400 leading-relaxed">
-                Tenha feedback em tempo real sobre a percepção e o bem-estar do paciente.
-            </p>
+    {% if relacionados %}
+    <section class='bg-gray-900 py-10 px-4 md:px-12 border-t border-gray-800'>
+        <h2 class="text-gray-400 text-lg font-semibold mb-6">Veja também</h2>
+        <div class="flex overflow-x-auto pb-4 gap-4 scrollbar-hide">
+            {% for narrativa_relacionada in relacionados %}
+                <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa_relacionada.pk %}" class="flex-shrink-0 w-64 group">
+                    <div class="aspect-video rounded-lg overflow-hidden mb-2 relative">
+                        <img src="{{ narrativa_relacionada.thumb.url}}" class="w-full h-full object-cover group-hover:scale-105 transition opacity-80 group-hover:opacity-100">
+                    </div>
+                    <p class="text-gray-300 text-sm font-medium group-hover:text-white truncate">{{ narrativa_relacionada.titulo }}</p>
+                </a>
+            {% endfor %}
         </div>
     </section>
+    {% endif %}
 
-    <section class='flex flex-col md:flex-row items-center bg-gray-900 py-16'>
-        <div class="w-full md:w-1/2 p-8 md:p-16 text-center md:text-left">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">Conclua Atendimentos</h2>
-            <p class="text-lg text-gray-400 leading-relaxed">
-                Finalize ciclos de cuidado com dados concretos e maior satisfação.
-            </p>
-        </div>
-        <div class='w-full md:w-1/2 flex justify-center p-8'>
-            <img src="{% static 'images/atendimento.png' %}" class="w-3/4 rounded-xl shadow-2xl opacity-90 hover:opacity-100 transition" alt="Atendimento">
-        </div>
-    </section>
+</main>
 {% endblock %}
