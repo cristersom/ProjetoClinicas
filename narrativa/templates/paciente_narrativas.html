@@ -1,211 +1,83 @@
 {% extends 'base.html' %}
-
 {% block navbar %}{% include 'navbar.html' %}{% endblock %}
-
 {% load static %}
 
-{% block titulo %}
-Nossas Jornadas
-{% endblock %}
+{% block titulo %}Nossas Jornadas{% endblock %}
 
 {% block head %}
 <style>
-    html {
-      scroll-behavior: smooth;
+    html { scroll-behavior: smooth; }
+    .mobile-scroll-container {
+        display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px;
     }
-    .wrapper {
-      display: grid;
-      grid-template-columns: 100% 100%;
-      overflow: hidden;
+    .mobile-scroll-container::-webkit-scrollbar { display: none; }
+
+    .narrativa-card {
+        flex-shrink: 0;
+        scroll-snap-align: start;
+        transition: transform 0.3s;
     }
-    .item {
-        transition: 250ms all;
-    }
-    .item:hover {
-      transform: scale(1.1);
-      z-index: 10;
-    }
-    .arrow__btn {
-      display: flex;
-      align-items: center;
-      color: #fff;
-      text-decoration: none;
-      font-size: 4em;
-      z-index: 1;
-      padding: 0 20px;
-    }
-    @media only screen and (max-width: 600px) {
-      a.arrow__btn {
-        display: none;
-      }
-    }
+    .narrativa-card:hover { transform: scale(1.02); }
 </style>
 {% endblock %}
 
 {% block content %}
 <main class='bg-primary_black min-h-screen w-full'>
 
-<section class="min-h-screen bg-black bg-opacity-75 bg-blend-overlay relative bg-no-repeat flex justify-center items-center bg-cover" style="background-image: url('{% static 'images/background.png' %}');">
-    <div class="z-10 h-full py-32 md:py-0 text-gray-100 text-center flex items-center flex-col justify-center w-full">
-        <h1 class="font-semibold text-4xl md:text-5xl w-10/12 md:w-3/4 text-center">
-            Conheça nossas jornadas interativas
-        </h1>
-        <h3 class="text-xl md:text-xl py-5">
-            Selecione uma narrativa abaixo para começar.
-        </h3>
-    </div>
-</section>
+    <section class="min-h-[60vh] bg-black bg-opacity-75 bg-blend-overlay relative bg-no-repeat bg-cover bg-center flex items-center justify-center" style="background-image: url('{% static 'images/background.png' %}');">
+        <div class="z-10 w-full px-4 text-center">
+            <h1 class="font-bold text-3xl md:text-5xl text-gray-100 mb-4">
+                Conheça nossas jornadas interativas
+            </h1>
+            <h3 class="text-lg md:text-xl text-gray-300">
+                Selecione uma narrativa abaixo para começar.
+            </h3>
+        </div>
+    </section>
 
-{% if lista_narrativas_emalta %}
-<section class='bg-primary_black flex justify-center py-10'>
-    <div class="p-8 w-10/12 relative" >
-        <h2 class="text-gray-200 text-2xl font-medium">
-            Escolha sua jornada
-        </h2>
-        <div class="wrapper">
-          <section id="section1jornada" class="flex flex-nowrap items-center justify-center space-x-8">
-            <a href="#section2jornada" class="arrow__btn text-6xl page">‹</a>
+    {% if lista_narrativas_emalta %}
+    <section class='bg-primary_black py-10 pl-4 md:pl-12'>
+        <h2 class="text-gray-100 text-2xl font-semibold mb-4">Escolha sua Jornada</h2>
+        <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_emalta %}
-            {% if forloop.counter < 5 %}
-                {# --- CARD MODIFICADO: Imagem + Título --- #}
-                <div class="item w-1/4 m-4">
+                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 relative group">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="h-48 w-full relative">
-                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                        <div class="aspect-video w-full overflow-hidden rounded-t-md">
+                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                         </div>
-                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                        <div class="bg-gray-800 p-3 rounded-b-md border-t border-gray-700">
+                            <p class="text-white font-bold truncate">{{ narrativa.titulo }}</p>
                         </div>
                     </a>
                 </div>
-            {% endif %}
             {% endfor %}
-                <a href="#section2jornada" class="arrow__btn text-6xl">›</a>
-          </section>
-            {% if lista_narrativas_emalta|length > 4 %}
-              <section id="section2jornada" class="flex flex-nowrap items-center justify-center">
-                <a href="#section1jornada" class="arrow__btn text-6xl">‹</a>
-                    {% for narrativa in lista_narrativas_emalta %}
-                    {% if forloop.counter > 4 %}
-                        <div class="item w-1/4 m-4">
-                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <div class="h-48 w-full relative">
-                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                                </div>
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% endfor %}
-                <a href="#section1jornada" class="arrow__btn text-6xl">›</a>
-              </section>
-            {% endif %}
         </div>
-    </div>
-</section>
-{% endif %}
+    </section>
+    {% endif %}
 
-{% if lista_narrativas_recentes %}
-<section class='bg-primary_black flex justify-center py-10'>
-    <div class="p-8 w-10/12 relative" >
-        <h2 class="text-gray-200 text-2xl font-medium">
-            Novas Jornadas
-        </h2>
-        <div class="wrapper">
-          <section id="section1" class="flex flex-nowrap items-center justify-center space-x-8">
-            <a href="#section2" class="arrow__btn text-6xl page">‹</a>
+    {% if lista_narrativas_recentes %}
+    <section class='bg-primary_black py-10 pl-4 md:pl-12'>
+        <h2 class="text-gray-100 text-2xl font-semibold mb-4">Novas Jornadas</h2>
+        <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_recentes %}
-            {% if forloop.counter < 5 %}
-                <div class="item w-1/4 m-4">
+                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 relative group">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="h-48 w-full relative">
-                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
+                        <div class="aspect-video w-full overflow-hidden rounded-t-md">
+                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110">
                         </div>
-                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
+                        <div class="bg-gray-800 p-3 rounded-b-md border-t border-gray-700">
+                            <p class="text-white font-bold truncate">{{ narrativa.titulo }}</p>
                         </div>
                     </a>
                 </div>
-            {% endif %}
             {% endfor %}
-                <a href="#section2" class="arrow__btn text-6xl">›</a>
-          </section>
-            {% if lista_narrativas_recentes|length > 4 %}
-              <section id="section2" class="flex flex-nowrap items-center justify-center">
-                <a href="#section1" class="arrow__btn text-6xl">‹</a>
-                    {% for narrativa in lista_narrativas_recentes %}
-                    {% if forloop.counter > 4 %}
-                        <div class="item w-1/4 m-4">
-                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <div class="h-48 w-full relative">
-                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                                </div>
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% endfor %}
-                <a href="#section1" class="arrow__btn text-6xl">›</a>
-              </section>
-            {% endif %}
         </div>
-    </div>
-</section>
-{% endif %}
-
-{% if lista_narrativas_emalta %}
-<section class='bg-primary_black flex justify-center py-10'>
-    <div class="p-8 w-10/12 relative" >
-        <h2 class="text-gray-200 text-2xl font-medium">
-            Jornadas Populares
-        </h2>
-        <div class="wrapper">
-          <section id="section1emalta" class="flex flex-nowrap items-center justify-center space-x-8">
-            <a href="#section2emalta" class="arrow__btn text-6xl page">‹</a>
-            {% for narrativa in lista_narrativas_emalta %}
-            {% if forloop.counter < 5 %}
-                <div class="item w-1/4 m-4">
-                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="h-48 w-full relative">
-                            <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
-                        </div>
-                        <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endif %}
-            {% endfor %}
-                <a href="#section2emalta" class="arrow__btn text-6xl">›</a>
-          </section>
-            {% if lista_narrativas_emalta|length > 4 %}
-              <section id="section2emalta" class="flex flex-nowrap items-center justify-center">
-                <a href="#section1emalta" class="arrow__btn text-6xl">‹</a>
-                    {% for narrativa in lista_narrativas_emalta %}
-                    {% if forloop.counter > 4 %}
-                        <div class="item w-1/4 m-4">
-                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                                <div class="h-48 w-full relative">
-                                    <img src="{{ narrativa.thumb.url }}" class="rounded-t-md w-full h-full object-cover">
-                                </div>
-                                <div class="bg-gray-800 p-2 rounded-b-md text-center border border-gray-700 border-t-0">
-                                    <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                                </div>
-                            </a>
-                        </div>
-                    {% endif %}
-                    {% endfor %}
-                <a href="#section1emalta" class="arrow__btn text-6xl">›</a>
-              </section>
-            {% endif %}
-        </div>
-    </div>
-</section>
-{% endif %}
+    </section>
+    {% endif %}
 
 </main>
 {% endblock %}

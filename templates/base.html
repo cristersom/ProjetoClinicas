@@ -2,51 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>
         {% block titulo %}
         {% endblock %}
     </title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Melhorias Globais de Mobile */
+        body {
+            overflow-x: hidden; /* Evita rolagem horizontal indesejada */
+            -webkit-font-smoothing: antialiased;
+        }
+        /* Garante que imagens não estouram a tela */
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
     {% block head %}
     {% endblock %}
 </head>
-<body class="bg-blue-600 text-black-100 font-primary">
+<body class="bg-blue-600 text-black-100 font-sans antialiased">
     {% block navbar %}
         {% include 'navbar.html' %}
     {% endblock %}
+
     {% block content %}
     {% endblock %}
 
-    <footer class="text-gray-100 px-5 py-10 bg-blue-600">
-        <ul class="flex justify-between items-center">
-            <li>&copy; 2025</li>
-            <li>
+    <footer class="text-gray-100 px-5 py-10 bg-blue-600 mt-auto">
+        <ul class="flex flex-col md:flex-row justify-between items-center gap-4">
+            <li class="text-sm">&copy; 2025 Minha Clínica</li>
+            <li class="text-sm text-center">
                 <a href="{% url 'narrativa:termos_de_uso' %}" class="hover:underline">Termos de Uso</a> |
                 <a href="{% url 'narrativa:politica_privacidade' %}" class="hover:underline">Política de Privacidade</a>
             </li>
-            <li></li> {# Deixado em branco para manter o espaçamento #}
+            <li></li>
         </ul>
     </footer>
-    <script>
-    const nav = document.querySelector('nav')
 
-    document.addEventListener("scroll",e=>{
-
-        if(scrollY>100){
-            if(scrollY>window.innerHeight){
-            nav.classList.add('invisible')
-        }else{
-            nav.classList.add('bg-gray-900')
-            nav.classList.remove('invisible')
-        }
-        }else{
-            nav.classList.remove('bg-gray-900')
-            nav.classList.remove('invisible')
-        }
-    })
-</script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<script>
+    const nav = document.querySelector('nav');
+    if(nav) {
+        document.addEventListener("scroll", e => {
+            if(scrollY > 50){ // Reduzi o trigger para mobile
+                nav.classList.add('bg-gray-900');
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('bg-gray-900');
+                nav.classList.remove('shadow-md');
+            }
+        });
+    }
+</script>
 </body>
 </html>
