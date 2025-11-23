@@ -15,36 +15,41 @@
 {% endblock %}
 
 {% block content %}
-<main class='bg-gray-900 min-h-screen w-full'>
+<main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="relative w-full">
-        <img src="{% static 'images/background.png' %}" alt="Admin Banner" class="w-full h-auto block object-contain">
+    <section class="min-h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-center justify-center"
+             style="background-image: url('{% static 'images/background.png' %}');">
 
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent flex flex-col justify-end pb-8 md:pb-20 px-6 md:px-12">
-            <div class="max-w-4xl mx-auto text-center w-full">
-                <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-2 md:mb-4 block shadow-black drop-shadow-md">Painel Administrativo</span>
-                <h1 class="font-bold text-2xl md:text-6xl text-white mb-4 md:mb-6 leading-tight drop-shadow-xl">
-                    Gestão de <br>Jornadas Clínicas.
-                </h1>
+        <div class="absolute inset-0 bg-black bg-opacity-75 bg-blend-overlay"></div>
 
-                <div class="flex flex-col md:flex-row gap-4 justify-center mt-4">
-                    <a href="{% url 'admin:narrativa_narrativa_add' %}" class="w-full md:w-auto">
-                        <button class="w-full md:w-auto flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
-                            <ion-icon name="add-circle" class="text-xl mr-2"></ion-icon>
-                            <span>Nova Narrativa</span>
-                        </button>
-                    </a>
-                    <button onclick="handleShareGeneral()" class="w-full md:w-auto flex justify-center items-center bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
-                        <ion-icon name="share-social-outline" class="text-xl mr-2"></ion-icon>
-                        <span id="share-text-general">Link Pacientes</span>
+        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto relative">
+            <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block">
+                Painel Administrativo
+            </span>
+            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
+                Gestão de <br>Jornadas Clínicas.
+            </h1>
+            <h3 class="text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto">
+                Crie, edite e acompanhe o desempenho das narrativas interativas.
+            </h3>
+
+            <div class="flex flex-col md:flex-row gap-4 justify-center mt-4">
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="w-full md:w-auto">
+                    <button class="w-full md:w-auto flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                        <ion-icon name="add-circle" class="text-xl mr-2"></ion-icon>
+                        <span>Nova Narrativa</span>
                     </button>
-                </div>
+                </a>
+                <button onclick="handleShareGeneral()" class="w-full md:w-auto flex justify-center items-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-transform hover:scale-105">
+                    <ion-icon name="share-social-outline" class="text-xl mr-2"></ion-icon>
+                    <span id="share-text-general">Link Pacientes</span>
+                </button>
             </div>
         </div>
     </section>
 
     {% if lista_narrativas_recentes %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 -mt-6 rounded-t-3xl shadow-2xl'>
+    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20'>
         <div class="flex items-center mb-6 pr-4">
             <h2 class="text-white text-xl md:text-2xl font-semibold mr-3">Recentes</h2>
             <div class="h-px flex-1 bg-gray-800"></div>
@@ -56,7 +61,7 @@
                         <div class="aspect-[4/3] w-full overflow-hidden">
                             <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
                         </div>
-                        <div class="p-4">
+                        <div class="p-5">
                             <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
                             <p class="text-teal-400 text-xs font-bold uppercase mt-1">Gerenciar</p>
                         </div>
@@ -80,8 +85,9 @@
                                 <ion-icon name="eye" class="mr-1"></ion-icon> {{ narrativa.visualizacoes }}
                             </div>
                         </div>
-                        <div class="p-4">
+                        <div class="p-5">
                             <p class="text-gray-200 font-semibold truncate">{{ narrativa.titulo }}</p>
+                            <p class="text-gray-500 text-xs uppercase mt-2 font-bold">Gerenciar</p>
                         </div>
                     </a>
                 </div>
