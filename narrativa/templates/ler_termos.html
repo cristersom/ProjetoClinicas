@@ -2,100 +2,77 @@
 {% load static %}
 
 {% block navbar %}{% endblock %}
-
-{% block titulo %}
-Aceite de Termos e Privacidade
-{% endblock %}
+{% block titulo %}Termos de Uso{% endblock %}
 
 {% block head %}
 <style>
-    /* Estilo do sistema (base.html e homepage) */
-    .bg-primary_black {
-        background-color: #141414; /* Cor de fundo principal do sistema */
-    }
-    .text-gray-100 {
-        color: #f7fafc;
-    }
-    .text-gray-400 {
-        color: #a0aec0;
-    }
-    .bg-red-600 {
-        background-color: #dc2626;
-    }
-    .hover\:bg-red-700:hover {
-        background-color: #b91c1c;
-    }
-    /* Estilo para a caixa do termo */
+    /* Caixa de texto com rolagem e estilo dark */
     .termo-box {
-        max-height: 300px;
+        max-height: 400px;
         overflow-y: auto;
-        padding: 1rem;
-        background-color: #2d3748; /* bg-gray-700 */
+        padding: 1.5rem;
+        background-color: #1f2937; /* gray-800 */
+        border: 1px solid #374151; /* gray-700 */
         border-radius: 0.5rem;
-        border: 1px solid #4a5568; /* border-gray-600 */
-        color: #f7fafc;
-        text-align: left;
+        color: #d1d5db; /* gray-300 */
+        line-height: 1.7;
+        font-size: 0.95rem;
     }
-    .termo-box p {
-        margin-bottom: 1em;
-        line-height: 1.6;
-    }
-    .loading-spinner {
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        border-top: 4px solid #dc2626; /* red-600 */
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
-        margin: 10px auto;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+
+    /* Scrollbar customizada para combinar */
+    .termo-box::-webkit-scrollbar { width: 8px; }
+    .termo-box::-webkit-scrollbar-track { background: #111827; }
+    .termo-box::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    .termo-box::-webkit-scrollbar-thumb:hover { background: #0d9488; }
+
+    /* Checkbox customizado Teal */
+    .form-check-input:checked {
+        background-color: #0d9488;
+        border-color: #0d9488;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<main class="bg-primary_black min-h-screen w-full flex justify-center items-center text-gray-100 p-4">
+<main class="min-h-screen w-full flex justify-center items-center p-4 bg-fixed bg-center bg-cover relative" style="background-image: url('{% static 'images/background.png' %}');">
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6">
+    <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm fixed"></div>
 
-        {# BOTÃO VOLTAR: Funciona via histórico do navegador #}
-        <div class="absolute top-4 left-4 z-10">
-             <a href="#" onclick="window.history.back(); return false;"
-                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold py-1 px-3 rounded transition duration-300"
-                title="Voltar à página anterior">
-                 &larr; Voltar
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 backdrop-blur-md rounded-xl shadow-2xl border border-gray-700 p-8 relative z-10 my-8">
+
+        <div class="absolute top-4 left-4">
+             <a href="#" onclick="window.history.back(); return false;" class="text-gray-400 hover:text-white transition flex items-center text-sm font-medium">
+                 <ion-icon name="arrow-back" class="mr-1"></ion-icon> Voltar
              </a>
         </div>
 
-        <h1 class="text-3xl font-bold mb-6 text-center">Termos de Uso e Política de Privacidade</h1>
-        <p class="text-center text-gray-400 mb-4">
-            Para prosseguir com a jornada, você precisa aceitar os termos e políticas da clínica.
+        <h1 class="text-2xl md:text-3xl font-bold mb-2 text-center text-white mt-4">Termos e Privacidade</h1>
+        <p class="text-center text-gray-400 mb-6 text-sm">
+            Leia atentamente para prosseguir com a jornada.
         </p>
 
-        <div id="termoTexto" class="termo-box">
-            <div class="loading-spinner"></div>
-            <p class="text-center">Carregando conteúdo dos termos...</p>
+        <div id="termoTexto" class="termo-box mb-6 shadow-inner">
+            <div class="flex justify-center py-10">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+            </div>
         </div>
 
-        <div class="flex items-center justify-center mt-6 mb-6">
-            <input id="agreeCheckbox" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500">
-            <label for="agreeCheckbox" class="ml-3 block text-base font-medium text-gray-100">
-                Li e concordo com os termos de uso e a política de privacidade.
+        <div class="flex items-center justify-center mb-8 bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+            <input id="agreeCheckbox" type="checkbox" class="h-5 w-5 rounded border-gray-600 bg-gray-700 text-teal-600 focus:ring-teal-500 transition cursor-pointer form-check-input">
+            <label for="agreeCheckbox" class="ml-3 block text-sm md:text-base font-medium text-gray-200 cursor-pointer select-none">
+                Li e concordo com os termos de uso e política de privacidade.
             </label>
         </div>
 
         <div class="text-center">
-            {# O formulário dinâmico no script irá adicionar o CSRF e o campo 'aceite' #}
-            <button id="acceptBtn" disabled class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 ease-in-out disabled:bg-gray-700 disabled:cursor-not-allowed focus:outline-none focus:ring-4 focus:ring-red-300">
-                Aceitar e Continuar
+            <button id="acceptBtn" disabled class="w-full md:w-auto bg-teal-600 hover:bg-teal-700 disabled:bg-gray-700 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-bold py-3.5 px-10 rounded-lg transition-all duration-300 shadow-lg flex items-center justify-center mx-auto group">
+                <span>Aceitar e Continuar</span>
+                <ion-icon name="arrow-forward" class="ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
             </button>
         </div>
     </div>
 </main>
-{# Inclui um CSRF token escondido que o JS pode ler #}
+
 <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
 <script>
@@ -103,69 +80,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const termoTextoEl = document.getElementById('termoTexto');
     const checkbox = document.getElementById('agreeCheckbox');
     const acceptBtn = document.getElementById('acceptBtn');
-
     const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
-
-    // --- LÓGICA CORRIGIDA: Obtém o token CSRF ---
     const csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
     const csrftoken = csrfTokenInput ? csrfTokenInput.value : '';
-    // --- FIM DA LÓGICA CORRIGIDA ---
 
-    function fetchTermos() {
-        fetch(termosUrl)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar os termos: ' + response.statusText);
-                }
-                return response.text();
-            })
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
+    // Busca o conteúdo da página de termos
+    fetch(termosUrl)
+        .then(response => {
+            if (!response.ok) { throw new Error('Erro ao carregar'); }
+            return response.text();
+        })
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            // Tenta pegar o conteúdo principal da página de termos
+            const mainContent = doc.querySelector('main .w-full');
 
-                // Localiza o bloco de conteúdo principal
-                // Usa um seletor mais robusto, mirando a div interna que contém o texto legal
-                const mainContent = doc.querySelector('main .w-full.md\\:w-8\\/12.lg\\:w-6\\/12');
+            if (mainContent) {
+                // Limpa elementos de navegação internos se existirem (títulos duplicados, botão voltar)
+                const title = mainContent.querySelector('h1'); if (title) title.remove();
+                const backButton = mainContent.querySelector('.absolute'); if (backButton) backButton.remove();
 
-                if (mainContent) {
-                    // Remove elementos de navegação e título duplicados
-                    const title = mainContent.querySelector('h1');
-                    if (title) title.remove();
-                    const backButton = mainContent.querySelector('.absolute');
-                    if (backButton) backButton.remove();
+                termoTextoEl.innerHTML = mainContent.innerHTML;
+            } else {
+                termoTextoEl.innerHTML = '<p class="text-center text-red-400">Conteúdo não encontrado.</p>';
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            termoTextoEl.innerHTML = '<p class="text-center text-red-400">Falha ao carregar termos de uso.</p>';
+        });
 
-                    termoTextoEl.innerHTML = mainContent.innerHTML;
-                    termoTextoEl.classList.add('prose', 'prose-invert', 'max-w-none');
-
-                } else {
-                    termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Erro: Conteúdo dos termos não encontrado na página de destino. Verifique o template termos.html.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Falha na busca dos termos:', error);
-                termoTextoEl.innerHTML = '<p class="text-red-400 text-center">Falha ao buscar os termos. Verifique o console ou a URL.</p>';
-            });
-    }
-
+    // Habilita/Desabilita botão
     checkbox.addEventListener('change', () => {
         acceptBtn.disabled = !checkbox.checked;
+        if (!acceptBtn.disabled) {
+            acceptBtn.classList.remove('bg-gray-700');
+            acceptBtn.classList.add('bg-teal-600');
+        }
     });
 
-    // AÇÃO CORRIGIDA: Submete o aceite com o token CSRF
+    // Envia o aceite
     acceptBtn.addEventListener('click', () => {
         if (checkbox.checked) {
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = window.location.href;
 
-            // Adiciona o token CSRF
             const csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = 'csrfmiddlewaretoken';
             csrfInput.value = csrftoken;
             form.appendChild(csrfInput);
 
-            // Adiciona o campo de aceite
             const aceiteInput = document.createElement('input');
             aceiteInput.type = 'hidden';
             aceiteInput.name = 'aceite';
@@ -176,9 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
             form.submit();
         }
     });
-
-    // Inicia o carregamento
-    fetchTermos();
 });
 </script>
 {% endblock %}
