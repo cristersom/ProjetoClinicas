@@ -19,9 +19,11 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="relative w-full flex items-end
+    <section class="relative w-full flex items-center justify-center
                     bg-no-repeat
-                    bg-contain bg-top h-[60vh]
+                    /* Mobile: Imagem no Topo, texto embaixo */
+                    bg-contain bg-top h-[50vh]
+                    /* Desktop: Cover Total */
                     md:bg-cover md:bg-fixed md:bg-center md:h-screen"
              style="background-image: url('{% static 'images/background.png' %}');">
 
@@ -29,14 +31,14 @@
 
         <div class="hidden md:block absolute inset-0 bg-black bg-opacity-75 bg-blend-overlay"></div>
 
-        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto relative pb-12 md:pb-0 md:h-full md:flex md:flex-col md:justify-center">
+        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto relative pt-32 md:pt-0 pb-10 md:pb-0">
             <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-2 md:mb-4 block shadow-black drop-shadow-md">
                 Bem-vindo à Clínica Interativa
             </span>
             <h1 class="font-bold text-3xl md:text-6xl text-white mb-4 md:mb-6 leading-tight drop-shadow-xl">
                 Sua saúde, <br>sua jornada.
             </h1>
-            <h3 class="hidden md:block text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto">
+            <h3 class="hidden md:block text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto drop-shadow-md">
                 Selecione uma das narrativas abaixo para iniciar seu acompanhamento personalizado.
             </h3>
 
@@ -76,7 +78,7 @@
 
     {% if lista_narrativas_recentes %}
     <section class='bg-gray-900 py-8 md:py-10 pl-4 md:pl-12 pb-20'>
-        <h2 class="text-gray-400 text-base md:text-xl font-semibold mb-4 md:mb-6 uppercase tracking-wider">Novidades</h2>
+        <h2 class="text-white text-base md:text-xl font-semibold mb-4 md:mb-6 text-gray-400">Novidades</h2>
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_recentes %}
                 <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-4 md:mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">

@@ -5,25 +5,26 @@
 <main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
     <section class="relative w-full flex flex-col justify-end
-                    bg-no-repeat
-                    bg-contain bg-top h-[50vh]
+                    /* Mobile: Imagem Real (não corta) */
                     md:bg-cover md:bg-center md:bg-fixed md:h-screen"
-             style="background-image: url('{{ object.thumb.url }}');">
+             style="/* Desktop apenas: */ background-image: url('{{ object.thumb.url }}');">
 
-        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-gray-900/50 to-gray-900 md:hidden"></div>
+        <img src="{{ object.thumb.url }}" alt="{{ object.titulo }}" class="w-full h-auto object-contain md:hidden">
 
-        <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent pointer-events-none"></div>
+        <div class="hidden md:block absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent"></div>
 
-        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-40">
+        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent md:hidden"></div>
+
+        <div class="relative z-10 w-full max-w-7xl mx-auto p-6 md:p-12 pb-12 md:pb-40 -mt-20 md:mt-0">
             <div class="max-w-4xl">
-                <span class="bg-teal-600 text-white text-[10px] md:text-xs font-bold px-2 md:px-3 py-1 rounded uppercase tracking-wide mb-2 md:mb-4 inline-block shadow-lg border border-teal-500">
+                <span class="bg-teal-600 text-white text-[10px] md:text-xs font-bold px-3 py-1 rounded uppercase tracking-wide mb-2 md:mb-4 inline-block shadow-lg border border-teal-500">
                     Gestão de Narrativa
                 </span>
                 <h2 class="text-3xl md:text-6xl lg:text-7xl font-extrabold text-white mb-4 md:mb-6 leading-tight drop-shadow-2xl">
                     {{ object.titulo }}
                 </h2>
 
-                <p class="hidden md:block text-gray-100 text-xl font-medium mb-8 line-clamp-3 drop-shadow-lg md:w-3/4 leading-relaxed">
+                <p class="hidden md:block text-gray-100 text-base md:text-xl font-medium mb-8 line-clamp-3 drop-shadow-lg md:w-3/4 leading-relaxed">
                     {{ object.descricao }}
                 </p>
 
@@ -55,7 +56,6 @@
 
             <div class="mb-10 md:mb-12 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
                 <h2 class="text-white text-xl md:text-2xl font-semibold">Sobre a Narrativa</h2>
-
                 <div class="inline-flex items-center bg-gray-800 px-3 md:px-4 py-2 rounded-full border border-gray-700 shadow-inner self-start md:self-auto">
                     <ion-icon name="eye" class="text-teal-400 text-lg mr-2"></ion-icon>
                     <span class="text-gray-300 font-bold text-xs md:text-sm">{{ object.visualizacoes }} visualizações</span>
@@ -87,29 +87,20 @@
                             </a>
                         </div>
                     </div>
-                    {% empty %}
-                    <p class="text-gray-500 italic col-span-2 text-center py-8 border border-dashed border-gray-700 rounded-xl">
-                        Nenhuma cena cadastrada.
-                    </p>
                     {% endfor %}
                 </div>
             </div>
 
             {% if relacionados %}
             <div class="border-t border-gray-800 pt-10 md:pt-12">
-                <h2 class="text-gray-400 text-base md:text-lg font-bold mb-6 md:mb-8 uppercase tracking-widest flex items-center">
-                    <span class="w-8 h-1 bg-teal-600 mr-3 rounded-full"></span>
-                    Veja também
-                </h2>
+                <h2 class="text-gray-400 text-base md:text-lg font-bold mb-6 md:mb-8 uppercase tracking-widest">Veja também</h2>
                 <div class="flex overflow-x-auto pb-8 gap-4 md:gap-6 scrollbar-hide">
                     {% for rel in relacionados %}
                     <a href="{% url 'narrativa:detalhes' rel.pk %}" class="flex-shrink-0 w-64 md:w-72 group relative">
-                        <div class="aspect-video rounded-2xl overflow-hidden mb-3 relative border border-gray-700 group-hover:border-teal-500/50 transition-all shadow-lg">
+                        <div class="aspect-video rounded-2xl overflow-hidden mb-3 relative border border-gray-700 group-hover:border-teal-500/50 transition-all">
                             <img src="{{ rel.thumb.url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 opacity-80 group-hover:opacity-100">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-60"></div>
                         </div>
                         <p class="text-gray-200 text-base md:text-lg font-bold group-hover:text-white truncate transition-colors">{{ rel.titulo }}</p>
-                        <p class="text-teal-500 text-[10px] md:text-xs font-bold uppercase mt-1 tracking-wide">Ver Detalhes</p>
                     </a>
                     {% endfor %}
                 </div>
@@ -121,14 +112,8 @@
 </main>
 <script>
     const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
-    function copyLinkToClipboard() {
-        navigator.clipboard.writeText(linkParaCompartilhar).then(() => { alert('Link copiado!'); });
-    }
-    function shareLink() {
-        if(navigator.share) {
-            navigator.share({title:'{{ object.titulo }}', url: linkParaCompartilhar});
-        }
-    }
+    function copyLinkToClipboard() { navigator.clipboard.writeText(linkParaCompartilhar).then(() => alert('Link copiado!')); }
+    function shareLink() { if(navigator.share) navigator.share({title:'{{ object.titulo }}', url: linkParaCompartilhar}); }
     if(navigator.share) document.getElementById('share-button').classList.remove('hidden');
 </script>
 {% endblock %}
