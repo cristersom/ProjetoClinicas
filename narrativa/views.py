@@ -134,7 +134,15 @@ class PacienteDetalhes(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(PacienteDetalhes, self).get_context_data(**kwargs)
-        relacionados = Narrativa.objects.filter(categoria=self.get_object().categoria).order_by('-visualizacoes')[0:5]
+
+        # --- CORREÇÃO AQUI: Excluir a narrativa atual da lista de relacionados ---
+        narrativa_atual = self.get_object()
+        relacionados = Narrativa.objects.filter(
+            categoria=narrativa_atual.categoria
+        ).exclude(
+            pk=narrativa_atual.pk  # Remove a própria narrativa da lista
+        ).order_by('-visualizacoes')[0:5]
+
         context["relacionados"] = relacionados
         return context
 
@@ -150,12 +158,12 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # Busca ou cria a sessão do paciente
+    # Garante a criação da sessão e atribuição do perfil
     sessao, created = SessaoPaciente.objects.get_or_create(
         session_key=session_key
     )
 
-    # GARANTIA DE PERFIL: Se acabou de criar OU se o perfil está vazio, define agora.
+    # Se acabou de criar OU se existe mas não tem perfil: define agora.
     if created or not sessao.narrativa_perfil:
         sessao.narrativa_perfil = narrativa
         sessao.save()
@@ -337,7 +345,7 @@ def perfil_sessao_view(request, narrativa_id):
 
 # --- DASHBOARD ADMINISTRATIVO ---
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = "admin/dashboard.html"  # Caminho atualizado para admin/
+    template_name = "admin/dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
