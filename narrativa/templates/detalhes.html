@@ -4,9 +4,10 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full'>
 
-    <section class="h-screen relative bg-no-repeat flex items-end bg-cover bg-center bg-fixed" style="background-image: url('{{ object.thumb.url }}');">
+    <section class="relative bg-no-repeat flex items-end bg-cover bg-center bg-fixed w-full"
+             style="background-image: url('{{ object.thumb.url }}'); min-height: 100vh;">
 
-        <div class="bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent w-full p-6 md:p-12 pb-24 md:pb-32">
+        <div class="bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent w-full p-6 md:p-12 pb-24 md:pb-32 h-full flex flex-col justify-end">
             <div class="max-w-4xl">
                 <span class="bg-teal-600 text-white text-xs font-bold px-2 py-1 rounded uppercase tracking-wide mb-3 inline-block shadow-lg">
                     Gestão de Narrativa
