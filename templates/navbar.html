@@ -1,39 +1,60 @@
+{% extends 'base.html' %}
 {% load static %}
-<nav class="flex text-gray-100 justify-between items-center py-3 px-4 fixed w-full z-50 transition-colors duration-300">
-    <div class="flex-shrink-0">
-      {% if logo_url %}
-        <a href='/'>
-        <img src="{{ logo_url }}" alt="logo" class="h-8 md:h-8 w-auto">
-        </a>
-      {% endif %}
-    </div>
+{% load crispy_forms_tags %}
 
-    {% if user.is_authenticated %}
-    <div class="flex items-center gap-2">
-          <div class="hidden md:block mr-2">
-              <form method="get" action="{% url 'narrativa:pesquisa' %}">
-                  <input class="py-1 px-2 rounded-md text-black text-sm" name="query" value="{{ request.GET.query }}" type="text" placeholder="Pesquisar...">
-              </form>
-          </div>
+{% block titulo %}Login - Clínica Interativa{% endblock %}
 
-          <form method="post" action="{% url 'narrativa:logout' %}">
-          {% csrf_token %}
-           <button type="submit" class="bg-red-600 hover:bg-red-700 py-1 px-3 text-white text-sm md:text-base rounded-md font-medium transition">
-           Sair
-           </button>
-          </form>
-    </div>
-    {% else %}
-        {% if "/paciente/" not in request.path %}
-        <div class="flex justify-end">
-          <div>
-              <a href="{% url 'narrativa:login' %}" class="">
-                <button class='bg-red-600 hover:bg-red-700 py-1 px-3 md:px-4 text-white text-sm md:text-lg rounded-md font-medium'>
-                    Login
+{% block head %}
+<style>
+    /* Estilização Dark para inputs do Crispy Forms */
+    .form-group label { color: #d1d5db; font-weight: 500; margin-bottom: 0.5rem; }
+    .form-control {
+        background-color: #1f2937 !important; /* bg-gray-800 */
+        border: 1px solid #374151 !important; /* border-gray-700 */
+        color: #fff !important;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+    }
+    .form-control:focus {
+        border-color: #0d9488 !important; /* teal-600 */
+        box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-24" style="background-image: url('{% static 'images/background.png' %}');">
+    <div class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm"></div>
+
+    <div class="z-10 w-full max-w-md px-4">
+        <div class="bg-gray-800/80 border border-gray-700 p-8 rounded-2xl shadow-2xl backdrop-blur-md">
+
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-900/50 mb-4 ring-1 ring-teal-500/30">
+                    <ion-icon name="medkit" class="text-3xl text-teal-400"></ion-icon>
+                </div>
+                <h2 class="text-2xl font-bold text-white">Acesso Restrito</h2>
+                <p class="text-gray-400 text-sm mt-2">Entre com suas credenciais administrativas</p>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <fieldset class="form-group mb-6">
+                    {{ form|crispy }}
+                </fieldset>
+
+                <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg flex items-center justify-center group" type="submit">
+                    <ion-icon name="log-in-outline" class="mr-2 text-xl group-hover:translate-x-1 transition-transform"></ion-icon>
+                    Entrar
                 </button>
-              </a>
-          </div>
+            </form>
+
+            <div class="mt-6 text-center border-t border-gray-700 pt-4">
+                <p class="text-gray-400 text-sm">Não tem conta?
+                    <a href="{% url 'narrativa:criarconta' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition hover:underline">Criar conta</a>
+                </p>
+            </div>
         </div>
-        {% endif %}
-    {% endif %}
-</nav>
+    </div>
+</header>
+{% endblock %}
