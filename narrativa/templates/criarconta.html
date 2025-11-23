@@ -16,9 +16,9 @@
     .form-text, .help-block { color: #9ca3af !important; font-size: 0.8rem; margin-top: 0.25rem; }
 
     /* Checkbox de Termos */
-    .form-check { display: flex; align-items: start; margin-top: 1rem; padding-left: 0; }
+    .form-check { display: flex; align-items: start; margin-top: 1.5rem; padding-left: 0; }
     .form-check-input {
-        background-color: #374151; border-color: #4b5563; width: 1.2em; height: 1.2em; margin-right: 0.75rem; margin-top: 0.25rem;
+        background-color: #374151; border-color: #4b5563; width: 1.2em; height: 1.2em; margin-right: 0.75rem; margin-top: 0.25rem; flex-shrink: 0;
     }
     .form-check-input:checked { background-color: #0d9488; border-color: #0d9488; }
     .form-check-label { color: #d1d5db; font-size: 0.9rem; line-height: 1.5; }
@@ -27,31 +27,33 @@
 {% endblock %}
 
 {% block content %}
-    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-12 md:py-32" style="background-image: url('{% static 'images/background.png' %}');">
+    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-20" style="background-image: url('{% static 'images/background.png' %}');">
         <div class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm"></div>
 
         <div class="z-10 w-full max-w-lg px-4">
-            <div class="bg-gray-800/90 border border-gray-700 p-6 md:p-8 rounded-2xl shadow-2xl">
+            <div class="bg-gray-800/90 border border-gray-700 p-8 rounded-2xl shadow-2xl">
 
-                <div class="text-center mb-6">
-                    <h1 class="text-2xl md:text-3xl font-bold text-white">Criar Conta</h1>
+                <div class="text-center mb-8">
+                    <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
                     <p class="text-gray-400 text-sm mt-2">Junte-se à plataforma clínica</p>
                 </div>
 
                 <form method="post">
                     {% csrf_token %}
-                    <fieldset class="form-group space-y-4">
+                    <fieldset class="form-group space-y-5">
                         {{ form|crispy }}
                     </fieldset>
 
-                    <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-4 rounded-lg transition shadow-lg mt-6 text-lg flex justify-center items-center" type="submit">
-                        Registrar
-                    </button>
+                    <div class="mt-8">
+                        <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-4 rounded-lg transition shadow-lg text-lg flex justify-center items-center" type="submit">
+                            Registrar
+                        </button>
+                    </div>
                 </form>
 
-                <div class="mt-6 text-center border-t border-gray-700 pt-4">
+                <div class="mt-10 text-center border-t border-gray-700 pt-6">
                     <p class="text-gray-400 text-sm">Já tem uma conta?
-                        <a href="{% url 'narrativa:login' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition hover:underline ml-1">Fazer Login</a>
+                        <a href="{% url 'narrativa:login' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition hover:underline ml-1 text-base">Fazer Login</a>
                     </p>
                 </div>
             </div>

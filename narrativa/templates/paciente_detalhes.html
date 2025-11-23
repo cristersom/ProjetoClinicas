@@ -23,7 +23,7 @@
                     Jornada Clínica
                 </span>
 
-                <h1 class="text-3xl md:text-6xl lg:text-7xl font-extrabold text-white mb-4 leading-tight drop-shadow-2xl">
+                <h1 class="text-3xl md:text-6xl lg:text-7xl font-extrabold text-white mb-4 md:mb-6 leading-tight drop-shadow-2xl">
                     {{ object.titulo }}
                 </h1>
 
@@ -52,27 +52,31 @@
                 </p>
             </div>
 
-            <h2 class="text-white text-lg md:text-2xl font-semibold mb-6 flex items-center">
-                <ion-icon name="map-outline" class="mr-3 text-teal-500"></ion-icon>
-                O que você vai encontrar:
-            </h2>
+            <div class="mb-12">
+                <h2 class="text-white text-lg md:text-2xl font-semibold mb-6 flex items-center">
+                    <ion-icon name="map-outline" class="mr-3 text-teal-500"></ion-icon>
+                    O que você vai encontrar:
+                </h2>
 
-            <div class="grid gap-3 md:grid-cols-2">
-                {% for cena in object.cenas.all %}
-                <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" class="group block">
-                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700 flex items-center transition-all duration-200 hover:bg-gray-750 hover:border-teal-500/50 hover:shadow-lg">
-                        <span class="bg-gray-700 text-gray-300 h-10 w-10 rounded-full flex items-center justify-center font-bold text-sm mr-4 group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
-                            {{ forloop.counter }}
-                        </span>
-                        <div class="flex-1 min-w-0">
-                            <span class="text-gray-200 font-medium text-base md:text-lg group-hover:text-white transition-colors block truncate">
-                                {{ cena.titulo }}
+                <div class="grid gap-3 md:grid-cols-2">
+                    {% for cena in object.cenas.all %}
+                    <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" class="group block">
+                        <div class="bg-gray-800 p-5 rounded-xl border border-gray-700 flex items-center transition-all duration-200 hover:bg-gray-750 hover:border-teal-500/50 hover:shadow-lg w-full">
+                            <span class="bg-gray-700 text-gray-300 h-10 w-10 md:h-12 md:w-12 rounded-full flex items-center justify-center font-bold text-sm md:text-lg mr-4 shrink-0 border border-gray-600 group-hover:border-teal-400 group-hover:bg-teal-600 group-hover:text-white transition-colors">
+                                {{ forloop.counter }}
                             </span>
+
+                            <div class="flex-1 min-w-0">
+                                <span class="text-gray-200 font-medium text-base md:text-lg group-hover:text-white transition-colors block truncate">
+                                    {{ cena.titulo }}
+                                </span>
+                            </div>
+
+                            <ion-icon name="arrow-forward" class="text-gray-500 text-xl group-hover:text-teal-400 ml-3 group-hover:translate-x-1 transition-transform shrink-0"></ion-icon>
                         </div>
-                        <ion-icon name="arrow-forward" class="text-gray-500 text-xl group-hover:text-teal-400 ml-2 group-hover:translate-x-1 transition-transform"></ion-icon>
-                    </div>
-                </a>
-                {% endfor %}
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </section>
