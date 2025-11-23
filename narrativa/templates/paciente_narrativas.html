@@ -17,47 +17,50 @@
 {% endblock %}
 
 {% block content %}
-<main class='bg-gray-900 min-h-screen w-full'>
+<main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
 
-    <section class="relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end w-full"
-             style="background-image: url('{% static 'images/background.png' %}'); height: 100vh !important;">
+    <section class="min-h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-center justify-center"
+             style="background-image: url('{% static 'images/background.png' %}');">
 
-        <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
+        <div class="absolute inset-0 bg-gray-900/80"></div>
 
-        <div class="z-10 w-full px-6 pb-24 md:pb-32 md:px-12 max-w-4xl">
-            <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block shadow-black drop-shadow-md">
-                Bem-vindo à Clínica Interativa
+        <div class="z-10 w-full px-6 text-center max-w-4xl mx-auto">
+            <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block">
+                Clínica Interativa
             </span>
-            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight drop-shadow-xl">
+            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
                 Sua saúde, <br>sua jornada.
             </h1>
-            <h3 class="text-lg md:text-xl text-gray-200 mb-8 font-light border-l-4 border-teal-500 pl-4 drop-shadow-md">
+            <h3 class="text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto">
                 Selecione uma das narrativas abaixo para iniciar seu acompanhamento personalizado.
             </h3>
-        </div>
 
-        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-gray-400 hidden md:block">
-            <ion-icon name="chevron-down-outline" class="text-3xl"></ion-icon>
+            <div class="animate-bounce text-teal-500 mt-8">
+                <ion-icon name="arrow-down-outline" class="text-4xl"></ion-icon>
+            </div>
         </div>
     </section>
 
     {% if lista_narrativas_emalta %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 -mt-10 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.6)]'>
-        <div class="flex items-center mb-6">
-            <h2 class="text-white text-2xl font-semibold mr-3">Escolha sua Jornada</h2>
-            <div class="h-px flex-1 bg-gray-800 mr-8"></div>
+    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 rounded-t-3xl -mt-10 shadow-2xl'>
+        <div class="flex items-center mb-8 pr-4">
+            <h2 class="text-white text-xl md:text-2xl font-semibold mr-4 whitespace-nowrap">Escolha sua Jornada</h2>
+            <div class="h-px flex-1 bg-gray-800"></div>
         </div>
 
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_emalta %}
                 <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="aspect-[4/3] w-full overflow-hidden">
+                        <div class="aspect-[4/3] w-full overflow-hidden relative">
                             <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
                         </div>
-                        <div class="p-4">
+                        <div class="p-5">
                             <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-1">Iniciar Jornada</p>
+                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
+                                <ion-icon name="play-circle-outline" class="mr-1 text-base"></ion-icon> Iniciar
+                            </p>
                         </div>
                     </a>
                 </div>
@@ -67,18 +70,20 @@
     {% endif %}
 
     {% if lista_narrativas_recentes %}
-    <section class='bg-gray-900 py-10 pl-4 md:pl-12'>
-        <h2 class="text-white text-xl font-semibold mb-6 text-gray-400">Novidades</h2>
+    <section class='bg-gray-900 py-10 pl-4 md:pl-12 pb-20'>
+        <h2 class="text-gray-400 text-lg md:text-xl font-semibold mb-6 uppercase tracking-wider">Novidades</h2>
         <div class="mobile-scroll-container">
             {% for narrativa in lista_narrativas_recentes %}
                 <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
                     <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.pk %}">
-                        <div class="aspect-[4/3] w-full overflow-hidden">
+                        <div class="aspect-[4/3] w-full overflow-hidden relative">
                             <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
                         </div>
-                        <div class="p-4">
+                        <div class="p-5">
                             <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-1">Iniciar Jornada</p>
+                            <p class="text-teal-400 text-xs font-bold uppercase tracking-wide mt-2 flex items-center">
+                                <ion-icon name="play-circle-outline" class="mr-1 text-base"></ion-icon> Iniciar
+                            </p>
                         </div>
                     </a>
                 </div>
