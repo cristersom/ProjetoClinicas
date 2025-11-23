@@ -1,136 +1,39 @@
-{% extends 'base.html' %}
+{% load static %}
+<nav class="flex text-gray-100 justify-between items-center py-3 px-4 fixed w-full z-50 transition-colors duration-300">
+    <div class="flex-shrink-0">
+      {% if logo_url %}
+        <a href='/'>
+        <img src="{{ logo_url }}" alt="logo" class="h-8 md:h-8 w-auto">
+        </a>
+      {% endif %}
+    </div>
 
-{% block titulo %}
-    Detalhes da Narrativa
-{% endblock %}
+    {% if user.is_authenticated %}
+    <div class="flex items-center gap-2">
+          <div class="hidden md:block mr-2">
+              <form method="get" action="{% url 'narrativa:pesquisa' %}">
+                  <input class="py-1 px-2 rounded-md text-black text-sm" name="query" value="{{ request.GET.query }}" type="text" placeholder="Pesquisar...">
+              </form>
+          </div>
 
-{% block content %}
-<main class='bg-primary_black min-h-screen w-full'>
-    <section class="h-screen relative bg-no-repeat pb-8 pl-6 flex items-end bg-cover bg-black bg-opacity-75 bg-blend-overlay" style="background-image: url('{{ object.thumb.url }}');">
-        <div>
-            <h2 class="text-6xl font-semibold text-white my-4">
-                {{ object.titulo }}
-            </h2>
-            <p class="text-white w-11/12 md:w-5/12 font-medium my-4">
-                {{ object.descricao|slice:"150" }}...
-            </p>
-            <div class="flex my-4 space-x-4">
-                <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}" target="_blank">
-                    <button class="flex items-center bg-white py-2 px-5 rounded-md" style='color:black;'>
-                        <ion-icon name="play" class="text-2xl"></ion-icon>
-                        <span class="ml-3 font-medium">
-                            Preview Paciente
-                        </span>
-                    </button>
-                </a>
-
-                <button
-                    id="copy-button"
-                    onclick="copyLinkToClipboard()"
-                    class="flex items-center bg-gray-300 hover:bg-gray-400 py-2 px-5 rounded-md"
-                    style='color:black;'>
-                    <ion-icon name="clipboard-outline" class="text-2xl"></ion-icon>
-                    <span id="copy-button-text" class="ml-3 font-medium">
-                        Copiar Link de Acesso
-                    </span>
+          <form method="post" action="{% url 'narrativa:logout' %}">
+          {% csrf_token %}
+           <button type="submit" class="bg-red-600 hover:bg-red-700 py-1 px-3 text-white text-sm md:text-base rounded-md font-medium transition">
+           Sair
+           </button>
+          </form>
+    </div>
+    {% else %}
+        {% if "/paciente/" not in request.path %}
+        <div class="flex justify-end">
+          <div>
+              <a href="{% url 'narrativa:login' %}" class="">
+                <button class='bg-red-600 hover:bg-red-700 py-1 px-3 md:px-4 text-white text-sm md:text-lg rounded-md font-medium'>
+                    Login
                 </button>
-
-                <button
-                    id="share-button"
-                    onclick="shareLink()"
-                    class="flex items-center bg-blue-500 hover:bg-blue-600 py-2 px-5 rounded-md text-white"
-                    style="display: none;">
-                    <ion-icon name="share-social-outline" class="text-2xl"></ion-icon>
-                    <span class="ml-3 font-medium">
-                        Encaminhar
-                    </span>
-                </button>
-            </div>
+              </a>
+          </div>
         </div>
-    </section>
-
-    <section class='bg-primary_black flex justify-center py-10'>
-        <div class="p-8 w-10/12 relative" >
-            <h2 class="text-gray-200 text-3xl font-medium">
-                Descrição
-            </h2>
-            <div class="flex justify-left items-center min-w-full movie_lis">
-                <p class="text-gray-100 text-lg">
-                    {{ object.descricao }}
-                    <br>
-                    Visualizações: {{object.visualizacoes}}
-                </p>
-            </div>
-
-            <div style='margin-top:2rem;margin-bottom:2rem;'>
-                <h2 class="text-gray-200 text-3xl font-medium">
-                    Cenas (Admin Preview)
-                </h2>
-                {% for cena in object.cenas.all %}
-                    <h3 class='text-lg text-gray-200 hover:text-white'>
-                        <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" target="_blank">
-                            <p>Preview da Cena {{ forloop.counter }}: {{ cena.titulo }}</p>
-                        </a>
-                    </h3>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-
-    <section class='bg-primary_black flex justify-center py-10'>
-        <div class="p-8 w-10/12 relative" >
-            <h2 class="text-gray-200 text-2xl font-medium">
-                Relacionados
-            </h2>
-            <div class="flex flex-wrap items-center min-w-full movie_lis">
-            {% for narrativa in relacionados %}
-                {# --- CARD ATUALIZADO (COM TÍTULO) --- #}
-                <div class="m-4 flex-shrink-0 w-96 cursor-pointer hover:scale-105 transition-transform duration-200">
-                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                        <div class="h-48 w-full relative">
-                            <img src="{{ narrativa.thumb.url}}" class="rounded-t-md w-full h-full object-cover" alt="{{ narrativa.titulo }}">
-                        </div>
-                        <div class="bg-gray-800 p-3 rounded-b-md text-center border border-gray-700 border-t-0">
-                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<script>
-    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
-
-    function copyLinkToClipboard() {
-        navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
-            const buttonText = document.getElementById('copy-button-text');
-            buttonText.innerText = 'Link Copiado!';
-            setTimeout(function() {
-                buttonText.innerText = 'Copiar Link de Acesso';
-            }, 2000);
-        }, function(err) {
-            console.error('Erro ao copiar o link: ', err);
-        });
-    }
-
-    function shareLink() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Convite para Jornada Interativa',
-                text: 'Olá! Gostaria de te convidar para iniciar uma jornada interativa.',
-                url: linkParaCompartilhar
-            });
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        if (navigator.share) {
-            document.getElementById('share-button').style.display = 'flex';
-        }
-    });
-</script>
-{% endblock %}
+        {% endif %}
+    {% endif %}
+</nav>

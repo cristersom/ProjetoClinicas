@@ -3,7 +3,7 @@
     <div class="flex-shrink-0">
       {% if logo_url %}
         <a href='/'>
-        <img src="{{ logo_url }}" alt="logo" class="h-6 md:h-8 w-auto">
+        <img src="{{ logo_url }}" alt="logo" class="h-8 md:h-8 w-auto">
         </a>
       {% endif %}
     </div>
@@ -18,16 +18,10 @@
 
           <form method="post" action="{% url 'narrativa:logout' %}">
           {% csrf_token %}
-           <button type="submit" class="bg-red-600 hover:bg-red-700 py-1 px-2 md:px-3 text-white text-xs md:text-lg rounded-md font-medium">
+           <button type="submit" class="bg-red-600 hover:bg-red-700 py-1 px-3 text-white text-sm md:text-base rounded-md font-medium transition">
            Sair
            </button>
           </form>
-
-          <a href="{% url 'narrativa:perfil' user.pk %}" class="">
-            <button class='bg-red-600 hover:bg-red-700 py-1 px-2 md:px-3 text-white text-xs md:text-lg rounded-md font-medium'>
-                Perfil
-            </button>
-          </a>
     </div>
     {% else %}
         {% if "/paciente/" not in request.path %}
