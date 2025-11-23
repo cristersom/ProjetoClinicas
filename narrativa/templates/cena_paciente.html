@@ -8,83 +8,98 @@
 {% endblock %}
 
 {% block content %}
-<main class="bg-primary_black min-h-screen w-full flex justify-center items-center text-gray-100 p-4">
+<main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative" style="background-image: url('{% static 'images/background.png' %}');">
+    <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900 rounded-lg shadow-lg p-6 pt-12 relative">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 rounded-xl shadow-2xl p-6 pt-12 relative border border-gray-800 backdrop-blur-md z-10 my-8">
 
         {# Botão Sair / Perfil #}
-        <div class="absolute top-3 right-3 z-10">
+        <div class="absolute top-4 right-4 z-10">
              <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}"
-                class="inline-block bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1.5 px-3 rounded transition duration-300"
+                class="inline-flex items-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-300 border border-gray-700"
                 title="Ver perfil da sessão e sair">
-                 Sair / Perfil
+                 <ion-icon name="person-circle-outline" class="text-xl mr-1"></ion-icon>
+                 Sair
              </a>
         </div>
 
-        {# Título centralizado com largura limitada #}
-        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center w-11/12 mx-auto leading-tight">
+        {# Título #}
+        <h1 class="text-2xl md:text-3xl font-bold mb-6 text-center w-11/12 mx-auto leading-tight tracking-tight text-white">
             {{ cena.titulo }}
         </h1>
 
-        {# Barra de Progresso #}
+        {# Barra de Progresso (Mantida Verde, é universal para progresso) #}
         {% if total_cenas > 0 %}
-        <div class="mb-6">
-            <p class="text-center text-sm text-gray-400 mb-1">Passo {{ progresso_atual }} de {{ total_cenas }}</p>
-            <div class="progress h-2 bg-gray-700 rounded-full" role="progressbar">
-                <div class="progress-bar bg-green-500 rounded-full transition-all duration-500" style="width: {{ percentual }}%"></div>
+        <div class="mb-8 px-2">
+            <div class="flex justify-between text-xs text-gray-400 mb-2 font-medium tracking-wider uppercase">
+                <span>Início</span>
+                <span>Progresso: {{ percentual }}%</span>
+                <span>Fim</span>
+            </div>
+            <div class="progress h-2.5 bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-700" role="progressbar">
+                <div class="progress-bar bg-gradient-to-r from-teal-500 to-green-500 rounded-full transition-all duration-700 ease-out shadow-lg relative" style="width: {{ percentual }}%">
+                    <div class="absolute inset-0 bg-white/20 animate-pulse"></div> </div>
             </div>
         </div>
         {% endif %}
 
-        {# Conteúdo da Cena #}
+        {# Conteúdo (Vídeo/Imagem/Texto) - Mantido igual #}
         {% if cena.video %}
-            <div class="mb-6">
-                <iframe src="{{ cena.video }}" frameborder="0" allowfullscreen class="w-full h-auto aspect-video rounded shadow-md"></iframe>
+            <div class="mb-8 rounded-lg overflow-hidden shadow-xl border border-gray-800 relative group">
+                <div class="aspect-video w-full relative z-10 bg-black">
+                    <iframe src="{{ cena.video }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                </div>
             </div>
         {% endif %}
 
         {% if cena.imagem %}
-            <div class="mb-6">
-                 <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-auto rounded shadow-md">
+            <div class="mb-8 rounded-lg overflow-hidden shadow-xl border border-gray-800 relative group">
+                 <div class="absolute inset-0 bg-gradient-to-t from-gray-900/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-10 pointer-events-none"></div>
+                 <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-auto object-cover relative z-0">
             </div>
         {% endif %}
 
         {% if cena.conteudo_textual %}
-            <div class="text-base md:text-lg mb-8 leading-relaxed text-gray-200">
+            <div class="text-base md:text-lg mb-10 leading-relaxed text-gray-300 prose prose-invert max-w-none p-2">
                 {{ cena.conteudo_textual|linebreaks }}
             </div>
         {% endif %}
 
         {# Bloco de Ação #}
-        <div class="border-t border-gray-700 pt-6 space-y-4">
+        <div class="border-t border-gray-800 pt-8 space-y-4">
 
-            {# 1. Questionários #}
+            {# 1. Questionários (Mantido Vermelho para destaque de ação obrigatória/importante) #}
             {% for questionario in cena.questionarios.all %}
-                <div class="bg-gray-800 p-5 rounded-md text-center shadow-sm border border-gray-700">
-                    <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
-                    <p class="text-sm text-gray-400 mb-4">Pesquisa Rápida</p>
+                <div class="bg-gradient-to-br from-gray-800 to-gray-850 p-6 rounded-xl text-center shadow-md border border-gray-700 relative overflow-hidden group hover:border-red-900/50 transition-colors">
                     <a href="{% url 'narrativa:responder_questionario' questionario_id=questionario.id %}"
-                       class="block w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded transition duration-300">
+                       class="flex items-center justify-center w-full bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg hover:shadow-red-900/30 hover:-translate-y-0.5 relative z-10 tracking-wide">
+                        <ion-icon name="clipboard" class="mr-2 text-2xl"></ion-icon>
                         Responder Agora
                     </a>
                 </div>
             {% endfor %}
 
-            {# 2. Escolhas #}
+            {# 2. Escolhas (MUDANÇA PRINCIPAL: Azul -> Teal) #}
             {% if cena.escolhas.all %}
-                <div class="space-y-3">
+                <div class="space-y-4">
                     {% if not cena.questionarios.all %}
-                        <h2 class="text-center text-gray-400 text-sm uppercase tracking-wide mb-2">Como deseja prosseguir?</h2>
+                        <h2 class="text-center text-gray-400 text-sm uppercase tracking-wider font-medium mb-4 flex items-center justify-center">
+                            <span class="h-px w-8 bg-gray-700 mr-3"></span>
+                            Como deseja prosseguir?
+                            <span class="h-px w-8 bg-gray-700 ml-3"></span>
+                        </h2>
                     {% endif %}
 
                     {% for escolha in cena.escolhas.all %}
                         {% if escolha.cena_destino %}
                         <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}"
-                           class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-300 shadow-md">
+                           class="flex items-center justify-center w-full text-center bg-gradient-to-r from-teal-700 to-teal-600 hover:from-teal-600 hover:to-teal-500 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-md hover:shadow-teal-900/30 hover:-translate-y-0.5 tracking-wide border border-teal-800/50">
                             {{ escolha.texto_da_opcao }}
+                            <ion-icon name="arrow-forward" class="ml-2 text-xl opacity-70 group-hover:opacity-100 transition-opacity"></ion-icon>
                         </a>
                         {% else %}
-                         <a href="{% url 'narrativa:paciente_narrativas' %}" class="block w-full text-center bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded transition duration-300 shadow-md">
+                        <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-gray-200 hover:text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-md hover:-translate-y-0.5 border border-gray-600/50">
+                            <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl text-gray-400 group-hover:text-white transition-colors"></ion-icon>
                             {{ escolha.texto_da_opcao }} (Finalizar)
                         </a>
                         {% endif %}
@@ -92,11 +107,15 @@
                 </div>
             {% endif %}
 
-            {# 3. Fim #}
+            {# 3. Fim (Mantido Cinza Claro) #}
             {% if not cena.escolhas.all and not cena.questionarios.all %}
-                 <div class="text-center pt-4">
-                    <p class="text-gray-400 mb-4">Você chegou ao fim desta etapa.</p>
-                    <a href="{% url 'narrativa:paciente_narrativas' %}" class="block w-full text-center bg-white text-black hover:bg-gray-200 font-bold py-3 px-4 rounded transition duration-300">
+                 <div class="text-center pt-6">
+                    <div class="mb-6 text-gray-400 flex flex-col items-center">
+                        <ion-icon name="flag-outline" class="text-5xl mb-2 text-teal-500 opacity-80"></ion-icon>
+                        <p class="text-lg">Você chegou ao fim desta etapa.</p>
+                    </div>
+                    <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gray-200 hover:bg-white text-gray-900 font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg hover:-translate-y-0.5 tracking-wide">
+                        <ion-icon name="apps" class="mr-2 text-xl"></ion-icon>
                         Voltar para o Menu
                     </a>
                 </div>

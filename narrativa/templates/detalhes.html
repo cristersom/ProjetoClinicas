@@ -7,38 +7,31 @@
 {% block content %}
 <main class='bg-primary_black min-h-screen w-full overflow-x-hidden'>
 
-    <section class="min-h-[80vh] relative bg-no-repeat flex items-end bg-cover bg-center" style="background-image: url('{{ object.thumb.url }}');">
-        <div class="bg-gradient-to-t from-black via-black/80 to-transparent w-full p-6 md:p-12 pb-16">
+    <section class="min-h-[80vh] md:h-screen relative bg-no-repeat flex items-end bg-cover bg-center" style="background-image: url('{{ object.thumb.url }}');">
+        <div class="bg-gradient-to-t from-black via-black/80 to-transparent w-full p-6 md:p-12 pb-20 md:pb-16">
 
             <h2 class="text-3xl md:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
                 {{ object.titulo }}
             </h2>
 
-            <p class="text-gray-200 text-sm md:text-xl font-medium mb-6 w-full md:w-6/12 line-clamp-4 md:line-clamp-none drop-shadow-md">
+            <p class="text-gray-200 text-sm md:text-xl font-medium mb-8 w-full md:w-6/12 line-clamp-4 md:line-clamp-none drop-shadow-md">
                 {{ object.descricao }}
             </p>
 
-            <div class="flex flex-col md:flex-row gap-3 w-full md:w-auto">
+            <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto flex-wrap">
                 <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}" target="_blank" class="w-full md:w-auto">
-                    <button class="flex justify-center items-center bg-white hover:bg-gray-200 text-black py-3 px-6 rounded-md font-bold w-full md:w-auto transition">
+                    <button class="flex justify-center items-center bg-white hover:bg-gray-200 text-black py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md">
                         <ion-icon name="play" class="text-xl mr-2"></ion-icon>
                         Preview Paciente
                     </button>
                 </a>
 
-                <button
-                    id="copy-button"
-                    onclick="copyLinkToClipboard()"
-                    class="flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition">
+                <button id="copy-button" onclick="copyLinkToClipboard()" class="flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md">
                     <ion-icon name="clipboard-outline" class="text-xl mr-2"></ion-icon>
                     <span id="copy-button-text">Copiar Link</span>
                 </button>
 
-                <button
-                    id="share-button"
-                    onclick="shareLink()"
-                    class="flex justify-center items-center bg-blue-600 hover:bg-blue-500 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition"
-                    style="display: none;">
+                <button id="share-button" onclick="shareLink()" class="flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white py-3 px-6 rounded-md font-bold w-full md:w-auto transition shadow-md" style="display: none;">
                     <ion-icon name="share-social-outline" class="text-xl mr-2"></ion-icon>
                     Encaminhar
                 </button>
@@ -48,87 +41,17 @@
 
     <section class='bg-primary_black flex justify-center py-10 px-4'>
         <div class="w-full md:w-10/12 relative" >
-            <h2 class="text-gray-200 text-2xl md:text-3xl font-medium mb-4">
+            <h2 class="text-gray-200 text-2xl md:text-3xl font-medium mb-4 tracking-wide">
                 Descrição Completa
             </h2>
-            <div class="flex justify-left items-center w-full">
+            <div class="flex justify-left items-center w-full bg-gray-900/50 p-6 rounded-lg">
                 <p class="text-gray-300 text-base md:text-lg leading-relaxed">
                     {{ object.descricao }}
                     <br><br>
-                    <span class="text-gray-500 text-sm">Visualizações: {{object.visualizacoes}}</span>
+                    <span class="text-teal-400 font-medium flex items-center"> <ion-icon name="eye" class="mr-2"></ion-icon>
+                        Visualizações: {{object.visualizacoes}}
+                    </span>
                 </p>
             </div>
-
-            <div class="mt-8 mb-8">
-                <h2 class="text-gray-200 text-2xl md:text-3xl font-medium mb-4">
-                    Cenas (Admin Preview)
-                </h2>
-                <div class="space-y-2">
-                {% for cena in object.cenas.all %}
-                    <div class='text-gray-300 hover:text-white bg-gray-900 p-3 rounded border border-gray-800'>
-                        <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.pk %}" target="_blank" class="block">
-                            <p><strong>Cena {{ forloop.counter }}:</strong> {{ cena.titulo }}</p>
-                        </a>
-                    </div>
-                {% endfor %}
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class='bg-primary_black flex justify-center py-10 px-4'>
-        <div class="w-full md:w-10/12 relative" >
-            <h2 class="text-gray-200 text-2xl font-medium mb-4">
-                Relacionados
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {% for narrativa in relacionados %}
-                <div class="bg-gray-800 rounded-md overflow-hidden hover:scale-105 transition-transform duration-200">
-                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                        <div class="h-40 w-full relative">
-                            <img src="{{ narrativa.thumb.url}}" class="w-full h-full object-cover" alt="">
-                        </div>
-                        <div class="p-3">
-                            <p class="text-white text-sm font-bold truncate">{{ narrativa.titulo }}</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-            </div>
-        </div>
-    </section>
-
-</main>
-
-<script>
-    const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
-
-    function copyLinkToClipboard() {
-        navigator.clipboard.writeText(linkParaCompartilhar).then(function() {
-            const buttonText = document.getElementById('copy-button-text');
-            buttonText.innerText = 'Link Copiado!';
-            setTimeout(function() {
-                buttonText.innerText = 'Copiar Link';
-            }, 2000);
-        }, function(err) {
-            console.error('Erro ao copiar o link: ', err);
-        });
-    }
-
-    function shareLink() {
-        if (navigator.share) {
-            navigator.share({
-                title: 'Convite para Jornada Interativa',
-                text: 'Olá! Gostaria de te convidar para iniciar uma jornada interativa.',
-                url: linkParaCompartilhar
-            });
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        if (navigator.share) {
-            document.getElementById('share-button').style.display = 'flex';
-        }
-    });
-</script>
+             </main>
 {% endblock %}
