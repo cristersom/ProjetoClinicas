@@ -19,15 +19,19 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full'>
 
-    <section class="h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
+    <section class="relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end w-full"
+             style="background-image: url('{% static 'images/background.png' %}'); height: 100vh !important;">
+
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
 
         <div class="z-10 w-full px-6 pb-24 md:pb-32 md:px-12 max-w-4xl">
-            <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block">Bem-vindo à Clínica Interativa</span>
-            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
+            <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block shadow-black drop-shadow-md">
+                Bem-vindo à Clínica Interativa
+            </span>
+            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight drop-shadow-xl">
                 Sua saúde, <br>sua jornada.
             </h1>
-            <h3 class="text-lg md:text-xl text-gray-300 mb-8 font-light border-l-4 border-teal-500 pl-4">
+            <h3 class="text-lg md:text-xl text-gray-200 mb-8 font-light border-l-4 border-teal-500 pl-4 drop-shadow-md">
                 Selecione uma das narrativas abaixo para iniciar seu acompanhamento personalizado.
             </h3>
         </div>
@@ -38,7 +42,7 @@
     </section>
 
     {% if lista_narrativas_emalta %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20'>
+    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 -mt-10 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.6)]'>
         <div class="flex items-center mb-6">
             <h2 class="text-white text-2xl font-semibold mr-3">Escolha sua Jornada</h2>
             <div class="h-px flex-1 bg-gray-800 mr-8"></div>

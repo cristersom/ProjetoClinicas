@@ -53,7 +53,6 @@
 
             <div class="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-800 pb-6">
                 <h2 class="text-white text-2xl font-semibold">Sobre a Narrativa</h2>
-
                 <div class="inline-flex items-center bg-gray-800 px-4 py-2 rounded-full border border-gray-700 shadow-inner">
                     <ion-icon name="eye" class="text-teal-400 text-lg mr-2"></ion-icon>
                     <span class="text-gray-300 font-bold text-sm">{{ object.visualizacoes }} visualizações</span>
@@ -103,8 +102,8 @@
                     {% for rel in relacionados %}
                     <a href="{% url 'narrativa:detalhes' rel.pk %}" class="flex-shrink-0 w-72 group relative">
                         <div class="aspect-video rounded-2xl overflow-hidden mb-3 relative border border-gray-700 group-hover:border-teal-500/50 transition-all shadow-lg group-hover:shadow-teal-900/20">
-                            <img src="{{ rel.thumb.url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 opacity-80 group-hover:opacity-100">
-                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent opacity-60"></div>
+                            <img src="{{ rel.thumb.url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-700 opacity-90 group-hover:opacity-100">
+                            <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80"></div>
                         </div>
                         <p class="text-gray-200 text-lg font-bold group-hover:text-white truncate transition-colors">{{ rel.titulo }}</p>
                         <p class="text-teal-500 text-xs font-bold uppercase mt-1 tracking-wide">Ver Detalhes</p>
@@ -122,16 +121,13 @@
 <script>
     const linkParaCompartilhar = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=object.pk %}";
     function copyLinkToClipboard() {
-        navigator.clipboard.writeText(linkParaCompartilhar).then(() => {
-            // Feedback visual simples (Alert) ou pode implementar um Toast se preferir
-            alert('Link copiado com sucesso!');
-        });
+        navigator.clipboard.writeText(linkParaCompartilhar).then(() => { alert('Link copiado!'); });
     }
     function shareLink() {
         if(navigator.share) {
             navigator.share({
                 title: '{{ object.titulo }}',
-                text: 'Acesse a gestão da jornada: {{ object.titulo }}',
+                text: 'Confira esta jornada clínica: {{ object.titulo }}',
                 url: linkParaCompartilhar
             });
         }

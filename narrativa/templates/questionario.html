@@ -1,138 +1,95 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block navbar %}{% endblock %}
-
-{% block titulo %}
-    Responder Questionário
-{% endblock %}
+{% block titulo %}Responder Questionário{% endblock %}
 
 {% block head %}
 <style>
-    .star-rating {
-      display: flex;
-      flex-direction: row-reverse;
-      justify-content: center;
-      gap: 0.25rem;
-    }
-    .star-rating input[type="radio"] {
-      display: none;
-    }
-    .star-rating label {
-      cursor: pointer;
-      font-size: 2.5rem;
-      color: #4a5568;
-      transition: color 0.2s ease-in-out;
-    }
-    .star-rating:hover label {
-      color: #fbbf24;
-    }
-    .star-rating label:hover ~ label {
-      color: #4a5568;
-    }
-    .star-rating input[type="radio"]:checked ~ label {
-      color: #fbbf24;
-    }
-
-    /* Estilização de Inputs Dark */
+    /* Checkbox Padronizado (Teal) */
     .form-check-input {
-        background-color: #374151;
-        border-color: #4b5563;
-        width: 1.25em;
-        height: 1.25em;
-        margin-right: 0.75rem;
+        background-color: #374151; border-color: #4b5563;
+        width: 1.25em; height: 1.25em; margin-right: 0.75rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        appearance: none;
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
     }
     .form-check-input:checked {
-        background-color: #0d9488; /* Teal */
-        border-color: #0d9488;
+        background-color: #0d9488; border-color: #0d9488;
+        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
     }
+
+    /* Textarea Ajustada */
     textarea {
         background-color: #1f2937 !important;
         border-color: #374151 !important;
         color: white !important;
+        min-height: 100px; /* Altura mínima decente no mobile */
     }
-    textarea:focus {
-        border-color: #0d9488 !important;
-        ring: 2px solid #0d9488 !important;
-    }
+
+    /* Estrelas */
+    .star-rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 0.5rem; }
+    .star-rating input { display: none; }
+    .star-rating label { font-size: 2.5rem; color: #4b5563; cursor: pointer; }
+    .star-rating:hover label, .star-rating input:checked ~ label { color: #f59e0b; }
 </style>
 {% endblock %}
 
 {% block content %}
 <main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative" style="background-image: url('{% static 'images/background.png' %}');">
-
     <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm fixed"></div>
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 rounded-xl shadow-2xl p-6 relative border border-gray-800 backdrop-blur-md z-10 my-8">
+    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 rounded-xl shadow-2xl p-6 relative border border-gray-800 backdrop-blur-md z-10 my-8 pt-16">
 
-        {# Botão Sair / Perfil #}
         <div class="absolute top-4 right-4 z-10">
              <a href="{% url 'narrativa:perfil_sessao' narrativa_id=questionario.cena_associada.narrativa.id %}"
-                class="inline-flex items-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-300 border border-gray-700"
-                title="Ver perfil da sessão e sair">
-                 <ion-icon name="person-circle-outline" class="text-xl mr-1"></ion-icon>
-                 Sair
+                class="inline-flex items-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-xs font-bold py-2 px-3 rounded-lg border border-gray-700 transition">
+                 <ion-icon name="person-circle-outline" class="text-lg mr-1"></ion-icon> Sair
              </a>
         </div>
 
-        {# Título #}
-        <h1 class="text-2xl md:text-3xl font-bold mb-2 text-center w-11/12 mx-auto text-white pt-4">
-            {{ questionario.titulo }}
-        </h1>
-        <p class="text-center text-gray-400 text-sm mb-8 uppercase tracking-wider font-medium">
-            Sua opinião é importante
-        </p>
+        <h1 class="text-2xl md:text-3xl font-bold mb-2 text-center text-white">{{ questionario.titulo }}</h1>
+        <p class="text-center text-gray-400 text-sm mb-8 uppercase tracking-wider font-medium">Sua opinião é importante</p>
 
         <form method="POST">
             {% csrf_token %}
 
             {% for pergunta in questionario.perguntas.all %}
-            <div class="mb-6 p-6 bg-gray-800/50 border border-gray-700 rounded-xl hover:border-teal-500/30 transition-colors">
-                <p class="text-lg font-semibold mb-4 text-gray-100">{{ forloop.counter }}. {{ pergunta.texto_pergunta }}</p>
+            <div class="mb-6 p-5 bg-gray-800/50 border border-gray-700 rounded-xl">
+                <p class="text-lg font-semibold mb-4 text-gray-100 leading-tight">{{ forloop.counter }}. {{ pergunta.texto_pergunta }}</p>
 
                 {% if pergunta.tipo_resposta == "TEXTO" %}
-                    <textarea name="pergunta_{{ pergunta.id }}" rows="4" class="w-full p-3 rounded-lg shadow-inner outline-none transition-all"></textarea>
+                    <textarea name="pergunta_{{ pergunta.id }}" rows="3" class="w-full p-3 rounded-lg shadow-inner outline-none transition-all focus:ring-2 focus:ring-teal-500"></textarea>
 
                 {% elif pergunta.tipo_resposta == "ESCALA_5" %}
                     <div class="star-rating py-2">
-                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_5" value="5"><label for="escala_{{ pergunta.id }}_5"><ion-icon name="star"></ion-icon></label>
-                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_4" value="4"><label for="escala_{{ pergunta.id }}_4"><ion-icon name="star"></ion-icon></label>
-                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_3" value="3"><label for="escala_{{ pergunta.id }}_3"><ion-icon name="star"></ion-icon></label>
-                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_2" value="2"><label for="escala_{{ pergunta.id }}_2"><ion-icon name="star"></ion-icon></label>
-                        <input type="radio" name="pergunta_{{ pergunta.id }}" id="escala_{{ pergunta.id }}_1" value="1"><label for="escala_{{ pergunta.id }}_1"><ion-icon name="star"></ion-icon></label>
+                        {% for i in "54321" %}
+                           <input type="radio" name="pergunta_{{ pergunta.id }}" id="e_{{ pergunta.id }}_{{ i }}" value="{{ i }}">
+                           <label for="e_{{ pergunta.id }}_{{ i }}">★</label>
+                        {% endfor %}
                     </div>
 
-                {% elif pergunta.tipo_resposta == "UNICA_ESCOLHA" %}
+                {% elif pergunta.tipo_resposta == "UNICA_ESCOLHA" or pergunta.tipo_resposta == "MULTIPLA_ESCOLHA" %}
                     <div class="space-y-3">
                     {% for opcao in pergunta.opcoes.all %}
-                        <div class="flex items-center p-2 rounded hover:bg-gray-700/30 transition-colors cursor-pointer" onclick="document.getElementById('opcao_{{ pergunta.id }}_{{ opcao.id }}').click()">
-                            <input class="form-check-input cursor-pointer" type="radio" name="pergunta_{{ pergunta.id }}" id="opcao_{{ pergunta.id }}_{{ opcao.id }}" value="{{ opcao.texto }}">
-                            <label class="form-check-label cursor-pointer text-gray-300" for="opcao_{{ pergunta.id }}_{{ opcao.id }}">
-                                {{ opcao.texto }}
-                            </label>
-                        </div>
-                    {% endfor %}
-                    </div>
-
-                {% elif pergunta.tipo_resposta == "MULTIPLA_ESCOLHA" %}
-                     <div class="space-y-3">
-                     {% for opcao in pergunta.opcoes.all %}
-                        <div class="flex items-center p-2 rounded hover:bg-gray-700/30 transition-colors cursor-pointer" onclick="document.getElementById('opcao_{{ pergunta.id }}_{{ opcao.id }}').click()">
-                            <input class="form-check-input cursor-pointer" type="checkbox" name="pergunta_{{ pergunta.id }}" id="opcao_{{ pergunta.id }}_{{ opcao.id }}" value="{{ opcao.texto }}">
-                            <label class="form-check-label cursor-pointer text-gray-300" for="opcao_{{ pergunta.id }}_{{ opcao.id }}">
-                                {{ opcao.texto }}
-                            </label>
-                        </div>
+                        <label class="flex items-start p-3 rounded-lg hover:bg-gray-700/30 cursor-pointer transition-colors border border-transparent hover:border-gray-600">
+                            <input class="form-check-input mt-1 flex-shrink-0"
+                                   type="{% if pergunta.tipo_resposta == 'UNICA_ESCOLHA' %}radio{% else %}checkbox{% endif %}"
+                                   name="pergunta_{{ pergunta.id }}"
+                                   value="{{ opcao.texto }}">
+                            <span class="text-gray-300 text-base leading-snug pt-0.5">{{ opcao.texto }}</span>
+                        </label>
                     {% endfor %}
                     </div>
                 {% endif %}
             </div>
             {% endfor %}
 
-            <div class="text-center mt-8 mb-2">
-                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-6 rounded-xl transition duration-300 shadow-lg hover:shadow-teal-900/30 flex items-center justify-center text-lg">
-                    <ion-icon name="send" class="mr-2"></ion-icon>
-                    Enviar Respostas
+            <div class="text-center mt-8">
+                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-6 rounded-xl transition duration-300 shadow-lg flex items-center justify-center text-lg">
+                    <ion-icon name="send" class="mr-2"></ion-icon> Enviar Respostas
                 </button>
             </div>
         </form>

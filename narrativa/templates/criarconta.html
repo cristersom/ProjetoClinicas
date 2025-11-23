@@ -9,61 +9,49 @@
     /* Estilização Dark para inputs */
     .form-group label { color: #d1d5db; font-weight: 500; margin-bottom: 0.5rem; display: block; }
     .form-control {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        color: #fff !important;
-        padding: 0.75rem;
-        border-radius: 0.5rem;
-        width: 100%;
+        background-color: #1f2937 !important; border: 1px solid #374151 !important;
+        color: #fff !important; padding: 0.75rem; border-radius: 0.5rem; width: 100%;
     }
-    .form-control:focus {
-        border-color: #0d9488 !important;
-        box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important;
-    }
-    /* Help text do Django (senha fraca etc) */
-    .form-text, .help-block { color: #9ca3af !important; font-size: 0.85rem; }
+    .form-control:focus { border-color: #0d9488 !important; box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important; }
+    .form-text, .help-block { color: #9ca3af !important; font-size: 0.8rem; margin-top: 0.25rem; }
 
-    /* Checkbox customizado */
-    .form-check { display: flex; align-items: flex-start; padding-left: 0; margin-top: 1rem; }
+    /* Checkbox de Termos */
+    .form-check { display: flex; align-items: start; margin-top: 1rem; padding-left: 0; }
     .form-check-input {
-        background-color: #374151; border-color: #4b5563;
-        width: 1.2em; height: 1.2em; margin-right: 0.5em; margin-top: 0.2em;
+        background-color: #374151; border-color: #4b5563; width: 1.2em; height: 1.2em; margin-right: 0.75rem; margin-top: 0.25rem;
     }
     .form-check-input:checked { background-color: #0d9488; border-color: #0d9488; }
-    .form-check-label { color: #d1d5db; font-size: 0.95rem; }
-
-    /* Link dos termos dentro do label */
+    .form-check-label { color: #d1d5db; font-size: 0.9rem; line-height: 1.5; }
     .termos-link { color: #2dd4bf !important; text-decoration: underline; font-weight: bold; }
-    .termos-link:hover { color: #5eead4 !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-10" style="background-image: url('{% static 'images/background.png' %}');">
+    <header class="min-h-screen flex justify-center items-center bg-no-repeat bg-cover bg-center relative py-12 md:py-32" style="background-image: url('{% static 'images/background.png' %}');">
         <div class="absolute inset-0 bg-gray-900/90 backdrop-blur-sm"></div>
 
         <div class="z-10 w-full max-w-lg px-4">
-            <div class="bg-gray-800/90 border border-gray-700 p-8 rounded-2xl shadow-2xl">
+            <div class="bg-gray-800/90 border border-gray-700 p-6 md:p-8 rounded-2xl shadow-2xl">
 
                 <div class="text-center mb-6">
-                    <h1 class="text-3xl font-bold text-white">Criar Conta</h1>
-                    <p class="text-gray-400 text-sm mt-2">Junte-se à plataforma de narrativas clínicas</p>
+                    <h1 class="text-2xl md:text-3xl font-bold text-white">Criar Conta</h1>
+                    <p class="text-gray-400 text-sm mt-2">Junte-se à plataforma clínica</p>
                 </div>
 
                 <form method="post">
                     {% csrf_token %}
-                    <fieldset class="form-group">
+                    <fieldset class="form-group space-y-4">
                         {{ form|crispy }}
                     </fieldset>
 
-                    <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg transition shadow-lg mt-4 text-lg" type="submit">
+                    <button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 px-4 rounded-lg transition shadow-lg mt-6 text-lg flex justify-center items-center" type="submit">
                         Registrar
                     </button>
                 </form>
 
                 <div class="mt-6 text-center border-t border-gray-700 pt-4">
                     <p class="text-gray-400 text-sm">Já tem uma conta?
-                        <a href="{% url 'narrativa:login' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition">Fazer Login</a>
+                        <a href="{% url 'narrativa:login' %}" class="text-teal-400 hover:text-teal-300 font-semibold transition hover:underline ml-1">Fazer Login</a>
                     </p>
                 </div>
             </div>
@@ -71,15 +59,11 @@
     </header>
 
     <script>
-        // Script para injetar os links de Termos e Privacidade no Label do Checkbox
         const label = document.querySelector('label[for="id_aceite_termos"]');
         if (label) {
             const termosUrl = "{% url 'narrativa:termos_de_uso' %}";
             const politicaUrl = "{% url 'narrativa:politica_privacidade' %}";
-
-            label.innerHTML = `Aceita nossos
-                <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e
-                <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>?`;
+            label.innerHTML = `Li e concordo com os <a href="${termosUrl}" target="_blank" class="termos-link">termos de uso</a> e <a href="${politicaUrl}" target="_blank" class="termos-link">política de privacidade</a>.`;
         }
     </script>
 {% endblock %}

@@ -6,23 +6,11 @@
 {% block head %}
 <style>
     html { scroll-behavior: smooth; }
-
-    /* Container de Scroll Horizontal */
     .mobile-scroll-container {
-        display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-bottom: 20px;
-        -webkit-overflow-scrolling: touch;
+        display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; -webkit-overflow-scrolling: touch;
     }
     .mobile-scroll-container::-webkit-scrollbar { display: none; }
-
-    /* Cards */
-    .narrativa-card {
-        flex-shrink: 0;
-        scroll-snap-align: start;
-        transition: transform 0.3s;
-    }
+    .narrativa-card { flex-shrink: 0; scroll-snap-align: start; transition: transform 0.3s; }
     .narrativa-card:hover { transform: scale(1.02); }
 </style>
 {% endblock %}
@@ -30,15 +18,17 @@
 {% block content %}
 <main class='bg-gray-900 min-h-screen w-full'>
 
-    <section class="h-screen relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end" style="background-image: url('{% static 'images/background.png' %}');">
+    <section class="relative bg-no-repeat bg-cover bg-center bg-fixed flex items-end w-full"
+             style="background-image: url('{% static 'images/background.png' %}'); height: 100vh !important;">
+
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/60 to-transparent"></div>
 
         <div class="z-10 w-full px-6 pb-24 md:pb-32 md:px-12 max-w-4xl">
-            <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block">Painel Administrativo</span>
-            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight">
+            <span class="text-teal-400 font-bold tracking-wider uppercase text-sm mb-2 block shadow-black drop-shadow-md">Painel Administrativo</span>
+            <h1 class="font-bold text-4xl md:text-6xl text-white mb-6 leading-tight drop-shadow-xl">
                 Gestão de <br>Jornadas Clínicas.
             </h1>
-            <h3 class="text-lg md:text-xl text-gray-300 mb-8 font-light border-l-4 border-teal-500 pl-4">
+            <h3 class="text-lg md:text-xl text-gray-200 mb-8 font-light border-l-4 border-teal-500 pl-4 drop-shadow-md">
                 Crie, edite e acompanhe o desempenho das narrativas interativas.
             </h3>
 
@@ -63,7 +53,7 @@
     </section>
 
     {% if lista_narrativas_recentes %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20'>
+    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 -mt-10 rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.6)]'>
         <div class="flex items-center mb-6">
             <h2 class="text-white text-2xl font-semibold mr-3">Recentes</h2>
             <div class="h-px flex-1 bg-gray-800 mr-8"></div>
@@ -138,31 +128,19 @@
 </main>
 
 <script>
-    // Link Geral para a área de pacientes (Lista de Narrativas)
     const linkHubPacientes = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
-
     function handleShareGeneral() {
         if (navigator.share) {
-            // Mobile: Abre WhatsApp/Telegram/etc
             navigator.share({
                 title: 'Clínica Interativa',
                 text: 'Acesse nossa central de narrativas e escolha sua jornada:',
                 url: linkHubPacientes
             }).catch((error) => console.log('Compartilhamento cancelado', error));
         } else {
-            // Desktop: Copia para a área de transferência
             navigator.clipboard.writeText(linkHubPacientes).then(function() {
                 const btnText = document.getElementById('share-text-general');
-                const originalText = btnText.innerText;
-
                 btnText.innerText = 'Link Copiado!';
-
-                // Volta ao texto original após 2 segundos
-                setTimeout(function() {
-                    btnText.innerText = originalText;
-                }, 2000);
-            }, function(err) {
-                console.error('Erro ao copiar: ', err);
+                setTimeout(function() { btnText.innerText = 'Compartilhar Acesso Geral'; }, 2000);
             });
         }
     }

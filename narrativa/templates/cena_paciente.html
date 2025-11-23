@@ -1,125 +1,102 @@
 {% extends 'base.html' %}
 {% load static %}
-
 {% block navbar %}{% endblock %}
 
-{% block titulo %}
-    Jornada Interativa
-{% endblock %}
+{% block titulo %}Jornada Interativa{% endblock %}
 
 {% block content %}
-<main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative" style="background-image: url('{% static 'images/background.png' %}');">
+<main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative overflow-x-hidden" style="background-image: url('{% static 'images/background.png' %}');">
 
     <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 rounded-xl shadow-2xl p-6 relative border border-gray-800 backdrop-blur-md z-10 my-8">
+    <div class="w-full md:w-8/12 lg:w-6/12 max-w-full bg-gray-900/90 rounded-xl shadow-2xl p-5 md:p-8 pt-20 relative border border-gray-800 backdrop-blur-md z-10 my-4">
 
-        {# Botão Sair / Perfil #}
-        <div class="absolute top-4 right-4 z-10">
+        <div class="absolute top-4 right-4 z-30">
              <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}"
-                class="inline-flex items-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-sm font-medium py-2 px-3 rounded-lg transition duration-300 border border-gray-700"
-                title="Ver perfil da sessão e sair">
-                 <ion-icon name="person-circle-outline" class="text-xl mr-1"></ion-icon>
+                class="inline-flex items-center bg-gray-800/90 hover:bg-gray-700 text-gray-300 hover:text-white text-xs md:text-sm font-bold py-2 px-4 rounded-full transition duration-300 border border-gray-600 shadow-lg backdrop-blur-md">
+                 <ion-icon name="person-circle-outline" class="text-lg mr-2 text-teal-500"></ion-icon>
                  Sair
              </a>
         </div>
 
-        {# Título (Com mt-10 para desgrudar do botão sair) #}
-        <h1 class="text-2xl md:text-3xl font-bold mb-6 mt-10 text-center w-11/12 mx-auto leading-tight tracking-tight text-white">
+        <h1 class="text-2xl md:text-4xl font-extrabold mb-6 mt-8 text-center w-full mx-auto leading-snug text-white drop-shadow-md break-words">
             {{ cena.titulo }}
         </h1>
 
-        {# Barra de Progresso #}
         {% if total_cenas > 0 %}
-        <div class="mb-8 px-2">
-            <div class="flex justify-between text-xs text-gray-400 mb-2 font-medium tracking-wider uppercase">
+        <div class="mb-8 px-1">
+            <div class="flex justify-between text-[10px] md:text-xs text-gray-400 mb-2 font-bold tracking-wider uppercase">
                 <span>Início</span>
-                <span>Progresso: {{ percentual }}%</span>
+                <span class="text-teal-400">Progresso: {{ percentual }}%</span>
                 <span>Fim</span>
             </div>
-            <div class="progress h-2.5 bg-gray-800 rounded-full overflow-hidden shadow-inner border border-gray-700" role="progressbar">
-                <div class="progress-bar bg-gradient-to-r from-teal-500 to-green-500 rounded-full transition-all duration-700 ease-out relative" style="width: {{ percentual }}%">
-                </div>
+            <div class="progress h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700/80">
+                <div class="progress-bar bg-gradient-to-r from-teal-500 to-green-500 h-full rounded-full relative" style="width: {{ percentual }}%"></div>
             </div>
         </div>
         {% endif %}
 
-        {# Conteúdo (Vídeo) #}
         {% if cena.video %}
-            <div class="mb-8 rounded-lg overflow-hidden shadow-xl border border-gray-800 bg-black">
+            <div class="mb-8 rounded-xl overflow-hidden shadow-xl border border-gray-800 bg-black w-full">
                 <div class="aspect-video w-full relative">
-                    <iframe src="{{ cena.video }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                    <iframe src="{{ cena.video }}" frameborder="0" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 </div>
             </div>
         {% endif %}
 
-        {# Conteúdo (Imagem) #}
         {% if cena.imagem %}
-            <div class="mb-8 rounded-lg overflow-hidden shadow-xl border border-gray-800">
+            <div class="mb-8 rounded-xl overflow-hidden shadow-xl border border-gray-800 w-full">
                  <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-auto object-cover">
             </div>
         {% endif %}
 
-        {# Conteúdo (Texto) #}
         {% if cena.conteudo_textual %}
-            <div class="text-base md:text-lg mb-10 leading-relaxed text-gray-300 prose prose-invert max-w-none p-2">
+            <div class="text-base md:text-xl mb-10 leading-relaxed text-gray-200 prose prose-invert max-w-none p-4 bg-gray-800/40 rounded-xl border border-white/5 font-medium break-words">
                 {{ cena.conteudo_textual|linebreaks }}
             </div>
         {% endif %}
 
-        {# Bloco de Ação #}
-        <div class="border-t border-gray-800 pt-8 space-y-4">
+        <div class="border-t border-gray-800 pt-8 space-y-6">
 
-            {# 1. Questionários (COR E ÍCONE ALTERADOS) #}
             {% for questionario in cena.questionarios.all %}
-                <div class="bg-gray-800 p-6 rounded-xl text-center shadow-md border border-gray-700">
+                <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700">
                     <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
-                    <p class="text-sm text-gray-400 mb-6 uppercase tracking-wide font-medium">Pesquisa Rápida</p>
-
+                    <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Pesquisa Rápida</p>
                     <a href="{% url 'narrativa:responder_questionario' questionario_id=questionario.id %}"
-                       class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg">
+                       class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-amber-900/40">
                         <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon>
                         Responder Agora
                     </a>
                 </div>
             {% endfor %}
 
-            {# 2. Escolhas #}
             {% if cena.escolhas.all %}
                 <div class="space-y-4">
                     {% if not cena.questionarios.all %}
-                        <h2 class="text-center text-gray-400 text-sm uppercase tracking-wider font-medium mb-4 flex items-center justify-center">
-                            <span class="h-px w-8 bg-gray-700 mr-3"></span>
-                            Como deseja prosseguir?
-                            <span class="h-px w-8 bg-gray-700 ml-3"></span>
-                        </h2>
+                        <h2 class="text-center text-gray-400 text-xs uppercase tracking-widest font-bold mb-6">Como deseja prosseguir?</h2>
                     {% endif %}
 
                     {% for escolha in cena.escolhas.all %}
                         {% if escolha.cena_destino %}
                         <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}"
-                           class="flex items-center justify-center w-full text-center bg-teal-600 hover:bg-teal-700 text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-md border border-teal-500/50">
-                            {{ escolha.texto_da_opcao }}
+                           class="flex items-center justify-center w-full text-center bg-teal-600 hover:bg-teal-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-md border border-teal-500/50 break-words">
+                            <span class="flex-1">{{ escolha.texto_da_opcao }}</span>
                             <ion-icon name="arrow-forward" class="ml-2 text-xl"></ion-icon>
                         </a>
                         {% else %}
-                         <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-lg font-bold py-4 px-6 rounded-lg transition duration-300 shadow-md border border-gray-600/50">
+                         <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-md border border-gray-600/50">
                             <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl"></ion-icon>
-                            {{ escolha.texto_da_opcao }} (Finalizar)
+                            {{ escolha.texto_da_opcao }}
                         </a>
                         {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
 
-            {# 3. Fim da Jornada #}
             {% if not cena.escolhas.all and not cena.questionarios.all %}
                  <div class="text-center pt-6">
-                    <div class="mb-6 text-gray-400 flex flex-col items-center">
-                        <ion-icon name="flag-outline" class="text-5xl mb-2 text-teal-500 opacity-80"></ion-icon>
-                        <p class="text-lg">Você chegou ao fim desta etapa.</p>
-                    </div>
-                    <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gray-200 hover:bg-white text-gray-900 font-bold py-4 px-6 rounded-lg transition duration-300 shadow-lg tracking-wide">
+                    <p class="text-gray-400 mb-4 text-lg">Você chegou ao fim desta etapa.</p>
+                    <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full bg-gray-200 hover:bg-white text-gray-900 font-bold py-4 px-6 rounded-xl transition shadow-lg">
                         <ion-icon name="apps" class="mr-2 text-xl"></ion-icon>
                         Voltar para o Menu
                     </a>
