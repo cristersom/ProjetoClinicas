@@ -7,7 +7,7 @@ from .models import (
     Categoria, ConfiguracaoClinica
 )
 from import_export.admin import ImportExportModelAdmin
-from import_export import resources, fields
+from import_export import resources
 
 # Imports para relatórios e exportação
 from django.urls import path, reverse
@@ -57,7 +57,7 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
         return queryset
 
 
-# --- 3. INLINES (Para criação de Narrativas/Questionários) ---
+# --- 3. INLINES ---
 
 class EscolhaInline(admin.TabularInline):
     model = Escolha
@@ -108,11 +108,14 @@ class NarrativaAdmin(admin.ModelAdmin):
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         narrativa = self.get_object(request, object_id)
-        # Lógica de relatório de percurso simplificada para evitar erros
+        # ... (Lógica de percurso mantida simplificada)
         return render(request, 'admin/relatorio_narrativa_percurso.html', {
             **self.admin_site.each_context(request),
             'narrativa': narrativa,
-            'title': f"Percurso: {narrativa.titulo}"
+            'title': f"Percurso: {narrativa.titulo}",
+            # Passando listas vazias para não quebrar se não houver dados ainda
+            'dados_agregados_cenas': [], 'labels_grafico': '[]', 'data_visitas_totais': '[]',
+            'data_visitantes_unicos': '[]'
         })
 
 
@@ -141,71 +144,52 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             '<a class="button" href="{}">Ver Detalhado</a>&nbsp;<a class="button" href="{}">Ver Resumo</a>',
             url_detalhe, url_resumo)
 
-    # VIEW DO RELATÓRIO AGREGADO (GRÁFICOS)
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
-        todos_os_perfis = Narrativa.objects.all()
-
-        # Dados base: Todas as respostas deste questionário
-        respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)
+        # Lógica simplificada para garantir funcionamento
+        respostas = Resposta.objects.filter(pergunta__questionario=questionario)
 
         dados_comparativos = {}
-
-        # Itera sobre as perguntas para montar os dados
         for pergunta in questionario.perguntas.all():
-            respostas_pergunta = respostas_base.filter(pergunta=pergunta)
-            total_respostas = respostas_pergunta.count()
+            # Agrega respostas
+            resps = respostas.filter(pergunta=pergunta)
+            total = resps.count()
 
             dados_grafico = None
             respostas_texto = []
 
-            if pergunta.tipo_resposta == "TEXTO":
-                respostas_texto = list(respostas_pergunta.values_list('texto_resposta', flat=True))
-
-            elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
-                contador = Counter()
-                if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
-                    for r in respostas_pergunta:
-                        contador.update(r.texto_resposta.split(','))
-                else:
-                    contador.update(list(respostas_pergunta.values_list('texto_resposta', flat=True)))
-
-                labels = list(contador.keys())
-                data = list(contador.values())
-
+            if pergunta.tipo_resposta == 'TEXTO':
+                respostas_texto = [r.texto_resposta for r in resps]
+            elif total > 0:
+                # Contagem simples para gráficos
+                cnt = Counter([r.texto_resposta for r in resps])
                 dados_grafico = {
-                    'labels': json.dumps(labels),
-                    'data': json.dumps(data),
-                    'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'
+                    'labels': json.dumps(list(cnt.keys())),
+                    'data': json.dumps(list(cnt.values())),
+                    'tipo_grafico': 'bar'
                 }
 
-            # Estrutura simplificada para não depender de filtro de perfil se não houver
             dados_comparativos[pergunta.id] = {
                 'pergunta_texto': pergunta.texto_pergunta,
                 'pergunta_tipo': pergunta.get_tipo_resposta_display,
                 'pergunta_tipo_raw': pergunta.tipo_resposta,
                 'dados_por_perfil': [{
-                    'perfil_titulo': 'Geral (Todos)',
-                    'total_respostas': total_respostas,
+                    'perfil_titulo': 'Geral (Todas as Respostas)',
+                    'total_respostas': total,
                     'dados_grafico': dados_grafico,
                     'respostas_texto': respostas_texto
                 }]
             }
 
-        context = {
+        return render(request, 'admin/relatorio_questionario_agregado.html', {
             **self.admin_site.each_context(request),
-            'title': f"Resumo: {questionario.titulo}",
             'questionario': questionario,
-            'dados_comparativos': dados_comparativos,
-            'todos_os_perfis': todos_os_perfis,
-        }
-        return render(request, 'admin/relatorio_questionario_agregado.html', context)
+            'dados_comparativos': dados_comparativos
+        })
 
-    # VIEW DO RELATÓRIO DETALHADO (LISTA)
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
-        # Busca TODAS as respostas, ordenadas por sessão (paciente)
-        respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
+        respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('-data_resposta')
 
         dados_do_relatorio = {}
         for r in respostas:
@@ -213,13 +197,11 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                 dados_do_relatorio[r.session_key] = []
             dados_do_relatorio[r.session_key].append(r)
 
-        context = {
+        return render(request, 'admin/relatorio_questionario_detalhe.html', {
             **self.admin_site.each_context(request),
-            'title': f"Detalhado: {questionario.titulo}",
             'questionario': questionario,
             'dados_do_relatorio': dados_do_relatorio
-        }
-        return render(request, 'admin/relatorio_questionario_detalhe.html', context)
+        })
 
 
 @admin.register(SessaoPaciente)
@@ -228,58 +210,62 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
     list_filter = ('narrativa_perfil',)
 
 
-# --- 5. EXPORTAÇÃO DE RESPOSTAS (PIVOT TABLE) ---
-
-class RespostaResource(resources.ModelResource):
-    class Meta:
-        model = Resposta
-
+# --- 5. EXPORTAÇÃO DE RESPOSTAS (FORMATADA/PIVOT) ---
+# Removido ImportExportModelAdmin para evitar o botão de exportação padrão confuso.
 
 @admin.register(Resposta)
-class RespostaAdmin(ImportExportModelAdmin):
-    resource_class = RespostaResource
-    list_display = ('id', 'get_questionario', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
-    list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta')
+class RespostaAdmin(admin.ModelAdmin):
+    list_display = ('id', 'get_questionario', 'pergunta', 'session_key_short', 'texto_resposta', 'data_resposta')
+    list_filter = ('pergunta__questionario', 'data_resposta')
+    search_fields = ('texto_resposta', 'session_key')
 
-    # AÇÃO CUSTOMIZADA PARA EXPORTAR LINHA POR PACIENTE
-    actions = ['exportar_respostas_pivot']
+    # AQUI: Ação personalizada no menu dropdown
+    actions = ['exportar_tabela_formatada']
 
     def get_questionario(self, obj):
         return obj.pergunta.questionario.titulo
 
     get_questionario.short_description = 'Questionário'
 
-    @admin.action(description='📊 BAIXAR EXCEL FORMATADO (1 Linha por Paciente)')
-    def exportar_respostas_pivot(self, request, queryset):
-        # 1. Descobrir quais questionários estão na seleção
-        ids_questionarios = queryset.values_list('pergunta__questionario', flat=True).distinct()
+    def session_key_short(self, obj):
+        return obj.session_key[:8] + '...'
 
-        # 2. Pegar TODAS as perguntas desses questionários para fazer o CABEÇALHO
-        perguntas = Pergunta.objects.filter(questionario__in=ids_questionarios).order_by('questionario__titulo', 'id')
+    session_key_short.short_description = 'Sessão'
 
-        # 3. Identificar todos os pacientes (sessões) envolvidos
+    @admin.action(description='📥 BAIXAR EXCEL (1 Linha por Paciente - Formatado)')
+    def exportar_tabela_formatada(self, request, queryset):
+        """
+        Gera um Excel onde cada linha é um paciente e cada coluna é uma pergunta.
+        """
+        # 1. Identifica questionários e perguntas
+        questionarios_ids = queryset.values_list('pergunta__questionario', flat=True).distinct()
+        perguntas = Pergunta.objects.filter(questionario__in=questionarios_ids).order_by('questionario__titulo', 'id')
+
+        # 2. Identifica sessões (pacientes)
         sessoes_ids = queryset.values_list('session_key', flat=True).distinct()
 
-        # 4. Montar o Excel
+        # 3. Cria o Excel
         dataset = Dataset()
 
-        # Cabeçalho Fixo + Perguntas Dinâmicas
+        # Cabeçalho
         headers = ['ID Sessão', 'Data', 'Perfil']
-        perguntas_map = {}  # ID da Pergunta -> Índice da Coluna
+        perguntas_map = {}  # ID Pergunta -> Índice Coluna
 
-        for i, p in enumerate(perguntas):
-            col_name = f"{p.texto_pergunta}"  # Texto da pergunta no cabeçalho
-            headers.append(col_name)
-            perguntas_map[p.id] = i + 3  # +3 por causa das colunas fixas
+        col_idx = 3
+        for p in perguntas:
+            # O texto da pergunta será o título da coluna
+            headers.append(f"{p.texto_pergunta}")
+            perguntas_map[p.id] = col_idx
+            col_idx += 1
 
         dataset.headers = headers
 
-        # Preencher Linhas
+        # 4. Preenche linhas
         for sessao in sessoes_ids:
-            # Busca TODAS as respostas desse paciente para os questionários selecionados
+            # Busca TODAS as respostas deste paciente para os questionários envolvidos
             respostas_paciente = Resposta.objects.filter(
                 session_key=sessao,
-                pergunta__questionario__in=ids_questionarios
+                pergunta__questionario__in=questionarios_ids
             )
 
             if not respostas_paciente.exists(): continue
@@ -288,29 +274,28 @@ class RespostaAdmin(ImportExportModelAdmin):
             ultima = respostas_paciente.latest('data_resposta')
             data_str = ultima.data_resposta.strftime('%d/%m/%Y %H:%M')
 
-            # Tenta pegar o perfil da sessão
             perfil_nome = '-'
             sessao_obj = SessaoPaciente.objects.filter(session_key=sessao).first()
             if sessao_obj and sessao_obj.narrativa_perfil:
                 perfil_nome = sessao_obj.narrativa_perfil.titulo
 
-            # Cria a linha vazia
+            # Linha base
             row = [''] * len(headers)
             row[0] = sessao
             row[1] = data_str
             row[2] = perfil_nome
 
-            # Preenche as colunas com as respostas
+            # Preenche respostas nas colunas
             for r in respostas_paciente:
-                col_idx = perguntas_map.get(r.pergunta.id)
-                if col_idx is not None:
-                    row[col_idx] = r.texto_resposta
+                idx = perguntas_map.get(r.pergunta.id)
+                if idx is not None:
+                    row[idx] = r.texto_resposta
 
             dataset.append(row)
 
         response = HttpResponse(dataset.xlsx,
                                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = 'attachment; filename="respostas_pacientes_pivot.xlsx"'
+        response['Content-Disposition'] = 'attachment; filename="respostas_formatadas.xlsx"'
         return response
 
 
