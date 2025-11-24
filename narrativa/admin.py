@@ -9,7 +9,7 @@ from .models import (
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 
-# Imports necessários para os relatórios
+# Imports necessários para os relatórios customizados
 from django.urls import path, reverse
 from django.http import HttpResponse
 import csv
@@ -20,29 +20,36 @@ from collections import Counter
 import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
-import openpyxl
-from openpyxl.utils import get_column_letter
 
+# Importar o formulário customizado
 from .forms import PerguntaAdminForm
 
 
+# --- ADICIONADO NOVO ADMIN PARA CATEGORIA ---
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
     list_display = ('titulo',)
     search_fields = ('titulo',)
 
 
+# --- ADMIN ADICIONADO PARA O LOGO ---
 @admin.register(ConfiguracaoClinica)
 class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
     list_display = ('logo',)
 
     def has_add_permission(self, request):
+        # Impede a criação de novos objetos se um já existir (pk=1)
         return not ConfiguracaoClinica.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
+        # Impede a exclusão do objeto de configuração
         return False
 
 
+# --- FIM DA ADIÇÃO ---
+
+
+# --- Filtro de Perfil (usado em RespostaAdmin) ---
 class NarrativaPerfilFilter(admin.SimpleListFilter):
     title = 'por Perfil (Narrativa)'
     parameter_name = 'narrativa_perfil'
@@ -58,6 +65,7 @@ class NarrativaPerfilFilter(admin.SimpleListFilter):
         return queryset
 
 
+# --- Classes Inline ---
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -72,12 +80,13 @@ class OpcaoRespostaInline(nested_admin.NestedTabularInline):
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
-    form = PerguntaAdminForm
+    form = PerguntaAdminForm  # Usa o formulário customizado
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
 
 
+# --- Registros dos Modelos no Admin ---
 @admin.register(Cena)
 class CenaAdmin(admin.ModelAdmin):
     list_display = ('titulo', 'narrativa')
@@ -111,6 +120,10 @@ class NarrativaAdmin(admin.ModelAdmin):
     links_relatorios.short_description = 'Relatório de Percurso'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
+        """
+        View que mostra dados AGREGADOS do percurso de cenas visitadas
+        e permite EXPORTAR em múltiplos formatos (XLSX, CSV, JSON).
+        """
         narrativa_atual = self.get_object(request, object_id)
         todos_os_perfis = Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
@@ -170,7 +183,7 @@ class NarrativaAdmin(admin.ModelAdmin):
 
             response = HttpResponse(file_data, content_type=content_type)
             response[
-                'Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.{export_format}"'
+                'Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.{export_format}'
             return response
 
         context = {
@@ -212,13 +225,12 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         ]
         return custom_urls + urls
 
-    # --- MUDANÇA AQUI: display: block para quebrar linha ---
     def links_relatorios(self, obj):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<a class="button" style="display: block; margin-bottom: 5px; text-align: center;" href="{}">Ver Detalhado</a>'
-            '<a class="button" style="display: block; text-align: center;" href="{}">Ver Resumo</a>',
+            '<a class="button" href="{}">Ver Detalhado (por Paciente)</a>&nbsp;'
+            '<a class="button" href="{}">Ver Resumo (Agregado)</a>',
             url_detalhe, url_resumo)
 
     links_relatorios.short_description = 'Relatórios'
@@ -229,120 +241,20 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
         perfis_a_processar = []
 
-        # Lógica de filtro de perfil
         if not perfis_selecionados_ids or 'all' in perfis_selecionados_ids:
             perfis_a_processar.append({'id': 'all', 'titulo': 'Todos os Perfis'})
             perfis_selecionados_ids = ['all']
-            sessoes_filtradas = SessaoPaciente.objects.all()
         else:
             perfis_selecionados = list(Narrativa.objects.filter(id__in=perfis_selecionados_ids))
             for p in perfis_selecionados:
                 perfis_a_processar.append({'id': p.id, 'titulo': p.titulo})
-            sessoes_filtradas = SessaoPaciente.objects.filter(narrativa_perfil_id__in=perfis_selecionados_ids)
 
-        lista_de_session_keys = sessoes_filtradas.values_list('session_key', flat=True)
-
-        # Base de respostas filtrada pelos perfis selecionados
-        respostas_base = Resposta.objects.filter(
-            pergunta__questionario=questionario,
-            session_key__in=lista_de_session_keys
-        )
-
-        export_format = request.GET.get('export')
-
-        # --- LÓGICA DE EXPORTAÇÃO PIVOTADA (XLSX, CSV, JSON) ---
-        if export_format in ['xlsx', 'csv', 'json']:
-            perguntas_ordenadas = questionario.perguntas.all().order_by('id')
-
-            dados_sessao = {}
-            mapa_perfis = {s.session_key: (s.narrativa_perfil.titulo if s.narrativa_perfil else "Indefinido") for s in
-                           sessoes_filtradas}
-
-            for resp in respostas_base.select_related('pergunta'):
-                key = resp.session_key
-                if key not in dados_sessao:
-                    dados_sessao[key] = {
-                        'perfil': mapa_perfis.get(key, "Visitante"),
-                        'data': resp.data_resposta.strftime('%d/%m/%Y %H:%M'),
-                        'respostas_dict': {}
-                    }
-                dados_sessao[key]['respostas_dict'][resp.pergunta.id] = resp.texto_resposta
-
-            # === EXPORTAÇÃO XLSX ===
-            if export_format == 'xlsx':
-                workbook = openpyxl.Workbook()
-                worksheet = workbook.active
-                worksheet.title = "Dados Consolidados"
-
-                headers = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
-                for p in perguntas_ordenadas:
-                    headers.append(p.texto_pergunta)
-
-                worksheet.append(headers)
-
-                for cell in worksheet[1]:
-                    cell.font = openpyxl.styles.Font(bold=True)
-
-                for session_key, dados in dados_sessao.items():
-                    row = [session_key[:8] + "...", dados['perfil'], dados['data']]
-                    for p in perguntas_ordenadas:
-                        row.append(dados['respostas_dict'].get(p.id, ""))
-                    worksheet.append(row)
-
-                # Ajuste de largura
-                for column_cells in worksheet.columns:
-                    length = max(len(str(cell.value) if cell.value else "") for cell in column_cells)
-                    if length > 50: length = 50
-                    worksheet.column_dimensions[get_column_letter(column_cells[0].column)].width = length + 2
-
-                response = HttpResponse(
-                    content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.xlsx"'
-                workbook.save(response)
-                return response
-
-            # === EXPORTAÇÃO CSV ===
-            elif export_format == 'csv':
-                response = HttpResponse(content_type='text/csv')
-                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.csv"'
-
-                writer = csv.writer(response)
-                header_row = ["Sessão (ID)", "Perfil do Paciente", "Data Última Resp."]
-                for p in perguntas_ordenadas:
-                    header_row.append(p.texto_pergunta)
-                writer.writerow(header_row)
-
-                for session_key, dados in dados_sessao.items():
-                    row = [session_key[:8] + "...", dados['perfil'], dados['data']]
-                    for p in perguntas_ordenadas:
-                        row.append(dados['respostas_dict'].get(p.id, ""))
-                    writer.writerow(row)
-
-                return response
-
-            # === EXPORTAÇÃO JSON ===
-            elif export_format == 'json':
-                json_data = []
-                for session_key, dados in dados_sessao.items():
-                    item = {
-                        "sessao_id": session_key[:8] + "...",
-                        "perfil": dados['perfil'],
-                        "data": dados['data'],
-                        "respostas": {}
-                    }
-                    for p in perguntas_ordenadas:
-                        item["respostas"][p.texto_pergunta] = dados['respostas_dict'].get(p.id, "")
-                    json_data.append(item)
-
-                response = HttpResponse(
-                    json.dumps(json_data, indent=4, ensure_ascii=False),
-                    content_type='application/json'
-                )
-                response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.json"'
-                return response
-
-        # Renderização normal da página HTML (Resumo)
+        respostas_base = Resposta.objects.filter(pergunta__questionario=questionario)
         dados_comparativos = {}
+
+        export_dataset = Dataset()
+        export_dataset.headers = ['Pergunta', 'Tipo de Pergunta', 'Perfil do Paciente', 'Opção/Resposta', 'Contagem']
+
         for pergunta in questionario.perguntas.all():
             dados_comparativos[pergunta.id] = {
                 'pergunta_texto': pergunta.texto_pergunta,
@@ -353,15 +265,18 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
             for perfil_info in perfis_a_processar:
                 respostas_perfil = respostas_base.filter(pergunta=pergunta)
                 if perfil_info['id'] != 'all':
-                    sessoes_p = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
-                    keys_p = sessoes_p.values_list('session_key', flat=True)
-                    respostas_perfil = respostas_perfil.filter(session_key__in=keys_p)
+                    sessoes = SessaoPaciente.objects.filter(narrativa_perfil_id=perfil_info['id'])
+                    lista_de_session_keys = sessoes.values_list('session_key', flat=True)
+                    respostas_perfil = respostas_perfil.filter(session_key__in=lista_de_session_keys)
 
                 total_respostas_perfil = respostas_perfil.count()
                 dados_grafico_processado = None
 
                 if pergunta.tipo_resposta == "TEXTO":
                     dados_grafico_processado = list(respostas_perfil.values_list('texto_resposta', flat=True))
+                    for resposta_texto in dados_grafico_processado:
+                        export_dataset.append(
+                            [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], resposta_texto, 1])
                 elif pergunta.tipo_resposta in ["UNICA_ESCOLHA", "ESCALA_5", "MULTIPLA_ESCOLHA"]:
                     contador = Counter()
                     if pergunta.tipo_resposta == "MULTIPLA_ESCOLHA":
@@ -373,6 +288,9 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     labels = list(contador.keys())
                     data = list(contador.values())
                     dados_grafico_processado = dict(zip(labels, data))
+                    for label, count in dados_grafico_processado.items():
+                        export_dataset.append(
+                            [pergunta.texto_pergunta, pergunta.tipo_resposta, perfil_info['titulo'], label, count])
 
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({
                         'perfil_titulo': perfil_info['titulo'],
@@ -393,6 +311,22 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
                     'respostas_texto': dados_grafico_processado,
                 })
 
+        export_format = request.GET.get('export')
+        if export_format in ['csv', 'xlsx', 'json']:
+            if export_format == 'xlsx':
+                content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                file_data = export_dataset.xlsx
+            elif export_format == 'json':
+                content_type = 'application/json'
+                file_data = export_dataset.json
+            else:
+                content_type = 'text/csv'
+                file_data = export_dataset.csv
+
+            response = HttpResponse(file_data, content_type=content_type)
+            response['Content-Disposition'] = f'resumo_questionario_{questionario.id}.{export_format}'
+            return response
+
         context = {
             **self.admin_site.each_context(request),
             'title': f"Resumo Comparativo: {questionario.titulo}",
@@ -405,8 +339,8 @@ class QuestionarioAdmin(nested_admin.NestedModelAdmin):
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
-        respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
-
+        respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key',
+                                                                                          'pergunta__id')
         dados_do_relatorio = {}
         for resposta in respostas:
             if resposta.session_key not in dados_do_relatorio:
@@ -433,6 +367,7 @@ class SessaoPacienteAdmin(admin.ModelAdmin):
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 
+# --- Define RespostaResource ANTES de RespostaAdmin ---
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
     perfil_narrativa = resources.Field(column_name='Perfil (Narrativa)')
@@ -454,6 +389,8 @@ class RespostaResource(resources.ModelResource):
         return 'Não definido'
 
 
+# ----------------------------------------------------
+
 @admin.register(Resposta)
 class RespostaAdmin(ImportExportModelAdmin):
     resource_class = RespostaResource
@@ -462,6 +399,73 @@ class RespostaAdmin(ImportExportModelAdmin):
     list_filter = (NarrativaPerfilFilter, 'pergunta__questionario', 'data_resposta',)
     search_fields = ('texto_resposta', 'session_key')
     ordering = ('session_key', 'pergunta__questionario', 'pergunta__id')
+
+    # --- AÇÃO CUSTOMIZADA ADICIONADA: Exportar como Tabela (Pivot) ---
+    actions = ['exportar_respostas_pivot']
+
+    @admin.action(description='Exportar como Tabela (Perguntas em Colunas)')
+    def exportar_respostas_pivot(self, request, queryset):
+        # 1. Identificar sessões únicas e questionários envolvidos no queryset selecionado
+        sessoes_ids = queryset.values_list('session_key', flat=True).distinct()
+        perguntas_ids = queryset.values_list('pergunta', flat=True).distinct()
+
+        # 2. Coletar todas as perguntas para criar as colunas
+        perguntas = Pergunta.objects.filter(id__in=perguntas_ids).select_related('questionario').order_by(
+            'questionario__titulo', 'id')
+
+        # 3. Criar Dataset (Tablib)
+        dataset = Dataset()
+
+        # Cabeçalho: Sessão + Dados Fixos + Perguntas
+        headers = ['ID Sessão', 'Data Última Resp.', 'Perfil (Narrativa)']
+        perguntas_map = {}  # Map pergunta_id -> indice da coluna
+
+        for i, p in enumerate(perguntas):
+            # Nome da coluna = "Questionário - Texto da Pergunta"
+            header_text = f"{p.questionario.titulo} - {p.texto_pergunta}"
+            headers.append(header_text)
+            perguntas_map[p.id] = i + 3  # +3 por causa das 3 colunas iniciais fixas
+
+        dataset.headers = headers
+
+        # 4. Preencher Dados (Linha por Sessão)
+        for sessao_key in sessoes_ids:
+            # Filtra apenas as respostas desta sessão que estão no queryset original
+            respostas_sessao = queryset.filter(session_key=sessao_key)
+
+            if not respostas_sessao.exists():
+                continue
+
+            # Dados fixos da sessão (Data e Perfil)
+            primeira_resp = respostas_sessao.latest('data_resposta')  # Pega a mais recente para a data
+            data_str = primeira_resp.data_resposta.strftime('%d/%m/%Y %H:%M')
+
+            nome_perfil = 'Não definido'
+            sessao_obj = SessaoPaciente.objects.filter(session_key=sessao_key).first()
+            if sessao_obj and sessao_obj.narrativa_perfil:
+                nome_perfil = sessao_obj.narrativa_perfil.titulo
+
+            # Monta a linha
+            row = [''] * len(headers)
+            row[0] = sessao_key
+            row[1] = data_str
+            row[2] = nome_perfil
+
+            # Preenche as respostas nas colunas corretas
+            for resp in respostas_sessao:
+                col_idx = perguntas_map.get(resp.pergunta_id)
+                if col_idx is not None:
+                    row[col_idx] = resp.texto_resposta
+
+            dataset.append(row)
+
+        # 5. Retornar Excel
+        response = HttpResponse(dataset.xlsx,
+                                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename="respostas_formatadas_tabela.xlsx"'
+        return response
+
+    # --- FIM DA AÇÃO CUSTOMIZADA ---
 
     def get_urls(self):
         urls = super().get_urls()
@@ -604,4 +608,5 @@ class RespostaAdmin(ImportExportModelAdmin):
     session_key_abreviada.short_description = 'Sessão do Paciente'
 
 
+# Registra o usuário customizado
 admin.site.register(Usuario, UserAdmin)
