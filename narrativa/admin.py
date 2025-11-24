@@ -38,15 +38,10 @@ class ConfiguracaoClinicaAdmin(admin.ModelAdmin):
     list_display = ('logo',)
 
     def has_add_permission(self, request):
-        # Impede a criação de novos objetos se um já existir (pk=1)
         return not ConfiguracaoClinica.objects.exists()
 
     def has_delete_permission(self, request, obj=None):
-        # Impede a exclusão do objeto de configuração
         return False
-
-
-# --- FIM DA ADIÇÃO ---
 
 
 # --- Filtro de Perfil (usado em RespostaAdmin) ---
@@ -80,7 +75,7 @@ class OpcaoRespostaInline(nested_admin.NestedTabularInline):
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
-    form = PerguntaAdminForm  # Usa o formulário customizado
+    form = PerguntaAdminForm
     fk_name = 'questionario'
     extra = 1
     inlines = [OpcaoRespostaInline]
@@ -120,10 +115,6 @@ class NarrativaAdmin(admin.ModelAdmin):
     links_relatorios.short_description = 'Relatório de Percurso'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
-        """
-        View que mostra dados AGREGADOS do percurso de cenas visitadas
-        e permite EXPORTAR em múltiplos formatos (XLSX, CSV, JSON).
-        """
         narrativa_atual = self.get_object(request, object_id)
         todos_os_perfis = Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
@@ -183,7 +174,7 @@ class NarrativaAdmin(admin.ModelAdmin):
 
             response = HttpResponse(file_data, content_type=content_type)
             response[
-                'Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.{export_format}'
+                'Content-Disposition'] = f'attachment; filename="percurso_narrativa_{narrativa_atual.id}.{export_format}"'
             return response
 
         context = {
@@ -405,33 +396,46 @@ class RespostaAdmin(ImportExportModelAdmin):
 
     @admin.action(description='Exportar como Tabela (Perguntas em Colunas)')
     def exportar_respostas_pivot(self, request, queryset):
-        # 1. Identificar sessões únicas e questionários envolvidos no queryset selecionado
+        # 1. Identificar sessões únicas baseadas na seleção
         sessoes_ids = queryset.values_list('session_key', flat=True).distinct()
-        perguntas_ids = queryset.values_list('pergunta', flat=True).distinct()
 
-        # 2. Coletar todas as perguntas para criar as colunas
-        perguntas = Pergunta.objects.filter(id__in=perguntas_ids).select_related('questionario').order_by(
+        # IMPORTANTE: Para que as colunas fiquem consistentes, precisamos saber
+        # quais questionários estão envolvidos na seleção.
+        # Se o usuário filtrar por "Questionário de Satisfação", as colunas serão as perguntas desse questionário.
+        # Se selecionar tudo, serão todas as perguntas de todos os questionários (pode ficar grande).
+        perguntas_ids_na_selecao = queryset.values_list('pergunta', flat=True).distinct()
+
+        # Busca as perguntas ordenadas para criar o cabeçalho
+        perguntas = Pergunta.objects.filter(id__in=perguntas_ids_na_selecao).select_related('questionario').order_by(
             'questionario__titulo', 'id')
 
-        # 3. Criar Dataset (Tablib)
+        # 2. Criar Dataset (Tablib)
         dataset = Dataset()
 
-        # Cabeçalho: Sessão + Dados Fixos + Perguntas
-        headers = ['ID Sessão', 'Data Última Resp.', 'Perfil (Narrativa)']
+        # Cabeçalho Fixo + Dinâmico
+        headers = ['ID Sessão', 'Data', 'Perfil']
         perguntas_map = {}  # Map pergunta_id -> indice da coluna
 
         for i, p in enumerate(perguntas):
             # Nome da coluna = "Questionário - Texto da Pergunta"
+            # Isso garante que perguntas iguais em questionários diferentes não se misturem
             header_text = f"{p.questionario.titulo} - {p.texto_pergunta}"
             headers.append(header_text)
             perguntas_map[p.id] = i + 3  # +3 por causa das 3 colunas iniciais fixas
 
         dataset.headers = headers
 
-        # 4. Preencher Dados (Linha por Sessão)
+        # 3. Preencher Dados (Linha por Sessão)
+        # Aqui está a correção: Iteramos sobre as SESSÕES encontradas na seleção
+        # e buscamos TODAS as respostas dessa sessão que correspondem às colunas (perguntas) criadas.
+
         for sessao_key in sessoes_ids:
-            # Filtra apenas as respostas desta sessão que estão no queryset original
-            respostas_sessao = queryset.filter(session_key=sessao_key)
+            # Busca todas as respostas desse paciente QUE FAZEM PARTE DO CONJUNTO DE PERGUNTAS do relatório
+            # Isso evita pegar respostas de outros questionários que não foram filtrados/selecionados
+            respostas_sessao = Resposta.objects.filter(
+                session_key=sessao_key,
+                pergunta__id__in=perguntas_ids_na_selecao
+            ).select_related('pergunta')
 
             if not respostas_sessao.exists():
                 continue
@@ -445,7 +449,7 @@ class RespostaAdmin(ImportExportModelAdmin):
             if sessao_obj and sessao_obj.narrativa_perfil:
                 nome_perfil = sessao_obj.narrativa_perfil.titulo
 
-            # Monta a linha
+            # Monta a linha vazia
             row = [''] * len(headers)
             row[0] = sessao_key
             row[1] = data_str
@@ -459,7 +463,7 @@ class RespostaAdmin(ImportExportModelAdmin):
 
             dataset.append(row)
 
-        # 5. Retornar Excel
+        # 4. Retornar Excel
         response = HttpResponse(dataset.xlsx,
                                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename="respostas_formatadas_tabela.xlsx"'
