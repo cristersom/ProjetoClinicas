@@ -1,65 +1,20 @@
-# narrativa/forms.py
-
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import Usuario, Pergunta
-from django import forms
-from django.utils.html import format_html
 
-
-# --- Formulário da Homepage (Original) ---
 class FormHomepage(forms.Form):
-    email = forms.EmailField(label=False)
+    email = forms.EmailField(label=False, widget=forms.EmailInput(attrs={'placeholder': 'Seu e-mail'}))
 
-# --- Formulário de Criar Conta (MODIFICADO) ---
 class CriarContaForm(UserCreationForm):
-    # Adicionamos email ao formulário de criação de conta
     email = forms.EmailField(required=True)
-
-    # NOVO CAMPO: Checkbox de Aceite dos Termos. O link de 'política de privacidade'
-    # é incluído aqui, e o script em criarconta.html o formatará e ligará corretamente.
-    aceite_termos = forms.BooleanField(
-        # O script em criarconta.html irá formatar este texto e adicionar o segundo link.
-        label=format_html(
-            'Aceita nossos <a href="{}" target="_blank">termos de uso e política de privacidade</a>?',
-            '/termos/' # Link estático de placeholder
-        ),
-        required=True,
-        error_messages={'required': 'Você deve aceitar os termos de uso para criar uma conta.'}
-    )
-
     class Meta:
         model = Usuario
         fields = ('username', 'email')
 
-    # Garante que o email seja salvo
-    def save(self, commit=True):
-        user = super(CriarContaForm, self).save(commit=False)
-        user.email = self.cleaned_data["email"]
-        if commit:
-            user.save()
-        return user
-
-
-# --- Formulário Customizado para Pergunta no Admin (Original) ---
-PERGUNTA_TIPO_CHOICES = list(Pergunta.TIPOS_RESPOSTA)
-
 class PerguntaAdminForm(forms.ModelForm):
-
-    # Adiciona a opção "Selecione o tipo" ao dropdown
-    tipo_resposta = forms.ChoiceField(
-        choices=[('', 'Selecione o tipo')] + PERGUNTA_TIPO_CHOICES,
-        required=True
-    )
-
-    # Adiciona placeholder ao campo de texto da pergunta
-    texto_pergunta = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'placeholder': 'Digite o texto da pergunta aqui...',
-            'style': 'width: 90%;'
-        }),
-        required=True
-    )
-
     class Meta:
         model = Pergunta
         fields = '__all__'
+        widgets = {
+            'texto_pergunta': forms.TextInput(attrs={'style': 'width: 100%;', 'placeholder': 'Digite a pergunta...'}),
+        }

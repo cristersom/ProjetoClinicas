@@ -1,27 +1,21 @@
-from .models import Narrativa, ConfiguracaoClinica
-
-
-def lista_narrativas_recentes(request):
-    lista_narrativas = Narrativa.objects.all().order_by('-data_criacao')[0:8]
-    if lista_narrativas:
-        narrativa_destaque = lista_narrativas[0]
-    else:
-        narrativa_destaque = None
-    return {"lista_narrativas_recentes": lista_narrativas, "narrativa_destaque": narrativa_destaque}
-
-
-def lista_narrativas_emalta(request):
-    lista_narrativas = Narrativa.objects.all().order_by('-visualizacoes')[0:8]
-    return {"lista_narrativas_emalta": lista_narrativas}
-
+from .models import Narrativa, Clinica
 
 def dados_clinica(request):
-    try:
-        # Busca a configuração (que sempre será pk=1)
-        config = ConfiguracaoClinica.objects.get(pk=1)
-        if config.logo:
-            return {'logo_url': config.logo.url}
-    except ConfiguracaoClinica.DoesNotExist:
-        pass
-
+    """Injeta o logo da clínica ativa na navbar."""
+    if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
+        return {'logo_url': request.user.clinica.logo.url if request.user.clinica.logo else None}
     return {'logo_url': None}
+
+def lista_narrativas_recentes(request):
+    """Filtra narrativas pela clínica do usuário logado."""
+    qs = Narrativa.objects.all()
+    if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
+        qs = qs.filter(clinica=request.user.clinica)
+    return {"lista_narrativas_recentes": qs.order_by('-data_criacao')[:8]}
+
+def lista_narrativas_emalta(request):
+    """Filtra narrativas populares pela clínica."""
+    qs = Narrativa.objects.all()
+    if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
+        qs = qs.filter(clinica=request.user.clinica)
+    return {"lista_narrativas_emalta": qs.order_by('-visualizacoes')[:8]}
