@@ -22,6 +22,7 @@ class ClinicaFilterMixin:
         return queryset.none()
 
 
+# --- ÁREA PÚBLICA ---
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
@@ -38,6 +39,19 @@ class Homepage(FormView):
         return reverse('narrativa:criarconta')
 
 
+class Criarconta(FormView):
+    template_name = "criarconta.html"
+    form_class = CriarContaForm
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('narrativa:login')
+
+
+# --- ÁREA DO ADMINISTRADOR ---
 class Narrativas(LoginRequiredMixin, ClinicaFilterMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
@@ -53,12 +67,13 @@ class Detalhes(LoginRequiredMixin, DetailView):
         return Narrativa.objects.filter(clinica=self.request.user.clinica)
 
 
-class PacienteNarrativas(ListView):
-    template_name = "paciente_narrativas.html"
-    model = Narrativa
+class PerfilView(LoginRequiredMixin, UpdateView):
+    template_name = "perfil.html"
+    model = Usuario
+    fields = ['first_name', 'last_name', 'email']
 
-    def get_queryset(self):
-        return Narrativa.objects.all().order_by('-visualizacoes')
+    def get_success_url(self):
+        return reverse('narrativa:narrativas')
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -80,29 +95,24 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class Criarconta(FormView):
-    template_name = "criarconta.html"
-    form_class = CriarContaForm
+# --- ÁREA DO PACIENTE ---
+class PacienteNarrativas(ListView):
+    template_name = "paciente_narrativas.html"
+    model = Narrativa
 
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('narrativa:login')
+    def get_queryset(self):
+        return Narrativa.objects.all().order_by('-visualizacoes')
 
 
-class PerfilView(LoginRequiredMixin, UpdateView):
-    template_name = "perfil.html"
-    model = Usuario
-    fields = ['first_name', 'last_name', 'email']
-
-    def get_success_url(self):
-        return reverse('narrativa:narrativas')
+class PacienteDetalhes(DetailView):
+    template_name = "paciente_detalhes.html"
+    model = Narrativa
 
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, pk=cena_id)
+    if not request.session.session_key:
+        request.session.create()
     LogVisitaCena.objects.get_or_create(session_key=request.session.session_key, cena_visitada=cena,
                                         defaults={'narrativa_associada': cena.narrativa})
     return render(request, 'cena_paciente.html', {'cena': cena})
