@@ -1,72 +1,64 @@
 {% extends "admin/base_site.html" %}
-{% load static %}
-
 {% block content %}
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <h2 class="fw-bold">Painel da Clínica: <span class="text-teal">{{ request.user.clinica.nome }}</span></h2>
-            <hr>
-        </div>
-    </div>
-
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card bg-primary text-white shadow">
-                <div class="card-body">
-                    <h5>Sessões de Pacientes</h5>
-                    <h3>{{ kpi_sessoes }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-success text-white shadow">
-                <div class="card-body">
-                    <h5>Total de Respostas</h5>
-                    <h3>{{ kpi_respostas }}</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card bg-info text-white shadow">
-                <div class="card-body">
-                    <h5>Jornadas Ativas</h5>
-                    <h3>{{ kpi_narrativas }}</h3>
-                </div>
-            </div>
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4 text-gray-800">Resumo de Atividades: <strong>{{ request.user.clinica.nome }}</strong></h1>
         </div>
     </div>
 
     <div class="row">
-        <div class="col-md-12">
-            <div class="card shadow">
-                <div class="card-header bg-dark text-white">Visualizações por Jornada</div>
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
-                    <canvas id="topNarrativasChart" height="100"></canvas>
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Suas Jornadas Criadas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_narrativas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book-medical fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pacientes que Iniciaram</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_sessoes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Respostas Coletadas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_respostas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <div class="mt-4">
+        <a href="/admin/narrativa/narrativa/add/" class="btn btn-primary btn-lg"> + Criar Nova Jornada</a>
+    </div>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('topNarrativasChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: JSON.parse('{{ chart_top_labels|safe }}'),
-            datasets: [{
-                label: 'Visualizações',
-                data: JSON.parse('{{ chart_top_data|safe }}'),
-                backgroundColor: '#20c997'
-            }]
-        },
-        options: { responsive: true }
-    });
-</script>
-
-<style>
-    .text-teal { color: #20c997; }
-</style>
 {% endblock %}
