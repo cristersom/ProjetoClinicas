@@ -3,18 +3,18 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-m#7*8-@1=lq#8)7_5^9)@_!_@*!_@*!_')
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-padrao-temporaria')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
-    'jazzmin',  # Deve vir antes do admin
+    'jazzmin',  # DEVE ser o primeiro para os ícones funcionarem
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # Necessário para o WhiteNoise
     'narrativa',
     'cloudinary',
     'cloudinary_storage',
@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # DEVE vir logo após o SecurityMiddleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,10 +64,12 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# CONFIGURAÇÃO DE ESTÁTICOS (CRÍTICO PARA O HEROKU)
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+# Armazenamento otimizado para Heroku
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -81,7 +83,7 @@ CLOUDINARY_STORAGE = {
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# Configuração Jazzmin - Voltando aos ícones e visual limpo
+# JAZZMIN: Recuperando os ícones e removendo as bolinhas
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
@@ -90,17 +92,27 @@ JAZZMIN_SETTINGS = {
     "copyright": "Narrativas Clínicas © 2026",
     "user_avatar": None,
     "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Home", "url": "admin:index"},
         {"name": "Dashboard", "url": "narrativa:dashboard_admin"},
     ],
     "show_sidebar": True,
     "navigation_expanded": True,
     "icons": {
+        "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "narrativa.Usuario": "fas fa-user-md",
         "narrativa.Clinica": "fas fa-hospital",
         "narrativa.Narrativa": "fas fa-book-medical",
         "narrativa.Cena": "fas fa-play-circle",
         "narrativa.Questionario": "fas fa-list-alt",
+        "narrativa.Resposta": "fas fa-comment-medical",
+        "narrativa.SessaoPaciente": "fas fa-history",
     },
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "flatly",
+    "navbar": "navbar-dark bg-dark",
+    "accent": "accent-primary",
+    "sidebar": "sidebar-dark-primary",
 }
