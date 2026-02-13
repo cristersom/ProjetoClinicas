@@ -3,18 +3,18 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-padrao-temporaria')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
-    'jazzmin',  # DEVE ser o primeiro para os ícones funcionarem
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', # Necessário para o WhiteNoise
+    'django.contrib.staticfiles',
     'narrativa',
     'cloudinary',
     'cloudinary_storage',
@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # DEVE vir logo após o SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Essencial para servir CSS/JS no Heroku
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -64,11 +64,10 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# CONFIGURAÇÃO DE ESTÁTICOS (CRÍTICO PARA O HEROKU)
+# --- CONFIGURAÇÃO DE ARQUIVOS ESTÁTICOS ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-# Armazenamento otimizado para Heroku
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
@@ -80,33 +79,20 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
-CRISPY_TEMPLATE_PACK = "bootstrap5"
-
-# JAZZMIN: Recuperando os ícones e removendo as bolinhas
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
     "site_brand": "Narrativas Clínicas",
     "welcome_sign": "Gestão de Jornadas",
-    "copyright": "Narrativas Clínicas © 2026",
-    "user_avatar": None,
-    "topmenu_links": [
-        {"name": "Home", "url": "admin:index"},
-        {"name": "Dashboard", "url": "narrativa:dashboard_admin"},
-    ],
     "show_sidebar": True,
     "navigation_expanded": True,
     "icons": {
-        "auth": "fas fa-users-cog",
         "auth.user": "fas fa-user",
         "narrativa.Usuario": "fas fa-user-md",
         "narrativa.Clinica": "fas fa-hospital",
         "narrativa.Narrativa": "fas fa-book-medical",
         "narrativa.Cena": "fas fa-play-circle",
         "narrativa.Questionario": "fas fa-list-alt",
-        "narrativa.Resposta": "fas fa-comment-medical",
-        "narrativa.SessaoPaciente": "fas fa-history",
     },
 }
 
