@@ -1,22 +1,28 @@
 from django.urls import path
 from . import views
-from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 app_name = 'narrativa'
 
 urlpatterns = [
-    # Dashboard e Gestão
+    # Rota Raiz - Resolve o erro de 'Not Found' na home
+    path('', views.Homepage.as_view(), name='home'),
+
+    # Dashboard e Gestão SaaS
     path('dashboard/', views.DashboardView.as_view(), name='dashboard_admin'),
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
     path('detalhes/<int:pk>/', views.Detalhes.as_view(), name='detalhes'),
     path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
 
-    # Autenticação
+    # Autenticação e Redirecionamento de Perfil
     path('login/', views.Homepage.as_view(), name='login'),
     path('criarconta/', views.Criarconta.as_view(), name='criarconta'),
-    path('logout/', admin.site.logout, name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # Área do Paciente
+    # Resolve o erro /accounts/profile/ enviando para as narrativas
+    path('accounts/profile/', views.Narrativas.as_view(), name='perfil_automatico'),
+
+    # Área do Paciente (Jornadas)
     path('paciente/jornadas/', views.PacienteNarrativas.as_view(), name='paciente_narrativas'),
     path('paciente/detalhes/<int:pk>/', views.PacienteDetalhes.as_view(), name='paciente_detalhes'),
     path('paciente/cena/<int:cena_id>/', views.exibir_cena_paciente, name='exibir_cena_paciente'),

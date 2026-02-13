@@ -102,3 +102,10 @@ JAZZMIN_UI_TWEAKS = {
     "accent": "accent-primary",
     "sidebar": "sidebar-dark-primary",
 }
+
+# Adicione ou altere estas linhas no final do seu settings.py
+
+# Redirecionamentos de Login
+LOGIN_REDIRECT_URL = 'narrativa:narrativas'  # Após logar, vai para a lista de jornadas
+LOGOUT_REDIRECT_URL = 'narrativa:login'      # Após sair, volta para a home/login
+LOGIN_URL = 'narrativa:login'

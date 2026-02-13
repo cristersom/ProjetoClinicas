@@ -5,17 +5,24 @@ from django.conf.urls.static import static
 from narrativa import views
 
 urlpatterns = [
-    # O Admin padrão do Django para login direto
+    # Login direto para o Administrador
     path('admin/login/', admin.site.login),
 
-    # Intercepta a raiz do admin para o seu Dashboard customizado
+    # Dashboard Customizado na raiz do Admin
     path('admin/', views.DashboardView.as_view(), name='admin_index'),
 
-    # Restante das rotas do admin
+    # URLs padrão do Django Admin
     path('admin/', admin.site.urls),
 
+    # Inclui todas as rotas do App Narrativa (incluindo a raiz '')
     path('', include('narrativa.urls', namespace='narrativa')),
 ]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Configuração para arquivos de mídia e estáticos
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    # No Heroku, o WhiteNoise cuida disso, mas mantemos as rotas para consistência
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
