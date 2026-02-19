@@ -114,3 +114,10 @@ LOGIN_URL = 'narrativa:login'
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'sua-chave-publica-aqui')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sua-chave-secreta-aqui')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'seu-segredo-webhook-aqui')
+
+# gameflix/settings.py
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True  # Força o HTTPS
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True

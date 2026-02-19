@@ -1,33 +1,40 @@
 {% extends 'base.html' %}
-{% block title %}Escolha seu Plano - Narrativas Clínicas{% endblock %}
+{% block title %}Planos - Narrativas Clínicas{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="text-center mb-5">
-        <h2 class="display-4 fw-bold text-teal">Planos e Preços</h2>
-        <p class="lead text-muted">Escolha a melhor escala para sua clínica.</p>
+        <h2 class="display-4 fw-bold text-teal">Escolha o plano ideal</h2>
+        <p class="lead text-muted">Escalabilidade e controle para sua prática clínica.</p>
     </div>
 
     <div class="row row-cols-1 row-cols-md-4 g-4">
         {% for plano in planos %}
         <div class="col">
-            <div class="card h-100 shadow-sm {% if plano.nome == 'Profissional' %}border-teal{% endif %}">
-                <div class="card-header py-3 bg-dark text-white text-center">
-                    <h4 class="my-0 fw-normal">{{ plano.nome }}</h4>
+            <div class="card h-100 shadow-sm border-0 bg-dark text-white text-center">
+                <div class="card-header py-3 bg-teal text-white">
+                    <h4 class="my-0 fw-bold">{{ plano.nome }}</h4>
                 </div>
-                <div class="card-body text-center d-flex flex-column">
-                    <h1 class="card-title pricing-card-title">R$ {{ plano.preco }}<small class="text-muted fw-light">/mês</small></h1>
-                    <ul class="list-unstyled mt-3 mb-4 text-white">
-                        <li><strong>{{ plano.limite }}</strong></li>
-                        <li>Suporte por E-mail</li>
-                        <li>Dashboard de métricas</li>
+                <div class="card-body d-flex flex-column">
+                    <h1 class="card-title pricing-card-title">
+                        {% if plano.preco == 'Sob Consulta' %}
+                            {{ plano.preco }}
+                        {% else %}
+                            R$ {{ plano.preco }}<small class="text-muted fw-light">/mês</small>
+                        {% endif %}
+                    </h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li class="mb-2"><strong>{{ plano.limite }}</strong></li>
+                        <li class="text-muted">Suporte Dedicado</li>
+                        <li class="text-muted">Painel de Métricas</li>
                     </ul>
-                    
+
                     <div class="mt-auto">
                         {% if plano.pid %}
                             <a href="{% url 'narrativa:checkout' plano.pid %}" class="w-100 btn btn-lg btn-teal">Assinar Agora</a>
                         {% else %}
-                            <a href="https://wa.me/SEUNUMERO" class="w-100 btn btn-lg btn-outline-light">Falar com Consultor</a>
+                            {# Link para o WhatsApp no Enterprise #}
+                            <a href="https://wa.me/5554999999999?text=Tenho%20interesse%20no%20plano%20Enterprise" target="_blank" class="w-100 btn btn-lg btn-outline-teal">Falar com Consultor</a>
                         {% endif %}
                     </div>
                 </div>
@@ -38,7 +45,12 @@
 </div>
 
 <style>
-    .border-teal { border: 2px solid #20c997 !important; }
-    .card { background-color: #1e1e1e; color: white; border: 1px solid #333; }
+    .btn-teal { background-color: #20c997; border-color: #20c997; color: white; }
+    .btn-teal:hover { background-color: #18a67d; color: white; }
+    .btn-outline-teal { border-color: #20c997; color: #20c997; }
+    .bg-teal { background-color: #20c997; }
+    .text-teal { color: #20c997; }
+    .card { transition: transform 0.3s; }
+    .card:hover { transform: translateY(-10px); }
 </style>
 {% endblock %}
