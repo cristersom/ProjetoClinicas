@@ -109,3 +109,8 @@ JAZZMIN_UI_TWEAKS = {
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'  # Após logar, vai para a lista de jornadas
 LOGOUT_REDIRECT_URL = 'narrativa:login'      # Após sair, volta para a home/login
 LOGIN_URL = 'narrativa:login'
+
+# CONFIGURAÇÕES DO STRIPE
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'sua-chave-publica-aqui')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sua-chave-secreta-aqui')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'seu-segredo-webhook-aqui')
