@@ -65,24 +65,17 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- SEGURANÇA E PROXY ---
+# --- SEGURANÇA ---
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://narrativasclinicas.com.br',
-    'https://www.narrativasclinicas.com.br',
-]
-
-# Mantemos False para evitar loop 301 com o Cloudflare
+CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://www.narrativasclinicas.com.br']
 SECURE_SSL_REDIRECT = False
 
 if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 
-# --- ESTÁTICOS ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -90,26 +83,18 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
     'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# --- STRIPE E REDIRECTS ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-LOGIN_REDIRECT_URL = 'narrativa:narrativas'
-LOGOUT_REDIRECT_URL = 'narrativa:login'
-LOGIN_URL = 'narrativa:login'
+LOGIN_REDIRECT_URL = 'narrativa:home'
+LOGOUT_REDIRECT_URL = 'narrativa:home'
+LOGIN_URL = 'narrativa:home'
 
-JAZZMIN_SETTINGS = {
-    "site_title": "Narrativas Clínicas",
-    "site_header": "Narrativas Clínicas",
-    "site_brand": "Narrativas Clínicas",
-    "welcome_sign": "Gestão de Jornadas",
-    "show_sidebar": True,
-}
+JAZZMIN_SETTINGS = {"site_title": "Narrativas Clínicas", "show_sidebar": True}
