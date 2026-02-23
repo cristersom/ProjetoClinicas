@@ -14,12 +14,12 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class ClinicaFilterMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.request.user.is_superuser: return queryset
+        if self.request.user.is_superuser:
+            return queryset
         if self.request.user.is_authenticated and self.request.user.clinica:
             return queryset.filter(clinica=self.request.user.clinica)
         return queryset.none()
 
-# --- PÚBLICAS ---
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
@@ -36,7 +36,6 @@ class Criarconta(FormView):
         return super().form_valid(form)
     def get_success_url(self): return reverse('narrativa:home')
 
-# --- FINANCEIRO ---
 class PlanosView(LoginRequiredMixin, TemplateView):
     template_name = 'planos.html'
     def get_context_data(self, **kwargs):
@@ -58,13 +57,16 @@ def criar_checkout_sessao(request, price_id):
     except: return HttpResponse(status=400)
 
 @csrf_exempt
-def stripe_webhook(request):
-    return HttpResponse(status=200)
+def stripe_webhook(request): return HttpResponse(status=200)
 
-# --- MÉDICO ---
 class Narrativas(LoginRequiredMixin, ClinicaFilterMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            if not request.user.clinica or not request.user.clinica.assinatura_ativa:
+                return redirect('narrativa:home')
+        return super().dispatch(request, *args, **kwargs)
 
 class Detalhes(LoginRequiredMixin, DetailView):
     template_name = "detalhes.html"
@@ -83,7 +85,6 @@ class PerfilView(LoginRequiredMixin, UpdateView):
     fields = ['first_name', 'last_name', 'email']
     def get_success_url(self): return reverse('narrativa:home')
 
-# --- PACIENTE ---
 class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
@@ -104,7 +105,6 @@ def perfil_sessao_view(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
     return render(request, 'perfil_sessao.html', {'narrativa': narrativa})
 
-# --- TERMOS ---
 class TermosView(TemplateView): template_name = "termos.html"
 class PoliticaView(TemplateView): template_name = "politica.html"
 class LerTermosView(TemplateView):
