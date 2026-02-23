@@ -5,7 +5,8 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -26,7 +27,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Essencial para servir CSS/JS no Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -79,6 +80,29 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
+# --- SEGURANÇA E CSRF (CORREÇÃO PARA O ERRO 403) ---
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = [
+    'https://narrativasclinicas.com.br',
+    'https://www.narrativasclinicas.com.br',
+]
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# --- CONFIGURAÇÕES DO STRIPE ---
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
+
+# Redirecionamentos
+LOGIN_REDIRECT_URL = 'narrativa:narrativas'
+LOGOUT_REDIRECT_URL = 'narrativa:login'
+LOGIN_URL = 'narrativa:login'
+
+# JAZZMIN SETTINGS (Mantido do original)
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
@@ -86,38 +110,4 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Gestão de Jornadas",
     "show_sidebar": True,
     "navigation_expanded": True,
-    "icons": {
-        "auth.user": "fas fa-user",
-        "narrativa.Usuario": "fas fa-user-md",
-        "narrativa.Clinica": "fas fa-hospital",
-        "narrativa.Narrativa": "fas fa-book-medical",
-        "narrativa.Cena": "fas fa-play-circle",
-        "narrativa.Questionario": "fas fa-list-alt",
-    },
 }
-
-JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",
-    "navbar": "navbar-dark bg-dark",
-    "accent": "accent-primary",
-    "sidebar": "sidebar-dark-primary",
-}
-
-# Adicione ou altere estas linhas no final do seu settings.py
-
-# Redirecionamentos de Login
-LOGIN_REDIRECT_URL = 'narrativa:narrativas'  # Após logar, vai para a lista de jornadas
-LOGOUT_REDIRECT_URL = 'narrativa:login'      # Após sair, volta para a home/login
-LOGIN_URL = 'narrativa:login'
-
-# CONFIGURAÇÕES DO STRIPE
-STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'sua-chave-publica-aqui')
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'sua-chave-secreta-aqui')
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', 'seu-segredo-webhook-aqui')
-
-# gameflix/settings.py
-if not DEBUG:
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True  # Força o HTTPS
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
