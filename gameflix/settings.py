@@ -65,7 +65,7 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- SEGURANÇA (CORREÇÃO ERRO 403) ---
+# --- SEGURANÇA (CORREÇÃO ERRO 403 E LOOP 301) ---
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
@@ -75,8 +75,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://www.narrativasclinicas.com.br',
 ]
 
+# Mudança vital para parar o loop infinito no Heroku + Cloudflare
+SECURE_SSL_REDIRECT = False
+
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
 

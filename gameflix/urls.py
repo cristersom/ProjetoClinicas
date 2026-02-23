@@ -4,7 +4,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # Rota padrão estável
     path('admin/', admin.site.urls),
     path('', include('narrativa.urls')),
 ]

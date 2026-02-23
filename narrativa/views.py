@@ -19,7 +19,6 @@ class ClinicaFilterMixin:
             return queryset.filter(clinica=self.request.user.clinica)
         return queryset.none()
 
-# --- PÚBLICAS ---
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
@@ -39,15 +38,11 @@ class Criarconta(FormView):
         return super().form_valid(form)
     def get_success_url(self): return reverse('narrativa:login')
 
-# --- FINANCEIRO ---
 class PlanosView(LoginRequiredMixin, TemplateView):
     template_name = 'planos.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['planos'] = [
-            {'nome': 'Básico', 'pid': 'price_1QuVv4C3uXz6...'},
-            {'nome': 'Profissional', 'pid': 'price_1QuVv4C3uXz7...'},
-        ]
+        context['planos'] = [{'nome': 'Básico', 'pid': 'price_1...'}, {'nome': 'Pro', 'pid': 'price_2...'}]
         return context
 
 def criar_checkout_sessao(request, price_id):
@@ -75,11 +70,10 @@ def stripe_webhook(request):
         clinica_id = session.get('client_reference_id')
         if clinica_id:
             clinica = Clinica.objects.get(id=clinica_id)
-            clinica.assinatura_active = True
+            clinica.assinatura_ativa = True
             clinica.save()
     return HttpResponse(status=200)
 
-# --- MÉDICO ---
 class Narrativas(LoginRequiredMixin, ClinicaFilterMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
@@ -101,7 +95,6 @@ class PerfilView(LoginRequiredMixin, UpdateView):
     fields = ['first_name', 'last_name', 'email']
     def get_success_url(self): return reverse('narrativa:narrativas')
 
-# --- PACIENTE ---
 class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
@@ -122,7 +115,6 @@ def perfil_sessao_view(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, pk=narrativa_id)
     return render(request, 'perfil_sessao.html', {'narrativa': narrativa})
 
-# --- TERMOS ---
 class TermosView(TemplateView): template_name = "termos.html"
 class PoliticaView(TemplateView): template_name = "politica.html"
 class LerTermosView(TemplateView):
