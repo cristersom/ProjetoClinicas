@@ -5,10 +5,10 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria')
 
-# ATENÇÃO: DEBUG como True para vermos o erro exato na tela
+# DEBUG Ativado para recuperarmos o site e vermos o erro real
 DEBUG = True
 
-ALLOWED_HOSTS = ['*'] # Liberado para teste
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'jazzmin',
@@ -67,109 +67,13 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- CONFIGURAÇÃO DE SEGURANÇA (ESTADO DE RECUPERAÇÃO) ---
+# --- SEGURANÇA (ESTADO DE RECUPERAÇÃO) ---
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
 CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://www.narrativasclinicas.com.br']
 
-# DESATIVADO para parar o erro de "Raiz fora do ar"
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
-
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-MEDIA_URL = '/media/'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
-
-LOGIN_REDIRECT_URL = 'narrativa:home'
-LOGOUT_REDIRECT_URL = 'narrativa:home'
-LOGIN_URL = 'narrativa:home'
-
-JAZZMIN_SETTINGS = {"site_title": "Narrativas Clínicas", "show_sidebar": True}import os
-from pathlib import Path
-import dj_database_url
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria')
-
-# ATENÇÃO: DEBUG como True para vermos o erro exato na tela
-DEBUG = True
-
-ALLOWED_HOSTS = ['*'] # Liberado para teste
-
-INSTALLED_APPS = [
-    'jazzmin',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'narrativa',
-    'cloudinary',
-    'cloudinary_storage',
-    'crispy_forms',
-    'crispy_bootstrap5',
-    'import_export',
-    'nested_admin',
-]
-
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'narrativa.middleware.SaaSControlMiddleware',
-]
-
-ROOT_URLCONF = 'gameflix.urls'
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'narrativa.context.dados_clinica',
-            ],
-        },
-    },
-]
-
-WSGI_APPLICATION = 'gameflix.wsgi.application'
-
-DATABASES = {
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3', conn_max_age=600)
-}
-
-AUTH_USER_MODEL = 'narrativa.Usuario'
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# --- CONFIGURAÇÃO DE SEGURANÇA (ESTADO DE RECUPERAÇÃO) ---
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-USE_X_FORWARDED_HOST = True
-USE_X_FORWARDED_PORT = True
-CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://www.narrativasclinicas.com.br']
-
-# DESATIVADO para parar o erro de "Raiz fora do ar"
+# Desativamos redirecionamentos forçados para o domínio voltar a responder
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
