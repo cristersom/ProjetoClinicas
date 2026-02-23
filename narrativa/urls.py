@@ -6,20 +6,21 @@ app_name = 'narrativa'
 urlpatterns = [
     # Públicas
     path('', views.Homepage.as_view(), name='home'),
+    path('login/', views.Homepage.as_view(), name='login'), # Adicionado o nome 'login'
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
 
-    # Financeiro
+    # Financeiro e Planos
     path('planos/', views.PlanosView.as_view(), name='planos'),
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
     path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
 
-    # Médico
+    # Área do Médico (Multi-tenant)
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
     path('narrativa/<int:pk>/', views.Detalhes.as_view(), name='detalhes'),
     path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
     path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
 
-    # Paciente
+    # Área do Paciente
     path('explorar/', views.PacienteNarrativas.as_view(), name='paciente_narrativas'),
     path('v/<int:pk>/', views.PacienteDetalhes.as_view(), name='paciente_detalhes'),
     path('cena/<int:cena_id>/', views.exibir_cena_paciente, name='exibir_cena_paciente'),
