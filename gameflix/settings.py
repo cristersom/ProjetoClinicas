@@ -65,7 +65,22 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# --- CONFIGURAÇÃO DE ARQUIVOS ESTÁTICOS ---
+# --- SEGURANÇA (CORREÇÃO DO ERRO 403) ---
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://narrativasclinicas.com.br',
+    'https://www.narrativasclinicas.com.br',
+]
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# --- ARQUIVOS ESTÁTICOS ---
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -80,34 +95,19 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-# --- SEGURANÇA E CSRF (CORREÇÃO PARA O ERRO 403) ---
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CSRF_TRUSTED_ORIGINS = [
-    'https://narrativasclinicas.com.br',
-    'https://www.narrativasclinicas.com.br',
-]
-
-if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-
-# --- CONFIGURAÇÕES DO STRIPE ---
+# --- STRIPE ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# Redirecionamentos
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:login'
 LOGIN_URL = 'narrativa:login'
 
-# JAZZMIN SETTINGS (Mantido do original)
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
     "site_brand": "Narrativas Clínicas",
     "welcome_sign": "Gestão de Jornadas",
     "show_sidebar": True,
-    "navigation_expanded": True,
 }
