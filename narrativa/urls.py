@@ -6,6 +6,7 @@ app_name = 'narrativa'
 urlpatterns = [
     # Públicas
     path('', views.Homepage.as_view(), name='home'),
+    path('login/', views.Homepage.as_view(), name='login'),
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
 
     # Financeiro e Planos
