@@ -8,8 +8,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
 
+# ORDEM CRÍTICA: Jazzmin deve ser o primeiro para evitar TemplateDoesNotExist
 INSTALLED_APPS = [
-    'jazzmin', # ORDEM VITAL: Deve ser o primeiro da lista
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +44,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'APP_DIRS': True, # Garante que o Django procure templates dentro das pastas dos apps (como o Jazzmin)
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -95,7 +96,7 @@ LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 LOGIN_URL = 'narrativa:home'
 
-# --- JAZZMIN (CONFIGURAÇÃO VISUAL) ---
+# --- JAZZMIN (CONFIGURAÇÃO VISUAL E ÍCONES) ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
