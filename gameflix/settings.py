@@ -9,7 +9,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
 
 INSTALLED_APPS = [
-    'jazzmin', # DEVE vir antes do admin para carregar jazzmin/change_list.html
+    'jazzmin', # ORDEM VITAL: Deve ser o primeiro da lista
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -90,12 +90,12 @@ STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# --- REDIRECIONAMENTOS (Fix do erro /accounts/login/) ---
+# --- REDIRECIONAMENTOS ---
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 LOGIN_URL = 'narrativa:home'
 
-# --- JAZZMIN (Ícones e Relatórios Visuais) ---
+# --- JAZZMIN (CONFIGURAÇÃO VISUAL) ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
