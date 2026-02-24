@@ -8,7 +8,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
 
-# ORDEM CRÍTICA: Jazzmin deve ser o primeiro para evitar TemplateDoesNotExist
+# ORDEM CRÍTICA: Jazzmin deve ser o primeiro
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -44,7 +44,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True, # Garante que o Django procure templates dentro das pastas dos apps (como o Jazzmin)
+        'APP_DIRS': True, # VITAL para encontrar jazzmin/change_list.html
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -96,7 +96,7 @@ LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 LOGIN_URL = 'narrativa:home'
 
-# --- JAZZMIN (CONFIGURAÇÃO VISUAL E ÍCONES) ---
+# --- JAZZMIN (CONFIGURAÇÃO VISUAL) ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
@@ -117,7 +117,7 @@ JAZZMIN_SETTINGS = {
         "narrativa.Categoria": "fas fa-tags",
     },
     "topmenu_links": [
-        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Dashboard", "url": "narrativa:dashboard_admin"},
     ],
     "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario"],
