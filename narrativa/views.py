@@ -14,19 +14,25 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class ClinicaFilterMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
+        # Garante que o usuário está logado antes de filtrar
+        if not self.request.user.is_authenticated:
+            return queryset.none()
         if self.request.user.is_superuser:
             return queryset
-        if self.request.user.is_authenticated and self.request.user.clinica:
+        if self.request.user.clinica:
             return queryset.filter(clinica=self.request.user.clinica)
         return queryset.none()
 
+# --- PÚBLICAS ---
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated: return redirect('narrativa:narrativas')
+        if request.user.is_authenticated:
+            return redirect('narrativa:narrativas')
         return super().get(request, *args, **kwargs)
-    def get_success_url(self): return reverse('narrativa:home')
+    def get_success_url(self):
+        return reverse('narrativa:home')
 
 class Criarconta(FormView):
     template_name = "criarconta.html"
@@ -34,35 +40,16 @@ class Criarconta(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-    def get_success_url(self): return reverse('narrativa:home')
+    def get_success_url(self):
+        return reverse('narrativa:home')
 
-class PlanosView(LoginRequiredMixin, TemplateView):
-    template_name = 'planos.html'
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['planos'] = [{'nome': 'Básico', 'pid': 'price_1...'}]
-        return context
-
-def criar_checkout_sessao(request, price_id):
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{'price': price_id, 'quantity': 1}],
-            mode='subscription',
-            success_url=request.build_absolute_uri(reverse('narrativa:narrativas')) + "?success=true",
-            cancel_url=request.build_absolute_uri(reverse('narrativa:planos')),
-            client_reference_id=str(request.user.clinica.id),
-        )
-        return redirect(checkout_session.url, code=303)
-    except: return HttpResponse(status=400)
-
-@csrf_exempt
-def stripe_webhook(request): return HttpResponse(status=200)
-
+# --- MÉDICO (PROTEGIDAS) ---
 class Narrativas(LoginRequiredMixin, ClinicaFilterMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect('narrativa:home')
         if not request.user.is_superuser:
             if not request.user.clinica or not request.user.clinica.assinatura_ativa:
                 return redirect('narrativa:home')
@@ -83,8 +70,36 @@ class PerfilView(LoginRequiredMixin, UpdateView):
     template_name = "perfil.html"
     model = Usuario
     fields = ['first_name', 'last_name', 'email']
-    def get_success_url(self): return reverse('narrativa:home')
+    def get_success_url(self):
+        return reverse('narrativa:home')
 
+# --- FINANCEIRO ---
+class PlanosView(LoginRequiredMixin, TemplateView):
+    template_name = 'planos.html'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['planos'] = [{'nome': 'Básico', 'pid': 'price_1...'}]
+        return context
+
+def criar_checkout_sessao(request, price_id):
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{'price': price_id, 'quantity': 1}],
+            mode='subscription',
+            success_url=request.build_absolute_uri(reverse('narrativa:narrativas')) + "?success=true",
+            cancel_url=request.build_absolute_uri(reverse('narrativa:planos')),
+            client_reference_id=str(request.user.clinica.id),
+        )
+        return redirect(checkout_session.url, code=303)
+    except:
+        return HttpResponse(status=400)
+
+@csrf_exempt
+def stripe_webhook(request):
+    return HttpResponse(status=200)
+
+# --- PACIENTE ---
 class PacienteNarrativas(ListView):
     template_name = "paciente_narrativas.html"
     model = Narrativa
@@ -109,4 +124,5 @@ class TermosView(TemplateView): template_name = "termos.html"
 class PoliticaView(TemplateView): template_name = "politica.html"
 class LerTermosView(TemplateView):
     template_name = "ler_termos.html"
-    def post(self, request, *args, **kwargs): return redirect('narrativa:paciente_narrativas')
+    def post(self, request, *args, **kwargs):
+        return redirect('narrativa:paciente_narrativas')
