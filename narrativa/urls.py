@@ -1,4 +1,5 @@
 from django.urls import path
+from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'narrativa'
@@ -9,6 +10,9 @@ urlpatterns = [
     path('login/', views.Homepage.as_view(), name='login'),
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
 
+    # AJUSTADO: Rota de Logout adicionada para resolver o erro da navbar
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+
     # Financeiro e Planos
     path('planos/', views.PlanosView.as_view(), name='planos'),
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
@@ -17,10 +21,7 @@ urlpatterns = [
     # Área do Médico (Multi-tenant)
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
     path('narrativa/<int:pk>/', views.Detalhes.as_view(), name='detalhes'),
-
-    # AJUSTADO: Nome alterado para dashboard_admin para bater com o template
     path('dashboard/', views.DashboardView.as_view(), name='dashboard_admin'),
-
     path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
 
     # Área do Paciente

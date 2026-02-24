@@ -106,8 +106,7 @@ STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# --- REDIRECIONAMENTOS ---
-LOGIN_REDIRECT_URL = 'narrativa:home'
+LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 LOGIN_URL = 'narrativa:home'
 
