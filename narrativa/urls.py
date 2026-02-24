@@ -6,7 +6,7 @@ app_name = 'narrativa'
 urlpatterns = [
     # Públicas
     path('', views.Homepage.as_view(), name='home'),
-    path('login/', views.Homepage.as_view(), name='login'), # Adicionado o nome 'login'
+    path('login/', views.Homepage.as_view(), name='login'),
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
 
     # Financeiro e Planos
@@ -17,7 +17,10 @@ urlpatterns = [
     # Área do Médico (Multi-tenant)
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
     path('narrativa/<int:pk>/', views.Detalhes.as_view(), name='detalhes'),
-    path('dashboard/', views.DashboardView.as_view(), name='dashboard'),
+
+    # AJUSTADO: Nome alterado para dashboard_admin para bater com o template
+    path('dashboard/', views.DashboardView.as_view(), name='dashboard_admin'),
+
     path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
 
     # Área do Paciente
