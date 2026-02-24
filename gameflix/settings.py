@@ -8,9 +8,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
 
-# ORDEM CRÍTICA: Jazzmin deve ser o primeiro
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin', # Deve ser o primeiro
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +43,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True, # VITAL para encontrar jazzmin/change_list.html
+        'APP_DIRS': True, # Vital para o Jazzmin
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -87,21 +86,10 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
-STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
-STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
-
-# --- REDIRECIONAMENTOS ---
-LOGIN_REDIRECT_URL = 'narrativa:narrativas'
-LOGOUT_REDIRECT_URL = 'narrativa:home'
-LOGIN_URL = 'narrativa:home'
-
-# --- JAZZMIN (CONFIGURAÇÃO VISUAL) ---
+# --- JAZZMIN (ÍCONES E VISUAL) ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
-    "site_header": "Narrativas Clínicas",
     "site_brand": "Administração",
-    "welcome_sign": "Gestão Clínica",
     "show_sidebar": True,
     "navigation_expanded": True,
     "icons": {
@@ -117,10 +105,9 @@ JAZZMIN_SETTINGS = {
         "narrativa.Categoria": "fas fa-tags",
     },
     "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Dashboard", "url": "narrativa:dashboard_admin"},
+        {"name": "Home", "url": "admin:index"},
+        {"name": "Dashboard Visual", "url": "narrativa:dashboard_admin"},
     ],
-    "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario"],
 }
 
 JAZZMIN_UI_TWEAKS = {"theme": "flatly", "sidebar": "sidebar-dark-primary"}
