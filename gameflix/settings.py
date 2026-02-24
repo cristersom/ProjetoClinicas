@@ -6,11 +6,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-chave-temporaria')
 DEBUG = True
 
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com',
-                 '127.0.0.1', '*']
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
 
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin', # DEVE vir antes do admin para carregar jazzmin/change_list.html
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,7 +21,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'crispy_forms',
     'crispy_bootstrap5',
-    'import_export',  # Relatórios de exportação Excel/CSV
+    'import_export',
     'nested_admin',
 ]
 
@@ -91,18 +90,19 @@ STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
-# --- CONFIGURAÇÃO VISUAL COMPLETA (JAZZMIN) ---
+# --- REDIRECIONAMENTOS (Fix do erro /accounts/login/) ---
+LOGIN_REDIRECT_URL = 'narrativa:narrativas'
+LOGOUT_REDIRECT_URL = 'narrativa:home'
+LOGIN_URL = 'narrativa:home'
+
+# --- JAZZMIN (Ícones e Relatórios Visuais) ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
     "site_brand": "Administração",
-    "welcome_sign": "Bem-vindo ao Painel de Gestão",
-    "copyright": "Clínica Interativa Ltd",
-    "search_model": ["narrativa.Usuario", "narrativa.Narrativa"],
+    "welcome_sign": "Gestão Clínica",
     "show_sidebar": True,
     "navigation_expanded": True,
-
-    # Ícones restaurados
     "icons": {
         "auth": "fas fa-users-cog",
         "narrativa.Usuario": "fas fa-user",
@@ -115,51 +115,14 @@ JAZZMIN_SETTINGS = {
         "narrativa.LogVisitaCena": "fas fa-history",
         "narrativa.Categoria": "fas fa-tags",
     },
-
-    # RELATÓRIOS VISUAIS: Links rápidos no topo/menu
     "topmenu_links": [
-        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Dashboard Visual", "url": "narrativa:dashboard_admin"},
-        {"model": "narrativa.Narrativa"},
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Dashboard", "url": "narrativa:dashboard_admin"},
     ],
-
-    # Customização do Menu Lateral
-    "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario",
-                              "narrativa.Questionario"],
+    "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario"],
 }
 
-# Dashboard UI Tweaks
-JAZZMIN_UI_TWEAKS = {
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "brand_colour": "navbar-dark",
-    "accent": "accent-primary",
-    "navbar": "navbar-dark",
-    "no_navbar_border": False,
-    "navbar_fixed": False,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": False,
-    "sidebar": "sidebar-dark-primary",
-    "sidebar_nav_small_text": False,
-    "sidebar_disable_expand": False,
-    "sidebar_nav_child_indent": False,
-    "sidebar_nav_compact_style": False,
-    "sidebar_nav_legacy_style": False,
-    "sidebar_nav_flat_style": False,
-    "theme": "flatly",  # Tema que traz os gráficos e cores limpas
-    "dark_mode_theme": None,
-    "button_classes": {
-        "primary": "btn-primary",
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",
-        "danger": "btn-danger",
-        "success": "btn-success"
-    }
-}
+JAZZMIN_UI_TWEAKS = {"theme": "flatly", "sidebar": "sidebar-dark-primary"}
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
