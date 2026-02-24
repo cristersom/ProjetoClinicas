@@ -29,7 +29,7 @@ urlpatterns = [
     path('responder/<int:questionario_id>/', views.responder_questionario, name='responder_questionario'),
     path('sessao/<int:narrativa_id>/', views.perfil_sessao_view, name='perfil_sessao'),
 
-    # Ajustado: Nomes sincronizados com o footer (base.html)
+    # Ajustado: Nomes sincronizados com o footer
     path('termos/', views.TermosView.as_view(), name='termos_de_uso'),
     path('politica/', views.PoliticaView.as_view(), name='politica_privacidade'),
     path('aceitar-termos/', views.LerTermosView.as_view(), name='ler_termos'),

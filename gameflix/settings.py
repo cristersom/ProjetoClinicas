@@ -65,6 +65,7 @@ DATABASES = {
 AUTH_USER_MODEL = 'narrativa.Usuario'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# --- SEGURANÇA ---
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
@@ -97,11 +98,25 @@ LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 LOGIN_URL = 'narrativa:home'
 
+# --- VISUAL DO ADMIN (JAZZMIN) COM ÍCONES RESTAURADOS ---
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
     "site_brand": "Administração",
     "show_sidebar": True,
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "narrativa.Usuario": "fas fa-user",
+        "narrativa.Clinica": "fas fa-clinic-medical",
+        "narrativa.Narrativa": "fas fa-book-medical",
+        "narrativa.Cena": "fas fa-image",
+        "narrativa.Questionario": "fas fa-poll-h",
+        "narrativa.Resposta": "fas fa-comment-dots",
+        "narrativa.SessaoPaciente": "fas fa-user-clock",
+        "narrativa.LogVisitaCena": "fas fa-history",
+        "narrativa.Categoria": "fas fa-tags",
+    },
+    "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario"],
 }
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
