@@ -28,7 +28,26 @@ class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
     clinica = models.ForeignKey(Clinica, on_delete=models.SET_NULL, null=True, blank=True)
     is_admin_clinica = models.BooleanField(default=False)
-    narrativas_vistas = models.ManyToManyField('Narrativa')
+    narrativas_vistas = models.ManyToManyField('Narrativa', blank=True)
+
+    # CORREÇÃO PARA O ERRO E304 (Conflito de acessores reversos)
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='usuario_custom_set',
+        blank=True,
+        help_text='The groups this user belongs to.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='usuario_custom_permissions_set',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )
+
+    def __str__(self):
+        return self.username
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=100)
