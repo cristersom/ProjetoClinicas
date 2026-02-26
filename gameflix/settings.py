@@ -2,28 +2,25 @@ import os
 from pathlib import Path
 import dj_database_url
 
-# BASE_DIR aponta para a raiz do projeto (/app no Heroku)
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-chave-temporaria')
-
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-# Segurança CSRF para domínios HTTPS
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', '127.0.0.1', '*']
+
+# Segurança CSRF e Cookies para HTTPS
 CSRF_TRUSTED_ORIGINS = [
     'https://narrativasclinicas.com.br',
     'https://www.narrativasclinicas.com.br',
     'https://narrativas-clinicas-0108a6c374ea.herokuapp.com'
 ]
-
-# Configurações de Cookie para HTTPS
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-# ORDEM CRUCIAL: Jazzmin sempre antes do admin
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin', # Jazzmin antes do admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,7 +69,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# Configuração de Banco de Dados para Heroku
+# Modelo de Usuário Customizado (Obrigatório para seu models.py funcionar)
+AUTH_USER_MODEL = 'narrativa.Usuario'
+
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL'),
@@ -80,24 +79,20 @@ DATABASES = {
     )
 }
 
-# --- CONFIGURAÇÕES DO STRIPE (O que estava travando seu deploy) ---
 STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY', 'pk_test_sua_chave')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_sua_chave')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 
-# Internacionalização
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# Arquivos Estáticos
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'du066v6vj'),
@@ -105,7 +100,6 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-# Jazzmin UI
 JAZZMIN_SETTINGS = {
     "site_title": "Narrativas Clínicas",
     "site_header": "Narrativas Clínicas",
