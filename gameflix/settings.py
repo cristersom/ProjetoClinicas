@@ -9,7 +9,17 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-chave-temporaria')
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'www.narrativasclinicas.com.br', 'narrativas-clinicas.herokuapp.com', '127.0.0.1', '*']
+# Segurança CSRF para domínios HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://narrativasclinicas.com.br',
+    'https://www.narrativasclinicas.com.br',
+    'https://narrativas-clinicas-0108a6c374ea.herokuapp.com'
+]
+
+# Configurações de Cookie para HTTPS
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ORDEM CRUCIAL: Jazzmin sempre antes do admin
 INSTALLED_APPS = [
