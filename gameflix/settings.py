@@ -107,10 +107,27 @@ JAZZMIN_SETTINGS = {
     "welcome_sign": "Gestão Clínica",
     "show_sidebar": True,
     "navigation_expanded": True,
+    "order_with_respect_to": ["narrativa.Clinica", "narrativa.Narrativa", "narrativa.Usuario"],
+
+    # Ícones para os itens do menu lateral
     "icons": {
         "auth": "fas fa-users-cog",
+        "auth.Group": "fas fa-users",
+        "narrativa.Usuario": "fas fa-user",
+        "narrativa.Clinica": "fas fa-clinic-medical",
+        "narrativa.Narrativa": "fas fa-book-medical",
+        "narrativa.Categoria": "fas fa-tags",
+        "narrativa.Cena": "fas fa-image",
+        "narrativa.LogVisitaCena": "fas fa-history",
+        "narrativa.Questionario": "fas fa-poll-h",
         "narrativa.Resposta": "fas fa-comment-dots",
+        "narrativa.SessaoPaciente": "fas fa-user-clock",
     },
-}
 
+    # Links customizados no topo (Dashboard)
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Dashboard", "url": "narrativa:dashboard_admin"},  # Garanta que essa rota existe em narrativa/urls.py
+    ],
+}
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
