@@ -11,7 +11,7 @@ urlpatterns = [
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # Financeiro e Planos
+    # Financeiro e Planos (Essenciais para Venda)
     path('planos/', views.PlanosView.as_view(), name='planos'),
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
     path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
@@ -29,7 +29,7 @@ urlpatterns = [
     path('responder/<int:questionario_id>/', views.responder_questionario, name='responder_questionario'),
     path('sessao/<int:narrativa_id>/', views.perfil_sessao_view, name='perfil_sessao'),
 
-    # Ajustado: Nomes sincronizados com o footer
+    # Legal e Termos
     path('termos/', views.TermosView.as_view(), name='termos_de_uso'),
     path('politica/', views.PoliticaView.as_view(), name='politica_privacidade'),
     path('aceitar-termos/', views.LerTermosView.as_view(), name='ler_termos'),

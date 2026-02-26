@@ -14,7 +14,6 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class ClinicaFilterMixin:
     def get_queryset(self):
         queryset = super().get_queryset()
-        # Garante que o usuário está logado antes de filtrar
         if not self.request.user.is_authenticated:
             return queryset.none()
         if self.request.user.is_superuser:
@@ -52,7 +51,7 @@ class Narrativas(LoginRequiredMixin, ClinicaFilterMixin, ListView):
             return redirect('narrativa:home')
         if not request.user.is_superuser:
             if not request.user.clinica or not request.user.clinica.assinatura_ativa:
-                return redirect('narrativa:home')
+                return redirect('narrativa:planos') # Redireciona para planos se não estiver ativo
         return super().dispatch(request, *args, **kwargs)
 
 class Detalhes(LoginRequiredMixin, DetailView):
@@ -73,30 +72,58 @@ class PerfilView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse('narrativa:home')
 
-# --- FINANCEIRO ---
+# --- FINANCEIRO (STRIPE) ---
 class PlanosView(LoginRequiredMixin, TemplateView):
     template_name = 'planos.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['planos'] = [{'nome': 'Básico', 'pid': 'price_1...'}]
+        # Substitua os PIDs pelos IDs reais do seu painel Stripe
+        context['planos'] = [
+            {'nome': 'Básico', 'pid': 'price_1Q...'},
+            {'nome': 'Profissional', 'pid': 'price_1Q...'},
+        ]
         return context
 
+@login_required
 def criar_checkout_sessao(request, price_id):
     try:
         checkout_session = stripe.checkout.Session.create(
+            customer_email=request.user.email,
             payment_method_types=['card'],
             line_items=[{'price': price_id, 'quantity': 1}],
             mode='subscription',
             success_url=request.build_absolute_uri(reverse('narrativa:narrativas')) + "?success=true",
             cancel_url=request.build_absolute_uri(reverse('narrativa:planos')),
-            client_reference_id=str(request.user.clinica.id),
+            metadata={
+                'clinica_id': request.user.clinica.id
+            }
         )
         return redirect(checkout_session.url, code=303)
-    except:
-        return HttpResponse(status=400)
+    except Exception as e:
+        return HttpResponse(content=str(e), status=400)
 
 @csrf_exempt
 def stripe_webhook(request):
+    payload = request.body
+    sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
+        )
+    except Exception:
+        return HttpResponse(status=400)
+
+    # Quando a assinatura é paga com sucesso
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        clinica_id = session.get('metadata', {}).get('clinica_id')
+        if clinica_id:
+            clinica = Clinica.objects.get(id=clinica_id)
+            clinica.assinatura_ativa = True
+            clinica.save()
+
     return HttpResponse(status=200)
 
 # --- PACIENTE ---
