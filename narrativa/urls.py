@@ -5,7 +5,7 @@ from . import views
 app_name = 'narrativa'
 
 urlpatterns = [
-    # Planos primeiro para garantir a prioridade da rota
+    # Planos no topo para não ser engolido pela home
     path('planos/', views.PlanosView.as_view(), name='planos'),
 
     # Públicas

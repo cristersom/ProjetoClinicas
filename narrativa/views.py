@@ -12,15 +12,22 @@ from .forms import CriarContaForm, FormHomepage
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 # --- PÚBLICAS ---
-
 class Homepage(FormView):
     template_name = "homepage.html"
     form_class = FormHomepage
     def get(self, request, *args, **kwargs):
-        # Só redireciona se estiver logado E na URL raiz '/'
         if request.user.is_authenticated and request.path == reverse('narrativa:home'):
             return redirect('narrativa:narrativas')
         return super().get(request, *args, **kwargs)
+    def get_success_url(self):
+        return reverse('narrativa:home')
+
+class Criarconta(FormView):
+    template_name = "criarconta.html"
+    form_class = CriarContaForm
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
     def get_success_url(self):
         return reverse('narrativa:home')
 
@@ -36,7 +43,6 @@ class PlanosView(TemplateView):
         return context
 
 # --- FINANCEIRO ---
-
 @login_required
 def criar_checkout_sessao(request, price_id):
     try:
@@ -72,11 +78,9 @@ def stripe_webhook(request):
             Clinica.objects.filter(id=clinica_id).update(assinatura_ativa=True)
     return HttpResponse(status=200)
 
-# --- MÉDICO ---
+# --- ÁREA LOGADA ---
 class Narrativas(LoginRequiredMixin, ListView):
     template_name = "narrativas.html"
     model = Narrativa
     def get_queryset(self):
         return Narrativa.objects.filter(clinica=self.request.user.clinica)
-
-# (Mantenha as demais views de Detalhes, CriarConta, etc. conforme já possui)
