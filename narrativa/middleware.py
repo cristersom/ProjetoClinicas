@@ -1,30 +1,32 @@
 from django.shortcuts import redirect
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
+
 
 class SaaSControlMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        # 1. Lista de URLs que NUNCA devem ser bloqueadas
-        exempt_urls = [
-            reverse('narrativa:planos'),
-            reverse('narrativa:home'),
-            reverse('narrativa:criarconta'),
-            reverse('narrativa:stripe_webhook'),
-            '/admin/', # Importante para você não ficar trancado fora
-        ]
+        # Lista de caminhos que não precisam de verificação
+        try:
+            exempt_urls = [
+                reverse('narrativa:home'),
+                reverse('narrativa:planos'),
+                reverse('narrativa:login'),
+                reverse('admin:index'),
+            ]
+            # Tenta adicionar criarconta se existir
+            try:
+                exempt_urls.append(reverse('narrativa:criarconta'))
+            except NoReverseMatch:
+                pass
 
-        # Se a URL atual estiver na lista ou for um arquivo estático, permite
-        if any(request.path.startswith(url) for url in exempt_urls) or request.path.startswith('/static/'):
-            return self.get_response(request)
+        except NoReverseMatch:
+            exempt_urls = []
 
-        # 2. Lógica de bloqueio para usuários logados sem assinatura
-        if request.user.is_authenticated:
-            # Verifica se a clínica do usuário tem assinatura ativa
-            # (Ajuste conforme o nome do campo no seu modelo Clinica)
-            if not request.user.clinica.assinatura_ativa:
-                if request.path != reverse('narrativa:planos'):
-                    return redirect('narrativa:planos')
+        # Se o usuário não está logado e tenta acessar algo fora da lista, manda pra home
+        if not request.user.is_authenticated and request.path not in exempt_urls:
+            return redirect('narrativa:home')
 
-        return self.get_response(request)
+        response = self.get_response(request)
+        return response
