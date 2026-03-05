@@ -1,15 +1,15 @@
-<div class="container">
+<div class="container py-4">
     <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold">Escolha seu Plano</h2>
-        <p class="text-muted">Selecione a melhor opção para impulsionar suas narrativas clínicas.</p>
+        <h2 class="display-5 fw-bold" style="color: #333;">Escolha seu Plano</h2>
+        <p class="text-muted">Acesso imediato após a confirmação do pagamento.</p>
     </div>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for plano in planos %}
         <div class="col">
-            <div class="card h-100 shadow-sm border-primary">
-                <div class="card-header py-3 bg-primary text-white text-center">
-                    <h4 class="my-0 fw-normal">{{ plano.nome }}</h4>
+            <div class="card h-100 shadow-sm" style="border-radius: 12px; border: 1px solid #ddd;">
+                <div class="card-header py-3 bg-dark text-white text-center border-0">
+                    <h4 class="my-0 fw-bold">{{ plano.nome }}</h4>
                 </div>
                 <div class="card-body d-flex flex-column text-center">
                     <h1 class="card-title pricing-card-title">
@@ -17,9 +17,10 @@
                         <small class="text-muted fw-light">/mês</small>
                     </h1>
                     <p class="mt-3 mb-4 text-muted">{{ plano.descricao }}</p>
-                    
-                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" 
-                       class="w-100 btn btn-lg btn-primary mt-auto">
+
+                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}"
+                       class="w-100 btn btn-lg mt-auto fw-bold"
+                       style="background-color: #e50914; color: white; border: none;">
                         Assinar Agora
                     </a>
                 </div>

@@ -3,29 +3,29 @@
 
 {% block content %}
 <div class="hero-section d-flex align-items-center justify-content-center text-center"
-     style="background-color: #4a4a4a; min-height: 70vh; color: white; padding: 20px;">
+     style="background-color: #4a4a4a; min-height: 80vh; color: white; padding: 40px 20px;">
     <div>
         <h1 class="display-3 fw-bold mb-3">
             Narrativas clínicas e <br>
             <span style="color: #e50914;">pesquisas de satisfação</span>, tudo <br>
             em um só lugar.
         </h1>
-        <p class="fs-4 mb-4">Crie onde quiser. Aplique quando quiser.</p>
+        <p class="fs-4 mb-4 opacity-90">Crie onde quiser. Aplique quando quiser.</p>
 
-        <form method="post" action="{% url 'narrativa:login' %}" class="d-flex justify-content-center gap-2">
+        <form method="post" action="{% url 'narrativa:login' %}" class="d-flex justify-content-center gap-2 mb-3">
             {% csrf_token %}
             <input type="email" name="username" class="form-control form-control-lg"
-                   placeholder="Seu e-mail" style="max-width: 400px; border-radius: 5px;">
-            <button type="submit" class="btn btn-lg"
-                    style="background-color: #e50914; color: white; padding: 10px 40px;">
+                   placeholder="Seu e-mail" style="max-width: 400px; border-radius: 4px;">
+            <button type="submit" class="btn btn-lg fw-bold"
+                    style="background-color: #e50914; color: white; padding: 12px 40px; border: none;">
                 Acessar
             </button>
         </form>
-        <p class="mt-2 text-light opacity-75">Digite seu e-mail para iniciar ou criar uma conta.</p>
+        <p class="text-light opacity-75">Digite seu e-mail para iniciar ou criar uma conta.</p>
     </div>
 </div>
 
-<div id="planos-section" class="bg-white py-5">
+<div id="planos-home" class="bg-white py-5">
     {% include "planos.html" %}
 </div>
 {% endblock %}
