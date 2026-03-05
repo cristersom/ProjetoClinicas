@@ -16,6 +16,16 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
+# --- CONFIGURAÇÃO DE CSRF E PROXY (Correção do erro 403) ---
+CSRF_TRUSTED_ORIGINS = [
+    'https://narrativasclinicas.com.br',
+    'https://narrativas-clinicas-b7d6b38c0379.herokuapp.com',
+]
+
+# Informa ao Django que o Heroku usa um proxy para HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+
 # --- APPS ---
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -25,14 +35,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # --- CRISPY FORMS (Adicionados para corrigir o erro) ---
+    # --- CRISPY FORMS ---
     'crispy_forms',
     'crispy_bootstrap5',
 
     'narrativa',
 ]
 
-# --- CONFIGURAÇÃO CRISPY (Essencial) ---
+# --- CONFIGURAÇÃO CRISPY ---
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
