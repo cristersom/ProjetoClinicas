@@ -5,11 +5,19 @@ import dj_database_url
 # Caminhos básicos
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- SEGURANÇA ---
-SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'django-insecure-chave-padrao')
+# --- SEGURANÇA (Ajustado) ---
+# O Django usa DJANGO_SECRET_KEY. O Stripe usa STRIPE_SECRET_KEY.
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
+
+# No Heroku, definimos a variável DEBUG como 'True' para ver erros reais
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-b7d6b38c0379.herokuapp.com', 'localhost',
-                 '127.0.0.1']
+
+ALLOWED_HOSTS = [
+    'narrativasclinicas.com.br',
+    'narrativas-clinicas-b7d6b38c0379.herokuapp.com',
+    'localhost',
+    '127.0.0.1'
+]
 
 # --- APPS ---
 INSTALLED_APPS = [
@@ -22,10 +30,10 @@ INSTALLED_APPS = [
     'narrativa',  # Seu app principal
 ]
 
-# --- MIDDLEWARE (ORDEM CRÍTICA) ---
+# --- MIDDLEWARE ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para arquivos estáticos no Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Essencial para CSS/Imagens no Heroku
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -33,7 +41,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-    # O SEU MIDDLEWARE (Ajustado para liberar a página de planos)
+    # Seu controle de assinatura (verifique se este arquivo existe em narrativa/middleware.py)
     'narrativa.middleware.SaaSControlMiddleware',
 ]
 
@@ -57,11 +65,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# --- BANCO DE DADOS (HEROKU) ---
+# --- BANCO DE DADOS (Configurado para Heroku Postgres) ---
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
-# Fallback para local
+
+# Fallback para banco local (SQLite) caso o Postgres não esteja disponível
 if not DATABASES['default']:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -82,18 +94,18 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- ESTÁTICOS ---
+# --- ARQUIVOS ESTÁTICOS (WhiteNoise) ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# --- CONFIGURAÇÃO DE USUÁRIO ---
+# --- CONFIGURAÇÃO DE USUÁRIO CUSTOMIZADO ---
 AUTH_USER_MODEL = 'narrativa.Usuario'
 LOGIN_URL = 'narrativa:home'
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 
-# --- STRIPE CONFIGURATION ---
+# --- STRIPE CONFIGURATION (Lendo do Heroku Config) ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')

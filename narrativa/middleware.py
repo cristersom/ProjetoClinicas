@@ -1,37 +1,30 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
-
 class SaaSControlMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        path = request.path
-
-        # URLs que SEMPRE devem ser acessíveis (públicas)
-        # Usamos strings diretas para evitar qualquer erro de reverse
-        exempt_paths = [
-            '/planos/',
-            '/login/',
-            '/criar-conta/',
-            '/webhook/stripe/',
-            '/pagamento/sucesso/',
-            '/admin/',
+        # 1. Lista de URLs que NUNCA devem ser bloqueadas
+        exempt_urls = [
+            reverse('narrativa:planos'),
+            reverse('narrativa:home'),
+            reverse('narrativa:criarconta'),
+            reverse('narrativa:stripe_webhook'),
+            '/admin/', # Importante para você não ficar trancado fora
         ]
 
-        # 1. Se o caminho começar com algum dos isentos, deixa passar na hora
-        if any(path.startswith(p) for p in exempt_paths) or path == '/':
+        # Se a URL atual estiver na lista ou for um arquivo estático, permite
+        if any(request.path.startswith(url) for url in exempt_urls) or request.path.startswith('/static/'):
             return self.get_response(request)
 
-        # 2. Se o usuário estiver logado mas sem assinatura, manda para planos
+        # 2. Lógica de bloqueio para usuários logados sem assinatura
         if request.user.is_authenticated:
-            if not request.user.is_superuser:
-                # Pega a clínica do usuário com segurança
-                clinica = getattr(request.user, 'clinica', None)
-                if not clinica or not clinica.assinatura_ativa:
-                    # Se não estiver na página de planos, manda para lá
-                    if path != '/planos/':
-                        return redirect('/planos/')
+            # Verifica se a clínica do usuário tem assinatura ativa
+            # (Ajuste conforme o nome do campo no seu modelo Clinica)
+            if not request.user.clinica.assinatura_ativa:
+                if request.path != reverse('narrativa:planos'):
+                    return redirect('narrativa:planos')
 
         return self.get_response(request)
