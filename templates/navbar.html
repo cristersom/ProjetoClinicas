@@ -1,12 +1,8 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom: 2px solid #20c997;">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top" style="border-bottom: 2px solid #e50914;">
     <div class="container">
-        <a class="navbar-brand d-flex align-items-center" href="{% url 'narrativa:narrativas' %}">
-            {% if logo_url %}
-                <img src="{{ logo_url }}" alt="Logo Clínica" height="40" class="me-2">
-            {% else %}
-                <span class="fw-bold text-teal">NARRATIVAS</span><span class="fw-light text-white">CLÍNICAS</span>
-            {% endif %}
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'narrativa:home' %}">
+            <span class="fw-bold text-danger">NARRATIVAS</span><span class="fw-light text-white">CLÍNICAS</span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -18,20 +14,16 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'narrativa:narrativas' %}">Minhas Jornadas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'narrativa:dashboard_admin' %}">Dashboard</a>
-                </li>
             </ul>
 
             <div class="d-flex align-items-center">
-                <span class="text-light me-3 small">Olá, {{ request.user.username }}</span>
-                <a href="{% url 'narrativa:logout' %}" class="btn btn-outline-danger btn-sm">Sair</a>
+                {% if request.user.is_authenticated %}
+                    <span class="text-light me-3 small">Olá, {{ request.user.username }}</span>
+                    <a href="{% url 'narrativa:logout' %}" class="btn btn-outline-danger btn-sm">Sair</a>
+                {% else %}
+                    <a href="{% url 'narrativa:login' %}" class="btn btn-danger btn-sm">Entrar</a>
+                {% endif %}
             </div>
         </div>
     </div>
 </nav>
-
-<style>
-    .text-teal { color: #20c997; }
-    .nav-link:hover { color: #20c997 !important; }
-</style>
