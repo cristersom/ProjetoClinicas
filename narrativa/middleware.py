@@ -9,27 +9,29 @@ class SaaSControlMiddleware:
     def __call__(self, request):
         path = request.path
 
-        # URLs que qualquer pessoa (logada ou não) pode acessar
-        exempt_urls = [
-            reverse('narrativa:home'),
-            reverse('narrativa:login'),
-            reverse('narrativa:criarconta'),
-            reverse('narrativa:planos'),  # Liberado para o público
-            reverse('narrativa:stripe_webhook'),
-            reverse('narrativa:sucesso_pagamento'),
+        # URLs que SEMPRE devem ser acessíveis (públicas)
+        # Usamos strings diretas para evitar qualquer erro de reverse
+        exempt_paths = [
+            '/planos/',
+            '/login/',
+            '/criar-conta/',
+            '/webhook/stripe/',
+            '/pagamento/sucesso/',
             '/admin/',
         ]
 
-        # Se for uma das URLs livres, deixa passar
-        if any(path.startswith(url) for url in exempt_urls):
+        # 1. Se o caminho começar com algum dos isentos, deixa passar na hora
+        if any(path.startswith(p) for p in exempt_paths) or path == '/':
             return self.get_response(request)
 
-        # Se estiver logado mas sem assinatura, força ir para planos
+        # 2. Se o usuário estiver logado mas sem assinatura, manda para planos
         if request.user.is_authenticated:
             if not request.user.is_superuser:
+                # Pega a clínica do usuário com segurança
                 clinica = getattr(request.user, 'clinica', None)
                 if not clinica or not clinica.assinatura_ativa:
-                    if path != reverse('narrativa:planos'):
-                        return redirect('narrativa:planos')
+                    # Se não estiver na página de planos, manda para lá
+                    if path != '/planos/':
+                        return redirect('/planos/')
 
         return self.get_response(request)
