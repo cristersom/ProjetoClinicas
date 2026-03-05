@@ -1,24 +1,16 @@
 from django.urls import path
-from django.contrib.auth import views as auth_views
 from . import views
 
 app_name = 'narrativa'
 
 urlpatterns = [
-    # Planos no topo para não ser engolido pela home
-    path('planos/', views.PlanosView.as_view(), name='planos'),
-
-    # Públicas
     path('', views.Homepage.as_view(), name='home'),
-    path('login/', views.Homepage.as_view(), name='login'),
-    path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-    # Financeiro
-    path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
-    path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
-    path('pagamento/sucesso/', views.pagamento_sucesso, name='sucesso_pagamento'),
-
-    # Médico
+    path('criarconta/', views.Criarconta.as_view(), name='criarconta'),
+    path('planos/', views.PlanosView.as_view(), name='planos'),
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
+
+    # Rota Financeira - O nome do parâmetro aqui deve ser price_id
+    path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
+    path('sucesso/', views.pagamento_sucesso, name='sucesso_pagamento'),
+    path('webhook/', views.stripe_webhook, name='stripe_webhook'),
 ]
