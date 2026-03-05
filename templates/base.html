@@ -2,79 +2,35 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>{% block titulo %}Clínica Interativa{% endblock %}</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Narrativas Clínicas{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        /* Estilos Globais Dark/Teal */
-        body {
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            background-color: #111827; /* Fundo Escuro Padrão */
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex: 1;
-        }
-
-        img, video, iframe {
-            max-width: 100%;
-            height: auto;
-        }
-
-        /* Correção de Autofill do Chrome para fundo escuro */
-        input:-webkit-autofill,
-        input:-webkit-autofill:hover,
-        input:-webkit-autofill:focus,
-        input:-webkit-autofill:active{
-            -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
-            -webkit-text-fill-color: white !important;
-            transition: background-color 5000s ease-in-out 0s;
-        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .navbar-brand { font-weight: bold; color: white !important; }
+        .btn-red { background-color: #e50914; color: white; border: none; }
+        .btn-red:hover { background-color: #b20710; color: white; }
     </style>
     {% block head %}{% endblock %}
 </head>
-<body class="text-gray-100 font-sans antialiased">
+<body class="d-flex flex-column min-vh-100">
 
-    {% block navbar %}
-        {% include 'navbar.html' %}
-    {% endblock %}
+    <nav class="navbar navbar-dark bg-dark px-4">
+        <a class="navbar-brand" href="/">NARRATIVAS<span style="color:#e50914">CLÍNICAS</span></a>
+        <a href="{% url 'narrativa:login' %}" class="btn btn-red btn-sm">Login</a>
+    </nav>
 
-    {% block content %}
-    {% endblock %}
+    {% block content %}{% endblock %}
 
-    <footer class="text-gray-400 px-5 py-8 bg-gray-900 border-t border-gray-800 mt-auto">
-        <ul class="flex flex-col md:flex-row justify-between items-center gap-4 container mx-auto">
-            <li class="text-sm">&copy; 2025 Clínica Interativa</li>
-            <li class="text-sm text-center">
-                <a href="{% url 'narrativa:termos_de_uso' %}" class="hover:text-teal-400 transition">Termos de Uso</a> |
-                <a href="{% url 'narrativa:politica_privacidade' %}" class="hover:text-teal-400 transition">Política de Privacidade</a>
-            </li>
-        </ul>
+    <footer class="bg-dark text-white py-4 mt-auto">
+        <div class="container text-center">
+            <small>&copy; 2025 Clínica Interativa |
+                <a href="{% url 'narrativa:termos_de_uso' %}" class="text-secondary text-decoration-none">Termos de Uso</a> |
+                <a href="{% url 'narrativa:politica_privacidade' %}" class="text-secondary text-decoration-none">Privacidade</a>
+            </small>
+        </div>
     </footer>
 
-<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-<script>
-    const nav = document.querySelector('nav');
-    if(nav) {
-        document.addEventListener("scroll", e => {
-            if(window.scrollY > 20){
-                nav.classList.add('bg-gray-900/90', 'backdrop-blur-md', 'shadow-md', 'border-b', 'border-gray-800');
-            } else {
-                nav.classList.remove('bg-gray-900/90', 'backdrop-blur-md', 'shadow-md', 'border-b', 'border-gray-800');
-            }
-        });
-    }
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

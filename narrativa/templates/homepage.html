@@ -1,23 +1,25 @@
 {% extends "base.html" %}
-{% load static %}
 
 {% block content %}
-<div style="background-color: #4a4a4a; min-height: 70vh; color: white; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px;">
-    <div>
-        <h1 class="display-3 fw-bold mb-3">
+<div style="background-color: #4a4a4a; min-height: 60vh; color: white; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px;">
+    <div style="max-width: 800px;">
+        <h1 class="display-4 fw-bold mb-3">
             Narrativas clínicas e <br>
             <span style="color: #e50914;">pesquisas de satisfação</span>, tudo <br>
             em um só lugar.
         </h1>
-        <p class="fs-4 mb-4">Crie onde quiser. Aplique quando quiser.</p>
+        <p class="fs-5 mb-4 text-light">Crie onde quiser. Aplique quando quiser.</p>
 
-        <form method="post" action="{% url 'narrativa:login' %}" class="d-flex justify-content-center gap-2">
+        <form method="post" action="{% url 'narrativa:login' %}" class="row g-2 justify-content-center">
             {% csrf_token %}
-            <input type="email" name="username" class="form-control form-control-lg" placeholder="Seu e-mail" style="max-width: 400px;">
-            <button type="submit" class="btn btn-lg fw-bold" style="background-color: #e50914; color: white; border: none; padding: 10px 40px;">
-                Acessar
-            </button>
+            <div class="col-auto">
+                <input type="email" name="username" class="form-control form-control-lg" placeholder="Seu e-mail" style="width: 300px;">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-red btn-lg fw-bold px-5">Acessar</button>
+            </div>
         </form>
+        <small class="text-secondary d-block mt-2">Digite seu e-mail para iniciar ou criar uma conta.</small>
     </div>
 </div>
 
