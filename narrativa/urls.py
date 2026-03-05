@@ -5,29 +5,20 @@ from . import views
 app_name = 'narrativa'
 
 urlpatterns = [
-    # 1. Rota de Planos no TOPO para evitar conflito
+    # Planos primeiro para garantir a prioridade da rota
     path('planos/', views.PlanosView.as_view(), name='planos'),
 
-    # 2. Área Pública
+    # Públicas
     path('', views.Homepage.as_view(), name='home'),
     path('login/', views.Homepage.as_view(), name='login'),
     path('criar-conta/', views.Criarconta.as_view(), name='criarconta'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # 3. Financeiro (Protegido)
+    # Financeiro
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
     path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
     path('pagamento/sucesso/', views.pagamento_sucesso, name='sucesso_pagamento'),
 
-    # 4. Área Logada
+    # Médico
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
-    path('narrativa/<int:pk>/', views.Detalhes.as_view(), name='detalhes'),
-    path('dashboard/', views.DashboardView.as_view(), name='dashboard_admin'),
-    path('perfil/<int:pk>/', views.PerfilView.as_view(), name='perfil'),
-
-    # 5. Outros
-    path('explorar/', views.PacienteNarrativas.as_view(), name='paciente_narrativas'),
-    path('v/<int:pk>/', views.PacienteDetalhes.as_view(), name='paciente_detalhes'),
-    path('termos/', views.TermosView.as_view(), name='termos_de_uso'),
-    path('politica/', views.PoliticaView.as_view(), name='politica_privacidade'),
 ]
