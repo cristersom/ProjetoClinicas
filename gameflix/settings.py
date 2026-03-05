@@ -5,11 +5,8 @@ import dj_database_url
 # Caminhos básicos
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# --- SEGURANÇA (Ajustado) ---
-# O Django usa DJANGO_SECRET_KEY. O Stripe usa STRIPE_SECRET_KEY.
+# --- SEGURANÇA ---
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
-
-# No Heroku, definimos a variável DEBUG como 'True' para ver erros reais
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = [
@@ -27,21 +24,28 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'narrativa',  # Seu app principal
+
+    # --- CRISPY FORMS (Adicionados para corrigir o erro) ---
+    'crispy_forms',
+    'crispy_bootstrap5',
+
+    'narrativa',
 ]
+
+# --- CONFIGURAÇÃO CRISPY (Essencial) ---
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # --- MIDDLEWARE ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Essencial para CSS/Imagens no Heroku
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # Seu controle de assinatura (verifique se este arquivo existe em narrativa/middleware.py)
     'narrativa.middleware.SaaSControlMiddleware',
 ]
 
@@ -65,7 +69,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# --- BANCO DE DADOS (Configurado para Heroku Postgres) ---
+# --- BANCO DE DADOS ---
 DATABASES = {
     'default': dj_database_url.config(
         conn_max_age=600,
@@ -73,20 +77,11 @@ DATABASES = {
     )
 }
 
-# Fallback para banco local (SQLite) caso o Postgres não esteja disponível
 if not DATABASES['default']:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-
-# --- SENHAS ---
-AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
-]
 
 # --- INTERNACIONALIZAÇÃO ---
 LANGUAGE_CODE = 'pt-br'
@@ -94,18 +89,18 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- ARQUIVOS ESTÁTICOS (WhiteNoise) ---
+# --- ARQUIVOS ESTÁTICOS ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# --- CONFIGURAÇÃO DE USUÁRIO CUSTOMIZADO ---
+# --- USUÁRIO E LOGIN ---
 AUTH_USER_MODEL = 'narrativa.Usuario'
 LOGIN_URL = 'narrativa:home'
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 
-# --- STRIPE CONFIGURATION (Lendo do Heroku Config) ---
+# --- STRIPE ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
