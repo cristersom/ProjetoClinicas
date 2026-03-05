@@ -9,8 +9,10 @@ urlpatterns = [
     path('planos/', views.PlanosView.as_view(), name='planos'),
     path('narrativas/', views.Narrativas.as_view(), name='narrativas'),
 
-    # Rota Financeira - O nome do parâmetro aqui deve ser price_id
+    # Rota de Checkout
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='checkout'),
+
+    # Outras rotas financeiras
     path('sucesso/', views.pagamento_sucesso, name='sucesso_pagamento'),
     path('webhook/', views.stripe_webhook, name='stripe_webhook'),
 ]
