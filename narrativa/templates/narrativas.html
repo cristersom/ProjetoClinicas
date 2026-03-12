@@ -1,112 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Gestão de Jornadas{% endblock %}
+{% block titulo %}Gestão de Jornadas - Narrativas Clínicas{% endblock %}
 
 {% block head %}
 <style>
     html { scroll-behavior: smooth; }
-    .mobile-scroll-container {
-        display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 20px; -webkit-overflow-scrolling: touch;
-    }
-    .mobile-scroll-container::-webkit-scrollbar { display: none; }
-    .narrativa-card { flex-shrink: 0; scroll-snap-align: start; transition: transform 0.3s; }
-    .narrativa-card:hover { transform: scale(1.02); }
+    /* Adicione estilos extras aqui se precisar */
 </style>
 {% endblock %}
 
 {% block content %}
-<main class='bg-gray-900 min-h-screen w-full overflow-x-hidden'>
+<main class="min-h-screen bg-gray-900 relative pb-20">
 
-    <section class="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+    <div class="fixed inset-0 z-0">
+        <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover opacity-20" alt="Background">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
+    </div>
 
-        <div class="absolute inset-0 z-0">
-            <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover object-center">
-        </div>
+    <div class="relative z-10 container mx-auto px-4 pt-24">
 
-        <div class="absolute inset-0 bg-black/75 z-0"></div>
-
-        <div class="relative z-10 w-full px-6 text-center max-w-4xl mx-auto py-20">
-            <span class="text-teal-400 font-bold tracking-widest uppercase text-xs md:text-sm mb-4 block shadow-black drop-shadow-md">
-                Painel Administrativo
-            </span>
-            <h1 class="font-bold text-3xl md:text-6xl text-white mb-6 leading-tight drop-shadow-xl">
-                Gestão de <br>Jornadas Clínicas.
-            </h1>
-            <h3 class="hidden md:block text-lg md:text-2xl text-gray-300 mb-10 font-light max-w-2xl mx-auto drop-shadow-md">
-                Crie, edite e acompanhe o desempenho das narrativas interativas.
-            </h3>
-
-            <div class="flex flex-col md:flex-row gap-3 justify-center mt-4">
-                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="w-full md:w-auto">
-                    <button class="w-full md:w-auto flex justify-center items-center bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 md:px-8 rounded-full shadow-lg transition-transform hover:scale-105 text-sm md:text-base">
-                        <ion-icon name="add-circle" class="text-lg md:text-2xl mr-2"></ion-icon>
-                        <span>Nova Narrativa</span>
-                    </button>
-                </a>
-                <button onclick="handleShareGeneral()" class="w-full md:w-auto flex justify-center items-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 text-white font-bold py-3 px-6 md:px-8 rounded-full shadow-lg transition-transform hover:scale-105 text-sm md:text-base">
-                    <ion-icon name="share-social-outline" class="text-lg md:text-2xl mr-2"></ion-icon>
-                    <span id="share-text-general">Link Geral</span>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 bg-gray-800/50 p-6 rounded-2xl border border-gray-700 backdrop-blur-md">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Gestão de Jornadas</h1>
+                <p class="text-gray-400">Gerencie as narrativas dos seus pacientes</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex flex-wrap gap-4 justify-center">
+                <button onclick="handleShareGeneral()" class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2.5 rounded-xl transition flex items-center font-medium shadow-lg border border-gray-600">
+                    <ion-icon name="share-social-outline" class="mr-2"></ion-icon>
+                    Link do Paciente
                 </button>
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 rounded-xl transition flex items-center font-bold shadow-lg shadow-teal-900/50">
+                    <ion-icon name="add-circle-outline" class="mr-2 text-xl"></ion-icon>
+                    Nova Narrativa
+                </a>
             </div>
         </div>
-    </section>
 
-    {% if lista_narrativas_recentes %}
-    <section class='bg-gray-900 py-12 pl-4 md:pl-12 border-t border-gray-800 relative z-20 rounded-t-3xl -mt-10 shadow-2xl'>
-        <div class="flex items-center mb-6 pr-4">
-            <h2 class="text-white text-xl md:text-2xl font-semibold mr-3 md:mr-4 whitespace-nowrap">Recentes</h2>
-            <div class="h-px flex-1 bg-gray-800"></div>
-        </div>
-        <div class="mobile-scroll-container">
-            {% for narrativa in lista_narrativas_recentes %}
-                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700 hover:border-teal-500/50 transition-all">
-                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                        <div class="aspect-[4/3] w-full overflow-hidden">
-                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                        </div>
-                        <div class="p-5">
-                            <p class="text-white font-bold truncate text-lg">{{ narrativa.titulo }}</p>
-                            <p class="text-teal-400 text-xs font-bold uppercase mt-1">Gerenciar</p>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
-
-    {% if lista_narrativas_emalta %}
-    <section class='bg-gray-900 py-10 pl-4 md:pl-12 pb-20'>
-        <h2 class="text-white text-lg font-semibold mb-6">Mais Vistas</h2>
-        <div class="mobile-scroll-container">
-            {% for narrativa in lista_narrativas_emalta %}
-                <div class="narrativa-card w-10/12 md:w-1/4 lg:w-1/5 mr-5 relative group bg-gray-800 rounded-xl overflow-hidden shadow-md border border-gray-700 hover:border-teal-500/50">
-                    <a href="{% url 'narrativa:detalhes' narrativa.pk %}">
-                        <div class="aspect-[4/3] w-full overflow-hidden relative">
-                            <img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100">
-                            <div class="absolute top-2 right-2 bg-black/60 px-2 py-1 rounded text-xs text-white flex items-center">
-                                <ion-icon name="eye" class="mr-1"></ion-icon> {{ narrativa.visualizacoes }}
+        {% if narrativas %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for narrativa in narrativas %}
+                    <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6 shadow-xl hover:border-teal-500/50 transition duration-300 group">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="bg-teal-900/30 p-3 rounded-lg text-teal-400 group-hover:bg-teal-600 group-hover:text-white transition">
+                                <ion-icon name="document-text" class="text-2xl"></ion-icon>
                             </div>
+                            <span class="text-xs font-medium bg-gray-700 text-gray-300 px-2.5 py-1 rounded-full border border-gray-600">
+                                Ativa
+                            </span>
                         </div>
-                        <div class="p-5">
-                            <p class="text-gray-200 font-semibold truncate">{{ narrativa.titulo }}</p>
-                            <p class="text-gray-500 text-xs uppercase mt-2 font-bold">Gerenciar</p>
+                        <h3 class="text-xl font-bold text-white mb-2">{{ narrativa.titulo|default:"Narrativa Sem Título" }}</h3>
+                        <p class="text-gray-400 text-sm mb-6 line-clamp-2">
+                            {{ narrativa.descricao|default:"Sem descrição disponível." }}
+                        </p>
+                        <div class="flex items-center text-teal-400 text-sm font-medium hover:text-teal-300 cursor-pointer">
+                            Ver detalhes <ion-icon name="arrow-forward" class="ml-1"></ion-icon>
                         </div>
-                    </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center bg-gray-800/50 border border-gray-700 rounded-2xl p-12 backdrop-blur-md mt-8">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-800 border border-gray-700 mb-6 shadow-inner">
+                    <ion-icon name="folder-open-outline" class="text-4xl text-gray-500"></ion-icon>
                 </div>
-            {% endfor %}
-        </div>
-    </section>
-    {% endif %}
+                <h3 class="text-2xl font-bold text-white mb-2">Nenhuma narrativa encontrada</h3>
+                <p class="text-gray-400 mb-8 max-w-md mx-auto">Você ainda não criou nenhuma jornada. Clique no botão abaixo para começar a registrar as narrativas dos seus pacientes.</p>
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="inline-flex bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-lg shadow-teal-900/50 items-center">
+                    <ion-icon name="add" class="mr-2 text-xl"></ion-icon>
+                    Criar Primeira Narrativa
+                </a>
+            </div>
+        {% endif %}
 
+    </div>
 </main>
 
 <script>
-    const linkHubPacientes = "{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_narrativas' %}";
+    // Link provisório corrigido (sem a tag url que estava quebrando)
+    const linkHubPacientes = "{{ request.scheme }}://{{ request.get_host }}/";
+
     function handleShareGeneral() {
-        if (navigator.share) { navigator.share({ title: 'Clínica', url: linkHubPacientes }); }
-        else { navigator.clipboard.writeText(linkHubPacientes).then(() => alert('Link Copiado!')); }
+        if (navigator.share) {
+            navigator.share({ title: 'Clínica', url: linkHubPacientes });
+        } else {
+            navigator.clipboard.writeText(linkHubPacientes).then(() => {
+                alert('Link Copiado!');
+            });
+        }
     }
 </script>
 {% endblock %}
