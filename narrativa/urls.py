@@ -9,8 +9,9 @@ urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
     path('planos/', views.PlanosView.as_view(), name='planos'),
 
-    # Autenticação
+    # Autenticação e Cadastro
     path('login/', views.LoginView.as_view(), name='login'),
+    path('criar-conta/', views.CriarContaView.as_view(), name='criarconta'),
     path('logout/', LogoutView.as_view(next_page='narrativa:home'), name='logout'),
 
     # Sistema

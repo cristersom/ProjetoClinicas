@@ -1,13 +1,15 @@
 import stripe
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, CreateView
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login
+from django.urls import reverse_lazy
 from .models import Plano, Narrativa, Clinica
+from .forms import CadastroForm
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -46,6 +48,20 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
         return Narrativa.objects.filter(clinica=self.request.user.clinica)
 
 
+# --- NOVA VIEW DE CADASTRO ---
+class CriarContaView(CreateView):
+    template_name = "criarconta.html"
+    form_class = CadastroForm
+    success_url = reverse_lazy('narrativa:home')  # Manda para os planos após criar a conta
+
+    def form_valid(self, form):
+        # Salva o usuário e já faz o login dele automaticamente para não precisar digitar a senha de novo
+        response = super().form_valid(form)
+        login(self.request, self.object)
+        return response
+
+
+# --- CHECKOUT E WEBHOOK ---
 def criar_checkout_sessao(request, price_id):
     try:
         checkout_session = stripe.checkout.Session.create(
@@ -95,6 +111,6 @@ def stripe_webhook(request):
                     usuario.clinica.stripe_subscription_id = session.get('subscription')
                     usuario.clinica.save()
             except Usuario.DoesNotExist:
-                pass  # Aqui você pode adicionar um log se o email não for encontrado
+                pass
 
     return HttpResponse(status=200)
