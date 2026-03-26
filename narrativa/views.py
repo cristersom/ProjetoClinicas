@@ -4,10 +4,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required  # Importação corrigida aqui
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, logout
 from django.urls import reverse_lazy
 from django.contrib import messages
 from .models import Plano, Narrativa, Clinica, Cena, Questionario, Pergunta, Resposta
@@ -37,6 +37,13 @@ class LoginView(DjangoLoginView):
         return reverse_lazy("narrativa:narrativas")
 
 
+@login_required
+def custom_logout(request):
+    """Força o logout do usuário de forma segura via GET ou POST para evitar o Erro 405"""
+    logout(request)
+    return redirect('narrativa:home')
+
+
 class CriarContaView(CreateView):
     template_name = "criarconta.html"
     form_class = CadastroForm
@@ -62,7 +69,7 @@ class PlanosView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@login_required  # Usando o decorador correto para funções
+@login_required
 def criar_checkout_sessao(request, price_id):
     try:
         checkout_session = stripe.checkout.Session.create(
@@ -78,7 +85,7 @@ def criar_checkout_sessao(request, price_id):
         return JsonResponse({'error': str(e)})
 
 
-@login_required  # Usando o decorador correto para funções
+@login_required
 def sucesso_pagamento(request):
     return render(request, 'sucesso.html')
 

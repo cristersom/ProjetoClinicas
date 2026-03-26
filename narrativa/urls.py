@@ -1,5 +1,4 @@
 from django.urls import path
-from django.contrib.auth.views import LogoutView
 from . import views
 
 app_name = 'narrativa'
@@ -8,7 +7,7 @@ urlpatterns = [
     # --- 1. INSTITUCIONAL E AUTENTICAÇÃO ---
     path('', views.HomeView.as_view(), name='home'),
     path('login/', views.LoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(next_page='narrativa:home'), name='logout'),
+    path('logout/', views.custom_logout, name='logout'),  # Rota de logout corrigida!
     path('criar-conta/', views.CriarContaView.as_view(), name='criarconta'),
 
     # --- 2. SAAS E PAGAMENTOS (Stripe) ---
