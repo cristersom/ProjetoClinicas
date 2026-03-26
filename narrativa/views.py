@@ -60,7 +60,7 @@ class CriarContaView(CreateView):
 # 2. SAAS E PAGAMENTOS (STRIPE)
 # ==========================================
 
-class PlanosView(LoginRequiredMixin, TemplateView):
+class PlanosView(TemplateView):  # <- LoginRequiredMixin removido! Agora a tela é pública.
     template_name = "planos.html"
 
     def get_context_data(self, **kwargs):

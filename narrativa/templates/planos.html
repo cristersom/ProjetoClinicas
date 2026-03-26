@@ -1,48 +1,63 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Planos e Assinaturas - Clínica Interativa{% endblock %}
+{% block titulo %}Nossos Planos - Narrativas Clínicas{% endblock %}
 
 {% block content %}
-<main class="min-h-screen bg-gray-900 relative pb-20 pt-24">
-    
-    <div class="fixed inset-0 z-0">
-        <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover opacity-20" alt="Background">
-        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
-    </div>
-
+<main class="min-h-screen bg-gray-50 relative pb-20 pt-24">
     <div class="relative z-10 container mx-auto px-4">
-        
+
         <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Escolha seu Plano</h1>
-            <p class="text-xl text-gray-400 max-w-2xl mx-auto">Selecione a melhor opção para impulsionar suas jornadas clínicas e liberar o acesso total ao sistema.</p>
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Nossos Planos de Uso</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Escolha o plano ideal para a sua clínica e transforme o atendimento aos seus pacientes.</p>
         </div>
 
         <div class="flex flex-wrap justify-center gap-8">
             {% for plano in planos %}
-            <div class="w-full md:w-80 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden hover:border-teal-500/80 transition-all duration-300 flex flex-col group">
-                
-                <div class="p-8 text-center border-b border-gray-700 bg-gray-800/50 group-hover:bg-gray-750 transition-colors">
-                    <h2 class="text-2xl font-bold text-white mb-3">{{ plano.nome_exibicao }}</h2>
-                    <div class="text-teal-400">
+            <div class="w-full md:w-80 bg-white rounded-3xl border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col group overflow-hidden">
+
+                <div class="p-8 text-center bg-gray-50 border-b border-gray-100 relative">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 mb-4 text-teal-600 text-3xl shadow-sm">
+                        <ion-icon name="document-text"></ion-icon>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ plano.nome_exibicao }}</h2>
+                    <div class="text-teal-600 mt-4">
                         <span class="text-4xl font-extrabold">R$ {{ plano.preco }}</span>
-                        <span class="text-gray-400 text-sm">/mês</span>
+                        <span class="text-gray-500 text-sm font-medium">/mês</span>
                     </div>
                 </div>
-                
+
                 <div class="p-8 flex-1 flex flex-col">
-                    <p class="text-gray-300 text-center mb-8 flex-1 leading-relaxed">{{ plano.descricao }}</p>
-                    
-                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-teal-900/50 flex items-center justify-center group-hover:scale-105 duration-300">
-                        Assinar Agora
-                        <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
-                    </a>
+                    <ul class="text-gray-600 space-y-4 mb-8 flex-1">
+                        <li class="flex items-start">
+                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
+                            <span class="leading-tight">{{ plano.descricao }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
+                            <span class="leading-tight">Até {{ plano.limite_narrativas }} narrativas ativas</span>
+                        </li>
+                        <li class="flex items-start">
+                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
+                            <span class="leading-tight">Relatórios e Exportação</span>
+                        </li>
+                    </ul>
+
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
+                            Assinar Agora
+                        </a>
+                    {% else %}
+                        <a href="{% url 'narrativa:criarconta' %}" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
+                            Cadastre-se para Assinar
+                        </a>
+                    {% endif %}
                 </div>
             </div>
             {% empty %}
-            <div class="text-center text-gray-400 w-full max-w-md p-8 bg-gray-800/80 rounded-2xl border border-gray-700 backdrop-blur-md shadow-xl mx-auto">
+            <div class="text-center text-gray-500 w-full max-w-md p-8 bg-white rounded-2xl shadow-md mx-auto border border-gray-200">
                 <ion-icon name="alert-circle-outline" class="text-6xl mb-4 text-teal-600"></ion-icon>
-                <p class="text-lg">Nenhum plano disponível no momento. Verifique o Painel Administrativo.</p>
+                <p class="text-lg">Planos sendo configurados no momento.</p>
             </div>
             {% endfor %}
         </div>
