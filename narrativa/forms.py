@@ -4,6 +4,7 @@ from .models import Clinica
 
 Usuario = get_user_model()
 
+
 class CadastroForm(forms.ModelForm):
     nome_clinica = forms.CharField(max_length=100, label='Nome da Clínica/Consultório', required=True)
     senha1 = forms.CharField(widget=forms.PasswordInput, label='Senha')
@@ -25,13 +26,20 @@ class CadastroForm(forms.ModelForm):
         return senha2
 
     def save(self, commit=True):
-        # Salva o usuário primeiro com a senha criptografada de forma segura
+        # 1. Salva o usuário primeiro com a senha criptografada
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['senha1'])
+        user.is_admin_clinica = True  # Marca como dono da clínica
+
         if commit:
             user.save()
-            # Cria a clínica automaticamente e já vincula ao novo usuário
-            clinica = Clinica.objects.create(nome=self.cleaned_data['nome_clinica'])
+            # 2. Cria a clínica zerada (sem assinatura ativa para forçar o pagamento)
+            clinica = Clinica.objects.create(
+                nome=self.cleaned_data['nome_clinica'],
+                assinatura_ativa=False
+            )
+            # 3. Vincula a clínica ao usuário
             user.clinica = clinica
             user.save()
+
         return user

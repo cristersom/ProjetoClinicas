@@ -5,24 +5,26 @@ from . import views
 app_name = 'narrativa'
 
 urlpatterns = [
-    # Páginas Principais
+    # --- 1. INSTITUCIONAL E AUTENTICAÇÃO ---
     path('', views.HomeView.as_view(), name='home'),
-    path('planos/', views.PlanosView.as_view(), name='planos'),
-
-    # Autenticação e Cadastro
     path('login/', views.LoginView.as_view(), name='login'),
-    path('criar-conta/', views.CriarContaView.as_view(), name='criarconta'),
     path('logout/', LogoutView.as_view(next_page='narrativa:home'), name='logout'),
+    path('criar-conta/', views.CriarContaView.as_view(), name='criarconta'),
 
-    # Sistema
-    path('minhas-narrativas/', views.MinhasNarrativasView.as_view(), name='narrativas'),
-
-    # Stripe (Checkout e Webhook)
+    # --- 2. SAAS E PAGAMENTOS (Stripe) ---
+    path('planos/', views.PlanosView.as_view(), name='planos'),
     path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='criar_checkout_sessao'),
     path('sucesso/', views.sucesso_pagamento, name='sucesso_pagamento'),
-    path('webhook/', views.stripe_webhook, name='stripe_webhook'),
+    path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
 
-    # Rotas obrigatórias para o footer não dar erro
-    path('termos/', views.HomeView.as_view(), name='termos_de_uso'),
-    path('privacidade/', views.HomeView.as_view(), name='politica_privacidade'),
+    # --- 3. PAINEL DA CLÍNICA ---
+    path('minhas-narrativas/', views.MinhasNarrativasView.as_view(), name='narrativas'),
+
+    # --- 4. FLUXO INTERATIVO DO PACIENTE (Design Original) ---
+    path('jornada/<int:pk>/', views.PacienteDetalhesView.as_view(), name='paciente_detalhes'),
+    path('jornada/<int:narrativa_id>/iniciar/', views.iniciar_jornada_paciente, name='iniciar_jornada_paciente'),
+    path('cena/<int:cena_id>/', views.exibir_cena_paciente, name='exibir_cena_paciente'),
+    path('cena/<int:cena_id>/questionario/<int:questionario_id>/', views.responder_questionario,
+         name='responder_questionario'),
+    path('jornada/<int:narrativa_id>/perfil/', views.perfil_sessao, name='perfil_sessao'),
 ]

@@ -1,27 +1,52 @@
-<div class="container text-center">
-    <h2 class="display-5 fw-bold mb-2">Escolha seu Plano</h2>
-    <p class="text-muted mb-5">Selecione a melhor opção para impulsionar suas narrativas clínicas.</p>
+{% extends 'base.html' %}
+{% load static %}
 
-    <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
-        {% for plano in planos %}
-        <div class="col" style="max-width: 350px;">
-            <div class="card h-100 shadow-sm border-primary">
-                <div class="card-header py-3 text-white bg-primary">
-                    <h4 class="my-0 fw-normal">{{ plano.nome }}</h4>
+{% block titulo %}Planos e Assinaturas - Clínica Interativa{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-gray-900 relative pb-20 pt-24">
+    
+    <div class="fixed inset-0 z-0">
+        <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover opacity-20" alt="Background">
+        <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4">
+        
+        <div class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">Escolha seu Plano</h1>
+            <p class="text-xl text-gray-400 max-w-2xl mx-auto">Selecione a melhor opção para impulsionar suas jornadas clínicas e liberar o acesso total ao sistema.</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-8">
+            {% for plano in planos %}
+            <div class="w-full md:w-80 bg-gray-800 rounded-2xl border border-gray-700 shadow-2xl overflow-hidden hover:border-teal-500/80 transition-all duration-300 flex flex-col group">
+                
+                <div class="p-8 text-center border-b border-gray-700 bg-gray-800/50 group-hover:bg-gray-750 transition-colors">
+                    <h2 class="text-2xl font-bold text-white mb-3">{{ plano.nome_exibicao }}</h2>
+                    <div class="text-teal-400">
+                        <span class="text-4xl font-extrabold">R$ {{ plano.preco }}</span>
+                        <span class="text-gray-400 text-sm">/mês</span>
+                    </div>
                 </div>
-                <div class="card-body d-flex flex-column">
-                    <h1 class="card-title pricing-card-title">R$ {{ plano.preco }}<small class="text-muted fw-light">/mês</small></h1>
-                    <ul class="list-unstyled mt-3 mb-4">
-                        <li class="py-2 border-bottom">{{ plano.descricao }}</li>
-                    </ul>
-                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-100 btn btn-lg btn-primary mt-auto">
+                
+                <div class="p-8 flex-1 flex flex-col">
+                    <p class="text-gray-300 text-center mb-8 flex-1 leading-relaxed">{{ plano.descricao }}</p>
+                    
+                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-teal-900/50 flex items-center justify-center group-hover:scale-105 duration-300">
                         Assinar Agora
+                        <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
                     </a>
                 </div>
             </div>
+            {% empty %}
+            <div class="text-center text-gray-400 w-full max-w-md p-8 bg-gray-800/80 rounded-2xl border border-gray-700 backdrop-blur-md shadow-xl mx-auto">
+                <ion-icon name="alert-circle-outline" class="text-6xl mb-4 text-teal-600"></ion-icon>
+                <p class="text-lg">Nenhum plano disponível no momento. Verifique o Painel Administrativo.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <p class="text-muted">Nenhum plano disponível no momento. Verifique o Painel Admin.</p>
-        {% endfor %}
+        
     </div>
-</div>
+</main>
+{% endblock %}

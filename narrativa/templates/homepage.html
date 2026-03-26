@@ -1,29 +1,47 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block titulo %}Narrativas Clínicas - Plataforma Interativa{% endblock %}
 
 {% block content %}
-<div style="background-color: #4a4a4a; min-height: 60vh; color: white; display: flex; align-items: center; justify-content: center; text-align: center; padding: 40px 20px;">
-    <div style="max-width: 800px;">
-        <h1 class="display-4 fw-bold mb-3">
-            Narrativas clínicas e <br>
-            <span style="color: #e50914;">pesquisas de satisfação</span>, tudo <br>
-            em um só lugar.
-        </h1>
-        <p class="fs-5 mb-4 text-light">Crie onde quiser. Aplique quando quiser.</p>
+<main class="min-h-screen bg-gray-900 text-white selection:bg-teal-500 selection:text-white flex flex-col">
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex-grow">
+        <div class="absolute inset-0 z-0">
+            <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover opacity-20" alt="Background">
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900"></div>
+        </div>
 
-        <form method="post" action="{% url 'narrativa:login' %}" class="row g-2 justify-content-center">
-            {% csrf_token %}
-            <div class="col-auto">
-                <input type="email" name="username" class="form-control form-control-lg" placeholder="Seu e-mail" style="width: 300px;">
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-red btn-lg fw-bold px-5">Acessar</button>
-            </div>
-        </form>
-        <small class="text-secondary d-block mt-2">Digite seu e-mail para iniciar ou criar uma conta.</small>
-    </div>
-</div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-10">
+            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-lg">
+                Jornadas clínicas e <span class="text-teal-500">pesquisas</span><br>
+                em um só lugar.
+            </h1>
+            <p class="mt-4 max-w-2xl text-xl text-gray-400 mx-auto mb-10">
+                Crie onde quiser. Aplique quando quiser. Aumente o engajamento dos seus pacientes com narrativas altamente interativas.
+            </p>
 
-<div class="bg-white py-5">
-    {% include "planos.html" %}
-</div>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-full transition shadow-lg shadow-teal-900/50 text-lg flex items-center justify-center">
+                    Ver Planos
+                    <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
+                </a>
+                <a href="{% url 'narrativa:login' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
+                    Acessar Conta
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="border-t border-gray-800 py-10 bg-gray-900 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-gray-400 text-sm">
+                &copy; 2026 Narrativas Clínicas. Todos os direitos reservados.
+            </p>
+            <p class="text-gray-500 text-sm mt-3 flex items-center justify-center gap-1">
+                <ion-icon name="location-outline" class="text-teal-600 text-lg"></ion-icon>
+                Sede: Bento Gonçalves, RS
+            </p>
+        </div>
+    </footer>
+</main>
 {% endblock %}

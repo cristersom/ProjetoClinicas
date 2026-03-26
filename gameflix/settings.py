@@ -2,12 +2,11 @@ import os
 from pathlib import Path
 import dj_database_url
 
-# Caminhos básicos
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- SEGURANÇA ---
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     'narrativasclinicas.com.br',
@@ -16,7 +15,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1'
 ]
 
-# --- CONFIGURAÇÃO DE CSRF E PROXY (Segurança Heroku) ---
 CSRF_TRUSTED_ORIGINS = [
     'https://narrativasclinicas.com.br',
     'https://narrativas-clinicas-b7d6b38c0379.herokuapp.com',
@@ -33,11 +31,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Crispy Forms
+    # Ferramentas Admin
+    'nested_admin',
+
+    # Forms
     'crispy_forms',
     'crispy_bootstrap5',
 
-    # Seu App
+    # Seu App Principal
     'narrativa',
 ]
 
@@ -54,7 +55,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'narrativa.middleware.SaaSControlMiddleware',
+    'narrativa.middleware.SaaSControlMiddleware',  # A trava de segurança da assinatura
 ]
 
 ROOT_URLCONF = 'gameflix.urls'
@@ -97,18 +98,22 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- ARQUIVOS ESTÁTICOS ---
+# --- ARQUIVOS ESTÁTICOS E MÍDIA ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # --- USUÁRIO E LOGIN ---
 AUTH_USER_MODEL = 'narrativa.Usuario'
-LOGIN_URL = 'narrativa:home'
+LOGIN_URL = 'narrativa:login'
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 
-# --- STRIPE ---
+# --- STRIPE CONFIGURAÇÕES ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
