@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 
 
@@ -20,7 +21,8 @@ class Plano(models.Model):
 class Clinica(models.Model):
     nome = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
-    logo = models.ImageField(upload_to='logos/', null=True, blank=True)
+    logo = models.ImageField(upload_to='logos/', null=True, blank=True,
+                             help_text="Logo da clínica. Recomendado: 250x45 px.")
     assinatura_ativa = models.BooleanField(default=False)
     plano_atual = models.ForeignKey(Plano, on_delete=models.SET_NULL, null=True, blank=True)
     stripe_customer_id = models.CharField(max_length=255, null=True, blank=True)
@@ -34,100 +36,119 @@ class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
     clinica = models.ForeignKey(Clinica, on_delete=models.SET_NULL, null=True, blank=True)
     is_admin_clinica = models.BooleanField(default=False)
-
-    groups = models.ManyToManyField('auth.Group', related_name='usuario_custom_set', blank=True)
-    user_permissions = models.ManyToManyField('auth.Permission', related_name='usuario_custom_permissions_set',
-                                              blank=True)
+    narrativas_vistas = models.ManyToManyField("Narrativa", blank=True)
 
 
 # ==========================================
-# MODELOS DA JORNADA CLÍNICA (DESENGESSADOS)
+# MODELOS DA JORNADA CLÍNICA (V1 TOTALMENTE LIVRE)
 # ==========================================
 
 class Categoria(models.Model):
-    nome = models.CharField(max_length=100)
+    titulo = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return self.nome
+        return self.titulo
+
+    class Meta:
+        verbose_name_plural = "Categorias"
 
 
 class Narrativa(models.Model):
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE, null=True, blank=True)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
-    titulo = models.CharField(max_length=200)
-    # Imagem e Descrição agora são 100% opcionais
-    thumb = models.ImageField(upload_to='capas/', null=True, blank=True,
-                              help_text="Opcional. Você pode adicionar a imagem de capa depois.")
-    descricao = models.TextField(null=True, blank=True,
-                                 help_text="Opcional. Você pode criar apenas com imagens se preferir.")
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    titulo = models.CharField(max_length=100)
+    thumb = models.ImageField(upload_to='thumb_narrativas', null=True, blank=True,
+                              help_text="Opcional. Imagem de capa.")
+    descricao = models.TextField(max_length=1000, null=True, blank=True, help_text="Opcional.")
     visualizacoes = models.IntegerField(default=0)
-    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_criacao = models.DateTimeField(default=timezone.now)
+    cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
     def __str__(self):
         return self.titulo
 
 
 class Cena(models.Model):
-    # Narrativa opcional com lembrete
-    narrativa = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name='cenas', null=True, blank=True,
-                                  help_text="Lembrete: Não esqueça de vincular esta cena a uma narrativa depois para que ela seja exibida aos pacientes.")
-    titulo = models.CharField(max_length=200)
-    conteudo_textual = models.TextField(blank=True, null=True)
-    imagem = models.ImageField(upload_to='cenas_imagens/', blank=True, null=True)
-    video = models.URLField(max_length=500, blank=True, null=True, help_text="Link do YouTube/Vimeo")
+    narrativa = models.ForeignKey("Narrativa", related_name="cenas", on_delete=models.CASCADE, null=True, blank=True,
+                                  help_text="Lembrete: Vincule a uma narrativa para exibi-la.")
+    titulo = models.CharField(max_length=100, help_text="Título interno para identificar a cena")
+    conteudo_textual = models.TextField(blank=True, null=True, help_text="Texto principal da cena.")
+    imagem = models.ImageField(upload_to='imagem_cenas', blank=True, null=True, help_text="Imagem de apoio.")
+    video = models.URLField(blank=True, null=True, help_text="Link do vídeo (opcional).")
     ordem = models.IntegerField(default=0)
 
     def __str__(self):
         if self.narrativa:
             return f"{self.narrativa.titulo} - {self.titulo}"
-        return f"[Sem vínculo] - {self.titulo}"
+        return f"[Solta] - {self.titulo}"
 
 
 class Escolha(models.Model):
-    cena_origem = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name='escolhas')
+    cena_origem = models.ForeignKey(Cena, related_name="escolhas", on_delete=models.CASCADE)
     texto_da_opcao = models.CharField(max_length=255)
-    cena_destino = models.ForeignKey(Cena, on_delete=models.SET_NULL, null=True, blank=True, related_name='destinos')
+    cena_destino = models.ForeignKey(Cena, on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='cenas_de_destino')
 
     def __str__(self):
-        return self.texto_da_opcao
+        destino = self.cena_destino.titulo if self.cena_destino else 'Fim da Jornada'
+        return f"Opção em '{self.cena_origem.titulo}': levar para '{destino}'"
 
 
 class Questionario(models.Model):
-    # Cena opcional com lembrete
-    cena_associada = models.OneToOneField(Cena, on_delete=models.CASCADE, related_name='questionarios', null=True,
-                                          blank=True,
-                                          help_text="Lembrete: Não esqueça de vincular este questionário a uma cena depois para que ele seja exibido.")
-    titulo = models.CharField(max_length=200)
+    cena_associada = models.ForeignKey('Cena', related_name="questionarios", on_delete=models.SET_NULL, null=True,
+                                       blank=True, help_text="Lembrete: Vincule a uma cena.")
+    titulo = models.CharField(max_length=200, help_text="Título do questionário.")
+    cena_destino = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True,
+                                     related_name='questionarios_de_origem')
 
-    def __str__(self):
-        return self.titulo
+    def __str__(self): return self.titulo
 
 
 class Pergunta(models.Model):
-    TIPOS_RESPOSTA = [
-        ('TEXTO', 'Texto Livre'),
-        ('ESCALA_5', 'Escala de 1 a 5 Estrelas'),
-        ('UNICA_ESCOLHA', 'Única Escolha'),
-        ('MULTIPLA_ESCOLHA', 'Múltipla Escolha'),
-    ]
-    questionario = models.ForeignKey(Questionario, on_delete=models.CASCADE, related_name='perguntas')
-    texto_pergunta = models.CharField(max_length=300)
+    TIPOS_RESPOSTA = (("TEXTO", "Texto Livre"), ("UNICA_ESCOLHA", "Múltipla Escolha (apenas uma resposta)"),
+                      ("MULTIPLA_ESCOLHA", "Múltipla Escolha (várias respostas)"),
+                      ("ESCALA_5", "Escala de Satisfação (1 a 5)"))
+    questionario = models.ForeignKey(Questionario, related_name="perguntas", on_delete=models.CASCADE)
+    texto_pergunta = models.CharField(max_length=500)
     tipo_resposta = models.CharField(max_length=20, choices=TIPOS_RESPOSTA)
 
-    def __str__(self):
-        return self.texto_pergunta
+    def __str__(self): return f"{self.questionario.titulo} - {self.texto_pergunta}"
 
 
 class OpcaoResposta(models.Model):
-    pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE, related_name='opcoes')
+    pergunta = models.ForeignKey(Pergunta, related_name="opcoes", on_delete=models.CASCADE)
     texto = models.CharField(max_length=200)
 
-    def __str__(self):
-        return self.texto
+    def __str__(self): return self.texto
 
 
 class Resposta(models.Model):
-    pergunta = models.ForeignKey(Pergunta, on_delete=models.CASCADE)
+    pergunta = models.ForeignKey(Pergunta, related_name="respostas", on_delete=models.CASCADE)
+    session_key = models.CharField(max_length=40, help_text="ID da sessão do paciente")
     texto_resposta = models.TextField()
-    session_key = models.CharField(max_length=100)
+    data_resposta = models.DateTimeField(default=timezone.now)
+
+    def __str__(self): return f"Resposta para '{self.pergunta.texto_pergunta}'"
+
+
+class SessaoPaciente(models.Model):
+    session_key = models.CharField(max_length=40, unique=True)
+    narrativa_perfil = models.ForeignKey(Narrativa, on_delete=models.SET_NULL, null=True, blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        perfil = self.narrativa_perfil.titulo if self.narrativa_perfil else 'Não definido'
+        return f"Sessão {self.session_key[:8]}... | Perfil: {perfil}"
+
+
+class LogVisitaCena(models.Model):
+    session_key = models.CharField(max_length=40, db_index=True)
+    cena_visitada = models.ForeignKey(Cena, on_delete=models.CASCADE, related_name="visitas")
+    timestamp = models.DateTimeField(auto_now_add=True)
+    narrativa_associada = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name="logs_visita", null=True)
+
+    def __str__(self):
+        return f"Sessão {self.session_key[:8]}... visitou '{self.cena_visitada.titulo}'"
+
+    class Meta:
+        ordering = ['session_key', 'timestamp']

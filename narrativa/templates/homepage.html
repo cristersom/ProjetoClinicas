@@ -25,9 +25,17 @@
                     Ver Planos
                     <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
                 </a>
-                <a href="{% url 'narrativa:login' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
-                    Acessar Conta
-                </a>
+
+                {% if user.is_authenticated %}
+                    <a href="{% url 'narrativa:narrativas' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
+                        <ion-icon name="grid" class="mr-2"></ion-icon>
+                        Ir para o Painel
+                    </a>
+                {% else %}
+                    <a href="{% url 'narrativa:login' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
+                        Acessar Conta
+                    </a>
+                {% endif %}
             </div>
         </div>
     </section>
@@ -36,10 +44,6 @@
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-gray-400 text-sm">
                 &copy; 2026 Narrativas Clínicas. Todos os direitos reservados.
-            </p>
-            <p class="text-gray-500 text-sm mt-3 flex items-center justify-center gap-1">
-                <ion-icon name="location-outline" class="text-teal-600 text-lg"></ion-icon>
-                Sede: Bento Gonçalves, RS
             </p>
         </div>
     </footer>

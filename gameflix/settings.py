@@ -22,9 +22,46 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
+# --- JAZZMIN CONFIGURAÇÕES VISUAIS E ÍCONES ---
+JAZZMIN_SETTINGS = {
+    "site_title": "Narrativas Clínicas",
+    "site_header": "Narrativas Clínicas",
+    "site_brand": "Administração",
+    "welcome_sign": "Bem-vindo ao Painel da Clínica",
+    "copyright": "Narrativas Clínicas",
+    "search_model": ["narrativa.Narrativa", "narrativa.Paciente"],
+    "topmenu_links": [
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Ver Site", "url": "/", "new_window": True},
+    ],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "narrativa.Plano": "fas fa-star",
+        "narrativa.Clinica": "fas fa-hospital",
+        "narrativa.Usuario": "fas fa-user-md",
+        "narrativa.Categoria": "fas fa-tags",
+        "narrativa.Narrativa": "fas fa-book-medical",
+        "narrativa.Cena": "fas fa-desktop",
+        "narrativa.Questionario": "fas fa-clipboard-list",
+        "narrativa.Resposta": "fas fa-comments",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "order_with_respect_to": ["narrativa", "narrativa.Narrativa", "narrativa.Cena", "narrativa.Questionario"],
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "pulse",
+    "dark_mode_theme": "darkly",
+}
+
 # --- APPS ---
 INSTALLED_APPS = [
-    'jazzmin',  # <- O Painel Admin bonitão voltou para o topo!
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,7 +93,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'narrativa.middleware.SaaSControlMiddleware',  # A trava de segurança da assinatura
+    'narrativa.middleware.SaaSControlMiddleware',
 ]
 
 ROOT_URLCONF = 'gameflix.urls'
