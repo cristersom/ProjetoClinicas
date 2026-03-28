@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model, login, logout
 from django.urls import reverse_lazy
 from django.contrib import messages
@@ -16,54 +17,39 @@ from .forms import CadastroForm
 stripe.api_key = settings.STRIPE_SECRET_KEY
 Usuario = get_user_model()
 
-
-# ==========================================
-# 1. INSTITUCIONAL E AUTENTICAÇÃO
-# ==========================================
 class HomeView(TemplateView):
     template_name = "homepage.html"
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['planos'] = Plano.objects.all()
         return context
 
-
 class LoginView(DjangoLoginView):
     template_name = "login.html"
-
     def get_success_url(self):
         return reverse_lazy("narrativa:narrativas")
 
-
-@login_required
+@require_http_methods(["GET", "POST"])
 def custom_logout(request):
+    """Aceita GET e POST para não gerar erro 405 ao sair"""
     logout(request)
     return redirect('narrativa:home')
-
 
 class CriarContaView(CreateView):
     template_name = "criarconta.html"
     form_class = CadastroForm
     success_url = reverse_lazy('narrativa:planos')
-
     def form_valid(self, form):
         response = super().form_valid(form)
         login(self.request, self.object)
         return response
 
-
-# ==========================================
-# 2. SAAS E PAGAMENTOS (STRIPE)
-# ==========================================
 class PlanosView(TemplateView):
     template_name = "planos.html"
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['planos'] = Plano.objects.all()
         return context
-
 
 def criar_checkout_sessao(request, price_id):
     try:
@@ -77,34 +63,25 @@ def criar_checkout_sessao(request, price_id):
             cancel_url=request.build_absolute_uri('/planos/'),
         )
         return redirect(checkout_session.url, code=303)
-    except Exception as e:
-        return JsonResponse({'error': str(e)})
-
+    except Exception as e: return JsonResponse({'error': str(e)})
 
 @login_required
-def sucesso_pagamento(request):
-    return render(request, 'sucesso.html')
-
+def sucesso_pagamento(request): return render(request, 'sucesso.html')
 
 @csrf_exempt
 def stripe_webhook(request):
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
     event = None
-    try:
-        event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)
-    except ValueError as e:
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
-        return HttpResponse(status=400)
+    try: event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)
+    except ValueError as e: return HttpResponse(status=400)
+    except stripe.error.SignatureVerificationError as e: return HttpResponse(status=400)
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email_cliente = session.get('customer_details', {}).get('email')
         if email_cliente:
-            usuario, created = Usuario.objects.get_or_create(email=email_cliente,
-                                                             defaults={'username': email_cliente, 'is_staff': True,
-                                                                       'is_admin_clinica': True})
+            usuario, created = Usuario.objects.get_or_create(email=email_cliente, defaults={'username': email_cliente, 'is_staff': True, 'is_admin_clinica': True})
             if created:
                 usuario.set_unusable_password()
                 usuario.save()
@@ -118,25 +95,42 @@ def stripe_webhook(request):
             usuario.clinica.save()
     return HttpResponse(status=200)
 
-
-# ==========================================
-# 3. PAINEL DA CLÍNICA
-# ==========================================
 class MinhasNarrativasView(LoginRequiredMixin, ListView):
     model = Narrativa
     template_name = "narrativas.html"
     context_object_name = "narrativas"
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return Narrativa.objects.all()
+        if self.request.user.is_superuser: return Narrativa.objects.all()
         if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             return Narrativa.objects.filter(clinica=self.request.user.clinica)
         return Narrativa.objects.none()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
+            context['link_portal'] = self.request.build_absolute_uri(f'/portal/{self.request.user.clinica.id}/')
+        return context
 
 # ==========================================
-# 4. FLUXO INTERATIVO DO PACIENTE
+# PORTAL DO PACIENTE (A página com todas as narrativas)
+# ==========================================
+class PortalPacienteView(ListView):
+    model = Narrativa
+    template_name = "portal_paciente.html"
+    context_object_name = "narrativas"
+
+    def get_queryset(self):
+        self.clinica = get_object_or_404(Clinica, id=self.kwargs['clinica_id'])
+        return Narrativa.objects.filter(clinica=self.clinica)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['clinica'] = self.clinica
+        return context
+
+# ==========================================
+# FLUXO INTERATIVO DO PACIENTE
 # ==========================================
 class PacienteDetalhesView(DetailView):
     model = Narrativa
@@ -144,29 +138,27 @@ class PacienteDetalhesView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Exibe outras narrativas da mesma clínica
         context['relacionados'] = Narrativa.objects.filter(clinica=self.object.clinica).exclude(id=self.object.id)[:4]
         return context
 
+    # RESOLVE O ERRO 405 - Se o seu template fizer um POST, ele inicia a jornada
+    def post(self, request, *args, **kwargs):
+        return iniciar_jornada_paciente(request, self.get_object().id)
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     narrativa.visualizacoes += 1
     narrativa.save()
-
     if not request.session.session_key: request.session.create()
-
     primeira_cena = narrativa.cenas.order_by('ordem').first()
     if primeira_cena: return redirect('narrativa:exibir_cena_paciente', cena_id=primeira_cena.id)
     return redirect('narrativa:paciente_detalhes', pk=narrativa.id)
-
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
     total_cenas = cena.narrativa.cenas.count() if cena.narrativa else 1
     percentual = int((cena.ordem / total_cenas) * 100) if total_cenas > 0 else 0
     return render(request, 'cena_paciente.html', {'cena': cena, 'total_cenas': total_cenas, 'percentual': percentual})
-
 
 def responder_questionario(request, cena_id, questionario_id):
     cena = get_object_or_404(Cena, id=cena_id)
@@ -182,19 +174,15 @@ def responder_questionario(request, cena_id, questionario_id):
                 if texto: Resposta.objects.create(pergunta=pergunta, texto_resposta=texto, session_key=session_key)
             elif pergunta.tipo_resposta == 'MULTIPLA_ESCOLHA':
                 textos = request.POST.getlist(resposta_key)
-                for texto in textos: Resposta.objects.create(pergunta=pergunta, texto_resposta=texto,
-                                                             session_key=session_key)
+                for texto in textos: Resposta.objects.create(pergunta=pergunta, texto_resposta=texto, session_key=session_key)
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena.id)
-
     return render(request, 'questionario.html', {'questionario': questionario, 'cena': cena})
-
 
 def perfil_sessao(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     return render(request, 'perfil_sessao.html', {
         'narrativa': narrativa, 'nome_perfil': "Paciente", 'cenas_visitadas': 1,
         'total_cenas': narrativa.cenas.count(), 'progresso_cenas_pct': 50,
-        'questionarios_respondidos': 0,
-        'total_questionarios': narrativa.cenas.filter(questionarios__isnull=False).count(),
+        'questionarios_respondidos': 0, 'total_questionarios': narrativa.cenas.filter(questionarios__isnull=False).count(),
         'progresso_questionarios_pct': 0,
     })

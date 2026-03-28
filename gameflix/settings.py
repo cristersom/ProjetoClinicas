@@ -8,17 +8,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = [
-    'narrativasclinicas.com.br',
-    'narrativas-clinicas-b7d6b38c0379.herokuapp.com',
-    'localhost',
-    '127.0.0.1'
-]
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://narrativasclinicas.com.br',
-    'https://narrativas-clinicas-b7d6b38c0379.herokuapp.com',
-]
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-b7d6b38c0379.herokuapp.com', 'localhost',
+                 '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas-clinicas-b7d6b38c0379.herokuapp.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
@@ -53,11 +45,7 @@ JAZZMIN_SETTINGS = {
     "navigation_expanded": True,
     "order_with_respect_to": ["narrativa", "narrativa.Narrativa", "narrativa.Cena", "narrativa.Questionario"],
 }
-
-JAZZMIN_UI_TWEAKS = {
-    "theme": "pulse",
-    "dark_mode_theme": "darkly",
-}
+JAZZMIN_UI_TWEAKS = {"theme": "pulse", "dark_mode_theme": "darkly"}
 
 # --- APPS ---
 INSTALLED_APPS = [
@@ -69,10 +57,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Cloudinary para Imagens
+    'cloudinary',
+    'cloudinary_storage',
+
     # Ferramentas Admin
     'nested_admin',
-
-    # Forms
     'crispy_forms',
     'crispy_bootstrap5',
 
@@ -116,27 +106,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# --- BANCO DE DADOS ---
 DATABASES = {
-    'default': dj_database_url.config(
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
-
 if not DATABASES['default']:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3', 'NAME': BASE_DIR / 'db.sqlite3'}
 
-# --- INTERNACIONALIZAÇÃO ---
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- ARQUIVOS ESTÁTICOS E MÍDIA ---
+# --- ARQUIVOS ESTÁTICOS E MÍDIA (CLOUDINARY) ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
@@ -145,15 +126,20 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# --- USUÁRIO E LOGIN ---
+# Configuração do Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 AUTH_USER_MODEL = 'narrativa.Usuario'
 LOGIN_URL = 'narrativa:login'
 LOGIN_REDIRECT_URL = 'narrativa:narrativas'
 LOGOUT_REDIRECT_URL = 'narrativa:home'
 
-# --- STRIPE CONFIGURAÇÕES ---
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
