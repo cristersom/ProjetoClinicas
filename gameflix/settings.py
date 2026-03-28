@@ -123,14 +123,24 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuração do Cloudinary
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-}
+# Configuração do Cloudinary (Atualizado para o método mais robusto)
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
-# CORREÇÃO CRÍTICA AQUI: Usando o formato STORAGES do Django 4.2/5.0
+CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL')
+
+if CLOUDINARY_URL:
+    cloudinary.config(
+        cloudinary_url=CLOUDINARY_URL
+    )
+else:
+    cloudinary.config(
+        cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME', 'du066v6vj'),
+        api_key=os.environ.get('CLOUDINARY_API_KEY', '513149594584218'),
+        api_secret=os.environ.get('CLOUDINARY_API_SECRET', '')
+    )
+
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
