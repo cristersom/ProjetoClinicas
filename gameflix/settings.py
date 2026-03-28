@@ -24,6 +24,7 @@ USE_X_FORWARDED_HOST = True
 
 # --- APPS ---
 INSTALLED_APPS = [
+    'jazzmin',  # <- O Painel Admin bonitão voltou para o topo!
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
