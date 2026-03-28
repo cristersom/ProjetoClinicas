@@ -41,7 +41,7 @@ class Usuario(AbstractUser):
 
 
 # ==========================================
-# MODELOS DA JORNADA CLÍNICA
+# MODELOS DA JORNADA CLÍNICA (DESENGESSADOS)
 # ==========================================
 
 class Categoria(models.Model):
@@ -52,12 +52,14 @@ class Categoria(models.Model):
 
 
 class Narrativa(models.Model):
-    # Clinica agora é opcional na criação, será preenchida automaticamente pelo Admin
     clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE, null=True, blank=True)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     titulo = models.CharField(max_length=200)
-    thumb = models.ImageField(upload_to='capas/')
-    descricao = models.TextField()
+    # Imagem e Descrição agora são 100% opcionais
+    thumb = models.ImageField(upload_to='capas/', null=True, blank=True,
+                              help_text="Opcional. Você pode adicionar a imagem de capa depois.")
+    descricao = models.TextField(null=True, blank=True,
+                                 help_text="Opcional. Você pode criar apenas com imagens se preferir.")
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(auto_now_add=True)
 
@@ -66,8 +68,9 @@ class Narrativa(models.Model):
 
 
 class Cena(models.Model):
-    # Narrativa agora é opcional na criação. Você pode criar a cena solta e vincular depois!
-    narrativa = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name='cenas', null=True, blank=True)
+    # Narrativa opcional com lembrete
+    narrativa = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name='cenas', null=True, blank=True,
+                                  help_text="Lembrete: Não esqueça de vincular esta cena a uma narrativa depois para que ela seja exibida aos pacientes.")
     titulo = models.CharField(max_length=200)
     conteudo_textual = models.TextField(blank=True, null=True)
     imagem = models.ImageField(upload_to='cenas_imagens/', blank=True, null=True)
@@ -90,8 +93,10 @@ class Escolha(models.Model):
 
 
 class Questionario(models.Model):
+    # Cena opcional com lembrete
     cena_associada = models.OneToOneField(Cena, on_delete=models.CASCADE, related_name='questionarios', null=True,
-                                          blank=True)
+                                          blank=True,
+                                          help_text="Lembrete: Não esqueça de vincular este questionário a uma cena depois para que ele seja exibido.")
     titulo = models.CharField(max_length=200)
 
     def __str__(self):
