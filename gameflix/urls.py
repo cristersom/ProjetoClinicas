@@ -8,5 +8,7 @@ urlpatterns = [
     path('', include('narrativa.urls')),
 ]
 
-#if settings.DEBUG:
-  #  urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Isso ensina o Django a entregar as imagens da pasta media
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
