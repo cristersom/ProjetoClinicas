@@ -60,7 +60,7 @@ class CriarContaView(CreateView):
 # 2. SAAS E PAGAMENTOS (STRIPE)
 # ==========================================
 
-class PlanosView(TemplateView):  # <- LoginRequiredMixin removido! Agora a tela é pública.
+class PlanosView(TemplateView):
     template_name = "planos.html"
 
     def get_context_data(self, **kwargs):
@@ -69,12 +69,13 @@ class PlanosView(TemplateView):  # <- LoginRequiredMixin removido! Agora a tela 
         return context
 
 
-@login_required
 def criar_checkout_sessao(request, price_id):
     try:
+        email_preenchido = request.user.email if request.user.is_authenticated else None
+
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
-            customer_email=request.user.email,
+            customer_email=email_preenchido,
             line_items=[{'price': price_id, 'quantity': 1}],
             mode='subscription',
             success_url=request.build_absolute_uri('/sucesso/'),
@@ -109,15 +110,25 @@ def stripe_webhook(request):
         email_cliente = session.get('customer_details', {}).get('email')
 
         if email_cliente:
-            try:
-                usuario = Usuario.objects.get(email=email_cliente)
-                if usuario.clinica:
-                    usuario.clinica.assinatura_ativa = True
-                    usuario.clinica.stripe_customer_id = session.get('customer')
-                    usuario.clinica.stripe_subscription_id = session.get('subscription')
-                    usuario.clinica.save()
-            except Usuario.DoesNotExist:
-                pass
+            # Cria a conta fantasma já com acesso ao painel (is_staff=True)
+            usuario, created = Usuario.objects.get_or_create(
+                email=email_cliente,
+                defaults={'username': email_cliente, 'is_staff': True, 'is_admin_clinica': True}
+            )
+
+            if created:
+                usuario.set_unusable_password()
+                usuario.save()
+
+            if not usuario.clinica:
+                nova_clinica = Clinica.objects.create(nome=f"Clínica de {email_cliente}")
+                usuario.clinica = nova_clinica
+                usuario.save()
+
+            usuario.clinica.assinatura_ativa = True
+            usuario.clinica.stripe_customer_id = session.get('customer')
+            usuario.clinica.stripe_subscription_id = session.get('subscription')
+            usuario.clinica.save()
 
     return HttpResponse(status=200)
 
@@ -169,7 +180,7 @@ def iniciar_jornada_paciente(request, narrativa_id):
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
-    total_cenas = cena.narrativa.cenas.count()
+    total_cenas = cena.narrativa.cenas.count() if cena.narrativa else 1
     percentual = int((cena.ordem / total_cenas) * 100) if total_cenas > 0 else 0
 
     return render(request, 'cena_paciente.html', {

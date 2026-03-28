@@ -39,19 +39,13 @@
                         </li>
                         <li class="flex items-start">
                             <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
-                            <span class="leading-tight">Relatórios e Exportação</span>
+                            <span class="leading-tight">Relatórios e Exportação de dados</span>
                         </li>
                     </ul>
 
-                    {% if request.user.is_authenticated %}
-                        <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
-                            Assinar Agora
-                        </a>
-                    {% else %}
-                        <a href="{% url 'narrativa:criarconta' %}" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
-                            Cadastre-se para Assinar
-                        </a>
-                    {% endif %}
+                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
+                        Assinar Agora
+                    </a>
                 </div>
             </div>
             {% empty %}

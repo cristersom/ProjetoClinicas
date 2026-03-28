@@ -25,21 +25,31 @@ class CadastroForm(forms.ModelForm):
             raise forms.ValidationError("As senhas não coincidem. Digite novamente.")
         return senha2
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        user = Usuario.objects.filter(email=email).first()
+        if user and user.has_usable_password():
+            raise forms.ValidationError("Este e-mail já possui um cadastro completo. Faça login.")
+        return email
+
     def save(self, commit=True):
-        # 1. Salva o usuário primeiro com a senha criptografada
-        user = super().save(commit=False)
+        email = self.cleaned_data['email']
+        user = Usuario.objects.filter(email=email).first()
+
+        if user:
+            user.username = self.cleaned_data['username']
+            if user.clinica:
+                user.clinica.nome = self.cleaned_data['nome_clinica']
+                user.clinica.save()
+        else:
+            user = super().save(commit=False)
+            user.clinica = Clinica.objects.create(nome=self.cleaned_data['nome_clinica'], assinatura_ativa=False)
+
+        # CRÍTICO: is_staff=True permite que ele logue no painel administrativo!
         user.set_password(self.cleaned_data['senha1'])
-        user.is_admin_clinica = True  # Marca como dono da clínica
+        user.is_admin_clinica = True
+        user.is_staff = True
 
         if commit:
             user.save()
-            # 2. Cria a clínica zerada (sem assinatura ativa para forçar o pagamento)
-            clinica = Clinica.objects.create(
-                nome=self.cleaned_data['nome_clinica'],
-                assinatura_ativa=False
-            )
-            # 3. Vincula a clínica ao usuário
-            user.clinica = clinica
-            user.save()
-
         return user

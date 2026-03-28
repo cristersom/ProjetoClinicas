@@ -41,7 +41,7 @@ class Usuario(AbstractUser):
 
 
 # ==========================================
-# MODELOS DA JORNADA CLÍNICA (V1 Preservada)
+# MODELOS DA JORNADA CLÍNICA
 # ==========================================
 
 class Categoria(models.Model):
@@ -52,8 +52,9 @@ class Categoria(models.Model):
 
 
 class Narrativa(models.Model):
-    clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    # Clinica agora é opcional na criação, será preenchida automaticamente pelo Admin
+    clinica = models.ForeignKey(Clinica, on_delete=models.CASCADE, null=True, blank=True)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     titulo = models.CharField(max_length=200)
     thumb = models.ImageField(upload_to='capas/')
     descricao = models.TextField()
@@ -65,7 +66,8 @@ class Narrativa(models.Model):
 
 
 class Cena(models.Model):
-    narrativa = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name='cenas')
+    # Narrativa agora é opcional na criação. Você pode criar a cena solta e vincular depois!
+    narrativa = models.ForeignKey(Narrativa, on_delete=models.CASCADE, related_name='cenas', null=True, blank=True)
     titulo = models.CharField(max_length=200)
     conteudo_textual = models.TextField(blank=True, null=True)
     imagem = models.ImageField(upload_to='cenas_imagens/', blank=True, null=True)
@@ -73,7 +75,9 @@ class Cena(models.Model):
     ordem = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.narrativa.titulo} - {self.titulo}"
+        if self.narrativa:
+            return f"{self.narrativa.titulo} - {self.titulo}"
+        return f"[Sem vínculo] - {self.titulo}"
 
 
 class Escolha(models.Model):
@@ -86,7 +90,8 @@ class Escolha(models.Model):
 
 
 class Questionario(models.Model):
-    cena_associada = models.OneToOneField(Cena, on_delete=models.CASCADE, related_name='questionarios')
+    cena_associada = models.OneToOneField(Cena, on_delete=models.CASCADE, related_name='questionarios', null=True,
+                                          blank=True)
     titulo = models.CharField(max_length=200)
 
     def __str__(self):
