@@ -123,15 +123,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuração do Cloudinary (Direto no código)
+# Configuração do Cloudinary com a chave secundária (mediaflows)
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
 cloudinary.config(
     cloud_name='hbkuy6qmh',
-    api_key='736647879458249',
-    api_secret='bLzCzn6xQelTC_i1YkNI9AQMNPQ'
+    api_key='893147256884695',
+    api_secret='uqy6sLZEHKbyUsT_xWMkMZtfBl4'
 )
 
 STORAGES = {
