@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    .btn-outline-dark { border-radius: 50px; font-weight: 600; padding: 12px 30px; }
+    .cancel-icon-wrapper {
+        width: 100px;
+        height: 100px;
+        background-color: rgba(220, 53, 69, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px auto;
+    }
+    .cancel-icon { font-size: 3.5rem; color: #dc3545; }
+    .glass-card {
+        border: none;
+        border-radius: 1.5rem;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        background: #ffffff;
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh; padding-top: 80px;">
+    <div class="card text-center p-5 glass-card" style="max-width: 550px; width: 100%;">
+        <div class="card-body">
+
+            <div class="cancel-icon-wrapper">
+                <i class="fas fa-times cancel-icon"></i>
+            </div>
+
+            <h2 class="fw-bold mb-3 text-dark">Pagamento Cancelado</h2>
+
+            <p class="lead text-muted mb-4">
+                {% if mensagem %}
+                    {{ mensagem }}
+                {% else %}
+                    O processo de assinatura foi interrompido. Nenhuma cobrança foi realizada.
+                {% endif %}
+            </p>
+
+            <hr class="my-4 bg-light">
+
+            <a href="{% url 'narrativa:planos' %}" class="btn btn-outline-dark btn-lg w-100">
+                <i class="fas fa-arrow-left me-2"></i> Voltar aos Planos
+            </a>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
