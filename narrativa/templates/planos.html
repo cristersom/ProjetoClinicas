@@ -1,61 +1,114 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% block content %}
+<style>
+    /* Estilos exclusivos para a página de Planos */
+    .bg-saas-dark {
+        background-color: #1a1e21; /* Fundo escuro moderno */
+    }
+    .text-teal {
+        color: #20c997; /* Verde Teal da identidade visual */
+    }
+    .pricing-card {
+        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 1.5rem;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        background: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+    .pricing-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+    }
+    .pricing-card.destaque {
+        border: 2px solid #20c997;
+    }
+    .badge-destaque {
+        position: absolute;
+        top: 15px;
+        right: -35px;
+        background-color: #20c997;
+        color: white;
+        padding: 5px 40px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        transform: rotate(45deg);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .btn-teal {
+        background-color: #20c997;
+        color: #ffffff;
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px 30px;
+        transition: background-color 0.2s;
+    }
+    .btn-teal:hover {
+        background-color: #1aa179;
+        color: #ffffff;
+    }
+    .btn-outline-dark {
+        border-radius: 50px;
+        font-weight: 600;
+        padding: 12px 30px;
+    }
+    .feature-list li {
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+    .feature-icon {
+        color: #20c997;
+        margin-right: 10px;
+    }
+</style>
 
-{% block titulo %}Nossos Planos - Narrativas Clínicas{% endblock %}
+<div class="bg-saas-dark text-white py-5 mb-5">
+    <div class="container text-center py-5">
+        <h1 class="display-4 fw-bold mb-3">Escolha o plano ideal para sua Clínica</h1>
+        <p class="lead text-light opacity-75 mx-auto" style="max-width: 600px;">
+            Comece a transformar a jornada dos seus pacientes com narrativas interativas e acompanhamento profissional.
+        </p>
+    </div>
+</div>
 
-{% block content %}
-<main class="min-h-screen bg-gray-50 relative pb-20 pt-24">
-    <div class="relative z-10 container mx-auto px-4">
+<div class="container pb-5">
+    <div class="row row-cols-1 row-cols-lg-3 g-4 justify-content-center mt-n5" style="margin-top: -80px;">
 
-        <div class="text-center mb-16">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">Nossos Planos de Uso</h1>
-            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Escolha o plano ideal para a sua clínica e transforme o atendimento aos seus pacientes.</p>
-        </div>
+        {% for plano in planos %}
+        <div class="col">
+            <div class="card h-100 pricing-card {% if plano.destaque %}destaque{% endif %} p-4">
+                {% if plano.destaque %}
+                    <div class="badge-destaque">Recomendado</div>
+                {% endif %}
 
-        <div class="flex flex-wrap justify-center gap-8">
-            {% for plano in planos %}
-            <div class="w-full md:w-80 bg-white rounded-3xl border border-gray-200 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col group overflow-hidden">
+                <div class="card-body text-center d-flex flex-column">
+                    <h4 class="card-title fw-bold text-uppercase mb-1" style="letter-spacing: 1px;">{{ plano.nome }}</h4>
+                    <p class="text-muted small mb-4">{{ plano.descricao_curta }}</p>
 
-                <div class="p-8 text-center bg-gray-50 border-b border-gray-100 relative">
-                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-teal-100 mb-4 text-teal-600 text-3xl shadow-sm">
-                        <ion-icon name="document-text"></ion-icon>
+                    <div class="mb-4">
+                        <span class="h1 fw-bold text-dark">R$ {{ plano.preco }}</span>
+                        <span class="text-muted">/mês</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ plano.nome_exibicao }}</h2>
-                    <div class="text-teal-600 mt-4">
-                        <span class="text-4xl font-extrabold">R$ {{ plano.preco }}</span>
-                        <span class="text-gray-500 text-sm font-medium">/mês</span>
-                    </div>
-                </div>
 
-                <div class="p-8 flex-1 flex flex-col">
-                    <ul class="text-gray-600 space-y-4 mb-8 flex-1">
-                        <li class="flex items-start">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
-                            <span class="leading-tight">{{ plano.descricao }}</span>
-                        </li>
-                        <li class="flex items-start">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
-                            <span class="leading-tight">Até {{ plano.limite_narrativas }} narrativas ativas</span>
-                        </li>
-                        <li class="flex items-start">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3 flex-shrink-0"></ion-icon>
-                            <span class="leading-tight">Relatórios e Exportação de dados</span>
-                        </li>
-                    </ul>
+                    <ul class="list-unstyled text-start feature-list flex-grow-1 mx-auto mb-5" style="max-width: 250px;">
+                        <li><i class="fas fa-check-circle feature-icon"></i> {{ plano.limite_narrativas }} Narrativas ativas</li>
+                        <li><i class="fas fa-check-circle feature-icon"></i> {{ plano.limite_pacientes }} Pacientes</li>
+                        <li><i class="fas fa-check-circle feature-icon"></i> Suporte {% if plano.destaque %}prioritário{% else %}padrão{% endif %}</li>
+                        </ul>
 
-                    <a href="{% url 'narrativa:criar_checkout_sessao' price_id=plano.pid %}" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-xl transition shadow-md flex items-center justify-center">
-                        Assinar Agora
+                    <a href="{% url 'narrativa:checkout' plano.id %}" class="btn w-100 mt-auto {% if plano.destaque %}btn-teal{% else %}btn-outline-dark{% endif %}">
+                        Assinar o {{ plano.nome }}
                     </a>
                 </div>
             </div>
-            {% empty %}
-            <div class="text-center text-gray-500 w-full max-w-md p-8 bg-white rounded-2xl shadow-md mx-auto border border-gray-200">
-                <ion-icon name="alert-circle-outline" class="text-6xl mb-4 text-teal-600"></ion-icon>
-                <p class="text-lg">Planos sendo configurados no momento.</p>
-            </div>
-            {% endfor %}
         </div>
-        
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <h4 class="text-muted">Os planos estão sendo configurados. Volte em breve!</h4>
+        </div>
+        {% endfor %}
+
     </div>
-</main>
+</div>
 {% endblock %}
