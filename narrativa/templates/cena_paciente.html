@@ -1,57 +1,24 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block navbar %}{% endblock %}
-
-{% block titulo %}Jornada Interativa{% endblock %}
 
 {% block content %}
-<main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative overflow-x-hidden" style="background-image: url('{% static 'images/background.png' %}');">
+<main class="min-h-screen bg-gray-900 text-white pb-12" style="background-image: url('{% static 'images/background.png' %}'); background-size: cover; background-position: center;">
 
-    <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm"></div>
+    <div class="max-w-3xl mx-auto pt-24 px-4 sm:px-6 lg:px-8">
 
-    <div class="w-full md:w-8/12 lg:w-6/12 max-w-full bg-gray-900/90 rounded-xl shadow-2xl p-5 md:p-8 pt-20 relative border border-gray-800 backdrop-blur-md z-10 my-4">
-
-        <div class="absolute top-4 right-4 z-30">
-             <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}"
-                class="inline-flex items-center bg-gray-800/90 hover:bg-gray-700 text-gray-300 hover:text-white text-xs md:text-sm font-bold py-2 px-4 rounded-full transition duration-300 border border-gray-600 shadow-lg backdrop-blur-md">
-                 <ion-icon name="person-circle-outline" class="text-lg mr-2 text-teal-500"></ion-icon>
-                 Sair
-             </a>
+        <div class="mb-8">
+            <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}" class="text-teal-400 hover:text-teal-300 flex items-center transition font-semibold">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Ver Perfil da Sessão
+            </a>
         </div>
 
-        <h1 class="text-2xl md:text-4xl font-extrabold mb-6 mt-8 text-center w-full mx-auto leading-snug text-white drop-shadow-md break-words">
+        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-center text-teal-400 drop-shadow-md">
             {{ cena.titulo }}
         </h1>
 
-        {% if total_cenas > 0 %}
-        <div class="mb-8 px-1">
-            <div class="flex justify-between text-[10px] md:text-xs text-gray-400 mb-2 font-bold tracking-wider uppercase">
-                <span>Início</span>
-                <span class="text-teal-400">Progresso: {{ percentual }}%</span>
-                <span>Fim</span>
-            </div>
-            <div class="progress h-2 bg-gray-800 rounded-full overflow-hidden border border-gray-700/80">
-                <div class="progress-bar bg-gradient-to-r from-teal-500 to-green-500 h-full rounded-full relative" style="width: {{ percentual }}%"></div>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if cena.video %}
-            <div class="mb-8 rounded-xl overflow-hidden shadow-xl border border-gray-800 bg-black w-full">
-                <div class="aspect-video w-full relative">
-                    <iframe src="{{ cena.video }}" frameborder="0" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
-                </div>
-            </div>
-        {% endif %}
-
-        {% if cena.imagem %}
-            <div class="mb-8 rounded-xl overflow-hidden shadow-xl border border-gray-800 w-full">
-                 <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-auto object-cover">
-            </div>
-        {% endif %}
-
         {% if cena.conteudo_textual %}
-            <div class="text-base md:text-xl mb-10 leading-relaxed text-gray-200 prose prose-invert max-w-none p-4 bg-gray-800/40 rounded-xl border border-white/5 font-medium break-words">
+            <div class="prose prose-invert prose-lg mx-auto mb-12 text-gray-300 leading-relaxed bg-gray-900/60 p-6 md:p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-gray-800">
                 {{ cena.conteudo_textual|linebreaks }}
             </div>
         {% endif %}
@@ -59,10 +26,11 @@
         <div class="border-t border-gray-800 pt-8 space-y-6">
 
             {% for questionario in cena.questionarios.all %}
-                <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700">
+                <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700 transform transition hover:-translate-y-1">
                     <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
                     <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Pesquisa Rápida</p>
-                    <a href="{% url 'narrativa:responder_questionario' questionario_id=questionario.id %}"
+
+                    <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=questionario.id %}"
                        class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-amber-900/40">
                         <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon>
                         Responder Agora
@@ -71,37 +39,20 @@
             {% endfor %}
 
             {% if cena.escolhas.all %}
-                <div class="space-y-4">
+                <div class="space-y-4 mt-8">
                     {% if not cena.questionarios.all %}
-                        <h2 class="text-center text-gray-400 text-xs uppercase tracking-widest font-bold mb-6">Como deseja prosseguir?</h2>
+                        <h3 class="text-center text-gray-400 mb-6 uppercase tracking-widest text-sm font-bold">O que você faz agora?</h3>
                     {% endif %}
 
                     {% for escolha in cena.escolhas.all %}
-                        {% if escolha.cena_destino %}
-                        <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}"
-                           class="flex items-center justify-center w-full text-center bg-teal-600 hover:bg-teal-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-md border border-teal-500/50 break-words">
-                            <span class="flex-1">{{ escolha.texto_da_opcao }}</span>
-                            <ion-icon name="arrow-forward" class="ml-2 text-xl"></ion-icon>
+                        <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.proxima_cena.id %}"
+                           class="block w-full text-center bg-gray-800 hover:bg-teal-600 border border-gray-700 hover:border-teal-500 text-white text-lg font-medium py-4 px-6 rounded-xl transition duration-300 shadow-md">
+                            {{ escolha.texto }}
                         </a>
-                        {% else %}
-                         <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full text-center bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-md border border-gray-600/50">
-                            <ion-icon name="checkmark-circle-outline" class="mr-2 text-xl"></ion-icon>
-                            {{ escolha.texto_da_opcao }}
-                        </a>
-                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
 
-            {% if not cena.escolhas.all and not cena.questionarios.all %}
-                 <div class="text-center pt-6">
-                    <p class="text-gray-400 mb-4 text-lg">Você chegou ao fim desta etapa.</p>
-                    <a href="{% url 'narrativa:paciente_narrativas' %}" class="flex items-center justify-center w-full bg-gray-200 hover:bg-white text-gray-900 font-bold py-4 px-6 rounded-xl transition shadow-lg">
-                        <ion-icon name="apps" class="mr-2 text-xl"></ion-icon>
-                        Voltar para o Menu
-                    </a>
-                </div>
-            {% endif %}
         </div>
     </div>
 </main>
