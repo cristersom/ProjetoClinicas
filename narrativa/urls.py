@@ -12,7 +12,10 @@ urlpatterns = [
 
     # 2. SAAS E PAGAMENTOS
     path('planos/', views.PlanosView.as_view(), name='planos'),
-    path('checkout/<str:price_id>/', views.criar_checkout_sessao, name='criar_checkout_sessao'),
+
+    # ROTA CORRIGIDA PARA O CHECKOUT:
+    path('checkout/<int:plano_id>/', views.checkout, name='checkout'),
+
     path('sucesso/', views.sucesso_pagamento, name='sucesso_pagamento'),
     path('webhook/stripe/', views.stripe_webhook, name='stripe_webhook'),
 
