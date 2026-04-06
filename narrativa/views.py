@@ -66,20 +66,23 @@ class PlanosView(TemplateView):
 # ==========================================
 
 def checkout(request, plano_id):
-    """Gera a sessão de pagamento no Stripe e redireciona o usuário"""
+    """Gera a sessão de pagamento no Stripe e redireciona o usuário (SEM EXIGIR LOGIN)"""
     plano = get_object_or_404(Plano, id=plano_id)
 
     try:
+        # Se já estiver logado, manda o email. Se não, vai em branco e o cliente digita no Stripe.
         email_preenchido = request.user.email if request.user.is_authenticated else None
+
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             customer_email=email_preenchido,
             line_items=[{
-                'price': plano.stripe_price_id,  # Puxa direto do banco de dados (o 'price_1xyz...')
+                'price': plano.stripe_price_id,
                 'quantity': 1
             }],
             mode='subscription',
-            success_url=request.build_absolute_uri('/sucesso/'),
+            # O Stripe vai devolver o ID da sessão de pagamento na URL de sucesso
+            success_url=request.build_absolute_uri('/sucesso/?session_id={CHECKOUT_SESSION_ID}'),
             cancel_url=request.build_absolute_uri('/planos/'),
             client_reference_id=request.user.id if request.user.is_authenticated else None,
         )
@@ -88,8 +91,39 @@ def checkout(request, plano_id):
         return JsonResponse({'error': str(e)})
 
 
-@login_required
 def sucesso_pagamento(request):
+    """Página de sucesso com Auto-Login Mágico (sem @login_required)"""
+    session_id = request.GET.get('session_id')
+
+    # Faz a mágica apenas se tiver o ID do Stripe e o usuário ainda não estiver logado
+    if session_id and not request.user.is_authenticated:
+        try:
+            # Pergunta ao Stripe: "Quem pagou essa sessão?"
+            session = stripe.checkout.Session.retrieve(session_id)
+            email_cliente = session.get('customer_details', {}).get('email')
+
+            if email_cliente:
+                # Cria a conta silenciosamente se não existir
+                usuario, created = Usuario.objects.get_or_create(
+                    email=email_cliente,
+                    defaults={'username': email_cliente, 'is_staff': True, 'is_admin_clinica': True}
+                )
+
+                if created:
+                    usuario.set_unusable_password()  # Conta criada sem senha por enquanto
+                    nova_clinica = Clinica.objects.create(nome=f"Clínica de {email_cliente}")
+                    usuario.clinica = nova_clinica
+
+                # Ativa a assinatura
+                usuario.clinica.assinatura_ativa = True
+                usuario.clinica.save()
+                usuario.save()
+
+                # Faz o login automático
+                login(request, usuario, backend='django.contrib.auth.backends.ModelBackend')
+        except Exception as e:
+            print(f"Erro no auto-login: {e}")
+
     return render(request, 'sucesso.html')
 
 
