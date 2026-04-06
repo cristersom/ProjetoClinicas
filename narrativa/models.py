@@ -6,16 +6,23 @@ from django.contrib.auth.models import AbstractUser
 # ==========================================
 # MODELOS DE SAAS E ASSINATURA
 # ==========================================
-
 class Plano(models.Model):
-    nome_exibicao = models.CharField(max_length=100)
+    nome = models.CharField(max_length=100)
+    descricao_curta = models.CharField(max_length=200, default="Ideal para acompanhamento de pacientes",
+                                       help_text="Aparece abaixo do nome na tela de vendas.")
     preco = models.DecimalField(max_digits=10, decimal_places=2)
-    descricao = models.TextField()
-    pid = models.CharField(max_length=255, help_text="ID do Preço no Stripe")
-    limite_narrativas = models.IntegerField(default=5)
+    stripe_product_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_price_id = models.CharField(max_length=255)
+
+    # NOVOS CAMPOS PARA CONTROLE DO SaaS E VISUAL
+    limite_narrativas = models.IntegerField(default=1,
+                                            help_text="Quantas narrativas ativas a clínica pode ter simultaneamente?")
+    limite_pacientes = models.IntegerField(default=5, help_text="Quantos pacientes a clínica pode cadastrar?")
+    destaque = models.BooleanField(default=False,
+                                   help_text="Marque para deixar este plano com visual de 'Recomendado' na tela.")
 
     def __str__(self):
-        return self.nome_exibicao
+        return f"{self.nome} - R$ {self.preco}"
 
 
 class Clinica(models.Model):

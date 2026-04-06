@@ -32,9 +32,10 @@ class SuperUserOnlyMixin:
 
 
 @admin.register(Plano)
-class PlanoAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
-    list_display = ('nome_exibicao', 'preco', 'limite_narrativas')
-
+class PlanoAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'preco', 'limite_narrativas', 'limite_pacientes', 'destaque', 'stripe_price_id')
+    list_editable = ('preco', 'limite_narrativas', 'limite_pacientes', 'destaque')
+    search_fields = ('nome', 'stripe_price_id')
 
 @admin.register(Clinica)
 class ClinicaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
