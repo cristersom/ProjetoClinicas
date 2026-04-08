@@ -1,98 +1,66 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block navbar %}{% endblock %}
-{% block titulo %}Responder Questionário{% endblock %}
-
-{% block head %}
-<style>
-    /* Checkbox Padronizado (Teal) */
-    .form-check-input {
-        background-color: #374151; border-color: #4b5563;
-        width: 1.25em; height: 1.25em; margin-right: 0.75rem;
-        border-radius: 0.25rem;
-        cursor: pointer;
-        appearance: none;
-        display: inline-block;
-        vertical-align: middle;
-        position: relative;
-    }
-    .form-check-input:checked {
-        background-color: #0d9488; border-color: #0d9488;
-        background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-    }
-
-    /* Textarea Ajustada */
-    textarea {
-        background-color: #1f2937 !important;
-        border-color: #374151 !important;
-        color: white !important;
-        min-height: 100px; /* Altura mínima decente no mobile */
-    }
-
-    /* Estrelas */
-    .star-rating { display: flex; flex-direction: row-reverse; justify-content: center; gap: 0.5rem; }
-    .star-rating input { display: none; }
-    .star-rating label { font-size: 2.5rem; color: #4b5563; cursor: pointer; }
-    .star-rating:hover label, .star-rating input:checked ~ label { color: #f59e0b; }
-</style>
-{% endblock %}
-
 {% block content %}
-<main class="min-h-screen w-full flex justify-center items-center text-gray-100 p-4 bg-fixed bg-center bg-cover relative" style="background-image: url('{% static 'images/background.png' %}');">
-    <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-sm fixed"></div>
+<div class="min-h-screen bg-gray-900 text-white pt-24 pb-12 px-4">
+    <div class="max-w-3xl mx-auto bg-gray-800 p-8 rounded-3xl shadow-2xl border border-gray-700">
 
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-900/90 rounded-xl shadow-2xl p-6 relative border border-gray-800 backdrop-blur-md z-10 my-8 pt-16">
+        <h1 class="text-3xl font-bold text-teal-400 mb-2">{{ questionario.titulo }}</h1>
+        <p class="text-gray-400 mb-8 pb-6 border-b border-gray-700">Por favor, responda às perguntas abaixo para continuar sua jornada.</p>
 
-        <div class="absolute top-4 right-4 z-10">
-             <a href="{% url 'narrativa:perfil_sessao' narrativa_id=questionario.cena_associada.narrativa.id %}"
-                class="inline-flex items-center bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white text-xs font-bold py-2 px-3 rounded-lg border border-gray-700 transition">
-                 <ion-icon name="person-circle-outline" class="text-lg mr-1"></ion-icon> Sair
-             </a>
-        </div>
-
-        <h1 class="text-2xl md:text-3xl font-bold mb-2 text-center text-white">{{ questionario.titulo }}</h1>
-        <p class="text-center text-gray-400 text-sm mb-8 uppercase tracking-wider font-medium">Sua opinião é importante</p>
-
-        <form method="POST">
+        <form method="POST" action="{% url 'narrativa:responder_questionario' cena.id questionario.id %}">
             {% csrf_token %}
 
             {% for pergunta in questionario.perguntas.all %}
-            <div class="mb-6 p-5 bg-gray-800/50 border border-gray-700 rounded-xl">
-                <p class="text-lg font-semibold mb-4 text-gray-100 leading-tight">{{ forloop.counter }}. {{ pergunta.texto_pergunta }}</p>
+                <div class="mb-8 bg-gray-900/50 p-6 rounded-xl border border-gray-700">
+                    <label class="block text-lg font-medium text-white mb-4">{{ pergunta.texto_pergunta }}</label>
 
-                {% if pergunta.tipo_resposta == "TEXTO" %}
-                    <textarea name="pergunta_{{ pergunta.id }}" rows="3" class="w-full p-3 rounded-lg shadow-inner outline-none transition-all focus:ring-2 focus:ring-teal-500"></textarea>
+                    {% if pergunta.tipo_resposta == 'TEXTO' %}
+                        <textarea name="pergunta_{{ pergunta.id }}" required class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 text-white focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition outline-none" rows="4" placeholder="Digite sua resposta aqui..."></textarea>
 
-                {% elif pergunta.tipo_resposta == "ESCALA_5" %}
-                    <div class="star-rating py-2">
-                        {% for i in "54321" %}
-                           <input type="radio" name="pergunta_{{ pergunta.id }}" id="e_{{ pergunta.id }}_{{ i }}" value="{{ i }}">
-                           <label for="e_{{ pergunta.id }}_{{ i }}">★</label>
+                    {% elif pergunta.tipo_resposta == 'UNICA_ESCOLHA' %}
+                        <div class="space-y-3">
+                        {% for opcao in pergunta.opcoes.all %}
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 border border-gray-700 rounded-lg hover:border-teal-500 transition">
+                                <input type="radio" name="pergunta_{{ pergunta.id }}" value="{{ opcao.texto }}" required class="form-radio h-5 w-5 text-teal-500 bg-gray-900 border-gray-600 focus:ring-teal-500">
+                                <span class="text-gray-300">{{ opcao.texto }}</span>
+                            </label>
                         {% endfor %}
-                    </div>
+                        </div>
 
-                {% elif pergunta.tipo_resposta == "UNICA_ESCOLHA" or pergunta.tipo_resposta == "MULTIPLA_ESCOLHA" %}
-                    <div class="space-y-3">
-                    {% for opcao in pergunta.opcoes.all %}
-                        <label class="flex items-start p-3 rounded-lg hover:bg-gray-700/30 cursor-pointer transition-colors border border-transparent hover:border-gray-600">
-                            <input class="form-check-input mt-1 flex-shrink-0"
-                                   type="{% if pergunta.tipo_resposta == 'UNICA_ESCOLHA' %}radio{% else %}checkbox{% endif %}"
-                                   name="pergunta_{{ pergunta.id }}"
-                                   value="{{ opcao.texto }}">
-                            <span class="text-gray-300 text-base leading-snug pt-0.5">{{ opcao.texto }}</span>
-                        </label>
-                    {% endfor %}
-                    </div>
-                {% endif %}
-            </div>
+                    {% elif pergunta.tipo_resposta == 'MULTIPLA_ESCOLHA' %}
+                        <div class="space-y-3">
+                        {% for opcao in pergunta.opcoes.all %}
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 bg-gray-800 border border-gray-700 rounded-lg hover:border-teal-500 transition">
+                                <input type="checkbox" name="pergunta_{{ pergunta.id }}" value="{{ opcao.texto }}" class="form-checkbox h-5 w-5 text-teal-500 bg-gray-900 border-gray-600 rounded focus:ring-teal-500">
+                                <span class="text-gray-300">{{ opcao.texto }}</span>
+                            </label>
+                        {% endfor %}
+                        </div>
+                        <p class="text-xs text-amber-500 mt-3 font-semibold">* Obrigatório selecionar pelo menos uma opção.</p>
+
+                    {% elif pergunta.tipo_resposta == 'ESCALA_5' %}
+                        <div class="flex flex-col sm:flex-row justify-between items-center bg-gray-800 p-4 rounded-lg border border-gray-700 gap-4">
+                            <span class="text-sm text-gray-400 font-bold uppercase tracking-wider">Discordo</span>
+                            <div class="flex space-x-4 sm:space-x-6">
+                                {% for i in "12345" %}
+                                <label class="flex flex-col items-center cursor-pointer group">
+                                    <input type="radio" name="pergunta_{{ pergunta.id }}" value="{{ i }}" required class="form-radio h-6 w-6 text-teal-500 bg-gray-900 border-gray-600 mb-2 cursor-pointer">
+                                    <span class="text-sm font-bold text-gray-400 group-hover:text-teal-400">{{ i }}</span>
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <span class="text-sm text-gray-400 font-bold uppercase tracking-wider">Concordo</span>
+                        </div>
+                    {% endif %}
+                </div>
             {% endfor %}
 
-            <div class="text-center mt-8">
-                <button type="submit" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-6 rounded-xl transition duration-300 shadow-lg flex items-center justify-center text-lg">
+            <div class="flex flex-col-reverse sm:flex-row justify-between items-center mt-10 pt-6 border-t border-gray-700 gap-4">
+                <a href="{% url 'narrativa:exibir_cena_paciente' cena.id %}" class="w-full sm:w-auto text-center text-gray-400 hover:text-white transition py-3 px-6">Voltar para a Cena</a>
+                <button type="submit" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition flex items-center justify-center">
                     <ion-icon name="send" class="mr-2"></ion-icon> Enviar Respostas
                 </button>
             </div>
         </form>
     </div>
-</main>
+</div>
 {% endblock %}

@@ -103,22 +103,21 @@
             fecharModalShare();
         });
 
+        // NOVO CÓDIGO DE COPIAR 100% GARANTIDO
         document.getElementById('btnShareCopy').addEventListener('click', function() {
-            const tempInput = document.createElement("input");
-            tempInput.value = currentShareUrl;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand("copy");
-            document.body.removeChild(tempInput);
+            navigator.clipboard.writeText(currentShareUrl).then(() => {
+                const btn = document.getElementById('btnShareCopy');
+                const textoOriginal = btn.innerHTML;
+                btn.innerHTML = '<ion-icon name="checkmark-circle" class="mr-3 text-2xl text-teal-400"></ion-icon> Copiado!';
 
-            const btn = document.getElementById('btnShareCopy');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '<ion-icon name="checkmark-circle" class="mr-3 text-2xl text-teal-400"></ion-icon> Copiado!';
-
-            setTimeout(() => {
-                btn.innerHTML = textoOriginal;
-                fecharModalShare();
-            }, 2000);
+                setTimeout(() => {
+                    btn.innerHTML = textoOriginal;
+                    fecharModalShare();
+                }, 2000);
+            }).catch(err => {
+                // Caso o navegador do usuário bloqueie a cópia automática por algum motivo obscuro
+                alert("Erro ao copiar o link automaticamente. Por favor, copie manualmente: " + currentShareUrl);
+            });
         });
     </script>
 
