@@ -1,68 +1,46 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block titulo %}Minhas Jornadas - Narrativas Clínicas{% endblock %}
+{% block titulo %}Minhas Narrativas - Painel da Clínica{% endblock %}
 
 {% block content %}
-<main class="min-h-screen bg-gray-50 pt-24 pb-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-gray-900 pt-24 px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="max-w-7xl mx-auto">
 
-        <div class="flex flex-col md:flex-row justify-between items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+        <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
+
+        <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Painel de Jornadas</h1>
-                <p class="text-gray-500 text-sm mt-1">Gerencie suas narrativas e acompanhe os pacientes.</p>
+                <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente (Portal)</h3>
+                <p class="text-sm text-gray-400">Envie este link único para o seu paciente. Ele terá acesso a todas as jornadas disponíveis da sua clínica para escolher e jogar.</p>
             </div>
-
-            <div class="mt-4 md:mt-0 flex gap-3">
-                <a href="/admin/narrativa/narrativa/add/" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-6 rounded-xl transition shadow flex items-center">
-                    <ion-icon name="add-circle" class="mr-2 text-xl"></ion-icon>
-                    Nova Narrativa
-                </a>
-            </div>
+            <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
+                <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon>
+                Copiar Link do Portal
+            </button>
         </div>
+
+        <h2 class="text-2xl font-bold text-gray-300 mb-6">Jornadas Disponíveis</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for narrativa in narrativas %}
-            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition flex flex-col">
-                {% if narrativa.thumb %}
-                    <img src="{{ narrativa.thumb.url }}" class="w-full h-40 object-cover" alt="Capa">
-                {% else %}
-                    <div class="w-full h-40 bg-gray-100 flex items-center justify-center">
-                        <ion-icon name="book" class="text-4xl text-gray-300"></ion-icon>
-                    </div>
-                {% endif %}
+            <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-lg flex flex-col transition hover:-translate-y-1 duration-300">
+                <div class="p-6 flex-1 flex flex-col">
+                    <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
+                    <p class="text-gray-400 text-sm mb-6 flex-1">{{ narrativa.descricao|default:"Sem descrição." }}</p>
 
-                <div class="p-5 flex-1 flex flex-col">
-                    <h3 class="text-lg font-bold text-gray-800 mb-2 truncate">{{ narrativa.titulo }}</h3>
-                    <div class="flex justify-between items-center text-sm text-gray-500 mb-4 border-b border-gray-100 pb-4">
-                        <span class="flex items-center"><ion-icon name="eye" class="mr-1"></ion-icon> {{ narrativa.visualizacoes }} visitas</span>
-                        <span class="flex items-center"><ion-icon name="time" class="mr-1"></ion-icon> {{ narrativa.data_criacao|date:"d/m/Y" }}</span>
-                    </div>
-
-                    <div class="flex gap-2 mb-3">
-                        <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa.id %}" class="flex-1 bg-teal-50 text-teal-700 hover:bg-teal-100 font-semibold py-2 text-center rounded-lg transition text-sm">
-                            Visualizar
-                        </a>
-                        <a href="/admin/narrativa/narrativa/{{ narrativa.id }}/change/" class="flex-1 border border-gray-300 text-gray-600 hover:bg-gray-50 font-semibold py-2 text-center rounded-lg transition text-sm">
-                            Editar
-                        </a>
-                    </div>
-
-                    <a href="{% url 'narrativa:paciente_detalhes' narrativa.id %}" target="_blank" class="w-full mt-auto bg-gray-800 hover:bg-gray-900 text-white font-bold py-2.5 px-4 rounded-lg transition shadow flex items-center justify-center text-sm">
-                        <ion-icon name="share-social" class="mr-2"></ion-icon>
-                        Link do Paciente
+                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="block w-full text-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-xl font-medium transition mt-auto">
+                        Ver Detalhes e Compartilhar
                     </a>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full text-center py-20 bg-white rounded-2xl border border-gray-200 border-dashed">
-                <ion-icon name="sad-outline" class="text-6xl text-gray-300 mb-4"></ion-icon>
-                <h3 class="text-xl font-bold text-gray-700">Nenhuma narrativa encontrada</h3>
-                <p class="text-gray-500 mt-2 max-w-md mx-auto">Você ainda não tem narrativas ou as que você criou no painel estão sem clínica vinculada (Vá no menu Usuários do Admin e vincule seu Superusuário a uma Clínica).</p>
+            <div class="col-span-full text-center py-12 bg-gray-800 rounded-2xl border border-gray-700">
+                <ion-icon name="folder-open-outline" class="text-6xl text-gray-600 mb-4"></ion-icon>
+                <p class="text-gray-400 text-lg">Nenhuma narrativa cadastrada na sua clínica ainda.</p>
             </div>
             {% endfor %}
         </div>
 
     </div>
-</main>
+</div>
 {% endblock %}

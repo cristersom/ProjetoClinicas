@@ -4,36 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block titulo %}Narrativas Clínicas{% endblock %}</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
     {% block head %}{% endblock %}
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans antialiased flex flex-col min-h-screen">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
     {% block navbar %}
-    <nav class="fixed w-full z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800">
+    <nav class="fixed w-full z-50 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
-                    <ion-icon name="medkit" class="text-2xl text-teal-500"></ion-icon>
-                    <span class="font-bold text-xl text-white tracking-wide">NARRATIVAS<span class="text-teal-500 font-light">CLÍNICAS</span></span>
-                </a>
-                <div class="flex items-center gap-4">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'narrativa:narrativas' %}" class="text-sm font-medium text-gray-300 hover:text-white transition hidden md:block">Minhas Jornadas</a>
-                        <a href="{% url 'narrativa:logout' %}" class="text-sm font-medium text-teal-500 border border-teal-500/50 hover:bg-teal-500/10 px-4 py-2 rounded-full transition">Sair</a>
+            <div class="flex items-center justify-between h-20">
+
+                <div class="flex-shrink-0">
+                    <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
+                        <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
+                            <ion-icon name="medkit" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-2xl font-extrabold tracking-tight text-white">
+                            Narrativas<span class="text-teal-500">Clínicas</span>
+                        </span>
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-6">
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
+                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
+
+                        <form action="{% url 'narrativa:logout' %}" method="post" class="inline m-0 p-0">
+                            {% csrf_token %}
+                            <button type="submit" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</button>
+                        </form>
                     {% else %}
-                        <a href="{% url 'narrativa:login' %}" class="text-sm font-medium text-gray-300 hover:text-white transition">Entrar</a>
-                        <a href="{% url 'narrativa:criarconta' %}" class="text-sm font-bold bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-full transition">Criar Conta</a>
+                        <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
+                        <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
                     {% endif %}
                 </div>
+
             </div>
         </div>
     </nav>
     {% endblock %}
 
-    {% block content %}{% endblock %}
+    <div class="flex-grow">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        function copiarLink(url) {
+            // 1. Cria um campo de texto invisível temporário
+            const tempInput = document.createElement("input");
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+
+            // 2. Seleciona e copia o conteúdo
+            tempInput.select();
+            document.execCommand("copy");
+
+            // 3. Remove o campo invisível para manter a tela limpa
+            document.body.removeChild(tempInput);
+
+            // 4. Mostra um alerta de sucesso na tela
+            alert("✅ Link copiado com sucesso!\n\nAgora é só colar no WhatsApp ou enviar para o paciente.");
+        }
+    </script>
 
 </body>
 </html>
