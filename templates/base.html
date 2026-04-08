@@ -15,10 +15,9 @@
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
     {% block navbar %}
-    <nav class="fixed w-full z-50 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
+    <nav class="fixed w-full z-40 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-
                 <div class="flex-shrink-0">
                     <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
                         <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
@@ -29,12 +28,10 @@
                         </span>
                     </a>
                 </div>
-
                 <div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
                         <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
-
                         <form action="{% url 'narrativa:logout' %}" method="post" class="inline m-0 p-0">
                             {% csrf_token %}
                             <button type="submit" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</button>
@@ -44,7 +41,6 @@
                         <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
                     {% endif %}
                 </div>
-
             </div>
         </div>
     </nav>
@@ -55,23 +51,69 @@
         {% endblock %}
     </div>
 
-    <script>
-        function copiarLink(url) {
-            // 1. Cria um campo de texto invisível temporário
-            const tempInput = document.createElement("input");
-            tempInput.value = url;
-            document.body.appendChild(tempInput);
+    <div id="shareModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
+        <div class="bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-700 overflow-hidden transform transition-all">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-white">Compartilhar com Paciente</h3>
+                <button onclick="fecharModalShare()" class="text-gray-400 hover:text-white transition text-2xl">
+                    <ion-icon name="close-outline"></ion-icon>
+                </button>
+            </div>
 
-            // 2. Seleciona e copia o conteúdo
+            <div class="p-6 space-y-4">
+                <p class="text-sm text-gray-400 text-center mb-6">Como você deseja enviar este acesso?</p>
+
+                <button id="btnShareWpp" class="w-full flex items-center justify-center py-4 px-4 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-bold transition shadow-lg">
+                    <ion-icon name="logo-whatsapp" class="mr-3 text-2xl"></ion-icon>
+                    Enviar pelo WhatsApp
+                </button>
+
+                <button id="btnShareCopy" class="w-full flex items-center justify-center py-4 px-4 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white rounded-xl font-bold transition">
+                    <ion-icon name="copy-outline" class="mr-3 text-2xl"></ion-icon>
+                    Copiar Link Direto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentShareUrl = "";
+
+        // Essa é a função que os botões do site vão chamar
+        function copiarLink(url) {
+            currentShareUrl = url;
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function fecharModalShare() {
+            document.getElementById('shareModal').classList.add('hidden');
+        }
+
+        // Lógica do botão de WhatsApp
+        document.getElementById('btnShareWpp').addEventListener('click', function() {
+            const mensagem = encodeURIComponent("Olá! Aqui está o seu link de acesso para o portal de Narrativas Clínicas:\n\n" + currentShareUrl);
+            window.open("https://api.whatsapp.com/send?text=" + mensagem, "_blank");
+            fecharModalShare();
+        });
+
+        // Lógica do botão de Copiar
+        document.getElementById('btnShareCopy').addEventListener('click', function() {
+            const tempInput = document.createElement("input");
+            tempInput.value = currentShareUrl;
+            document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand("copy");
-
-            // 3. Remove o campo invisível para manter a tela limpa
             document.body.removeChild(tempInput);
 
-            // 4. Mostra um alerta de sucesso na tela
-            alert("✅ Link copiado com sucesso!\n\nAgora é só colar no WhatsApp ou enviar para o paciente.");
-        }
+            const btn = document.getElementById('btnShareCopy');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<ion-icon name="checkmark-circle" class="mr-3 text-2xl text-teal-400"></ion-icon> Copiado!';
+
+            setTimeout(() => {
+                btn.innerHTML = textoOriginal;
+                fecharModalShare();
+            }, 2000);
+        });
     </script>
 
 </body>
