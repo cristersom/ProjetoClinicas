@@ -14,7 +14,7 @@
 
             {% if request.user.is_staff %}
             <a href="{% url 'admin:narrativa_cena_change' cena.id %}" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold flex items-center shadow-lg transition">
-                <ion-icon name="create-outline" class="mr-2"></ion-icon> Editar Cena (Admin)
+                <ion-icon name="create-outline" class="mr-2 text-xl"></ion-icon> Editar Cena (Admin)
             </a>
             {% endif %}
         </div>
@@ -53,8 +53,8 @@
                     {% endif %}
 
                     {% for escolha in cena.escolhas.all %}
-                        {% if escolha.proxima_cena %}
-                            <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.proxima_cena.id %}" class="block w-full text-center bg-gray-800 hover:bg-teal-600 border border-gray-700 hover:border-teal-500 text-white text-lg font-medium py-4 px-6 rounded-xl transition duration-300 shadow-md">
+                        {% if escolha.proxima_cena_id %}
+                            <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.proxima_cena_id %}" class="block w-full text-center bg-gray-800 hover:bg-teal-600 border border-gray-700 hover:border-teal-500 text-white text-lg font-medium py-4 px-6 rounded-xl transition duration-300 shadow-md">
                                 {{ escolha.texto }}
                             </a>
                         {% else %}
@@ -63,6 +63,12 @@
                             </button>
                         {% endif %}
                     {% endfor %}
+                </div>
+            {% else %}
+                <div class="mt-8 p-6 bg-red-900/20 border border-red-500/50 rounded-xl text-center">
+                    <ion-icon name="warning-outline" class="text-4xl text-red-400 mb-2"></ion-icon>
+                    <p class="text-red-400 font-bold mb-1">Nenhuma opção cadastrada</p>
+                    <p class="text-gray-400 text-sm">Você precisa ir no painel Admin e adicionar "Escolhas" para esta cena, senão o paciente fica preso aqui.</p>
                 </div>
             {% endif %}
 
