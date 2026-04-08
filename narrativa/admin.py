@@ -334,9 +334,44 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
         dados = {}
+
+        # AQUI FOI ADICIONADA A LÓGICA DE EXPORTAÇÃO PARA O DETALHADO!
+        export_format = request.GET.get('export')
+        if export_format in ['xlsx', 'csv', 'json']:
+            perguntas_ordenadas = questionario.perguntas.all().order_by('id')
+            dataset = Dataset()
+            dataset.headers = ["Sessão do Paciente", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
+
+            # Agrupa as respostas por sessão
+            dados_exportacao = {}
+            for r in respostas:
+                if r.session_key not in dados_exportacao:
+                    dados_exportacao[r.session_key] = {'data': r.data_resposta.strftime('%d/%m/%Y %H:%M'),
+                                                       'respostas': {}}
+                dados_exportacao[r.session_key]['respostas'][r.pergunta.id] = r.texto_resposta
+
+            # Popula o dataset
+            for session_key, d in dados_exportacao.items():
+                linha = [session_key[:8], d['data']] + [d['respostas'].get(p.id, "") for p in perguntas_ordenadas]
+                dataset.append(linha)
+
+            if export_format == 'xlsx':
+                file_data, content_type = dataset.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            elif export_format == 'json':
+                file_data, content_type = dataset.json, 'application/json'
+            else:
+                file_data, content_type = dataset.csv, 'text/csv'
+
+            response = HttpResponse(file_data, content_type=content_type)
+            response[
+                'Content-Disposition'] = f'attachment; filename="respostas_detalhadas_{questionario.id}.{export_format}"'
+            return response
+
+        # Prepara dados para a tela
         for r in respostas:
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
+
         return render(request, 'admin/relatorio_questionario_detalhe.html',
                       {**self.admin_site.each_context(request), 'questionario': questionario,
                        'dados_do_relatorio': dados})
@@ -344,10 +379,11 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
 class RespostaResource(resources.ModelResource):
     questionario = resources.Field(attribute='pergunta__questionario__titulo', column_name='Questionário')
+    pergunta_texto = resources.Field(attribute='pergunta__texto_pergunta', column_name='Pergunta')
 
     class Meta:
         model = Resposta
-        fields = ('id', 'session_key', 'questionario', 'pergunta__texto_pergunta', 'texto_resposta', 'data_resposta')
+        fields = ('id', 'session_key', 'questionario', 'pergunta_texto', 'texto_resposta', 'data_resposta')
         export_order = fields
 
 
@@ -356,6 +392,10 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     resource_class = RespostaResource
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
+
+    # IMPORTANTE: Habilita explicitamente a exportação no painel Admin (import_export)
+    def has_export_permission(self, request):
+        return True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

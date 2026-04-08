@@ -1,30 +1,110 @@
 {% extends "admin/base_site.html" %}
-{% block title %} Detalhes do Relatório {% endblock %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        .export-actions {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f8f8;
+            border-radius: 4px;
+            border: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .export-actions h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #666;
+            font-weight: bold;
+        }
+        .export-btn {
+            padding: 8px 15px;
+            background: #417690;
+            color: white;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .export-btn:hover {
+            background: #205067;
+            color: white;
+        }
+        .export-btn.csv { background: #1f8b4c; }
+        .export-btn.csv:hover { background: #145e33; }
+
+        .export-btn.json { background: #e67e22; }
+        .export-btn.json:hover { background: #b9651b; }
+
+        .session-header {
+            background: #417690;
+            color: white;
+            padding: 10px 15px;
+            margin-top: 30px;
+            margin-bottom: 0;
+            border-radius: 4px 4px 0 0;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .session-header span.date {
+            font-weight: normal;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+    </style>
+{% endblock %}
+
+{% block title %} Detalhes do Relatório: {{ questionario.titulo }} {% endblock %}
 
 {% block content %}
 <div id="content-main">
-  <h1>Relatório do Questionário: "{{ questionario.titulo }}"</h1>
+  <h1>Respostas Detalhadas: "{{ questionario.titulo }}"</h1>
+
+  {% if dados_do_relatorio %}
+  <div class="export-actions">
+      <h3>Exportar Relatório Completo:</h3>
+      <a href="?export=xlsx" class="export-btn">⬇️ Planilha Excel (.xlsx)</a>
+      <a href="?export=csv" class="export-btn csv">⬇️ Planilha Simples (.csv)</a>
+      <a href="?export=json" class="export-btn json">⬇️ Dados Brutos (.json)</a>
+  </div>
+  {% endif %}
 
   {% for session_key, respostas in dados_do_relatorio.items %}
-  <div class="module">
-    <h2>Respostas do Paciente (Sessão: {{ session_key|slice:":8" }}...)</h2>
-    <div class="results">
-        <table id="result_list">
+  <div class="module" style="margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+
+    <h2 class="session-header">
+        <span>Sessão do Paciente: <strong>{{ session_key|slice:":8" }}...</strong></span>
+        {% with first_answer=respostas|first %}
+            <span class="date">Respondido em: {{ first_answer.data_resposta|date:"d/m/Y H:i" }}</span>
+        {% endwith %}
+    </h2>
+
+    <div class="results" style="margin:0;">
+        <table id="result_list" style="width: 100%; margin: 0; border-top: none;">
             <thead>
               <tr>
-                <th class="sortable column-pergunta">
+                <th class="sortable column-pergunta" style="width: 60%; background: #f8f8f8;">
                   <div class="text"><a>Pergunta</a></div>
                 </th>
-                <th class="sortable column-resposta">
-                  <div class="text"><a>Resposta</a></div>
+                <th class="sortable column-resposta" style="width: 40%; background: #f8f8f8;">
+                  <div class="text"><a>Resposta do Paciente</a></div>
                 </th>
               </tr>
             </thead>
             <tbody>
                 {% for resposta in respostas %}
                 <tr class="{% cycle 'row1' 'row2' %}">
-                    <td class="field-pergunta">{{ resposta.pergunta.texto_pergunta }}</td>
-                    <td class="field-resposta"><strong>{{ resposta.texto_resposta }}</strong></td>
+                    <td class="field-pergunta" style="padding: 12px; font-size: 13px; color: #333;">
+                        {{ resposta.pergunta.texto_pergunta }}
+                    </td>
+                    <td class="field-resposta" style="padding: 12px; font-size: 14px;">
+                        <strong>{{ resposta.texto_resposta }}</strong>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -34,7 +114,10 @@
   {% endfor %}
 
   {% if not dados_do_relatorio %}
-    <p>Ainda não há respostas para este questionário.</p>
+    <div style="padding: 40px; text-align: center; background: #fff; border: 1px dashed #ccc; border-radius: 8px; margin-top: 20px;">
+        <h2 style="color: #666; font-weight: normal;">Ainda não há respostas para este questionário.</h2>
+        <p style="color: #999; font-size: 14px;">Envie o link da jornada para seus pacientes começarem a responder.</p>
+    </div>
   {% endif %}
 
 </div>
