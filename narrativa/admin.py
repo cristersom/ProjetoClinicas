@@ -37,6 +37,7 @@ class PlanoAdmin(admin.ModelAdmin):
     list_editable = ('preco', 'limite_narrativas', 'limite_pacientes', 'destaque')
     search_fields = ('nome', 'stripe_price_id')
 
+
 @admin.register(Clinica)
 class ClinicaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
     list_display = ('nome', 'plano_atual', 'assinatura_ativa')
@@ -140,7 +141,6 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         narrativa_atual = self.get_object(request, object_id)
 
-        # Proteção Tenant
         if not request.user.is_superuser and narrativa_atual.clinica != request.user.clinica:
             return HttpResponse("Acesso negado.", status=403)
 
@@ -247,7 +247,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica:
             return HttpResponse("Acesso negado.", status=403)
 
-        # Lógica original do Resumo do Questionário preservada
         todos_os_perfis = Narrativa.objects.filter(clinica=request.user.clinica) if hasattr(request.user,
                                                                                             'clinica') else Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
@@ -267,7 +266,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
         export_format = request.GET.get('export')
         if export_format in ['xlsx', 'csv', 'json']:
-            # Lógica original de exportação preservada
             perguntas_ordenadas = questionario.perguntas.all().order_by('id')
             dados_sessao, mapa_perfis = {}, {
                 s.session_key: (s.narrativa_perfil.titulo if s.narrativa_perfil else "Visitante") for s in
@@ -278,17 +276,23 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                                                              'data': resp.data_resposta.strftime('%d/%m/%Y'), 'r': {}}
                 dados_sessao[k]['r'][resp.pergunta.id] = resp.texto_resposta
 
+            dataset = Dataset()
+            headers = ["Sessão", "Perfil", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
+            dataset.headers = headers
+
+            for k, d in dados_sessao.items():
+                dataset.append([k[:8], d['perfil'], d['data']] + [d['r'].get(p.id, "") for p in perguntas_ordenadas])
+
             if export_format == 'xlsx':
-                wb = openpyxl.Workbook()
-                ws = wb.active
-                headers = ["Sessão", "Perfil", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
-                ws.append(headers)
-                for k, d in dados_sessao.items():
-                    ws.append([k[:8], d['perfil'], d['data']] + [d['r'].get(p.id, "") for p in perguntas_ordenadas])
-                resp = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-                resp['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.xlsx"'
-                wb.save(resp)
-                return resp
+                file_data, content_type = dataset.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            elif export_format == 'json':
+                file_data, content_type = dataset.json, 'application/json'
+            else:
+                file_data, content_type = dataset.csv, 'text/csv'
+
+            response = HttpResponse(file_data, content_type=content_type)
+            response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.{export_format}"'
+            return response
 
         # Resumo visual
         dados_comparativos = {}
