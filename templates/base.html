@@ -81,7 +81,6 @@
 
         function copiarLink(url) {
             currentShareUrl = url;
-            // Se estiver no celular, usa a gaveta nativa de compartilhamento. Se não, abre nosso Modal.
             if (navigator.share && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
                 navigator.share({
                     title: 'Jornada Clínica - Acesso do Paciente',
@@ -103,7 +102,6 @@
             fecharModalShare();
         });
 
-        // NOVO CÓDIGO DE COPIAR 100% GARANTIDO
         document.getElementById('btnShareCopy').addEventListener('click', function() {
             navigator.clipboard.writeText(currentShareUrl).then(() => {
                 const btn = document.getElementById('btnShareCopy');
@@ -115,7 +113,6 @@
                     fecharModalShare();
                 }, 2000);
             }).catch(err => {
-                // Caso o navegador do usuário bloqueie a cópia automática por algum motivo obscuro
                 alert("Erro ao copiar o link automaticamente. Por favor, copie manualmente: " + currentShareUrl);
             });
         });

@@ -393,7 +393,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    # IMPORTANTE: Habilita explicitamente a exportação no painel Admin (import_export)
+    # IMPORTANTE: Habilita explicitamente a exportação no painel Admin para furar o bloqueio do Tenant
     def has_export_permission(self, request):
         return True
 

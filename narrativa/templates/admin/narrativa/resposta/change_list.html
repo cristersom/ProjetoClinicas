@@ -1,14 +1,23 @@
-{% extends "admin/change_list.html" %}
+{% extends "admin/import_export/change_list_import_export.html" %}
 
-{% block breadcrumbs %}
-    {# Substitui o breadcrumb original por um texto de teste #}
-    <div class="breadcrumbs">
-        <a href="{% url 'admin:index' %}">Início</a> &rsaquo;
-        TESTE DE TEMPLATE CUSTOMIZADO!
-    </div>
-{% endblock %}
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        /* Conserta o contraste do botão Ninja de Exportar do import_export */
+        #object-tools .btn-default,
+        #object-tools a.export_link,
+        #object-tools a.import_link {
+            background-color: #417690 !important;
+            color: #ffffff !important;
+            border-color: #205067 !important;
+            font-weight: bold !important;
+            opacity: 1 !important;
+        }
 
-{% block content_title %}
-    {# Substitui o título original por um texto de teste #}
-    <h1>TESTE FUNCIONANDO</h1>
+        #object-tools .btn-default:hover,
+        #object-tools a.export_link:hover {
+            background-color: #205067 !important;
+            color: #ffffff !important;
+        }
+    </style>
 {% endblock %}
