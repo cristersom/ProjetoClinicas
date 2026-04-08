@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model, login, logout
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .models import Plano, Narrativa, Clinica, Cena, Questionario, Pergunta, Resposta
+from .models import Plano, Narrativa, Clinica, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena
 from .forms import CadastroForm
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -201,7 +201,7 @@ class PortalPacienteView(ListView):
 
 
 # ==========================================
-# FLUXO INTERATIVO DO PACIENTE
+# FLUXO INTERATIVO DO PACIENTE (COM COLETA DE DADOS)
 # ==========================================
 class PacienteDetalhesView(DetailView):
     model = Narrativa
@@ -212,7 +212,6 @@ class PacienteDetalhesView(DetailView):
         context['relacionados'] = Narrativa.objects.filter(clinica=self.object.clinica).exclude(id=self.object.id)[:4]
         return context
 
-    # RESOLVE O ERRO 405 - Se o seu template fizer um POST, ele inicia a jornada
     def post(self, request, *args, **kwargs):
         return iniciar_jornada_paciente(request, self.get_object().id)
 
@@ -221,14 +220,37 @@ def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     narrativa.visualizacoes += 1
     narrativa.save()
-    if not request.session.session_key: request.session.create()
+
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+
+    # INTELIGÊNCIA RESTAURADA 1: Define o 'Perfil' do paciente
+    sessao_paciente, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
+    if created or not sessao_paciente.narrativa_perfil:
+        sessao_paciente.narrativa_perfil = narrativa
+        sessao_paciente.save()
+
     primeira_cena = narrativa.cenas.order_by('ordem').first()
-    if primeira_cena: return redirect('narrativa:exibir_cena_paciente', cena_id=primeira_cena.id)
+    if primeira_cena:
+        return redirect('narrativa:exibir_cena_paciente', cena_id=primeira_cena.id)
     return redirect('narrativa:paciente_detalhes', pk=narrativa.id)
 
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
+
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+
+    # INTELIGÊNCIA RESTAURADA 2: Grava visita
+    LogVisitaCena.objects.create(
+        session_key=session_key,
+        cena_visitada=cena,
+        narrativa_associada=cena.narrativa
+    )
+
     total_cenas = cena.narrativa.cenas.count() if cena.narrativa else 1
     percentual = int((cena.ordem / total_cenas) * 100) if total_cenas > 0 else 0
     return render(request, 'cena_paciente.html', {'cena': cena, 'total_cenas': total_cenas, 'percentual': percentual})
@@ -237,28 +259,57 @@ def exibir_cena_paciente(request, cena_id):
 def responder_questionario(request, cena_id, questionario_id):
     cena = get_object_or_404(Cena, id=cena_id)
     questionario = get_object_or_404(Questionario, id=questionario_id, cena_associada=cena)
-    if not request.session.session_key: request.session.create()
+
+    if not request.session.session_key:
+        request.session.create()
     session_key = request.session.session_key
 
     if request.method == 'POST':
         for pergunta in questionario.perguntas.all():
             resposta_key = f'pergunta_{pergunta.id}'
+
+            # INTELIGÊNCIA RESTAURADA 3: Coleta as respostas
             if pergunta.tipo_resposta in ['TEXTO', 'ESCALA_5', 'UNICA_ESCOLHA']:
                 texto = request.POST.get(resposta_key)
-                if texto: Resposta.objects.create(pergunta=pergunta, texto_resposta=texto, session_key=session_key)
+                if texto:
+                    Resposta.objects.create(pergunta=pergunta, texto_resposta=texto, session_key=session_key)
             elif pergunta.tipo_resposta == 'MULTIPLA_ESCOLHA':
                 textos = request.POST.getlist(resposta_key)
-                for texto in textos: Resposta.objects.create(pergunta=pergunta, texto_resposta=texto,
-                                                             session_key=session_key)
+                for texto in textos:
+                    Resposta.objects.create(pergunta=pergunta, texto_resposta=texto, session_key=session_key)
+
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena.id)
+
     return render(request, 'questionario.html', {'questionario': questionario, 'cena': cena})
 
 
 def perfil_sessao(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
+
+    if not request.session.session_key:
+        request.session.create()
+    session_key = request.session.session_key
+
+    # INTELIGÊNCIA RESTAURADA 4: Puxa perfil
+    nome_perfil = "Paciente"
+    try:
+        sessao = SessaoPaciente.objects.get(session_key=session_key)
+        if sessao.narrativa_perfil:
+            nome_perfil = sessao.narrativa_perfil.titulo
+    except SessaoPaciente.DoesNotExist:
+        pass
+
+    cenas_visitadas = LogVisitaCena.objects.filter(session_key=session_key, narrativa_associada=narrativa).values(
+        'cena_visitada').distinct().count()
+    total_cenas = narrativa.cenas.count()
+    progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100) if total_cenas > 0 else 0
+
     return render(request, 'perfil_sessao.html', {
-        'narrativa': narrativa, 'nome_perfil': "Paciente", 'cenas_visitadas': 1,
-        'total_cenas': narrativa.cenas.count(), 'progresso_cenas_pct': 50,
+        'narrativa': narrativa,
+        'nome_perfil': nome_perfil,
+        'cenas_visitadas': cenas_visitadas,
+        'total_cenas': total_cenas,
+        'progresso_cenas_pct': progresso_cenas_pct,
         'questionarios_respondidos': 0,
         'total_questionarios': narrativa.cenas.filter(questionarios__isnull=False).count(),
         'progresso_questionarios_pct': 0,

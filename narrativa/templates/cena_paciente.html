@@ -30,12 +30,13 @@
         {% endif %}
 
         {% if cena.conteudo_textual %}
-            <div class="prose prose-invert prose-lg mx-auto mb-12 text-gray-300 leading-relaxed bg-gray-900/60 p-6 md:p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-gray-800">
+            <div class="prose prose-invert prose-lg mx-auto text-gray-300 leading-relaxed bg-gray-900/60 p-6 md:p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-gray-800">
                 {{ cena.conteudo_textual|linebreaks }}
             </div>
         {% endif %}
 
-        <div class="border-t border-gray-800 pt-8 space-y-6">
+        <div class="mt-8 space-y-6">
+
             {% for questionario in cena.questionarios.all %}
                 <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700 transform transition hover:-translate-y-1">
                     <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>

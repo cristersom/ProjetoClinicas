@@ -79,24 +79,30 @@
     <script>
         let currentShareUrl = "";
 
-        // Essa é a função que os botões do site vão chamar
         function copiarLink(url) {
             currentShareUrl = url;
-            document.getElementById('shareModal').classList.remove('hidden');
+            // Se estiver no celular, usa a gaveta nativa de compartilhamento. Se não, abre nosso Modal.
+            if (navigator.share && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                navigator.share({
+                    title: 'Jornada Clínica - Acesso do Paciente',
+                    text: 'Acesse o seu painel de narrativas clicando no link abaixo:',
+                    url: currentShareUrl
+                }).catch((error) => console.log('Erro ao compartilhar:', error));
+            } else {
+                document.getElementById('shareModal').classList.remove('hidden');
+            }
         }
 
         function fecharModalShare() {
             document.getElementById('shareModal').classList.add('hidden');
         }
 
-        // Lógica do botão de WhatsApp
         document.getElementById('btnShareWpp').addEventListener('click', function() {
             const mensagem = encodeURIComponent("Olá! Aqui está o seu link de acesso para o portal de Narrativas Clínicas:\n\n" + currentShareUrl);
             window.open("https://api.whatsapp.com/send?text=" + mensagem, "_blank");
             fecharModalShare();
         });
 
-        // Lógica do botão de Copiar
         document.getElementById('btnShareCopy').addEventListener('click', function() {
             const tempInput = document.createElement("input");
             tempInput.value = currentShareUrl;
