@@ -15,7 +15,7 @@
             </div>
             <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
                 <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon>
-                Copiar Link do Portal
+                Compartilhar Portal
             </button>
         </div>
 
@@ -28,9 +28,17 @@
                     <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
                     <p class="text-gray-400 text-sm mb-6 flex-1">{{ narrativa.descricao|default:"Sem descrição." }}</p>
 
-                    <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="block w-full text-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-xl font-medium transition mt-auto">
-                        Ver Detalhes e Compartilhar
-                    </a>
+                    <div class="mt-auto space-y-3">
+                        <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="block w-full text-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                            Ver Detalhes e Compartilhar
+                        </a>
+
+                        {% if request.user.is_staff %}
+                        <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="block w-full text-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white py-2 px-4 rounded-xl font-medium transition text-sm">
+                            <ion-icon name="construct-outline"></ion-icon> Editar no Admin
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% empty %}
