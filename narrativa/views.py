@@ -70,7 +70,6 @@ def checkout(request, plano_id):
     plano = get_object_or_404(Plano, id=plano_id)
 
     try:
-        # Se já estiver logado, manda o email. Se não, vai em branco e o cliente digita no Stripe.
         email_preenchido = request.user.email if request.user.is_authenticated else None
 
         checkout_session = stripe.checkout.Session.create(
@@ -81,7 +80,6 @@ def checkout(request, plano_id):
                 'quantity': 1
             }],
             mode='subscription',
-            # O Stripe vai devolver o ID da sessão de pagamento na URL de sucesso
             success_url=request.build_absolute_uri('/sucesso/?session_id={CHECKOUT_SESSION_ID}'),
             cancel_url=request.build_absolute_uri('/planos/'),
             client_reference_id=request.user.id if request.user.is_authenticated else None,
@@ -92,34 +90,29 @@ def checkout(request, plano_id):
 
 
 def sucesso_pagamento(request):
-    """Página de sucesso com Auto-Login Mágico (sem @login_required)"""
+    """Página de sucesso com Auto-Login Mágico"""
     session_id = request.GET.get('session_id')
 
-    # Faz a mágica apenas se tiver o ID do Stripe e o usuário ainda não estiver logado
     if session_id and not request.user.is_authenticated:
         try:
-            # Pergunta ao Stripe: "Quem pagou essa sessão?"
             session = stripe.checkout.Session.retrieve(session_id)
             email_cliente = session.get('customer_details', {}).get('email')
 
             if email_cliente:
-                # Cria a conta silenciosamente se não existir
                 usuario, created = Usuario.objects.get_or_create(
                     email=email_cliente,
                     defaults={'username': email_cliente, 'is_staff': True, 'is_admin_clinica': True}
                 )
 
                 if created:
-                    usuario.set_unusable_password()  # Conta criada sem senha por enquanto
+                    usuario.set_unusable_password()
                     nova_clinica = Clinica.objects.create(nome=f"Clínica de {email_cliente}")
                     usuario.clinica = nova_clinica
 
-                # Ativa a assinatura
                 usuario.clinica.assinatura_ativa = True
                 usuario.clinica.save()
                 usuario.save()
 
-                # Faz o login automático
                 login(request, usuario, backend='django.contrib.auth.backends.ModelBackend')
         except Exception as e:
             print(f"Erro no auto-login: {e}")
@@ -183,7 +176,7 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
 
 
 # ==========================================
-# PORTAL DO PACIENTE (A página com todas as narrativas)
+# PORTAL DO PACIENTE
 # ==========================================
 class PortalPacienteView(ListView):
     model = Narrativa
@@ -290,7 +283,6 @@ def perfil_sessao(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # INTELIGÊNCIA RESTAURADA 4: Puxa perfil
     nome_perfil = "Paciente"
     try:
         sessao = SessaoPaciente.objects.get(session_key=session_key)
@@ -304,13 +296,24 @@ def perfil_sessao(request, narrativa_id):
     total_cenas = narrativa.cenas.count()
     progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100) if total_cenas > 0 else 0
 
+    # LÓGICA DE QUESTIONÁRIOS ATIVADA:
+    questionarios_respondidos = Resposta.objects.filter(
+        session_key=session_key,
+        pergunta__questionario__cena_associada__narrativa=narrativa
+    ).values('pergunta__questionario').distinct().count()
+
+    total_questionarios = Questionario.objects.filter(cena_associada__narrativa=narrativa).count()
+
+    progresso_questionarios_pct = int(
+        (questionarios_respondidos / total_questionarios) * 100) if total_questionarios > 0 else 0
+
     return render(request, 'perfil_sessao.html', {
         'narrativa': narrativa,
         'nome_perfil': nome_perfil,
         'cenas_visitadas': cenas_visitadas,
         'total_cenas': total_cenas,
         'progresso_cenas_pct': progresso_cenas_pct,
-        'questionarios_respondidos': 0,
-        'total_questionarios': narrativa.cenas.filter(questionarios__isnull=False).count(),
-        'progresso_questionarios_pct': 0,
+        'questionarios_respondidos': questionarios_respondidos,
+        'total_questionarios': total_questionarios,
+        'progresso_questionarios_pct': progresso_questionarios_pct,
     })
