@@ -8,16 +8,26 @@
 
         <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
 
+        {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
             <div>
                 <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente</h3>
                 <p class="text-sm text-gray-400">Envie este link para que o paciente tenha acesso a todas as jornadas disponíveis da sua clínica.</p>
             </div>
 
-            <button onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:portal_paciente' clinica_id=request.user.clinica.id %}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
+            <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
                 <ion-icon name="share-social-outline" class="mr-2 text-xl"></ion-icon> Compartilhar Acesso Geral
             </button>
         </div>
+        {% else %}
+        <div class="mb-10 p-6 bg-amber-900/20 border border-amber-500/50 rounded-2xl flex items-center gap-4">
+            <ion-icon name="information-circle-outline" class="text-3xl text-amber-500"></ion-icon>
+            <div>
+                <h3 class="text-lg text-amber-400 font-bold mb-1">Modo Administrador</h3>
+                <p class="text-sm text-gray-400">Você está logado como Superusuário e não possui uma Clínica específica vinculada ao seu perfil. O link geral de pacientes não está disponível nesta visão.</p>
+            </div>
+        </div>
+        {% endif %}
 
         <h2 class="text-2xl font-bold text-gray-300 mb-6">Jornadas Disponíveis</h2>
 
