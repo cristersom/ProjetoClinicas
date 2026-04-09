@@ -163,15 +163,33 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
     context_object_name = "narrativas"
 
     def get_queryset(self):
-        if self.request.user.is_superuser: return Narrativa.objects.all()
+        if self.request.user.is_superuser:
+            return Narrativa.objects.all()
         if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             return Narrativa.objects.filter(clinica=self.request.user.clinica)
         return Narrativa.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        clinica_id = None
+        # Verifica se o usuário já tem uma clínica atrelada ao perfil
         if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
-            context['link_portal'] = self.request.build_absolute_uri(f'/portal/{self.request.user.clinica.id}/')
+            clinica_id = self.request.user.clinica.id
+
+        # MÁGICA DA DEMONSTRAÇÃO: Se for o Dono do Sistema (Superuser) e ele ainda não tem clínica, cria uma pra ele!
+        elif self.request.user.is_superuser:
+            clinica_demo, created = Clinica.objects.get_or_create(
+                nome="Clínica de Demonstração (Admin)",
+                defaults={'assinatura_ativa': True}
+            )
+            self.request.user.clinica = clinica_demo
+            self.request.user.save()
+            clinica_id = clinica_demo.id
+
+        if clinica_id:
+            context['link_portal'] = self.request.build_absolute_uri(f'/portal/{clinica_id}/')
+
         return context
 
 
@@ -218,7 +236,6 @@ def iniciar_jornada_paciente(request, narrativa_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # INTELIGÊNCIA RESTAURADA 1: Define o 'Perfil' do paciente
     sessao_paciente, created = SessaoPaciente.objects.get_or_create(session_key=session_key)
     if created or not sessao_paciente.narrativa_perfil:
         sessao_paciente.narrativa_perfil = narrativa
@@ -237,7 +254,6 @@ def exibir_cena_paciente(request, cena_id):
         request.session.create()
     session_key = request.session.session_key
 
-    # INTELIGÊNCIA RESTAURADA 2: Grava visita
     LogVisitaCena.objects.create(
         session_key=session_key,
         cena_visitada=cena,
@@ -261,7 +277,6 @@ def responder_questionario(request, cena_id, questionario_id):
         for pergunta in questionario.perguntas.all():
             resposta_key = f'pergunta_{pergunta.id}'
 
-            # INTELIGÊNCIA RESTAURADA 3: Coleta as respostas
             if pergunta.tipo_resposta in ['TEXTO', 'ESCALA_5', 'UNICA_ESCOLHA']:
                 texto = request.POST.get(resposta_key)
                 if texto:
@@ -296,7 +311,6 @@ def perfil_sessao(request, narrativa_id):
     total_cenas = narrativa.cenas.count()
     progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100) if total_cenas > 0 else 0
 
-    # LÓGICA DE QUESTIONÁRIOS ATIVADA:
     questionarios_respondidos = Resposta.objects.filter(
         session_key=session_key,
         pergunta__questionario__cena_associada__narrativa=narrativa
