@@ -24,6 +24,7 @@ class SaaSControlMiddleware:
             path.startswith('/checkout/') or # O Checkout não exige login (Frictionless)!
             path.startswith('/jornada/') or  # O paciente jogando
             path.startswith('/cena/') or     # Cenas e questionários
+            path.startswith('/portal/') or   # <--- AQUI ESTAVA O SEGREDO! Portal liberado pro paciente!
             path.startswith('/admin/')):     # Painel tem segurança própria
             return self.get_response(request)
 
