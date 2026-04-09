@@ -10,12 +10,12 @@
 
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
             <div>
-                <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente (Portal)</h3>
-                <p class="text-sm text-gray-400">Envie este link único para o seu paciente. Ele terá acesso a todas as jornadas disponíveis da sua clínica para escolher e jogar.</p>
+                <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente</h3>
+                <p class="text-sm text-gray-400">Envie este link para que o paciente tenha acesso a todas as jornadas disponíveis da sua clínica.</p>
             </div>
-            <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
-                <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon>
-                Compartilhar Portal
+
+            <button onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:portal_paciente' clinica_id=request.user.clinica.id %}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
+                <ion-icon name="share-social-outline" class="mr-2 text-xl"></ion-icon> Compartilhar Acesso Geral
             </button>
         </div>
 
@@ -24,6 +24,11 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for narrativa in narrativas %}
             <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-lg flex flex-col transition hover:-translate-y-1 duration-300">
+
+                {% if narrativa.thumb %}
+                <img src="{{ narrativa.thumb.url }}" alt="{{ narrativa.titulo }}" class="w-full h-48 object-cover">
+                {% endif %}
+
                 <div class="p-6 flex-1 flex flex-col">
                     <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
                     <p class="text-gray-400 text-sm mb-6 flex-1">{{ narrativa.descricao|default:"Sem descrição." }}</p>

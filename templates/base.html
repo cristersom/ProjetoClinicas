@@ -28,6 +28,8 @@
                         </span>
                     </a>
                 </div>
+
+                {% if 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path %}
                 <div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
@@ -41,6 +43,7 @@
                         <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
                     {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
     </nav>
