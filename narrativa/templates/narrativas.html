@@ -10,13 +10,14 @@
 
         {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg">
-            <h3 class="text-xl text-white font-bold mb-1">Portal do Paciente (Catálogo Geral)</h3>
-            <p class="text-sm text-gray-400 mb-4">Envie o link abaixo para o paciente acessar todas as jornadas disponíveis da sua clínica.</p>
+            <h3 class="text-xl text-teal-400 font-bold mb-1">Catálogo Geral da Clínica (Acesso do Paciente)</h3>
+            <p class="text-sm text-gray-400 mb-4">Envie o link abaixo para o paciente. Ele cairá em um portal exclusivo e sem necessidade de login para escolher qual jornada quer fazer.</p>
 
             <div class="flex flex-col sm:flex-row gap-3">
-                <input type="text" readonly value="{{ link_portal }}" class="w-full bg-gray-900 border border-gray-600 rounded-xl px-4 py-3 text-gray-300 focus:outline-none focus:border-teal-500 font-mono text-sm">
-                <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center justify-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
-                    <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> Copiar Link
+                <input type="text" readonly id="inputLinkPortal" value="{{ link_portal }}" class="w-full bg-gray-900 border border-gray-600 rounded-xl px-4 py-3 text-gray-300 focus:outline-none focus:border-teal-500 font-mono text-sm">
+
+                <button onclick="copiarDireto('{{ link_portal }}', this)" class="flex items-center justify-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
+                    <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> <span>Copiar Link</span>
                 </button>
             </div>
         </div>
@@ -52,26 +53,28 @@
                     <div class="mt-auto space-y-3">
                         <div class="flex gap-2">
                             <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex-1 flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-xl font-medium transition text-sm">
-                                <ion-icon name="information-circle-outline" class="mr-1"></ion-icon> Detalhes / Cenas
+                                <ion-icon name="information-circle-outline" class="mr-1"></ion-icon> Detalhes da Jornada
                             </a>
                         </div>
 
-                        <button onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}')" class="w-full flex justify-center items-center bg-gray-600 hover:bg-gray-500 text-white py-2 px-3 rounded-xl font-medium transition text-sm">
-                            <ion-icon name="share-social-outline" class="mr-1"></ion-icon> Copiar Link desta Jornada
+                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="w-full flex justify-center items-center bg-gray-600 hover:bg-gray-500 text-white py-2 px-3 rounded-xl font-medium transition text-sm">
+                            <ion-icon name="share-social-outline" class="mr-1"></ion-icon> <span>Copiar Link do Paciente</span>
                         </button>
 
-                        <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full">
-                            {% csrf_token %}
-                            <button type="submit" class="w-full border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white py-2 px-4 rounded-xl font-medium transition text-sm flex justify-center items-center">
-                                <ion-icon name="play-circle-outline" class="mr-2 text-lg"></ion-icon> Percorrer
-                            </button>
-                        </form>
+                        <div class="flex gap-2 pt-2 border-t border-gray-700">
+                            <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="flex-1">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white py-2 px-2 rounded-xl font-medium transition text-sm flex justify-center items-center">
+                                    <ion-icon name="play-circle-outline" class="mr-1 text-lg"></ion-icon> Percorrer
+                                </button>
+                            </form>
 
-                        {% if request.user.is_staff %}
-                        <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="block w-full text-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white py-2 px-4 rounded-xl font-medium transition text-sm mt-2">
-                            <ion-icon name="construct-outline" class="mr-1"></ion-icon> Editar (Admin)
-                        </a>
-                        {% endif %}
+                            {% if request.user.is_staff %}
+                            <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="flex-1 flex justify-center items-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white py-2 px-2 rounded-xl font-medium transition text-sm">
+                                <ion-icon name="construct-outline" class="mr-1 text-lg"></ion-icon> Editar
+                            </a>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -84,4 +87,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Função nova e blindada para copiar o link corretamente
+    function copiarDireto(urlTexto, botaoElemento) {
+        navigator.clipboard.writeText(urlTexto).then(() => {
+            const spanTexto = botaoElemento.querySelector('span');
+            const textoOriginal = spanTexto.innerText;
+            spanTexto.innerText = "Copiado!";
+            botaoElemento.classList.replace('bg-gray-600', 'bg-green-600');
+            botaoElemento.classList.replace('bg-teal-600', 'bg-green-600');
+
+            setTimeout(() => {
+                spanTexto.innerText = textoOriginal;
+                botaoElemento.classList.replace('bg-green-600', 'bg-gray-600');
+                botaoElemento.classList.replace('bg-green-600', 'bg-teal-600');
+            }, 2000);
+        }).catch(err => {
+            alert("Erro ao copiar o link. Copie manualmente a URL: " + urlTexto);
+        });
+    }
+</script>
 {% endblock %}

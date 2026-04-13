@@ -54,7 +54,7 @@ class CategoriaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
 
 
 # ==========================================
-# ISOLAMENTO MULTI-TENANT (SISTEMA PARA O CLIENTE)
+# ISOLAMENTO MULTI-TENANT E LÓGICA DE CLÍNICA PRINCIPAL
 # ==========================================
 class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
@@ -68,7 +68,7 @@ class TenantPermissionsMixin:
     def has_delete_permission(self, request, obj=None): return True
 
 
-# --- JORNADA CLINICA (Com Relatórios V1 Restaurados) ---
+# --- JORNADA CLINICA ---
 
 class EscolhaInline(admin.TabularInline):
     model = Escolha
@@ -112,7 +112,12 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
     list_filter = ('categoria',)
-    exclude = ('clinica', 'visualizacoes')
+
+    # Esconde a clínica para os usuários normais. Admins continuam vendo.
+    def get_exclude(self, request, obj=None):
+        if request.user.is_superuser:
+            return ('visualizacoes',)
+        return ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -122,8 +127,21 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
         return qs.none()
 
     def save_model(self, request, obj, form, change):
-        if not getattr(obj, 'clinica', None) and hasattr(request.user, 'clinica'):
+        # 1. Se quem está criando é um psicólogo normal (não admin) e tem clínica
+        if not request.user.is_superuser and hasattr(request.user, 'clinica'):
             obj.clinica = request.user.clinica
+
+        # 2. Se for Admin, e a narrativa está sendo salva SEM clínica
+        elif request.user.is_superuser and not obj.clinica:
+            # Tenta pegar a clínica atrelada ao perfil do admin
+            if hasattr(request.user, 'clinica') and request.user.clinica:
+                obj.clinica = request.user.clinica
+            else:
+                # Se o admin não tem clínica, atrela à primeira clínica do sistema (Clínica Principal)
+                primeira_clinica = Clinica.objects.first()
+                if primeira_clinica:
+                    obj.clinica = primeira_clinica
+
         super().save_model(request, obj, form, change)
 
     def get_urls(self):
@@ -335,7 +353,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
         dados = {}
 
-        # AQUI FOI ADICIONADA A LÓGICA DE EXPORTAÇÃO PARA O DETALHADO!
         export_format = request.GET.get('export')
         if export_format in ['xlsx', 'csv', 'json']:
             perguntas_ordenadas = questionario.perguntas.all().order_by('id')
@@ -393,7 +410,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    # IMPORTANTE: Habilita explicitamente a exportação no painel Admin para furar o bloqueio do Tenant
+    # IMPORTANTE: Habilita explicitamente a exportação no painel Admin
     def has_export_permission(self, request):
         return True
 
