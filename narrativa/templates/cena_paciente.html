@@ -2,18 +2,18 @@
 {% load static %}
 
 {% block content %}
-<main class="min-h-screen bg-gray-900 text-white pb-12" style="background-image: url('{% static 'images/background.png' %}'); background-size: cover; background-position: center;">
+<main class="min-h-screen bg-gray-900 text-white py-10" style="background-image: url('{% static 'images/background.png' %}'); background-size: cover; background-position: center;">
 
-    <div class="max-w-3xl mx-auto pt-24 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="mb-8 flex justify-between items-center">
             <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}" class="text-teal-400 hover:text-teal-300 flex items-center transition font-semibold">
-                <ion-icon name="arrow-back-outline" class="w-5 h-5 mr-2"></ion-icon> Ver Resumo da Sessão
+                <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon> Resumo da Sessão
             </a>
 
             {% if request.user.is_staff %}
-            <a href="{% url 'admin:narrativa_cena_change' cena.id %}" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg font-bold flex items-center shadow-lg transition">
-                <ion-icon name="create-outline" class="mr-2 text-xl"></ion-icon> Editar Cena (Admin)
+            <a href="{% url 'admin:narrativa_cena_change' cena.id %}" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold flex items-center shadow-lg transition">
+                <ion-icon name="create-outline" class="mr-1"></ion-icon> Editar Cena
             </a>
             {% endif %}
         </div>
@@ -34,39 +34,40 @@
             </div>
         {% endif %}
 
-        <div class="mt-8 space-y-6">
+        <div class="mt-8 space-y-8">
 
             {% for questionario in cena.questionarios.all %}
                 <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700 transform transition hover:-translate-y-1">
                     <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
                     <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Pesquisa Rápida</p>
-                    <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=questionario.id %}" class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-amber-900/40">
+                    <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=questionario.id %}" class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
                         <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon> Responder Agora
                     </a>
                 </div>
             {% endfor %}
 
             {% if cena.escolhas.all %}
-                <div class="space-y-4 mt-8">
+                <div class="pt-4">
                     {% if not cena.questionarios.all %}
                         <h3 class="text-center text-gray-400 mb-6 uppercase tracking-widest text-sm font-bold">O que você faz agora?</h3>
                     {% endif %}
 
-                    {% for escolha in cena.escolhas.all %}
-                        {% if escolha.cena_destino %}
-                            <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}" class="block w-full text-center bg-teal-600 hover:bg-teal-500 border border-teal-500 text-white text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg hover:shadow-teal-900/50">
-                                {{ escolha.texto_da_opcao }}
-                            </a>
-                        {% else %}
-                            <button onclick="alert('Esta opção ainda não tem uma próxima cena configurada pela clínica.')" class="block w-full text-center bg-gray-800 border border-gray-700 text-gray-400 text-lg font-medium py-4 px-6 rounded-xl shadow-md opacity-75 cursor-not-allowed">
-                                {{ escolha.texto_da_opcao }} (Em construção)
-                            </button>
-                        {% endif %}
-                    {% endfor %}
+                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
+                        {% for escolha in cena.escolhas.all %}
+                            {% if escolha.cena_destino %}
+                                <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}" class="flex-1 min-w-[200px] text-center bg-teal-600 hover:bg-teal-500 border border-teal-500 text-white text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
+                                    {{ escolha.texto_da_opcao }}
+                                </a>
+                            {% else %}
+                                <button class="flex-1 min-w-[200px] text-center bg-gray-800 border border-gray-700 text-gray-400 text-lg font-medium py-4 px-6 rounded-xl shadow-md opacity-75 cursor-not-allowed">
+                                    {{ escolha.texto_da_opcao }} (Em construção)
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
-            {% else %}
+            {% elif not cena.questionarios.all %}
                 <div class="mt-8 p-6 bg-red-900/20 border border-red-500/50 rounded-xl text-center">
-                    <ion-icon name="warning-outline" class="text-4xl text-red-400 mb-2"></ion-icon>
                     <p class="text-red-400 font-bold mb-1">Fim da Linha</p>
                     <p class="text-gray-400 text-sm">Esta cena não possui escolhas cadastradas para continuar a jornada.</p>
                 </div>

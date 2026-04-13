@@ -12,6 +12,7 @@
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
     {% block navbar %}
+    {% if 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path and 'perfil' not in request.path %}
     <nav class="fixed w-full z-40 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
@@ -26,7 +27,6 @@
                     </a>
                 </div>
 
-                {% if request.user.is_authenticated or 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path %}
                 <div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
@@ -40,73 +40,15 @@
                         <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
                     {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </nav>
+    {% endif %}
     {% endblock %}
 
     <div class="flex-grow">
         {% block content %}{% endblock %}
     </div>
 
-    <div id="shareModal" class="fixed inset-0 z-50 hidden bg-black/70 backdrop-blur-sm flex items-center justify-center px-4">
-        <div class="bg-gray-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-700 overflow-hidden transform transition-all">
-            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-                <h3 class="text-xl font-bold text-white">Compartilhar com Paciente</h3>
-                <button onclick="fecharModalShare()" class="text-gray-400 hover:text-white transition text-2xl">
-                    <ion-icon name="close-outline"></ion-icon>
-                </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-                <p class="text-sm text-gray-400 text-center mb-6">Como você deseja enviar este acesso?</p>
-
-                <button id="btnShareWpp" class="w-full flex items-center justify-center py-4 px-4 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-bold transition shadow-lg">
-                    <ion-icon name="logo-whatsapp" class="mr-3 text-2xl"></ion-icon>
-                    Enviar pelo WhatsApp
-                </button>
-
-                <button id="btnShareCopy" class="w-full flex items-center justify-center py-4 px-4 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white rounded-xl font-bold transition">
-                    <ion-icon name="copy-outline" class="mr-3 text-2xl"></ion-icon>
-                    Copiar Link Direto
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentShareUrl = "";
-        function copiarLink(url) {
-            currentShareUrl = url;
-            if (navigator.share && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                navigator.share({
-                    title: 'Jornada Clínica - Acesso',
-                    text: 'Acesse o portal clicando no link abaixo:',
-                    url: currentShareUrl
-                }).catch((error) => console.log('Erro:', error));
-            } else {
-                document.getElementById('shareModal').classList.remove('hidden');
-            }
-        }
-        function fecharModalShare() {
-            document.getElementById('shareModal').classList.add('hidden');
-        }
-        document.getElementById('btnShareWpp').addEventListener('click', function() {
-            const mensagem = encodeURIComponent("Olá! Aqui está o link de acesso:\n\n" + currentShareUrl);
-            window.open("https://api.whatsapp.com/send?text=" + mensagem, "_blank");
-            fecharModalShare();
-        });
-        document.getElementById('btnShareCopy').addEventListener('click', function() {
-            navigator.clipboard.writeText(currentShareUrl).then(() => {
-                const btn = document.getElementById('btnShareCopy');
-                const textoOriginal = btn.innerHTML;
-                btn.innerHTML = '<ion-icon name="checkmark-circle" class="mr-3 text-2xl text-teal-400"></ion-icon> Copiado!';
-                setTimeout(() => { btn.innerHTML = textoOriginal; fecharModalShare(); }, 2000);
-            }).catch(err => {
-                alert("Erro ao copiar: " + currentShareUrl);
-            });
-        });
-    </script>
-</body>
+    </body>
 </html>
