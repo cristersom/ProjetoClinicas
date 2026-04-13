@@ -11,7 +11,7 @@
         {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
             <div>
-                <h3 class="text-xl text-teal-400 font-bold mb-1">Catálogo Geral da Clínica</h3>
+                <h3 class="text-xl text-teal-400 font-bold mb-1">Catálogo Geral da Clínica (Portal)</h3>
                 <p class="text-sm text-gray-400">Envie o link do portal para o paciente ter acesso a todas as jornadas. Sem necessidade de login.</p>
             </div>
             <button onclick="copiarDireto('{{ link_portal }}', this)" class="flex items-center justify-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-8 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
@@ -47,27 +47,30 @@
                     <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
                     <p class="text-gray-400 text-sm mb-6 flex-1 line-clamp-3">{{ narrativa.descricao|default:"Sem descrição." }}</p>
 
-                    <div class="mt-auto space-y-3">
-                        <div class="flex gap-2">
-                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex-1 flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-2 px-2 rounded-xl font-medium transition text-xs sm:text-sm">
-                                <ion-icon name="information-circle-outline" class="mr-1"></ion-icon> Detalhes
+                    <div class="mt-auto pt-4 border-t border-gray-700">
+                        <div class="flex gap-2 w-full h-10">
+                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="group flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Detalhes">
+                                <ion-icon name="information-circle-outline" class="text-xl flex-shrink-0"></ion-icon>
+                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Detalhes</span>
                             </a>
-                            <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="flex-1 flex justify-center items-center bg-teal-700 hover:bg-teal-600 text-white py-2 px-2 rounded-xl font-medium transition text-xs sm:text-sm">
-                                <ion-icon name="share-social-outline" class="mr-1"></ion-icon> <span>Link Direto</span>
-                            </button>
-                        </div>
 
-                        <div class="flex gap-2 pt-2 border-t border-gray-700">
-                            <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="flex-1">
+                            <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="group flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Copiar Link">
+                                <ion-icon name="share-social-outline" class="text-xl flex-shrink-0"></ion-icon>
+                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Link</span>
+                            </button>
+
+                            <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="flex flex-1 hover:flex-[3] transition-all duration-300">
                                 {% csrf_token %}
-                                <button type="submit" class="w-full border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white py-2 px-2 rounded-xl font-medium transition text-sm flex justify-center items-center">
-                                    <ion-icon name="play-circle-outline" class="mr-1 text-lg"></ion-icon> Percorrer
+                                <button type="submit" class="group flex items-center justify-center border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white rounded-xl w-full transition-all duration-300 overflow-hidden" title="Percorrer">
+                                    <ion-icon name="play-circle-outline" class="text-xl flex-shrink-0"></ion-icon>
+                                    <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Percorrer</span>
                                 </button>
                             </form>
 
                             {% if request.user.is_staff %}
-                            <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="flex-1 flex justify-center items-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white py-2 px-2 rounded-xl font-medium transition text-sm">
-                                <ion-icon name="construct-outline" class="mr-1 text-lg"></ion-icon> Editar
+                            <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="group flex items-center justify-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Editar no Admin">
+                                <ion-icon name="construct-outline" class="text-xl flex-shrink-0"></ion-icon>
+                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Editar</span>
                             </a>
                             {% endif %}
                         </div>

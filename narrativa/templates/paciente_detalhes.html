@@ -47,24 +47,27 @@
                     <p class="text-lg text-gray-300 leading-relaxed">{{ narrativa.descricao|default:"Nenhuma descrição detalhada informada."|linebreaksbr }}</p>
                 </div>
 
-                {% if request.user.is_authenticated %}
-                <div class="mb-10 flex items-center justify-between bg-gray-900/80 p-5 rounded-2xl border-l-4 border-l-teal-500">
-                    <div>
-                        <h3 class="text-lg font-bold text-white mb-1">Link Direto do Paciente</h3>
-                        <p class="text-sm text-gray-400">Copie o link seguro desta jornada para compartilhar.</p>
-                    </div>
-                    <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="py-3 px-6 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold transition shadow-lg flex items-center whitespace-nowrap">
-                        <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> <span>Copiar</span>
-                    </button>
-                </div>
-                {% endif %}
+                <div class="grid grid-cols-1 {% if request.user.is_authenticated %}md:grid-cols-2{% endif %} gap-4 mb-12 border-b border-gray-700 pb-10">
 
-                <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full mb-12">
-                    {% csrf_token %}
-                    <button type="submit" class="w-full py-5 px-6 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 text-white rounded-2xl font-extrabold transition-all duration-300 shadow-xl flex justify-center items-center text-xl transform hover:-translate-y-1">
-                        <ion-icon name="play-circle" class="mr-3 text-3xl"></ion-icon> Iniciar Jornada
-                    </button>
-                </form>
+                    {% if request.user.is_authenticated %}
+                    <div class="bg-gray-900/80 p-3 rounded-2xl border-l-4 border-l-teal-500 flex items-center justify-between shadow-inner">
+                        <div class="flex-1 min-w-0 pr-3">
+                            <h3 class="text-xs text-gray-400 uppercase font-bold tracking-wider mb-1">Compartilhar Jornada</h3>
+                            <p class="text-sm text-white truncate w-full font-mono">{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}</p>
+                        </div>
+                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="bg-gray-700 hover:bg-teal-600 text-white px-4 py-3 rounded-xl font-bold transition shadow-lg flex items-center whitespace-nowrap h-full">
+                            <ion-icon name="copy-outline" class="mr-2"></ion-icon> <span>Copiar</span>
+                        </button>
+                    </div>
+                    {% endif %}
+
+                    <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="h-full w-full">
+                        {% csrf_token %}
+                        <button type="submit" class="w-full h-full min-h-[70px] bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 text-white rounded-2xl font-extrabold transition-all shadow-xl flex justify-center items-center text-xl transform hover:-translate-y-1">
+                            <ion-icon name="play-circle" class="mr-3 text-3xl"></ion-icon> Iniciar Jornada
+                        </button>
+                    </form>
+                </div>
 
                 <div>
                     <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
@@ -74,14 +77,22 @@
                     {% if narrativa.cenas.exists %}
                     <div class="space-y-3">
                         {% for cena in narrativa.cenas.all|dictsort:"ordem" %}
-                        <div class="bg-gray-900/50 border border-gray-700 p-4 rounded-xl flex items-center gap-4">
-                            <div class="bg-gray-800 text-teal-500 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm">
-                                {{ forloop.counter }}
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="text-white font-semibold">{{ cena.titulo }}</h4>
-                                <p class="text-xs text-gray-400 truncate max-w-md">{{ cena.conteudo_textual|striptags }}</p>
-                            </div>
+                        <div class="relative group">
+                            <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=cena.id %}" class="block bg-gray-900/50 hover:bg-gray-800 border border-gray-700 hover:border-teal-500 p-4 rounded-xl flex items-center gap-4 transition-all pr-16 shadow-sm hover:shadow-teal-900/30">
+                                <div class="bg-gray-800 text-teal-500 group-hover:bg-teal-600 group-hover:text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors">
+                                    {{ forloop.counter }}
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-white font-semibold">{{ cena.titulo }}</h4>
+                                    <p class="text-xs text-gray-400 truncate max-w-md">{{ cena.conteudo_textual|striptags }}</p>
+                                </div>
+                            </a>
+
+                            {% if request.user.is_authenticated %}
+                            <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:exibir_cena_paciente' cena_id=cena.id %}', this)" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-700 hover:bg-teal-600 text-white p-2 rounded-lg transition shadow-md z-10 flex items-center justify-center" title="Copiar link direto para esta cena">
+                                <ion-icon name="copy-outline" class="text-lg"></ion-icon>
+                            </button>
+                            {% endif %}
                         </div>
                         {% endfor %}
                     </div>
@@ -99,13 +110,17 @@
 <script>
     function copiarDireto(urlTexto, botaoElemento) {
         navigator.clipboard.writeText(urlTexto).then(() => {
-            const spanTexto = botaoElemento.querySelector('span');
-            const textoOriginal = spanTexto.innerText;
-            spanTexto.innerText = "Copiado!";
+            const icone = botaoElemento.querySelector('ion-icon');
+            const span = botaoElemento.querySelector('span'); // Pode não existir no botão da cena
+
+            icone.setAttribute('name', 'checkmark-outline');
             botaoElemento.classList.add('bg-green-600');
+            if(span) span.innerText = "Copiado!";
+
             setTimeout(() => {
-                spanTexto.innerText = textoOriginal;
+                icone.setAttribute('name', 'copy-outline');
                 botaoElemento.classList.remove('bg-green-600');
+                if(span) span.innerText = "Copiar";
             }, 2000);
         }).catch(err => { alert("Erro ao copiar."); });
     }

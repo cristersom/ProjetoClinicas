@@ -35,9 +35,7 @@
                             <ion-icon name="image-outline" class="text-6xl text-gray-700"></ion-icon>
                         </div>
                     {% endif %}
-                    
                     <div class="absolute inset-0 bg-gray-900/40 group-hover:bg-transparent transition duration-300"></div>
-                    
                     <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300">
                         <div class="bg-teal-500/90 text-white rounded-full p-4 transform scale-75 group-hover:scale-100 transition duration-300 shadow-lg">
                             <ion-icon name="play" class="text-3xl pl-1"></ion-icon>
@@ -51,16 +49,17 @@
                         {{ narrativa.categoria.titulo }}
                     </span>
                     {% endif %}
-                    
-                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-teal-400 transition">{{ narrativa.titulo }}</h3>
-                    <p class="text-gray-400 text-base leading-relaxed flex-1 line-clamp-3">{{ narrativa.descricao|default:"Clique para iniciar esta jornada." }}</p>
+
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-teal-400 transition">{{ narrativa.titulo }}</h3>
+
+                    <p class="text-gray-400 text-sm leading-relaxed flex-1 line-clamp-3">{{ narrativa.descricao|default:"Clique para iniciar esta jornada." }}</p>
                 </div>
             </a>
             {% empty %}
             <div class="col-span-full text-center py-16 bg-gray-800/50 rounded-3xl border border-gray-700">
                 <ion-icon name="leaf-outline" class="text-6xl text-gray-600 mb-4"></ion-icon>
                 <h3 class="text-2xl font-bold text-gray-300 mb-2">Nenhuma jornada disponível</h3>
-                <p class="text-gray-500 text-lg">A clínica ainda não disponibilizou narrativas neste catálogo.</p>
+                <p class="text-gray-500 text-lg">A clínica ainda não publicou jornadas interativas.</p>
             </div>
             {% endfor %}
         </div>
