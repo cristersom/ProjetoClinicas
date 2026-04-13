@@ -6,9 +6,13 @@
 <div class="min-h-screen bg-gray-900 pt-24 px-4 sm:px-6 lg:px-8 pb-12">
     <div class="max-w-4xl mx-auto">
 
-        {% if narrativa.clinica %}
+        {% if request.user.is_authenticated %}
+        <a href="{% url 'narrativa:narrativas' %}" class="inline-flex items-center text-teal-400 hover:text-teal-300 font-semibold mb-6 transition">
+            <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon> Voltar ao Painel
+        </a>
+        {% elif narrativa.clinica %}
         <a href="{% url 'narrativa:portal_paciente' clinica_id=narrativa.clinica.id %}" class="inline-flex items-center text-teal-400 hover:text-teal-300 font-semibold mb-6 transition">
-            <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon> Voltar ao Catálogo
+            <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon> Voltar ao Catálogo da Clínica
         </a>
         {% endif %}
 
@@ -26,7 +30,6 @@
             <p class="text-lg text-gray-300 mb-10 leading-relaxed">{{ narrativa.descricao }}</p>
 
             <div class="flex flex-col sm:flex-row gap-4">
-
                 <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full sm:w-1/2">
                     {% csrf_token %}
                     <button type="submit" class="w-full py-4 px-6 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold transition shadow-lg flex justify-center items-center">
