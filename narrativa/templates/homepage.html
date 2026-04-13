@@ -1,51 +1,161 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Narrativas Clínicas - Plataforma Interativa{% endblock %}
+{% block titulo %}Narrativas Clínicas - Revolucione o Engajamento dos seus Pacientes{% endblock %}
 
 {% block content %}
-<main class="min-h-screen bg-gray-900 text-white selection:bg-teal-500 selection:text-white flex flex-col">
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden flex-grow">
-        <div class="absolute inset-0 z-0">
-            <img src="{% static 'images/background.png' %}" class="w-full h-full object-cover opacity-20" alt="Background">
-            <div class="absolute inset-0 bg-gradient-to-b from-gray-900/80 to-gray-900"></div>
+<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-gray-900">
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] opacity-20 pointer-events-none">
+        <div class="absolute inset-0 bg-gradient-to-r from-teal-500 to-blue-600 blur-[100px] rounded-full mix-blend-screen"></div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 drop-shadow-lg">
+            Revolucione a <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-blue-500">Jornada Terapêutica</span><br/> dos seus Pacientes
+        </h1>
+
+        <p class="mt-6 text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-10">
+            Crie narrativas interativas personalizadas. Aumente o engajamento entre as sessões, simule cenários da vida real e colete dados clínicos através de decisões lúdicas.
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <a href="{% url 'narrativa:criarconta' %}" class="px-8 py-4 text-lg font-extrabold rounded-full text-white bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 shadow-xl hover:shadow-teal-900/50 transition-all transform hover:-translate-y-1 flex justify-center items-center">
+                <ion-icon name="rocket-outline" class="mr-2 text-2xl"></ion-icon> Começar Agora
+            </a>
+            <a href="{% url 'narrativa:planos' %}" class="px-8 py-4 text-lg font-bold rounded-full text-teal-400 bg-gray-800 hover:bg-gray-700 border border-gray-700 transition-all shadow-lg flex justify-center items-center">
+                <ion-icon name="pricetags-outline" class="mr-2 text-2xl"></ion-icon> Ver Planos e Preços
+            </a>
         </div>
+    </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-10">
-            <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 drop-shadow-lg">
-                Jornadas clínicas e <span class="text-teal-500">pesquisas</span><br>
-                em um só lugar.
-            </h1>
-            <p class="mt-4 max-w-2xl text-xl text-gray-400 mx-auto mb-10">
-                Crie onde quiser. Aplique quando quiser. Aumente o engajamento dos seus pacientes com narrativas altamente interativas.
-            </p>
+    <div class="max-w-6xl mx-auto mt-16 px-4 relative z-10">
+        <div class="rounded-2xl border border-gray-700 bg-gray-800 shadow-2xl overflow-hidden transform transition hover:scale-[1.02] duration-500">
+            <img src="{% static 'images/seu_banner_gerado.png' %}" alt="Preview do Sistema Narrativas Clínicas" class="w-full h-auto object-cover opacity-90 hover:opacity-100 transition-opacity" style="min-height: 300px; background: linear-gradient(135deg, #111827 0%, #1f2937 100%);">
 
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 px-8 rounded-full transition shadow-lg shadow-teal-900/50 text-lg flex items-center justify-center">
-                    Ver Planos
-                    <ion-icon name="arrow-forward" class="ml-2"></ion-icon>
-                </a>
-
-                {% if user.is_authenticated %}
-                    <a href="{% url 'narrativa:narrativas' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
-                        <ion-icon name="grid" class="mr-2"></ion-icon>
-                        Ir para o Painel
-                    </a>
-                {% else %}
-                    <a href="{% url 'narrativa:login' %}" class="bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-bold py-4 px-8 rounded-full transition shadow-lg text-lg flex items-center justify-center">
-                        Acessar Conta
-                    </a>
-                {% endif %}
+            <div class="absolute inset-0 flex items-center justify-center text-gray-600 text-xl font-bold uppercase tracking-widest pointer-events-none opacity-50">
+                [ Espaço para o seu Banner/Mockup da Aplicação ]
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="border-t border-gray-800 py-10 bg-gray-900 relative z-10">
-        <div class="max-w-7xl mx-auto px-4 text-center">
-            <p class="text-gray-400 text-sm">
-                &copy; 2026 Narrativas Clínicas. Todos os direitos reservados.
-            </p>
+
+<section class="py-24 bg-gray-800 border-y border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-16">
+            <h2 class="text-teal-500 font-bold tracking-wide uppercase text-sm mb-2">Por que escolher o nosso SaaS?</h2>
+            <h3 class="text-3xl md:text-4xl font-extrabold text-white">Ferramentas de ponta para a saúde mental</h3>
         </div>
-    </footer>
-</main>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="bg-gray-900 p-8 rounded-3xl border border-gray-700 shadow-lg hover:-translate-y-2 transition-transform duration-300 group">
+                <div class="w-16 h-16 bg-teal-900/50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-teal-600 transition-colors">
+                    <ion-icon name="game-controller-outline" class="text-3xl text-teal-400 group-hover:text-white transition-colors"></ion-icon>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">Engajamento Lúdico</h4>
+                <p class="text-gray-400 leading-relaxed">
+                    Transforme questionários chatos em aventuras interativas. Seus pacientes tomam decisões e você entende os padrões de comportamento na prática.
+                </p>
+            </div>
+
+            <div class="bg-gray-900 p-8 rounded-3xl border border-gray-700 shadow-lg hover:-translate-y-2 transition-transform duration-300 group">
+                <div class="w-16 h-16 bg-blue-900/50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 transition-colors">
+                    <ion-icon name="analytics-outline" class="text-3xl text-blue-400 group-hover:text-white transition-colors"></ion-icon>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">Dados Valiosos</h4>
+                <p class="text-gray-400 leading-relaxed">
+                    Saiba exatamente quais escolhas foram feitas e gere relatórios instantâneos de percurso. Monitoramento de decisões em tempo real.
+                </p>
+            </div>
+
+            <div class="bg-gray-900 p-8 rounded-3xl border border-gray-700 shadow-lg hover:-translate-y-2 transition-transform duration-300 group">
+                <div class="w-16 h-16 bg-amber-900/50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-500 transition-colors">
+                    <ion-icon name="color-wand-outline" class="text-3xl text-amber-400 group-hover:text-white transition-colors"></ion-icon>
+                </div>
+                <h4 class="text-xl font-bold text-white mb-3">100% Personalizável</h4>
+                <p class="text-gray-400 leading-relaxed">
+                    Crie cenas, adicione imagens, configure questionários rápidos ("Pesquisas Clínicas") e adapte toda a narrativa para as demandas da sua clínica.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="py-24 bg-gray-900 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-20">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Como funciona na prática?</h2>
+            <p class="text-xl text-gray-400">Implemente em sua clínica em 3 passos simples.</p>
+        </div>
+
+        <div class="space-y-16">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 md:text-right">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-teal-600 text-white font-bold rounded-full mb-4 text-xl">1</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Desenhe a História</h3>
+                    <p class="text-gray-400 text-lg leading-relaxed">Use nosso painel intuitivo para criar cenas, ramificações de escolhas e adicionar perguntas chave. Você é o roteirista da experiência do seu paciente.</p>
+                </div>
+                <div class="flex-1 w-full bg-gray-800 h-64 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
+                    <img src="{% static 'images/passo1.png' %}" alt="Criação de cenas" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 flex items-center justify-center"><ion-icon name="create" class="text-6xl text-gray-600"></ion-icon></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row-reverse items-center gap-12">
+                <div class="flex-1">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-teal-600 text-white font-bold rounded-full mb-4 text-xl">2</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Compartilhe o Link</h3>
+                    <p class="text-gray-400 text-lg leading-relaxed">Envie o link seguro via WhatsApp ou E-mail. O paciente acessa de qualquer celular ou computador, sem precisar baixar aplicativos ou criar senhas.</p>
+                </div>
+                <div class="flex-1 w-full bg-gray-800 h-64 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
+                    <img src="{% static 'images/passo2.png' %}" alt="Compartilhamento" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 flex items-center justify-center"><ion-icon name="share-social" class="text-6xl text-gray-600"></ion-icon></div>
+                </div>
+            </div>
+
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="flex-1 md:text-right">
+                    <div class="inline-flex items-center justify-center w-12 h-12 bg-teal-600 text-white font-bold rounded-full mb-4 text-xl">3</div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Analise os Resultados</h3>
+                    <p class="text-gray-400 text-lg leading-relaxed">Acesse o seu Dashboard para ver relatórios detalhados, baixar planilhas (Excel/CSV) e entender as decisões terapêuticas de cada indivíduo.</p>
+                </div>
+                <div class="flex-1 w-full bg-gray-800 h-64 rounded-3xl border border-gray-700 shadow-2xl relative overflow-hidden">
+                    <img src="{% static 'images/passo3.png' %}" alt="Relatórios" class="w-full h-full object-cover opacity-60">
+                    <div class="absolute inset-0 flex items-center justify-center"><ion-icon name="bar-chart" class="text-6xl text-gray-600"></ion-icon></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section class="py-20 relative">
+    <div class="absolute inset-0 bg-gradient-to-b from-gray-900 to-teal-900/20"></div>
+    <div class="max-w-4xl mx-auto px-4 relative z-10 text-center bg-gray-800/80 backdrop-blur-md p-10 md:p-16 rounded-3xl border border-teal-500/30 shadow-2xl">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-6">Pronto para elevar o nível da sua clínica?</h2>
+        <p class="text-xl text-gray-300 mb-10">Junte-se a dezenas de profissionais que já estão modernizando seus atendimentos e gerando resultados reais.</p>
+
+        <a href="{% url 'narrativa:planos' %}" class="inline-flex justify-center items-center px-10 py-5 text-xl font-bold rounded-full text-white bg-teal-600 hover:bg-teal-500 shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all transform hover:-translate-y-1">
+            <ion-icon name="medkit-outline" class="mr-3 text-2xl"></ion-icon> Conhecer Planos
+        </a>
+    </div>
+</section>
+
+<footer class="bg-gray-950 py-12 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+        <div class="flex items-center gap-2 mb-4 md:mb-0">
+            <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
+                <ion-icon name="medkit" class="text-xl"></ion-icon>
+            </div>
+            <span class="text-xl font-extrabold tracking-tight text-white">
+                Narrativas<span class="text-teal-500">Clínicas</span>
+            </span>
+        </div>
+        <p class="text-gray-500 text-sm text-center">
+            &copy; 2026 Narrativas Clínicas. Todos os direitos reservados.
+        </p>
+    </div>
+</footer>
 {% endblock %}
