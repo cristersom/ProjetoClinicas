@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block titulo %}{{ narrativa.titulo }} - Dashboard da Jornada{% endblock %}
+{% block titulo %}{{ narrativa.titulo }} - Início{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gray-900 pt-24 px-4 sm:px-6 lg:px-8 pb-12">
@@ -19,7 +19,7 @@
 
             {% if request.user.is_staff %}
             <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="inline-flex items-center text-amber-500 hover:text-amber-400 font-semibold transition">
-                <ion-icon name="construct-outline" class="mr-2"></ion-icon> Painel Admin
+                <ion-icon name="construct-outline" class="mr-2"></ion-icon> Editar (Admin)
             </a>
             {% endif %}
         </div>
@@ -32,51 +32,63 @@
 
                 <div class="absolute bottom-6 left-8 right-8">
                     <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-3 drop-shadow-lg">{{ narrativa.titulo }}</h1>
+                    {% if request.user.is_authenticated %}
                     <div class="flex items-center text-gray-300 space-x-4 font-medium">
                         <span class="flex items-center bg-gray-900/50 px-3 py-1 rounded-full backdrop-blur-sm border border-gray-600">
                             <ion-icon name="eye-outline" class="mr-2"></ion-icon> {{ narrativa.visualizacoes }} acessos
                         </span>
                     </div>
+                    {% endif %}
                 </div>
             </div>
             {% else %}
             <div class="p-8 pb-0 border-b border-gray-700">
                 <h1 class="text-4xl md:text-5xl font-extrabold text-white mb-4">{{ narrativa.titulo }}</h1>
+                {% if request.user.is_authenticated %}
                 <div class="flex items-center text-gray-400 space-x-4 mb-6">
                     <span class="flex items-center bg-gray-700 px-3 py-1 rounded-full text-sm">
                         <ion-icon name="eye-outline" class="mr-2"></ion-icon> {{ narrativa.visualizacoes }} acessos
                     </span>
                 </div>
+                {% endif %}
             </div>
             {% endif %}
 
             <div class="p-8">
-                <h3 class="text-lg font-bold text-teal-400 mb-2">Sobre esta Jornada</h3>
-                <p class="text-lg text-gray-300 leading-relaxed mb-10">{{ narrativa.descricao|default:"Nenhuma descrição detalhada informada para esta jornada." }}</p>
+                <div class="mb-10 bg-gray-900/40 p-6 rounded-2xl border border-gray-700">
+                    <h3 class="text-xl font-bold text-teal-400 mb-3 flex items-center">
+                        <ion-icon name="information-circle-outline" class="mr-2 text-2xl"></ion-icon> Sobre esta Jornada
+                    </h3>
+                    <p class="text-lg text-gray-300 leading-relaxed">{{ narrativa.descricao|default:"Nenhuma descrição detalhada informada para esta jornada."|linebreaksbr }}</p>
+                </div>
 
-                <div class="mb-12 border-b border-gray-700 pb-10">
-                    <h3 class="text-lg font-bold text-teal-400 mb-3">Link do Paciente (Compartilhamento)</h3>
-                    <p class="text-sm text-gray-400 mb-4">Envie o link abaixo. O paciente não precisará de login para acessar.</p>
+                {% if request.user.is_authenticated %}
+                <div class="mb-12 border-b border-gray-700 pb-10 bg-gray-900/80 p-6 rounded-2xl border-l-4 border-l-teal-500">
+                    <h3 class="text-lg font-bold text-white mb-2 flex items-center">
+                        <ion-icon name="link-outline" class="mr-2"></ion-icon> Link do Paciente
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-4">Copie o link abaixo para enviar diretamente a esta jornada.</p>
 
-                    <div class="flex flex-col sm:flex-row gap-3 mb-6">
-                        <input type="text" readonly value="{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="w-full bg-gray-900 border border-gray-600 rounded-xl px-4 py-3 text-gray-300 focus:outline-none focus:border-teal-500 font-mono text-sm">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input type="text" readonly value="{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="w-full bg-gray-800 border border-gray-600 rounded-xl px-4 py-3 text-gray-300 focus:outline-none focus:border-teal-500 font-mono text-sm">
 
-                        <button onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}')" class="w-full sm:w-auto py-3 px-6 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-white rounded-xl font-bold transition shadow-lg flex justify-center items-center whitespace-nowrap">
-                            <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> Copiar Link
+                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="w-full sm:w-auto py-3 px-6 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold transition shadow-lg flex justify-center items-center whitespace-nowrap">
+                            <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> <span>Copiar</span>
                         </button>
                     </div>
-
-                    <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full">
-                        {% csrf_token %}
-                        <button type="submit" class="w-full py-4 px-6 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold transition shadow-lg flex justify-center items-center text-lg">
-                            <ion-icon name="play-circle" class="mr-2 text-2xl"></ion-icon> Percorrer Jornada
-                        </button>
-                    </form>
                 </div>
+                {% endif %}
+
+                <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full mb-12">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full py-5 px-6 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white rounded-2xl font-extrabold transition-all duration-300 shadow-xl hover:shadow-teal-900/50 flex justify-center items-center text-xl transform hover:-translate-y-1">
+                        <ion-icon name="play-circle" class="mr-3 text-3xl"></ion-icon> Iniciar Jornada
+                    </button>
+                </form>
 
                 <div>
                     <h2 class="text-2xl font-bold text-white mb-6 flex items-center">
-                        <ion-icon name="list-outline" class="mr-2 text-teal-400"></ion-icon> Estrutura das Cenas ({{ narrativa.cenas.count }})
+                        <ion-icon name="list-outline" class="mr-2 text-teal-400"></ion-icon> Estrutura das Cenas
                     </h2>
 
                     {% if narrativa.cenas.exists %}
@@ -84,26 +96,20 @@
                         {% for cena in narrativa.cenas.all|dictsort:"ordem" %}
                         <div class="bg-gray-900/50 border border-gray-700 p-5 rounded-xl flex flex-col sm:flex-row gap-5 transition hover:border-teal-500/50">
 
-                            <div class="flex-shrink-0 w-24 h-24 sm:w-32 sm:h-32 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex items-center justify-center relative">
+                            <div class="flex-shrink-0 w-24 h-24 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex items-center justify-center relative">
                                 {% if cena.imagem %}
                                     <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-full object-cover">
                                 {% else %}
                                     <ion-icon name="image-outline" class="text-4xl text-gray-600"></ion-icon>
                                 {% endif %}
-                                <div class="absolute top-2 left-2 bg-teal-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow-md">
+                                <div class="absolute top-1 left-1 bg-teal-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-md">
                                     {{ forloop.counter }}
                                 </div>
                             </div>
 
-                            <div class="flex-1 py-1">
+                            <div class="flex-1 py-1 min-w-0">
                                 <div class="flex justify-between items-start mb-2">
-                                    <h4 class="text-white font-bold text-xl">{{ cena.titulo }}</h4>
-
-                                    {% if request.user.is_staff %}
-                                    <a href="{% url 'admin:narrativa_cena_change' cena.id %}" target="_blank" title="Editar Cena" class="bg-gray-800 border border-gray-600 text-gray-400 hover:text-amber-500 hover:border-amber-500 p-2 rounded-lg transition flex items-center justify-center">
-                                        <ion-icon name="create-outline" class="text-lg"></ion-icon>
-                                    </a>
-                                    {% endif %}
+                                    <h4 class="text-white font-bold text-xl truncate pr-4">{{ cena.titulo }}</h4>
                                 </div>
 
                                 <p class="text-sm text-gray-400 mb-4 line-clamp-2 leading-relaxed">
@@ -111,9 +117,14 @@
                                 </p>
 
                                 {% if cena.escolhas.exists %}
-                                    <span class="inline-flex items-center bg-gray-800 text-teal-400 text-xs px-3 py-1.5 rounded-md border border-gray-700 font-medium">
-                                        <ion-icon name="git-branch-outline" class="mr-1.5 text-sm"></ion-icon> {{ cena.escolhas.count }} escolha(s) mapeada(s)
-                                    </span>
+                                    <div class="flex flex-wrap gap-2">
+                                        {% for escolha in cena.escolhas.all %}
+                                            <span class="inline-flex items-center bg-gray-800 text-teal-400 text-xs px-3 py-1.5 rounded-md border border-gray-700 font-medium truncate max-w-[200px]" title="{{ escolha.texto_da_opcao }}">
+                                                <ion-icon name="git-branch-outline" class="mr-1.5 text-sm flex-shrink-0"></ion-icon>
+                                                <span class="truncate">{{ escolha.texto_da_opcao }}</span>
+                                            </span>
+                                        {% endfor %}
+                                    </div>
                                 {% else %}
                                     <span class="inline-flex items-center bg-gray-800 text-amber-500 text-xs px-3 py-1.5 rounded-md border border-gray-700 font-medium">
                                         <ion-icon name="warning-outline" class="mr-1.5 text-sm"></ion-icon> Fim de linha / Sem escolhas
@@ -126,8 +137,7 @@
                     {% else %}
                     <div class="p-8 bg-gray-900/50 border border-gray-700 rounded-xl text-center">
                         <ion-icon name="map-outline" class="text-5xl text-gray-600 mb-3"></ion-icon>
-                        <p class="text-gray-400 font-medium">Esta jornada ainda não possui cenas cadastradas ou vinculadas a ela.</p>
-                        <p class="text-sm text-gray-500 mt-2">Dica: Verifique no Painel Admin se as cenas estão com o campo "Narrativa" preenchido corretamente.</p>
+                        <p class="text-gray-400 font-medium">Esta jornada ainda não possui cenas cadastradas.</p>
                     </div>
                     {% endif %}
                 </div>
@@ -136,4 +146,22 @@
 
     </div>
 </div>
+
+<script>
+    // Função local para o botão de cópia do Admin
+    function copiarDireto(urlTexto, botaoElemento) {
+        navigator.clipboard.writeText(urlTexto).then(() => {
+            const spanTexto = botaoElemento.querySelector('span');
+            const textoOriginal = spanTexto.innerText;
+            spanTexto.innerText = "Copiado!";
+            botaoElemento.classList.replace('bg-teal-600', 'bg-green-600');
+            setTimeout(() => {
+                spanTexto.innerText = textoOriginal;
+                botaoElemento.classList.replace('bg-green-600', 'bg-teal-600');
+            }, 2000);
+        }).catch(err => {
+            alert("Erro ao copiar o link. Copie manualmente a URL: " + urlTexto);
+        });
+    }
+</script>
 {% endblock %}

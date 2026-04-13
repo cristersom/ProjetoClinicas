@@ -3,20 +3,29 @@
 {% block extrastyle %}
     {{ block.super }}
     <style>
-        /* Conserta o contraste do botão Ninja de Exportar do import_export */
-        #object-tools .btn-default,
-        #object-tools a.export_link,
-        #object-tools a.import_link {
-            background-color: #417690 !important;
-            color: #ffffff !important;
-            border-color: #205067 !important;
+        /* Força a cor dos botões de exportação passando por cima do tema Jazzmin */
+        .export_link,
+        .import_link,
+        .object-tools a.btn {
+            background-color: #0d9488 !important; /* Cor Teal (Verde água forte) */
+            color: #ffffff !important; /* Letras brancas */
+            border-color: #0f766e !important;
             font-weight: bold !important;
             opacity: 1 !important;
+            padding: 5px 15px !important;
+            border-radius: 4px !important;
         }
 
-        #object-tools .btn-default:hover,
-        #object-tools a.export_link:hover {
-            background-color: #205067 !important;
+        .export_link:hover,
+        .import_link:hover,
+        .object-tools a.btn:hover {
+            background-color: #0f766e !important; /* Cor mais escura no hover */
+            color: #ffffff !important;
+        }
+
+        /* Garante que o texto dentro do ícone também fique branco */
+        .export_link i,
+        .import_link i {
             color: #ffffff !important;
         }
     </style>
