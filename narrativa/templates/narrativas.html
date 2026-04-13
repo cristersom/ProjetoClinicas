@@ -11,12 +11,11 @@
         {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-lg">
             <div>
-                <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente</h3>
+                <h3 class="text-xl text-white font-bold mb-1">Acesso do Paciente (Portal)</h3>
                 <p class="text-sm text-gray-400">Envie este link para que o paciente tenha acesso a todas as jornadas disponíveis da sua clínica.</p>
             </div>
-
             <button onclick="copiarLink('{{ link_portal }}')" class="flex items-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-6 rounded-xl font-bold transition shadow-lg w-full sm:w-auto justify-center">
-                <ion-icon name="share-social-outline" class="mr-2 text-xl"></ion-icon> Compartilhar Acesso Geral
+                <ion-icon name="share-social-outline" class="mr-2 text-xl"></ion-icon> Copiar Link do Portal
             </button>
         </div>
         {% else %}
@@ -24,7 +23,7 @@
             <ion-icon name="information-circle-outline" class="text-3xl text-amber-500"></ion-icon>
             <div>
                 <h3 class="text-lg text-amber-400 font-bold mb-1">Modo Administrador</h3>
-                <p class="text-sm text-gray-400">Você está logado como Superusuário e não possui uma Clínica específica vinculada ao seu perfil. O link geral de pacientes não está disponível nesta visão.</p>
+                <p class="text-sm text-gray-400">Você não possui clínicas cadastradas no sistema ainda para gerar um portal.</p>
             </div>
         </div>
         {% endif %}
@@ -36,21 +35,38 @@
             <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-lg flex flex-col transition hover:-translate-y-1 duration-300">
 
                 {% if narrativa.thumb %}
-                <img src="{{ narrativa.thumb.url }}" alt="{{ narrativa.titulo }}" class="w-full h-48 object-cover">
+                <div class="h-48 relative">
+                    <img src="{{ narrativa.thumb.url }}" alt="{{ narrativa.titulo }}" class="w-full h-full object-cover">
+                    <div class="absolute top-3 right-3 bg-gray-900/80 backdrop-blur text-white text-xs px-2 py-1 rounded-md flex items-center border border-gray-700">
+                        <ion-icon name="eye-outline" class="mr-1"></ion-icon> {{ narrativa.visualizacoes }}
+                    </div>
+                </div>
                 {% endif %}
 
                 <div class="p-6 flex-1 flex flex-col">
                     <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
-                    <p class="text-gray-400 text-sm mb-6 flex-1">{{ narrativa.descricao|default:"Sem descrição." }}</p>
+                    <p class="text-gray-400 text-sm mb-6 flex-1 line-clamp-3">{{ narrativa.descricao|default:"Sem descrição." }}</p>
 
                     <div class="mt-auto space-y-3">
-                        <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="block w-full text-center bg-gray-700 hover:bg-gray-600 text-white py-3 px-4 rounded-xl font-medium transition">
-                            Ver Detalhes e Compartilhar
-                        </a>
+                        <div class="flex gap-2">
+                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex-1 flex justify-center items-center bg-gray-700 hover:bg-gray-600 text-white py-2 px-3 rounded-xl font-medium transition text-sm">
+                                <ion-icon name="information-circle-outline" class="mr-1"></ion-icon> Info
+                            </a>
+                            <button onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}')" class="flex-1 flex justify-center items-center bg-teal-600 hover:bg-teal-500 text-white py-2 px-3 rounded-xl font-medium transition text-sm">
+                                <ion-icon name="share-social-outline" class="mr-1"></ion-icon> Link
+                            </button>
+                        </div>
+
+                        <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="w-full">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white py-2 px-4 rounded-xl font-medium transition text-sm flex justify-center items-center">
+                                <ion-icon name="play-circle-outline" class="mr-2 text-lg"></ion-icon> Percorrer
+                            </button>
+                        </form>
 
                         {% if request.user.is_staff %}
                         <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="block w-full text-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white py-2 px-4 rounded-xl font-medium transition text-sm">
-                            <ion-icon name="construct-outline"></ion-icon> Editar no Admin
+                            <ion-icon name="construct-outline" class="mr-1"></ion-icon> Editar (Admin)
                         </a>
                         {% endif %}
                     </div>
@@ -59,11 +75,10 @@
             {% empty %}
             <div class="col-span-full text-center py-12 bg-gray-800 rounded-2xl border border-gray-700">
                 <ion-icon name="folder-open-outline" class="text-6xl text-gray-600 mb-4"></ion-icon>
-                <p class="text-gray-400 text-lg">Nenhuma narrativa cadastrada na sua clínica ainda.</p>
+                <p class="text-gray-400 text-lg">Nenhuma narrativa cadastrada no sistema ainda.</p>
             </div>
             {% endfor %}
         </div>
-
     </div>
 </div>
 {% endblock %}

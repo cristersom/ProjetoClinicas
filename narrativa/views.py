@@ -4,13 +4,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import TemplateView, ListView, CreateView, DetailView
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model, login, logout
 from django.urls import reverse_lazy
-from django.contrib import messages
 from .models import Plano, Narrativa, Clinica, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena
 from .forms import CadastroForm
 
@@ -163,6 +161,7 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
     context_object_name = "narrativas"
 
     def get_queryset(self):
+        # Admin supremo enxerga TUDO no painel dele. Clínicas veem só as delas.
         if self.request.user.is_superuser:
             return Narrativa.objects.all()
         if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
@@ -173,19 +172,13 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         clinica_id = None
-        # Verifica se o usuário já tem uma clínica atrelada ao perfil
         if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             clinica_id = self.request.user.clinica.id
-
-        # MÁGICA DA DEMONSTRAÇÃO: Se for o Dono do Sistema (Superuser) e ele ainda não tem clínica, cria uma pra ele!
         elif self.request.user.is_superuser:
-            clinica_demo, created = Clinica.objects.get_or_create(
-                nome="Clínica de Demonstração (Admin)",
-                defaults={'assinatura_ativa': True}
-            )
-            self.request.user.clinica = clinica_demo
-            self.request.user.save()
-            clinica_id = clinica_demo.id
+            # Se for admin sem clínica, puxa a primeira clínica do BD para poder gerar um link de teste
+            primeira_clinica = Clinica.objects.first()
+            if primeira_clinica:
+                clinica_id = primeira_clinica.id
 
         if clinica_id:
             context['link_portal'] = self.request.build_absolute_uri(f'/portal/{clinica_id}/')
