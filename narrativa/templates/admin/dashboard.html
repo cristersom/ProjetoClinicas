@@ -1,64 +1,86 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard de Controle{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    .dashboard-container { padding: 20px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; max-width: 100%; box-sizing: border-box; }
+    .kpi-grid { display: grid; gap: 20px; margin-bottom: 30px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .kpi-grid { grid-template-columns: repeat(4, 1fr); } }
+    .kpi-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-left: 4px solid #417690; display: flex; flex-direction: column; justify-content: space-between; min-height: 120px; }
+    .kpi-card h3 { margin: 0; font-size: 0.85rem; color: #666; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    .kpi-card .value { font-size: 2.5rem; font-weight: bold; color: #333; margin: 10px 0; }
+    .charts-grid { display: grid; gap: 20px; margin-bottom: 30px; grid-template-columns: 1fr; }
+    @media (min-width: 1024px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+    .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); height: 400px; display: flex; flex-direction: column; }
+    .chart-card h2 { margin-top: 0; font-size: 1.1rem; color: #444; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; font-weight: 600; }
+    .chart-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="h3 mb-4 text-gray-800">Resumo de Atividades: <strong>{{ request.user.clinica.nome }}</strong></h1>
+<div class="dashboard-container">
+
+    <div class="module" style="background: #f0fdfa; border-left: 5px solid #0d9488; padding: 20px; margin-bottom: 30px; border-radius: 8px;">
+        <h2 style="color: #134e4a; margin-top: 0;"><i class="fas fa-magic"></i> Guia Rápido de Criação</h2>
+        <p style="color: #134e4a;">Siga esta ordem para criar sua primeira jornada interativa sem erros:</p>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+            <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <strong>1. Crie as Cenas</strong><br><small>Cadastre os textos e vídeos de cada tela.</small>
+            </div>
+            <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <strong>2. Crie as Escolhas</strong><br><small>Dentro da Cena, crie botões que levam a outras cenas.</small>
+            </div>
+            <div style="flex: 1; min-width: 200px; background: white; padding: 15px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <strong>3. Defina o Início</strong><br><small>Edite a Narrativa e escolha qual cena começa a história.</small>
+            </div>
         </div>
+        <p style="margin-top: 15px;"><a href="{% url 'narrativa:admin_faq' %}" class="btn btn-sm btn-info">Ver Manual Completo</a></p>
     </div>
 
-    <div class="row">
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Suas Jornadas Criadas</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_narrativas }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-book-medical fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <h1 style="margin-bottom: 25px; font-size: 1.8rem; color: #333; font-weight: 300;">Visão Geral do Sistema</h1>
 
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pacientes que Iniciaram</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_sessoes }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Respostas Coletadas</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_respostas }}</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="kpi-grid">
+        <div class="kpi-card"><h3>Total de Pacientes</h3><div class="value">{{ kpi_sessoes }}</div><small>Sessões iniciadas</small></div>
+        <div class="kpi-card" style="border-left-color: #28a745;"><h3>Interações</h3><div class="value">{{ kpi_respostas }}</div><small>Perguntas respondidas</small></div>
+        <div class="kpi-card" style="border-left-color: #ffc107;"><h3>Jornadas Finalizadas</h3><div class="value">{{ kpi_finalizadas }}</div><small>Chegaram ao fim</small></div>
+        <div class="kpi-card" style="border-left-color: #17a2b8;"><h3>Narrativas Ativas</h3><div class="value">{{ kpi_narrativas }}</div><small>Disponíveis no sistema</small></div>
     </div>
 
-    <div class="mt-4">
-        <a href="/admin/narrativa/narrativa/add/" class="btn btn-primary btn-lg"> + Criar Nova Jornada</a>
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h2>Acessos por Dia (30 dias)</h2>
+            <div class="chart-wrapper"><canvas id="chartAcessos"></canvas></div>
+        </div>
+        <div class="chart-card">
+            <h2>Top 5 Narrativas Mais Vistas</h2>
+            <div class="chart-wrapper"><canvas id="chartTopNarrativas"></canvas></div>
+        </div>
     </div>
 </div>
+
+<script>
+    const ctxAcessos = document.getElementById('chartAcessos').getContext('2d');
+    new Chart(ctxAcessos, {
+        type: 'line',
+        data: {
+            labels: {{ chart_dias_labels|safe }},
+            datasets: [{ label: 'Interações', data: {{ chart_dias_data|safe }}, borderColor: '#417690', backgroundColor: 'rgba(65, 118, 144, 0.1)', borderWidth: 2, pointRadius: 4, fill: true, tension: 0.3 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
+    });
+
+    const ctxTop = document.getElementById('chartTopNarrativas').getContext('2d');
+    new Chart(ctxTop, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_top_labels|safe }},
+            datasets: [{ label: 'Visualizações', data: {{ chart_top_data|safe }}, backgroundColor: '#17a2b8', borderWidth: 0, barPercentage: 0.6 }]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }, plugins: { legend: { display: false } } }
+    });
+</script>
 {% endblock %}
