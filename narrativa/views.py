@@ -2,10 +2,10 @@ import stripe
 from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy, reverse
-from django.views.generic import TemplateView, ListView, CreateView, DetailView, FormView, UpdateView
+from django.views.generic import TemplateView, ListView, CreateView, DetailView, UpdateView
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model, login, logout
@@ -16,7 +16,7 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 
-from .models import Plano, Narrativa, Clinica, Cena, Questionario, Pergunta, Resposta, SessaoPaciente, LogVisitaCena, \
+from .models import Plano, Narrativa, Clinica, Cena, Questionario, Resposta, SessaoPaciente, LogVisitaCena, \
     ConfiguracaoClinica
 from .forms import CadastroForm
 
@@ -147,7 +147,7 @@ def sucesso_pagamento(request):
         else:
             request.session['email_pagamento'] = email
             request.session['plano_pago_id'] = plano_id
-            messages.info(request, "Pagamento confirmado! Agora, crie sua conta para acessar o painel.")
+            messages.info(request, "Pagamento confirmado! Agora, crie a sua conta para aceder ao painel.")
             return redirect('narrativa:criarconta')
 
     except Exception as e:
@@ -206,7 +206,6 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
             context['link_portal'] = self.request.build_absolute_uri(
                 reverse('narrativa:portal_paciente', args=[self.request.user.clinica.id])
             )
-            # Verifica se atingiu limite para mostrar aviso no template
             context['limite_atingido'] = self.request.user.clinica.atingiu_limite_narrativas()
         return context
 
@@ -292,7 +291,6 @@ class LerTermosView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         if request.session.get(TERMOS_ACEITOS_KEY, False):
-            # Se já aceitou e tiver PK de redirecionamento, volta pra lá
             pk = kwargs.get('narrativa_pk')
             if pk: return redirect('narrativa:paciente_detalhes', pk=pk)
             return redirect('narrativa:home')
@@ -400,3 +398,33 @@ def resumo_sessao(request, narrativa_id):
         'total_questionarios': total_questionarios,
         'progresso_questionarios_pct': progresso_questionarios_pct,
     })
+
+
+# --- FUNÇÕES DE FALLBACK E RESOLUÇÃO DE ROTAS ANTIGAS ---
+
+def iniciar_jornada_paciente(request, narrativa_id):
+    """Garante a criação da sessão e redireciona para a primeira cena da jornada."""
+    narrativa = get_object_or_404(Narrativa, id=narrativa_id)
+
+    if not request.session.session_key:
+        request.session.create()
+
+    SessaoPaciente.objects.get_or_create(
+        session_key=request.session.session_key,
+        defaults={'narrativa_perfil': narrativa}
+    )
+
+    if narrativa.cena_inicial:
+        return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
+    else:
+        return redirect('narrativa:paciente_detalhes', pk=narrativa.id)
+
+
+def paciente_narrativas_fallback(request):
+    """Redireciona o paciente de volta para o portal da clínica correta com base na sessão."""
+    if request.session.session_key:
+        sessao = SessaoPaciente.objects.filter(session_key=request.session.session_key).first()
+        if sessao and sessao.narrativa_perfil and sessao.narrativa_perfil.clinica:
+            return redirect('narrativa:portal_paciente', clinica_id=sessao.narrativa_perfil.clinica.id)
+
+    return redirect('narrativa:home')
