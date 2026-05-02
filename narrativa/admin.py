@@ -3,15 +3,12 @@ from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
-    SessaoPaciente, OpcaoResposta, LogVisitaCena, Categoria, Plano, Clinica
+    SessaoPaciente, OpcaoResposta, LogVisitaCena, Categoria, Plano, Clinica, PagamentoPendente
 )
 from import_export.admin import ImportExportModelAdmin
 from import_export import resources
-
-# Imports para os relatórios originais
 from django.urls import path, reverse
 from django.http import HttpResponse
-import csv
 from tablib import Dataset
 from django.shortcuts import render
 from django.utils.html import format_html
@@ -19,17 +16,12 @@ from collections import Counter
 import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
-import openpyxl
-from openpyxl.utils import get_column_letter
-
 
 # ==========================================
 # SAAS ADMIN (ACESSO EXCLUSIVO DO DONO)
 # ==========================================
 class SuperUserOnlyMixin:
-    def has_module_permission(self, request):
-        return request.user.is_superuser
-
+    def has_module_permission(self, request): return request.user.is_superuser
 
 @admin.register(Plano)
 class PlanoAdmin(admin.ModelAdmin):
@@ -37,50 +29,43 @@ class PlanoAdmin(admin.ModelAdmin):
     list_editable = ('preco', 'limite_narrativas', 'limite_pacientes', 'destaque')
     search_fields = ('nome', 'stripe_price_id')
 
-
 @admin.register(Clinica)
 class ClinicaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
-    list_display = ('nome', 'plano_atual', 'assinatura_ativa')
-
+    list_display = ('nome', 'plano', 'assinatura_ativa') # <-- Corrigido plano_atual para plano
 
 @admin.register(Usuario)
 class CustomUserAdmin(SuperUserOnlyMixin, UserAdmin):
-    list_display = ('username', 'email', 'clinica', 'is_admin_clinica')
-
+    list_display = ('username', 'email', 'clinica', 'is_staff') # <-- Corrigido is_admin_clinica para is_staff
 
 @admin.register(Categoria)
 class CategoriaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
     list_display = ('titulo',)
 
+@admin.register(PagamentoPendente)
+class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
+    list_display = ('email', 'plano', 'data_pagamento', 'utilizado')
+    list_filter = ('utilizado', 'data_pagamento')
+    search_fields = ('email',)
 
 # ==========================================
-# ISOLAMENTO MULTI-TENANT E LÓGICA DE CLÍNICA PRINCIPAL
+# ISOLAMENTO MULTI-TENANT
 # ==========================================
 class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
-
     def has_view_permission(self, request, obj=None): return True
-
     def has_add_permission(self, request): return True
-
     def has_change_permission(self, request, obj=None): return True
-
     def has_delete_permission(self, request, obj=None): return True
-
-
-# --- JORNADA CLINICA ---
 
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
 
-
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
-
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
@@ -88,10 +73,9 @@ class PerguntaInline(nested_admin.NestedTabularInline):
     extra = 1
     inlines = [OpcaoRespostaInline]
 
-
 @admin.register(Cena)
-class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
-    list_display = ('titulo', 'narrativa', 'ordem')
+class CenaAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
+    list_display = ('titulo', 'narrativa') # <-- Corrigido (removido ordem)
     list_filter = ('narrativa',)
     inlines = [EscolhaInline]
 
@@ -107,16 +91,13 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
             kwargs["queryset"] = Narrativa.objects.filter(clinica=request.user.clinica)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
-
 @admin.register(Narrativa)
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
     list_filter = ('categoria',)
 
-    # Esconde a clínica para os usuários normais. Admins continuam vendo.
     def get_exclude(self, request, obj=None):
-        if request.user.is_superuser:
-            return ('visualizacoes',)
+        if request.user.is_superuser: return ('visualizacoes',)
         return ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
@@ -127,21 +108,14 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
         return qs.none()
 
     def save_model(self, request, obj, form, change):
-        # 1. Se quem está criando é um psicólogo normal (não admin) e tem clínica
         if not request.user.is_superuser and hasattr(request.user, 'clinica'):
             obj.clinica = request.user.clinica
-
-        # 2. Se for Admin, e a narrativa está sendo salva SEM clínica
         elif request.user.is_superuser and not obj.clinica:
-            # Tenta pegar a clínica atrelada ao perfil do admin
             if hasattr(request.user, 'clinica') and request.user.clinica:
                 obj.clinica = request.user.clinica
             else:
-                # Se o admin não tem clínica, atrela à primeira clínica do sistema (Clínica Principal)
                 primeira_clinica = Clinica.objects.first()
-                if primeira_clinica:
-                    obj.clinica = primeira_clinica
-
+                if primeira_clinica: obj.clinica = primeira_clinica
         super().save_model(request, obj, form, change)
 
     def get_urls(self):
@@ -312,7 +286,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             response['Content-Disposition'] = f'attachment; filename="analise_{questionario.id}.{export_format}"'
             return response
 
-        # Resumo visual
         dados_comparativos = {}
         for pergunta in questionario.perguntas.all():
             dados_comparativos[pergunta.id] = {
@@ -359,7 +332,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             dataset = Dataset()
             dataset.headers = ["Sessão do Paciente", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
 
-            # Agrupa as respostas por sessão
             dados_exportacao = {}
             for r in respostas:
                 if r.session_key not in dados_exportacao:
@@ -367,7 +339,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                                                        'respostas': {}}
                 dados_exportacao[r.session_key]['respostas'][r.pergunta.id] = r.texto_resposta
 
-            # Popula o dataset
             for session_key, d in dados_exportacao.items():
                 linha = [session_key[:8], d['data']] + [d['respostas'].get(p.id, "") for p in perguntas_ordenadas]
                 dataset.append(linha)
@@ -384,7 +355,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                 'Content-Disposition'] = f'attachment; filename="respostas_detalhadas_{questionario.id}.{export_format}"'
             return response
 
-        # Prepara dados para a tela
         for r in respostas:
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
@@ -410,9 +380,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    # IMPORTANTE: Habilita explicitamente a exportacao no painel Admin
-    def has_export_permission(self, request):
-        return True
+    def has_export_permission(self, request): return True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 
 
 # ==========================================
@@ -25,6 +26,18 @@ class Plano(models.Model):
         return f"{self.nome} - R$ {self.preco}"
 
 
+# ---> NOVO: Armazena o pagamento antes da conta existir para sincronizar o onboarding
+class PagamentoPendente(models.Model):
+    email = models.EmailField(unique=True, help_text="E-mail usado no checkout do Stripe")
+    plano = models.ForeignKey(Plano, on_delete=models.CASCADE)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
+    data_pagamento = models.DateTimeField(auto_now_add=True)
+    utilizado = models.BooleanField(default=False, help_text="Marca como True após o usuário criar a conta.")
+
+    def __str__(self):
+        return f"Pagamento Pendente: {self.email} ({self.plano.nome})"
+
+
 class Clinica(models.Model):
     nome = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, null=True, blank=True)
@@ -38,6 +51,12 @@ class Clinica(models.Model):
     def __str__(self):
         return self.nome
 
+    # ---> NOVO: Checa se a clínica já bateu o limite do plano contratado
+    def atingiu_limite_narrativas(self):
+        if not self.plano_atual:
+            return True
+        return self.narrativa_set.count() >= self.plano_atual.limite_narrativas
+
 
 class Usuario(AbstractUser):
     email = models.EmailField(unique=True)
@@ -47,7 +66,7 @@ class Usuario(AbstractUser):
 
 
 # ==========================================
-# MODELOS DA JORNADA CLÍNICA (V1 TOTALMENTE LIVRE)
+# MODELOS DA JORNADA CLÍNICA
 # ==========================================
 
 class Categoria(models.Model):
@@ -70,6 +89,12 @@ class Narrativa(models.Model):
     visualizacoes = models.IntegerField(default=0)
     data_criacao = models.DateTimeField(default=timezone.now)
     cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
+
+    # ---> NOVO: Bloqueia a criação de novas narrativas se o limite do plano foi atingido
+    def clean(self):
+        if not self.pk and self.clinica:
+            if self.clinica.atingiu_limite_narrativas():
+                raise ValidationError(f"Sua clínica atingiu o limite de {self.clinica.plano_atual.limite_narrativas} narrativas do plano {self.clinica.plano_atual.nome}. Faça um upgrade para criar mais.")
 
     def __str__(self):
         return self.titulo
