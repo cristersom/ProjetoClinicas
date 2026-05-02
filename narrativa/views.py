@@ -46,7 +46,8 @@ class LoginView(DjangoLoginView):
 @require_http_methods(["GET", "POST"])
 def custom_logout(request):
     logout(request)
-    return render(request, "logout.html")
+    # Redireciona limpo para a Home sem erro CSRF
+    return redirect('narrativa:home')
 
 
 class CriarContaView(CreateView):
@@ -458,7 +459,10 @@ def iniciar_jornada_paciente(request, narrativa_id):
     if narrativa.cena_inicial:
         return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
     else:
-        return redirect('narrativa:paciente_detalhes', pk=narrativa.id)
+        # SE NÃO TIVER CENA INICIAL, ELE AVISA AO INVÉS DE QUEBRAR!
+        messages.warning(request,
+                         f"Atenção: A jornada '{narrativa.titulo}' ainda não possui uma Cena Inicial configurada. Acesse a Administração e configure.")
+        return redirect('narrativa:narrativas')
 
 
 def paciente_narrativas_fallback(request):

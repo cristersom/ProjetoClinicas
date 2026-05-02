@@ -1,0 +1,76 @@
+{% extends "jazzmin/base.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Destaque Máximo para a Central de Ajuda no Admin */
+    .admin-help-banner {
+        background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
+        color: white;
+        padding: 20px 30px;
+        border-radius: 8px;
+        margin: 15px 15px 25px 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    }
+    .admin-help-text h4 { margin: 0 0 8px 0; color: #fff; font-weight: 800; font-size: 1.3rem; }
+    .admin-help-text p { margin: 0; font-size: 0.95rem; opacity: 0.9; }
+    .admin-help-btn {
+        background-color: white;
+        color: #0f766e !important;
+        padding: 12px 24px;
+        border-radius: 6px;
+        text-decoration: none !important;
+        font-weight: bold;
+        font-size: 1.05rem;
+        transition: all 0.3s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        white-space: nowrap;
+    }
+    .admin-help-btn:hover { background-color: #f8fafc; transform: translateY(-2px); }
+
+    /* Banners SaaS Globais */
+    .saas-global-banner {
+        padding: 16px 24px; margin: 0 15px 25px 15px; border-radius: 8px;
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .saas-banner-warning { background-color: #ecfdf5; border-left: 6px solid #10b981; color: #065f46; }
+    .saas-banner-danger { background-color: #fef2f2; border-left: 6px solid #ef4444; color: #991b1b; }
+    .saas-btn { padding: 10px 20px; border-radius: 6px; text-decoration: none !important; font-weight: bold; color: white !important; }
+    .saas-btn-warning { background-color: #10b981; }
+    .saas-btn-danger { background-color: #ef4444; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <!-- BANNER DE MANUAL E INSTRUÇÕES EM TODAS AS TELAS -->
+    <div class="admin-help-banner">
+        <div class="admin-help-text">
+            <h4>🛠️ Central de Ajuda & Criação</h4>
+            <p>Dica de ouro: Comece criando suas <b>Cenas</b>. Depois, use as <b>Escolhas</b> para conectá-las e só então junte tudo em uma <b>Narrativa</b>.</p>
+        </div>
+        <a href="{% url 'narrativa:faq' %}" class="admin-help-btn">📖 Ler Manual Completo</a>
+    </div>
+
+    <!-- BANNERS DE SUSPENSÃO E LIMITES -->
+    {% if user.clinica %}
+        {% if not user.clinica.assinatura_ativa %}
+            <div class="saas-global-banner saas-banner-danger">
+                <span>⚠️ <b>Acesso Suspenso:</b> Assinatura inativa. A criação foi bloqueada.</span>
+                <a href="/planos/" class="saas-btn saas-btn-danger" target="_blank">Renovar Plano</a>
+            </div>
+        {% elif user.clinica.atingiu_limite_narrativas %}
+            <div class="saas-global-banner saas-banner-warning">
+                <span>🚀 <b>Limite Atingido ({{ user.clinica.plano_atual.limite_narrativas }} jornadas)!</b> Faça upgrade para criar mais.</span>
+                <a href="/planos/" class="saas-btn saas-btn-warning" target="_blank">Fazer Upgrade</a>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}

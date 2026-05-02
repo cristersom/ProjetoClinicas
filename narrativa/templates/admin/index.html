@@ -1,0 +1,18 @@
+{% extends "jazzmin/index.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* FORÇA A REMOÇÃO DA LINHA DO TEMPO DO DASHBOARD */
+    #recent-actions-module,
+    .col-12.col-md-3.col-sm-4 {
+        display: none !important;
+    }
+    
+    /* EXPANDE OS CARDS DE NAVEGAÇÃO PARA 100% DA TELA */
+    .col-12.col-md-9.col-sm-8 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+</style>
+{% endblock %}

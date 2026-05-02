@@ -6,116 +6,80 @@
 <div class="min-h-screen bg-gray-900 pt-24 px-4 sm:px-6 lg:px-8 pb-12">
     <div class="max-w-7xl mx-auto">
 
-        <!-- INÍCIO DOS BANNERS DE UPSELL E SUSPENSÃO -->
+        <!-- BANNERS COM INFORMAÇÃO EXATA DO LIMITE -->
         {% if request.user.clinica and request.user.clinica.assinatura_ativa == False %}
         <div class="mb-8 p-6 bg-red-900/30 border-l-4 border-red-500 rounded-r-2xl flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
             <div>
-                <h3 class="text-xl font-bold text-red-400 mb-1 flex items-center">
-                    <ion-icon name="warning-outline" class="mr-2 text-2xl"></ion-icon>Acesso Suspenso
-                </h3>
-                <p class="text-gray-300 text-sm">Sua assinatura está inativa. A criação de novas jornadas está bloqueada. Renove agora para evitar a perda de dados.</p>
+                <h3 class="text-xl font-bold text-red-400 mb-1 flex items-center"><ion-icon name="warning-outline" class="mr-2 text-2xl"></ion-icon>Acesso Suspenso</h3>
+                <p class="text-gray-300 text-sm">Sua assinatura está inativa. A criação de novas jornadas está bloqueada.</p>
             </div>
             <a href="{% url 'narrativa:planos' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg whitespace-nowrap">Renovar Plano</a>
         </div>
         {% elif limite_atingido %}
         <div class="mb-8 p-6 bg-teal-900/20 border-l-4 border-teal-500 rounded-r-2xl flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
             <div>
-                <h3 class="text-xl font-bold text-teal-400 mb-1 flex items-center">
-                    <ion-icon name="rocket-outline" class="mr-2 text-2xl"></ion-icon>Você atingiu o limite do seu plano!
-                </h3>
-                <p class="text-gray-300 text-sm">Sua clínica está crescendo! Faça um upgrade agora para continuar expandindo o tratamento dos seus pacientes.</p>
+                <h3 class="text-xl font-bold text-teal-400 mb-1 flex items-center"><ion-icon name="rocket-outline" class="mr-2 text-2xl"></ion-icon>Limite do plano atingido ({{ request.user.clinica.plano_atual.limite_narrativas }} Jornadas)</h3>
+                <p class="text-gray-300 text-sm">Sua clínica está crescendo! Faça um upgrade agora para continuar expandindo.</p>
             </div>
             <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-xl transition shadow-[0_0_15px_rgba(13,148,136,0.4)] whitespace-nowrap">Fazer Upgrade</a>
         </div>
         {% endif %}
-        <!-- FIM BANNERS -->
 
         <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
 
+        <!-- Restante da tela de links igual... -->
         {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
             <div>
                 <h3 class="text-xl text-teal-400 font-bold mb-1">Catálogo Geral da Clínica (Portal)</h3>
-                <p class="text-sm text-gray-400">Envie o link do portal para o paciente ter acesso a todas as jornadas. Sem necessidade de login.</p>
+                <p class="text-sm text-gray-400">Envie o link do portal para o paciente ter acesso a todas as jornadas.</p>
             </div>
-            <button onclick="copiarDireto('{{ link_portal }}', this)" class="flex items-center justify-center whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white py-3 px-8 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">
-                <ion-icon name="copy-outline" class="mr-2 text-xl"></ion-icon> <span>Copiar Link do Catálogo</span>
-            </button>
-        </div>
-        {% else %}
-        <div class="mb-10 p-6 bg-amber-900/20 border border-amber-500/50 rounded-2xl flex items-center gap-4">
-            <ion-icon name="information-circle-outline" class="text-3xl text-amber-500"></ion-icon>
-            <div>
-                <h3 class="text-lg text-amber-400 font-bold mb-1">Modo Administrador</h3>
-                <p class="text-sm text-gray-400">Você não possui clínicas cadastradas no sistema ainda para gerar um portal.</p>
-            </div>
+            <button onclick="copiarDireto('{{ link_portal }}', this)" class="bg-teal-600 hover:bg-teal-500 text-white py-3 px-8 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">Copiar Link do Catálogo</button>
         </div>
         {% endif %}
 
-        <!-- CABEÇALHO DAS JORNADAS COM BOTÃO ADMIN AQUI -->
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+        <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-bold text-gray-300">Jornadas Disponíveis</h2>
-
             {% if user.is_staff or user.is_superuser %}
-                <a href="{% url 'admin:index' %}" class="flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all shadow-md w-full sm:w-auto border border-indigo-500">
-                    <ion-icon name="settings-outline" class="mr-2 text-lg"></ion-icon>
-                    Acessar Administração
-                </a>
+                <a href="{% url 'admin:index' %}" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all shadow-md">Acessar Administração</a>
             {% endif %}
         </div>
 
+        <!-- MENSAGENS DE AVISO AQUI -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="mb-6 p-4 rounded-xl bg-amber-500/20 border border-amber-500 text-amber-400 font-medium">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for narrativa in narrativas %}
-            <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-lg flex flex-col transition hover:-translate-y-1 duration-300">
-
+            <div class="bg-gray-800 rounded-2xl overflow-hidden border border-gray-700 shadow-lg flex flex-col">
                 {% if narrativa.thumb %}
-                <div class="h-48 relative">
-                    <img src="{{ narrativa.thumb.url }}" alt="{{ narrativa.titulo }}" class="w-full h-full object-cover">
-                    <div class="absolute top-3 right-3 bg-gray-900/80 backdrop-blur text-white text-xs px-2 py-1 rounded-md flex items-center border border-gray-700">
-                        <ion-icon name="eye-outline" class="mr-1"></ion-icon> {{ narrativa.visualizacoes }}
-                    </div>
-                </div>
+                <div class="h-48 relative"><img src="{{ narrativa.thumb.url }}" class="w-full h-full object-cover"></div>
                 {% endif %}
 
                 <div class="p-6 flex-1 flex flex-col">
                     <h3 class="text-xl font-bold text-teal-400 mb-2">{{ narrativa.titulo }}</h3>
                     <p class="text-gray-400 text-sm mb-6 flex-1 line-clamp-3">{{ narrativa.descricao|default:"Sem descrição." }}</p>
 
-                    <div class="mt-auto pt-4 border-t border-gray-700">
-                        <div class="flex gap-2 w-full h-10">
-                            <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="group flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Detalhes">
-                                <ion-icon name="information-circle-outline" class="text-xl flex-shrink-0"></ion-icon>
-                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Detalhes</span>
-                            </a>
+                    <div class="mt-auto pt-4 border-t border-gray-700 flex gap-2 w-full h-10">
+                        <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Detalhes"><ion-icon name="information-circle-outline" class="text-xl"></ion-icon></a>
+                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Copiar"><ion-icon name="share-social-outline" class="text-xl"></ion-icon></button>
 
-                            <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="group flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Copiar Link">
-                                <ion-icon name="share-social-outline" class="text-xl flex-shrink-0"></ion-icon>
-                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Link</span>
-                            </button>
+                        <!-- CORREÇÃO DO ERRO 405 (MUDOU PARA A TAG E DIRETO PRO INÍCIO) -->
+                        <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=narrativa.id %}" class="flex items-center justify-center border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white rounded-xl transition w-full flex-[3]">
+                            <ion-icon name="play-circle-outline" class="text-xl mr-2"></ion-icon> <span class="text-sm font-medium">Percorrer</span>
+                        </a>
 
-                            <form action="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" method="post" class="flex flex-1 hover:flex-[3] transition-all duration-300">
-                                {% csrf_token %}
-                                <button type="submit" class="group flex items-center justify-center border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white rounded-xl w-full transition-all duration-300 overflow-hidden" title="Percorrer">
-                                    <ion-icon name="play-circle-outline" class="text-xl flex-shrink-0"></ion-icon>
-                                    <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Percorrer</span>
-                                </button>
-                            </form>
-
-                            {% if request.user.is_staff %}
-                            <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="group flex items-center justify-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white rounded-xl transition-all duration-300 flex-1 hover:flex-[3] overflow-hidden" title="Editar no Admin">
-                                <ion-icon name="construct-outline" class="text-xl flex-shrink-0"></ion-icon>
-                                <span class="max-w-0 opacity-0 group-hover:max-w-xs group-hover:opacity-100 group-hover:ml-2 transition-all duration-300 whitespace-nowrap text-sm font-medium">Editar</span>
-                            </a>
-                            {% endif %}
-                        </div>
+                        {% if request.user.is_staff %}
+                        <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="flex items-center justify-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white rounded-xl transition flex-1"><ion-icon name="construct-outline" class="text-xl"></ion-icon></a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% empty %}
-            <div class="col-span-full text-center py-12 bg-gray-800 rounded-2xl border border-gray-700">
-                <ion-icon name="folder-open-outline" class="text-6xl text-gray-600 mb-4"></ion-icon>
-                <p class="text-gray-400 text-lg">Nenhuma narrativa cadastrada no sistema ainda.</p>
-            </div>
+            <p class="text-gray-400">Nenhuma narrativa cadastrada.</p>
             {% endfor %}
         </div>
     </div>
@@ -124,16 +88,8 @@
 <script>
     function copiarDireto(urlTexto, botaoElemento) {
         navigator.clipboard.writeText(urlTexto).then(() => {
-            const spanTexto = botaoElemento.querySelector('span');
-            const textoOriginal = spanTexto.innerText;
-            spanTexto.innerText = "Copiado!";
             botaoElemento.classList.add('bg-green-600');
-            setTimeout(() => {
-                spanTexto.innerText = textoOriginal;
-                botaoElemento.classList.remove('bg-green-600');
-            }, 2000);
-        }).catch(err => {
-            alert("Erro ao copiar o link. URL: " + urlTexto);
+            setTimeout(() => { botaoElemento.classList.remove('bg-green-600'); }, 2000);
         });
     }
 </script>

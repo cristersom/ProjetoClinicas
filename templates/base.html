@@ -1,95 +1,13 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}Narrativas Clínicas{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    {% block head %}{% endblock %}
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
-
-    {% block navbar %}
-    {% if 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path and 'perfil' not in request.path %}
-    <nav class="fixed w-full z-40 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex-shrink-0">
-                    <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
-                        <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
-                            <ion-icon name="medkit" class="text-2xl"></ion-icon>
-                        </div>
-                        <span class="text-2xl font-extrabold tracking-tight text-white">
-                            Narrativas<span class="text-teal-500">Clínicas</span>
-                        </span>
-                    </a>
-                </div>
-
-                <div class="flex items-center space-x-6">
+<div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
                         <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
-                        <form action="{% url 'narrativa:logout' %}" method="post" class="inline m-0 p-0">
-                            {% csrf_token %}
-                            <button type="submit" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</button>
-                        </form>
+
+                        <!-- CORREÇÃO DO LOGOUT AQUI (Transformado em Link GET) -->
+                        <a href="{% url 'narrativa:logout' %}" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</a>
+
                     {% else %}
                         <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
                         <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
                     {% endif %}
                 </div>
-            </div>
-        </div>
-    </nav>
-    {% endif %}
-    {% endblock %}
-
-    <div class="flex-grow">
-        {% block content %}{% endblock %}
-    </div>
-
-    <!-- Rodapé Padrão do Sistema -->
-    <footer class="bg-gray-900 border-t border-gray-800 py-8 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-gray-500 text-sm">© {% now "Y" %} Narrativas Clínicas. Todos os direitos reservados.</p>
-            <div class="flex gap-6">
-                <a href="{% url 'narrativa:termos' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Termos de Uso</a>
-                <a href="{% url 'narrativa:politica' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Política de Privacidade</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Aviso de Cookies (LGPD) -->
-    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-teal-600 p-4 md:p-6 shadow-2xl z-50 hidden flex-col md:flex-row items-center justify-between gap-4">
-        <div class="text-gray-300 text-sm md:text-base">
-            Utilizamos cookies para melhorar sua experiência em nossa plataforma. Ao continuar navegando, você concorda com nossa
-            <a href="{% url 'narrativa:politica' %}" class="text-teal-400 underline hover:text-teal-300">Política de Privacidade</a>.
-        </div>
-        <button id="aceitar-cookies" class="whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-6 rounded-lg transition">
-            Entendi e Aceito
-        </button>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const banner = document.getElementById('cookie-banner');
-            const btnAceitar = document.getElementById('aceitar-cookies');
-
-            // Verifica se o usuário já aceitou os cookies
-            if (!localStorage.getItem('cookiesAceitos')) {
-                banner.classList.remove('hidden');
-                banner.classList.add('flex');
-            }
-
-            // Ação do botão
-            btnAceitar.addEventListener('click', function() {
-                localStorage.setItem('cookiesAceitos', 'true');
-                banner.classList.add('hidden');
-                banner.classList.remove('flex');
-            });
-        });
-    </script>
-</body>
-</html>
