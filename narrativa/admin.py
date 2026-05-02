@@ -21,7 +21,9 @@ from django.db.models.functions import Coalesce
 # SAAS ADMIN (ACESSO EXCLUSIVO DO DONO)
 # ==========================================
 class SuperUserOnlyMixin:
-    def has_module_permission(self, request): return request.user.is_superuser
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
 
 @admin.register(Plano)
 class PlanoAdmin(admin.ModelAdmin):
@@ -29,17 +31,21 @@ class PlanoAdmin(admin.ModelAdmin):
     list_editable = ('preco', 'limite_narrativas', 'limite_pacientes', 'destaque')
     search_fields = ('nome', 'stripe_price_id')
 
+
 @admin.register(Clinica)
 class ClinicaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
-    list_display = ('nome', 'plano', 'assinatura_ativa') # <-- Corrigido plano_atual para plano
+    list_display = ('nome', 'plano_atual', 'assinatura_ativa')
+
 
 @admin.register(Usuario)
 class CustomUserAdmin(SuperUserOnlyMixin, UserAdmin):
-    list_display = ('username', 'email', 'clinica', 'is_staff') # <-- Corrigido is_admin_clinica para is_staff
+    list_display = ('username', 'email', 'clinica', 'is_staff')
+
 
 @admin.register(Categoria)
 class CategoriaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
     list_display = ('titulo',)
+
 
 @admin.register(PagamentoPendente)
 class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
@@ -47,8 +53,9 @@ class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
     list_filter = ('utilizado', 'data_pagamento')
     search_fields = ('email',)
 
+
 # ==========================================
-# ISOLAMENTO MULTI-TENANT
+# ISOLAMENTO MULTI-TENANT E LÓGICA DE CLÍNICA PRINCIPAL
 # ==========================================
 class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
@@ -57,15 +64,20 @@ class TenantPermissionsMixin:
     def has_change_permission(self, request, obj=None): return True
     def has_delete_permission(self, request, obj=None): return True
 
+
+# --- JORNADA CLINICA ---
+
 class EscolhaInline(admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
 
+
 class OpcaoRespostaInline(nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
+
 
 class PerguntaInline(nested_admin.NestedTabularInline):
     model = Pergunta
@@ -73,9 +85,10 @@ class PerguntaInline(nested_admin.NestedTabularInline):
     extra = 1
     inlines = [OpcaoRespostaInline]
 
+
 @admin.register(Cena)
-class CenaAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
-    list_display = ('titulo', 'narrativa') # <-- Corrigido (removido ordem)
+class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
+    list_display = ('titulo', 'narrativa')
     list_filter = ('narrativa',)
     inlines = [EscolhaInline]
 
@@ -91,13 +104,15 @@ class CenaAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             kwargs["queryset"] = Narrativa.objects.filter(clinica=request.user.clinica)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+
 @admin.register(Narrativa)
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
     list_filter = ('categoria',)
 
     def get_exclude(self, request, obj=None):
-        if request.user.is_superuser: return ('visualizacoes',)
+        if request.user.is_superuser:
+            return ('visualizacoes',)
         return ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
@@ -115,7 +130,8 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
                 obj.clinica = request.user.clinica
             else:
                 primeira_clinica = Clinica.objects.first()
-                if primeira_clinica: obj.clinica = primeira_clinica
+                if primeira_clinica:
+                    obj.clinica = primeira_clinica
         super().save_model(request, obj, form, change)
 
     def get_urls(self):
@@ -380,7 +396,8 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    def has_export_permission(self, request): return True
+    def has_export_permission(self, request):
+        return True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

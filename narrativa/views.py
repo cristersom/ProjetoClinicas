@@ -69,7 +69,6 @@ class CriarContaView(CreateView):
         pagamento = PagamentoPendente.objects.filter(email__iexact=email_digitado, utilizado=False).first()
 
         if not pagamento:
-            # Se não tem pagamento atrelado a esse e-mail, trava o cadastro
             messages.error(self.request,
                            "Nenhum plano contratado para este e-mail. Por favor, escolha um plano antes de criar sua conta.")
             return redirect('narrativa:planos')
@@ -207,7 +206,6 @@ def stripe_webhook(request):
         if email and plano_id:
             plano = Plano.objects.filter(id=plano_id).first()
 
-            # Registra como pagamento pendente pelo Webhook como redundância
             PagamentoPendente.objects.update_or_create(
                 email=email,
                 defaults={
@@ -217,7 +215,6 @@ def stripe_webhook(request):
                 }
             )
 
-            # Se já existir o usuário, ativa
             user = Usuario.objects.filter(email=email).first()
             if user and hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
@@ -416,7 +413,7 @@ def responder_questionario(request, cena_id, questionario_id):
     return render(request, 'questionario.html', {'cena': cena, 'questionario': questionario})
 
 
-def resumo_sessao(request, narrativa_id):
+def perfil_sessao(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     if not request.session.session_key: request.session.create()
     session_key = request.session.session_key
