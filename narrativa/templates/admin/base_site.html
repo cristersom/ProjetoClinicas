@@ -1,23 +1,22 @@
-{% extends "admin/base.html" %}
-
-{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+{% extends "jazzmin/base.html" %}
 
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* 1. Remove a linha do tempo (Ações Recentes) do painel inicial e expande a tela */
-    #content-related {
+    /* Esconde a linha do tempo do Jazzmin e expande as tabelas */
+    #recent-actions-module {
         display: none !important;
     }
-    .col-md-9, .col-sm-8, .content-main {
+    .content-wrapper .row > div:first-child,
+    .col-12.col-md-9.col-sm-8 {
         flex: 0 0 100% !important;
         max-width: 100% !important;
     }
 
-    /* 2. Estilos para os Banners Globais de Upsell do SaaS */
+    /* Banners SaaS Globais - Exibidos em TODAS as telas */
     .saas-global-banner {
         padding: 16px 24px;
-        margin-bottom: 24px;
+        margin: 15px 15px 25px 15px;
         border-radius: 8px;
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         display: flex;
@@ -25,57 +24,42 @@
         justify-content: space-between;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
-    .saas-banner-warning {
-        background-color: #ecfdf5;
-        border-left: 6px solid #10b981;
-        color: #065f46;
-    }
-    .saas-banner-danger {
-        background-color: #fef2f2;
-        border-left: 6px solid #ef4444;
-        color: #991b1b;
-    }
-    .saas-btn-upgrade {
-        background-color: #10b981;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    .saas-btn-upgrade:hover { background-color: #059669; color: white; }
+    .saas-banner-warning { background-color: #ecfdf5; border-left: 6px solid #10b981; color: #065f46; }
+    .saas-banner-danger { background-color: #fef2f2; border-left: 6px solid #ef4444; color: #991b1b; }
 
-    .saas-btn-danger {
-        background-color: #ef4444;
-        color: white;
+    .saas-btn {
         padding: 10px 20px;
         border-radius: 6px;
-        text-decoration: none;
+        text-decoration: none !important;
         font-weight: bold;
+        color: white !important;
         transition: all 0.3s ease;
+        white-space: nowrap;
     }
-    .saas-btn-danger:hover { background-color: #dc2626; color: white; }
-    .saas-banner-text { font-size: 1.05rem; }
+    .saas-btn-warning { background-color: #10b981; }
+    .saas-btn-warning:hover { background-color: #059669; }
+
+    .saas-btn-danger { background-color: #ef4444; }
+    .saas-btn-danger:hover { background-color: #dc2626; }
 </style>
 {% endblock %}
 
 {% block content %}
-    <!-- INJEÇÃO DO BANNER GLOBAL DE LIMITES E ASSINATURA -->
+    <!-- BANNER GLOBAL DE UPSELL / SUSPENSÃO -->
     {% if user.clinica %}
         {% if not user.clinica.assinatura_ativa %}
             <div class="saas-global-banner saas-banner-danger">
-                <span class="saas-banner-text">⚠️ <b>Acesso Suspenso:</b> Sua assinatura está inativa. A criação de novas jornadas e cenas está bloqueada.</span>
-                <a href="/planos/" class="saas-btn-danger" target="_blank">Renovar Plano</a>
+                <span style="font-size: 1.05rem;">⚠️ <b>Acesso Suspenso:</b> Sua assinatura está inativa. A criação de novas jornadas e cenas está bloqueada.</span>
+                <a href="/planos/" class="saas-btn saas-btn-danger" target="_blank">Renovar Plano</a>
             </div>
         {% elif user.clinica.atingiu_limite_narrativas %}
             <div class="saas-global-banner saas-banner-warning">
-                <span class="saas-banner-text">🚀 <b>Você atingiu o limite do seu plano!</b> Faça um upgrade para continuar expandindo os atendimentos da clínica.</span>
-                <a href="/planos/" class="saas-btn-upgrade" target="_blank">Fazer Upgrade</a>
+                <span style="font-size: 1.05rem;">🚀 <b>Você atingiu o limite do seu plano!</b> Faça um upgrade para continuar expandindo as jornadas da clínica.</span>
+                <a href="/planos/" class="saas-btn saas-btn-warning" target="_blank">Fazer Upgrade</a>
             </div>
         {% endif %}
     {% endif %}
 
-    <!-- Mantém o conteúdo original da página do Admin abaixo do banner -->
+    <!-- Restante do conteúdo do painel -->
     {{ block.super }}
 {% endblock %}

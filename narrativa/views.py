@@ -9,7 +9,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model, login, logout
-from django.contrib import messages
+from django.contrib import messages, admin
 from django.db.models import Count
 from django.db.models.functions import TruncDay
 from django.utils import timezone
@@ -57,7 +57,7 @@ class CriarContaView(CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        email_pre = self.request.session.get('email_pagamento')
+        email_pre = self.request.GET.get('email') or self.request.session.get('email_pagamento')
         if email_pre:
             initial['email'] = email_pre
         return initial
@@ -65,34 +65,28 @@ class CriarContaView(CreateView):
     def form_valid(self, form):
         email_digitado = form.cleaned_data.get('email')
 
-        # 1. VERIFICAÇÃO DE SEGURANÇA: O email digitado tem pagamento pendente?
         pagamento = PagamentoPendente.objects.filter(email__iexact=email_digitado, utilizado=False).first()
 
         if not pagamento:
-            messages.error(self.request,
+            form.add_error('email',
                            "Nenhum plano contratado para este e-mail. Por favor, escolha um plano antes de criar sua conta.")
-            return redirect('narrativa:planos')
+            return self.form_invalid(form)
 
-        # 2. Usuário pagou, pode criar a conta
         response = super().form_valid(form)
         user = self.object
 
-        # 3. Ativa a clínica e vincula o plano pago
         if hasattr(user, 'clinica') and user.clinica:
             user.clinica.assinatura_ativa = True
-            user.clinica.plano = pagamento.plano
+            user.clinica.plano_atual = pagamento.plano
             user.clinica.stripe_customer_id = pagamento.stripe_customer_id
             user.clinica.save()
 
-            # Marca o pagamento como utilizado
             pagamento.utilizado = True
             pagamento.save()
 
-            # Limpa sessão
             if 'email_pagamento' in self.request.session:
                 del self.request.session['email_pagamento']
 
-        # Loga automaticamente
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         messages.success(self.request, "Conta criada e assinatura ativada com sucesso! Bem-vindo ao seu painel.")
         return response
@@ -147,7 +141,6 @@ def sucesso_pagamento(request):
         plano_id = session.metadata.get('plano_id')
         plano = Plano.objects.filter(id=plano_id).first()
 
-        # Cria ou atualiza o Pagamento Pendente
         PagamentoPendente.objects.update_or_create(
             email=email,
             defaults={
@@ -160,10 +153,9 @@ def sucesso_pagamento(request):
         user = Usuario.objects.filter(email=email).first()
 
         if user:
-            # Já tem conta, só ativa
             if hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
-                user.clinica.plano = plano
+                user.clinica.plano_atual = plano
                 user.clinica.stripe_customer_id = session.customer
                 user.clinica.save()
 
@@ -174,11 +166,8 @@ def sucesso_pagamento(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return render(request, 'pagamento_sucesso.html', {'user': user, 'novo_usuario': False})
         else:
-            # Não tem conta, redireciona para criar
-            request.session['email_pagamento'] = email
-            messages.info(request,
-                          "Pagamento confirmado! Crie sua conta com o mesmo e-mail usado na compra para liberar o acesso.")
-            return redirect('narrativa:criarconta')
+            messages.info(request, "Pagamento confirmado! Crie sua conta com o mesmo e-mail usado na compra.")
+            return redirect(f"{reverse('narrativa:criarconta')}?email={email}")
 
     except Exception as e:
         print(f"Erro no sucesso_pagamento: {e}")
@@ -218,7 +207,7 @@ def stripe_webhook(request):
             user = Usuario.objects.filter(email=email).first()
             if user and hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
-                user.clinica.plano = plano
+                user.clinica.plano_atual = plano
                 user.clinica.stripe_customer_id = session.get('customer')
                 user.clinica.save()
 
@@ -273,6 +262,12 @@ class PerfilView(LoginRequiredMixin, UpdateView):
 
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin/faq.html"
+
+    # INJEÇÃO DO CONTEXTO DO ADMIN PARA O MENU NÃO SUMIR
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(admin.site.each_context(self.request))
+        return context
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
