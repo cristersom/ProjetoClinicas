@@ -2,7 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
-
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # ==========================================
 # MODELOS DE SAAS E ASSINATURA
@@ -26,7 +27,6 @@ class Plano(models.Model):
         return f"{self.nome} - R$ {self.preco}"
 
 
-# ---> NOVO: Armazena o pagamento antes da conta existir para sincronizar o onboarding
 class PagamentoPendente(models.Model):
     email = models.EmailField(unique=True, help_text="E-mail usado no checkout do Stripe")
     plano = models.ForeignKey(Plano, on_delete=models.CASCADE)
@@ -51,7 +51,6 @@ class Clinica(models.Model):
     def __str__(self):
         return self.nome
 
-    # ---> NOVO: Checa se a clínica já bateu o limite do plano contratado
     def atingiu_limite_narrativas(self):
         if not self.plano_atual:
             return True
@@ -90,7 +89,6 @@ class Narrativa(models.Model):
     data_criacao = models.DateTimeField(default=timezone.now)
     cena_inicial = models.ForeignKey('Cena', on_delete=models.SET_NULL, null=True, blank=True, related_name='+')
 
-    # ---> NOVO: Bloqueia a criação de novas narrativas se o limite do plano foi atingido
     def clean(self):
         if not self.pk and self.clinica:
             if self.clinica.atingiu_limite_narrativas():
@@ -188,3 +186,17 @@ class LogVisitaCena(models.Model):
 
 class ConfiguracaoClinica(models.Model):
     logo = models.ImageField(upload_to='logos/', null=True, blank=True, help_text="Logo global do sistema (se aplicável)")
+
+
+# ==========================================
+# GATILHOS (SIGNALS) DE SEGURANÇA E LIMPEZA
+# ==========================================
+@receiver(post_delete, sender=Usuario)
+def limpar_dados_usuario_deletado(sender, instance, **kwargs):
+    """
+    Se um Usuário for deletado, deleta automaticamente a Clínica vinculada a ele.
+    Como a Narrativa tem 'on_delete=models.CASCADE' com a Clínica, isso vai
+    apagar em cascata todas as Cenas, Escolhas, Questionários e Respostas.
+    """
+    if hasattr(instance, 'clinica') and instance.clinica:
+        instance.clinica.delete()
