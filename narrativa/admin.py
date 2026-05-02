@@ -88,7 +88,6 @@ class PerguntaInline(nested_admin.NestedTabularInline):
 
 @admin.register(Cena)
 class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
-    # Botão de excluir direto na lista
     list_display = ('titulo', 'narrativa', 'botao_excluir')
     list_filter = ('narrativa',)
     inlines = [EscolhaInline]
@@ -113,15 +112,15 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
 @admin.register(Narrativa)
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
-    # Botão de excluir direto na lista
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
 
-    # AQUI ESTÁ O BLOQUEIO FÍSICO DO LIMITE: ESCONDE O BOTÃO ADICIONAR
+    # AQUI ESTÁ O BLOQUEIO FÍSICO DO LIMITE: Esconde botão Adicionar
     def has_add_permission(self, request):
         if not request.user.is_superuser and hasattr(request.user, 'clinica'):
-            if request.user.clinica and request.user.clinica.atingiu_limite_narrativas():
-                return False
+            if request.user.clinica:
+                if not request.user.clinica.assinatura_ativa or request.user.clinica.atingiu_limite_narrativas():
+                    return False
         return super().has_add_permission(request)
 
     def get_exclude(self, request, obj=None):
