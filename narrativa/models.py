@@ -184,3 +184,7 @@ class LogVisitaCena(models.Model):
 
     class Meta:
         ordering = ['session_key', 'timestamp']
+
+
+class ConfiguracaoClinica(models.Model):
+    logo = models.ImageField(upload_to='logos/', null=True, blank=True, help_text="Logo global do sistema (se aplicável)")
