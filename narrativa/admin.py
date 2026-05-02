@@ -88,7 +88,8 @@ class PerguntaInline(nested_admin.NestedTabularInline):
 
 @admin.register(Cena)
 class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
-    list_display = ('titulo', 'narrativa')
+    # Botão de excluir direto na lista
+    list_display = ('titulo', 'narrativa', 'botao_excluir')
     list_filter = ('narrativa',)
     inlines = [EscolhaInline]
 
@@ -104,11 +105,24 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
             kwargs["queryset"] = Narrativa.objects.filter(clinica=request.user.clinica)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
+    def botao_excluir(self, obj):
+        url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
+        return format_html('<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>', url)
+    botao_excluir.short_description = 'Ação'
+
 
 @admin.register(Narrativa)
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
-    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios')
+    # Botão de excluir direto na lista
+    list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
+
+    # AQUI ESTÁ O BLOQUEIO FÍSICO DO LIMITE: ESCONDE O BOTÃO ADICIONAR
+    def has_add_permission(self, request):
+        if not request.user.is_superuser and hasattr(request.user, 'clinica'):
+            if request.user.clinica and request.user.clinica.atingiu_limite_narrativas():
+                return False
+        return super().has_add_permission(request)
 
     def get_exclude(self, request, obj=None):
         if request.user.is_superuser:
@@ -145,6 +159,11 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
         return format_html('<a class="button" href="{}">Relatório de Percurso</a>', url_percurso)
+
+    def botao_excluir(self, obj):
+        url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
+        return format_html('<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>', url)
+    botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         narrativa_atual = self.get_object(request, object_id)
@@ -396,8 +415,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    def has_export_permission(self, request):
-        return True
+    def has_export_permission(self, request): return True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
