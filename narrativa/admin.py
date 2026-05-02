@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 import nested_admin
 from .models import (
@@ -115,13 +115,28 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
 
-    # AQUI ESTÁ O BLOQUEIO FÍSICO DO LIMITE: Esconde botão Adicionar
+    # BLOQUEIO FÍSICO DO LIMITE
     def has_add_permission(self, request):
         if not request.user.is_superuser and hasattr(request.user, 'clinica'):
             if request.user.clinica:
                 if not request.user.clinica.assinatura_ativa or request.user.clinica.atingiu_limite_narrativas():
                     return False
         return super().has_add_permission(request)
+
+    # --- NOVO: BANNERS DE UPSELL E BLOQUEIO ---
+    def changelist_view(self, request, extra_context=None):
+        if not request.user.is_superuser and hasattr(request.user, 'clinica'):
+            clinica = request.user.clinica
+            if clinica:
+                url_planos = reverse('narrativa:planos')
+                if not clinica.assinatura_ativa:
+                    msg = format_html('⚠️ <b>Acesso Suspenso:</b> Sua assinatura está inativa e a criação foi bloqueada. <a href="{}" style="color: #ffc107; text-decoration: underline;">Clique aqui para assinar um plano e liberar o sistema.</a>', url_planos)
+                    messages.error(request, msg)
+                elif clinica.atingiu_limite_narrativas():
+                    msg = format_html('🚀 <b>Você atingiu o limite do seu plano!</b> <a href="{}" style="color: #4ade80; font-weight: bold; text-decoration: underline; background: #064e3b; padding: 4px 8px; border-radius: 4px;">Clique aqui para fazer um UPGRADE e criar mais jornadas.</a>', url_planos)
+                    messages.warning(request, msg)
+
+        return super().changelist_view(request, extra_context=extra_context)
 
     def get_exclude(self, request, obj=None):
         if request.user.is_superuser:
