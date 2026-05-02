@@ -6,6 +6,30 @@
 <div class="min-h-screen bg-gray-900 pt-24 px-4 sm:px-6 lg:px-8 pb-12">
     <div class="max-w-7xl mx-auto">
 
+        <!-- INÍCIO DOS BANNERS DE UPSELL E SUSPENSÃO -->
+        {% if request.user.clinica and request.user.clinica.assinatura_ativa == False %}
+        <div class="mb-8 p-6 bg-red-900/30 border-l-4 border-red-500 rounded-r-2xl flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
+            <div>
+                <h3 class="text-xl font-bold text-red-400 mb-1 flex items-center">
+                    <ion-icon name="warning-outline" class="mr-2 text-2xl"></ion-icon>Acesso Suspenso
+                </h3>
+                <p class="text-gray-300 text-sm">Sua assinatura está inativa. A criação de novas jornadas está bloqueada. Renove agora para evitar a perda de dados.</p>
+            </div>
+            <a href="{% url 'narrativa:planos' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg whitespace-nowrap">Renovar Plano</a>
+        </div>
+        {% elif limite_atingido %}
+        <div class="mb-8 p-6 bg-teal-900/20 border-l-4 border-teal-500 rounded-r-2xl flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
+            <div>
+                <h3 class="text-xl font-bold text-teal-400 mb-1 flex items-center">
+                    <ion-icon name="rocket-outline" class="mr-2 text-2xl"></ion-icon>Você atingiu o limite do seu plano!
+                </h3>
+                <p class="text-gray-300 text-sm">Sua clínica está crescendo! Faça um upgrade agora para continuar expandindo o tratamento dos seus pacientes.</p>
+            </div>
+            <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-xl transition shadow-[0_0_15px_rgba(13,148,136,0.4)] whitespace-nowrap">Fazer Upgrade</a>
+        </div>
+        {% endif %}
+        <!-- FIM BANNERS -->
+
         <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
 
         {% if link_portal %}

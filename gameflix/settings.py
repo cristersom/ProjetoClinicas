@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-# Atualizei o link do Heroku com base nos logs que você enviou
 ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas-clinicas-0108a6c374ea.herokuapp.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -25,6 +24,8 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
         {"name": "Ver Site", "url": "/", "new_window": True},
+        # CORREÇÃO AQUI: Agora ele acha a página perfeitamente
+        {"name": "Manual do Sistema", "url": "narrativa:faq", "new_window": False},
     ],
     "icons": {
         "auth": "fas fa-users-cog",
@@ -55,26 +56,19 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # WhiteNoise para os estáticos
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
-
-    # AWS S3
     'storages',
-
-    # Ferramentas Admin
     'nested_admin',
     'crispy_forms',
     'crispy_bootstrap5',
-    'import_export', # Relatórios em Excel/CSV
-
-    # Seu App Principal
+    'import_export',
     'narrativa',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
-# --- MIDDLEWARE ---
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -107,7 +101,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'gameflix.wsgi.application'
 
-# --- BANCO DE DADOS ---
 DATABASES = {
     'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
@@ -119,22 +112,15 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 USE_TZ = True
 
-# --- ARQUIVOS ESTÁTICOS ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# Aponta para a pasta static correta na raiz do projeto (Resolve o aviso do Heroku)
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
-# --- AMAZON S3 PARA MÍDIAS (UPLOADS) ---
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
 AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-2')
 
-# Isso garante que a URL gerada seja pública e sem expiração temporária
 if AWS_STORAGE_BUCKET_NAME:
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
@@ -145,12 +131,8 @@ AWS_DEFAULT_ACL = 'public-read'
 AWS_QUERYSTRING_AUTH = False
 
 STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
 AUTH_USER_MODEL = 'narrativa.Usuario'

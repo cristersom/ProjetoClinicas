@@ -1,38 +1,25 @@
 {% extends 'base.html' %}
+
 {% block titulo %}Termos de Uso{% endblock %}
-{% block navbar %}{% endblock %}
 
 {% block content %}
-<main class="bg-gray-900 min-h-screen w-full flex justify-center text-gray-100 p-6 md:p-10">
-    <div class="w-full md:w-8/12 lg:w-6/12 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl p-8 relative">
+<main class="bg-gray-900 text-white min-h-screen pt-24 px-4 sm:px-6 lg:px-8 pb-12">
+    <div class="max-w-4xl mx-auto bg-gray-800 p-8 md:p-12 rounded-2xl border border-gray-700 shadow-xl">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-teal-400 mb-6">Termos de Uso</h1>
+        <p class="mb-4 text-gray-300 leading-relaxed">Bem-vindo às Narrativas Clínicas. Ao usar nossa plataforma, você concorda com os termos descritos abaixo.</p>
 
-        <div class="absolute top-4 right-4 z-10">
-             <a href="#" onclick="window.history.back(); return false;"
-                class="inline-flex items-center bg-gray-700 hover:bg-gray-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition duration-300">
-                 <ion-icon name="arrow-back" class="mr-2"></ion-icon> Voltar
-             </a>
-        </div>
-
-        <h1 class="text-3xl font-bold mb-8 text-center text-teal-400">Termos de Uso</h1>
-        <p class="mb-6 text-gray-300 leading-relaxed">
-            Bem-vindo à nossa plataforma de jornadas interativas. Ao utilizar este serviço, você concorda com os termos abaixo.
-        </p>
-
-        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">1. Definição dos Utilizadores</h2>
-        <ul class="list-disc list-inside text-gray-300 space-y-2 mb-4">
-            <li><strong class="text-teal-500">Administradores:</strong> Utilizadores autenticados que gerem o conteúdo.</li>
-            <li><strong class="text-teal-500">Pacientes:</strong> Utilizadores anónimos que consomem as jornadas.</li>
+        <h2 class="text-2xl font-semibold mt-10 mb-4 text-white border-b border-gray-700 pb-2">1. Utilizadores</h2>
+        <ul class="list-disc ml-6 space-y-2 text-gray-300">
+            <li><strong class="text-teal-500">Clínicas e Profissionais:</strong> São os responsáveis intelectuais pelo conteúdo e criação das jornadas disponibilizadas na plataforma.</li>
+            <li><strong class="text-teal-500">Pacientes:</strong> Utilizadores que consomem as jornadas e respondem às interações de forma anônima ou através de sessão.</li>
         </ul>
 
-        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">2. Responsabilidades</h2>
-        <p class="mb-4 text-gray-300">
-            O Paciente concorda em fornecer informações honestas nas respostas dos questionários. A participação é voluntária e pode ser interrompida a qualquer momento.
-        </p>
+        <h2 class="text-2xl font-semibold mt-10 mb-4 text-white border-b border-gray-700 pb-2">2. Responsabilidades</h2>
+        <p class="mb-4 text-gray-300 leading-relaxed">O Paciente concorda em fornecer informações honestas nas respostas dos questionários. A participação nas jornadas é voluntária e pode ser interrompida a qualquer momento, sem prejuízo.</p>
 
-        <h2 class="text-xl font-semibold mt-8 mb-4 text-white border-b border-gray-700 pb-2">3. Dados</h2>
-        <p class="mb-4 text-gray-300">
-            A plataforma recolhe dados estatísticos. Consulte nossa <a href="{% url 'narrativa:politica_privacidade' %}" class="text-teal-400 hover:text-teal-300 underline">Política de Privacidade</a> para detalhes.
-        </p>
+        <h2 class="text-2xl font-semibold mt-10 mb-4 text-white border-b border-gray-700 pb-2">3. Uso de Dados</h2>
+        <!-- CORREÇÃO AQUI: apontando para 'politica' corretamente -->
+        <p class="mb-4 text-gray-300 leading-relaxed">A plataforma recolhe dados estatísticos para acompanhamento do percurso. Para mais detalhes sobre como armazenamos e protegemos essas informações, consulte nossa <a href="{% url 'narrativa:politica' %}" class="text-teal-400 hover:text-teal-300 underline font-medium">Política de Privacidade</a>.</p>
     </div>
 </main>
 {% endblock %}
