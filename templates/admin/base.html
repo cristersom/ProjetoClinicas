@@ -29,8 +29,8 @@
     a { color: #14b8a6; }
     a:hover { color: #0d9488; text-decoration: none; }
 
-    /* ======== CORREÇÃO DOS BOTÕES INVISÍVEIS ======== */
-    .btn { color: white !important; } /* Impede que botões herdem a cor verde dos links */
+    /* ======== CORREÇÃO DOS BOTÕES ======== */
+    .btn { color: white !important; }
 
     .btn-primary, .bg-primary, .btn-info, .bg-info {
         background-color: #0d9488 !important;
@@ -66,8 +66,19 @@
         background-color: #1f2937 !important;
         color: white !important;
     }
+
+    /* Placeholders (Texto de Dica Invisível) */
+    ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
+    ::-ms-input-placeholder { color: #9ca3af !important; }
+
+    /* Dropdowns (Selects) */
+    select option { background-color: #1f2937 !important; color: #f3f4f6 !important; }
     .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
     .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
+
+    /* Botão de Lupa (Pesquisa do Topo) */
+    .main-header .input-group .btn { background-color: #4b5563 !important; border-color: #4b5563 !important; color: white !important; }
+    .main-header .input-group .btn:hover { background-color: #6b7280 !important; }
 
     /* Cards e Tabelas */
     .card {
