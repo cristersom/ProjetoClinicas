@@ -6,50 +6,40 @@
     /* FORÇANDO A IDENTIDADE VISUAL DARK MODE NO ADMIN */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
 
-    /* REMOVENDO A LOGO E A LINHA BRANCA DO TOPO */
+    /* REMOVENDO A LOGO E QUALQUER LINHA/BORDA BRANCA DO TOPO */
     .main-header { background-color: #1f2937 !important; border-bottom: none !important; box-shadow: none !important; }
-    .brand-link { display: none !important; } /* Extermina o logo e o espaço dele de vez */
+    .content-header { border-bottom: none !important; padding-top: 0 !important; }
+    .brand-link { display: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; }
 
-    /* EMPURRANDO A PESQUISA PARA A DIREITA E REMOVENDO BORDAS */
+    /* ESCONDENDO OS MENUS REDUNDANTES DO TOPO (Hambúrguer e Usuário Direito) */
+    .main-header .nav-item[data-widget="pushmenu"],
+    .main-header .user-menu { display: none !important; }
+
+    /* EMPURRANDO A PESQUISA PARA A DIREITA */
     .main-header .navbar-nav:first-of-type { flex-grow: 1; justify-content: flex-end; padding-right: 0 !important; margin-right: 0 !important; }
-    .main-header .navbar-nav.ml-auto { margin-left: 0 !important; }
     .main-header form.form-inline { margin-right: 15px !important; border: none !important; }
 
-    /* MENU LATERAL (Removendo o negrito do manual) */
+    /* MENU LATERAL (Corrigindo cores e removendo negrito do manual) */
     .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
     .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
 
-    /* ======== REGRA "TRATOR" PARA O MANUAL (FAQ) E LEITURA ======== */
-    /* Isso vai forçar qualquer caixa, alerta ou fundo branco a ficar cinza escuro */
-    .content-wrapper [class*="bg-"],
-    .content-wrapper [class*="alert"],
-    .content-wrapper [class*="callout"],
-    .content-wrapper .card,
-    .content-wrapper .info-box {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        color: #d1d5db !important;
+    /* ======== REGRA "TRATOR" PARA O MANUAL (FAQ) ======== */
+    .content-wrapper [class*="bg-"], .content-wrapper [class*="alert"], .content-wrapper [class*="callout"], .content-wrapper .card, .content-wrapper .info-box {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; color: #d1d5db !important;
     }
-
-    /* Força textos a ficarem cinza claro para leitura perfeita */
-    .content-wrapper p, .content-wrapper span, .content-wrapper li, .content-wrapper div {
-        color: #d1d5db !important;
-        background-color: transparent !important;
+    /* Força textos específicos a ficarem legíveis e remove fundos brancos residuais */
+    .content-wrapper .card-body p, .content-wrapper .card-body span, .content-wrapper .card-body li, .content-wrapper .card-body div {
+        color: #d1d5db !important; background-color: transparent !important;
     }
-
-    /* Títulos em branco absoluto */
     .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5, .content-wrapper strong, .content-wrapper b {
-        color: #ffffff !important;
-        background-color: transparent !important;
+        color: #ffffff !important; background-color: transparent !important;
     }
-
-    /* Destaques da identidade (Verde Água) */
     .content-wrapper a { color: #14b8a6 !important; }
+
+    /* BOTÕES GERAIS E SELECTS */
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
     a:hover { color: #0d9488; text-decoration: none; }
-
-    /* BOTÕES GERAIS */
     .btn, .btn * { color: white !important; border: none !important;}
     .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; }
     .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
@@ -57,10 +47,7 @@
     .btn-success:hover { background-color: #059669 !important; }
     .btn-danger { background-color: #ef4444 !important; }
     .btn-danger:hover { background-color: #dc2626 !important; }
-    .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; color: #f3f4f6 !important; }
-    .btn-default:hover, .btn-secondary:hover { background-color: #4b5563 !important; }
 
-    /* INPUTS E SELECT2 (Barras de Pesquisa) */
     .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
@@ -77,47 +64,65 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- FUNDINDO OS MENUS DE USUÁRIO E ALINHANDO A SETA ---
-        const topUserMenu = document.querySelector('.navbar-nav .user-menu'); // Bonequinho do topo direito
-        const sidebarUserPanel = document.querySelector('.sidebar .user-panel'); // Área de usuário da lateral
-        const pushMenuBtn = document.querySelector('[data-widget="pushmenu"]'); // Botão hambúrguer original
 
-        if (sidebarUserPanel && topUserMenu) {
-            // Limpa o painel da esquerda original
-            sidebarUserPanel.innerHTML = '';
+        // --- 1. ALINHAMENTO DA FLECHINHA NO E-MAIL ---
+        const userPanel = document.querySelector('.sidebar .user-panel');
+        if (userPanel) {
+            const info = userPanel.querySelector('.info');
+            userPanel.innerHTML = '';
 
-            // Estiliza o painel da esquerda para usar Flexbox e ficar alinhado
-            sidebarUserPanel.style.display = 'flex';
-            sidebarUserPanel.style.alignItems = 'center';
-            sidebarUserPanel.style.justifyContent = 'space-between';
-            sidebarUserPanel.style.padding = '15px';
-            sidebarUserPanel.style.borderBottom = '1px solid #1f2937';
-            sidebarUserPanel.style.marginBottom = '15px';
+            // Flexbox para jogar o e-mail pra esquerda e a seta pra direita
+            userPanel.style.display = 'flex';
+            userPanel.style.justifyContent = 'space-between';
+            userPanel.style.alignItems = 'center';
+            userPanel.style.padding = '15px';
+            userPanel.style.borderBottom = '1px solid #1f2937';
+            userPanel.style.marginBottom = '15px';
 
-            // Pega o bonequinho funcional da direita e joga para a esquerda
-            topUserMenu.style.listStyle = 'none';
-            topUserMenu.style.margin = '0';
-            sidebarUserPanel.appendChild(topUserMenu);
+            if(info) {
+                info.style.padding = '0';
+                userPanel.appendChild(info);
+            }
 
-            // Garante que o menu suspenso de alterar senha apareça por cima de tudo
-            const dropMenu = topUserMenu.querySelector('.dropdown-menu');
-            if(dropMenu) { dropMenu.style.zIndex = '9999'; }
+            // Flechinha nova
+            const arrowBtn = document.createElement('a');
+            arrowBtn.href = '#';
+            arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
+            arrowBtn.onclick = function(e) {
+                e.preventDefault();
+                document.body.classList.toggle('sidebar-collapse');
+            };
+            userPanel.appendChild(arrowBtn);
+        }
 
-            // Cria a flechinha perfeitamente alinhada
-            if (pushMenuBtn) {
-                pushMenuBtn.parentElement.style.display = 'none'; // Some com o hambúrguer original do topo
+        // --- 2. NOVO MENU DE CONTA E SAIR NO FINAL DA BARRA LATERAL ---
+        const sidebarMenu = document.querySelector('.nav-sidebar');
+        if (sidebarMenu) {
+            const contaHtml = `
+                <li class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
+                <li class="nav-item">
+                    <a href="/admin/password_change/" class="nav-link">
+                        <i class="nav-icon fas fa-key" style="color: #9ca3af;"></i>
+                        <p style="color: #d1d5db;">Alterar Senha</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/admin/logout/" class="nav-link">
+                        <i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i>
+                        <p style="color: #ef4444; font-weight: bold;">Sair</p>
+                    </a>
+                </li>
+            `;
+            sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
+        }
 
-                const arrowBtn = document.createElement('a');
-                arrowBtn.href = '#';
-                arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-                arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
-
-                // Ao clicar na seta, simula o clique no hambúrguer original
-                arrowBtn.onclick = function(e) {
-                    e.preventDefault();
-                    pushMenuBtn.click();
-                };
-                sidebarUserPanel.appendChild(arrowBtn);
+        // --- 3. CORRIGINDO O "Dica:Para" SEM PRECISAR MUDAR NO BANCO DE DADOS ---
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        while (node = walker.nextNode()) {
+            if (node.nodeValue.includes("Dica:Para")) {
+                node.nodeValue = node.nodeValue.replace("Dica:Para", "Dica: Para");
             }
         }
     });

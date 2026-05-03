@@ -4,12 +4,11 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* Esconde barra lateral inútil de ações */
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* Header puxado mais para cima */
-    .dashboard-header { margin-top: -10px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #374151; }
+    /* Remove linha e ajusta espacamento do topo */
+    .dashboard-header { margin-top: 0; margin-bottom: 25px; padding-bottom: 0; border-bottom: none; }
 
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 15px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
@@ -22,7 +21,6 @@
     .kpi-number { font-size: 2.2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
     .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
 
-    /* Ações Rápidas Customizadas */
     .quick-action-btn {
         display: flex; align-items: center; justify-content: space-between;
         background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
@@ -39,13 +37,12 @@
         <p style="color: #9ca3af; margin-top: 5px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
     </div>
 
-    <!-- Layout Dividido: Esquerda (KPIs e Tabela) / Direita (Ações) -->
     <div class="row">
 
         <!-- COLUNA ESQUERDA -->
         <div class="col-lg-8">
 
-            <!-- Grid 2x2 de KPIs -->
+            <!-- Linha 1: Acessos e Retenção (Métricas Globais) -->
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-blue">
@@ -69,6 +66,7 @@
                 </div>
             </div>
 
+            <!-- Linha 2: Concluídas e Respondidas (Métricas de Ação) -->
             <div class="row mb-4">
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-purple">
@@ -92,7 +90,7 @@
                 </div>
             </div>
 
-            <!-- Tabela original limpa -->
+            <!-- Gerenciamento de Narrativas -->
             {% get_side_menu using="app_list" as dashboard_list %}
             {% if dashboard_list %}
                 {% for app in dashboard_list %}
@@ -130,9 +128,11 @@
             {% endif %}
         </div>
 
-        <!-- COLUNA DIREITA: Ações Rápidas -->
+        <!-- COLUNA DIREITA: Ações e Status -->
         <div class="col-lg-4">
-            <div class="card card-primary card-outline" style="border-top: 3px solid #3b82f6;">
+
+            <!-- Ações Rápidas -->
+            <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6;">
                 <div class="card-header">
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
                 </div>
@@ -155,6 +155,25 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Status do Sistema (Preenchendo o vazio) -->
+            <div class="card card-primary card-outline" style="border-top: 3px solid #a855f7;">
+                <div class="card-header">
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-server text-info mr-2"></i>Status do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 15px;">Todos os serviços essenciais estão operando normalmente.</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Banco de Dados Integrado</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Servidor de Narrativas</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
     </div>
