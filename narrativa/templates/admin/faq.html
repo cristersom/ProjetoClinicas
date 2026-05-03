@@ -2,46 +2,139 @@
 {% load static %}
 
 {% block title %}Manual do Administrador{% endblock %}
-{% block content_title %}Manual do Administrador{% endblock %}
 
 {% block extrahead %}
 <style>
-    .manual-container { max-width: 1000px; margin: 0 auto 30px auto; font-family: inherit; color: #d1d5db; line-height: 1.6; }
-    .manual-container p { color: #9ca3af; font-size: 0.95rem; margin-bottom: 25px;}
+    /* Estilos do Manual (Doc Style) */
+    .manual-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #333;
+        line-height: 1.6;
+    }
 
-    .manual-section { background-color: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-    .manual-section:nth-of-type(1) { border-left: 4px solid #3b82f6; }
-    .manual-section:nth-of-type(2) { border-left: 4px solid #10b981; }
-    .manual-section:nth-of-type(3) { border-left: 4px solid #a855f7; }
-    .manual-section:nth-of-type(4) { border-left: 4px solid #f97316; }
-    .manual-section:nth-of-type(5) { border-left: 4px solid #14b8a6; }
+    .manual-header {
+        border-bottom: 2px solid #0d9488; /* Teal-600 */
+        padding-bottom: 20px;
+        margin-bottom: 40px;
+    }
 
-    .manual-section h2 { font-size: 1.5rem; color: #ffffff; font-weight: 800; margin-top: 0; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #374151; }
-    .manual-section h3 { font-size: 1.1rem; color: #ffffff; font-weight: 700; margin-top: 25px; margin-bottom: 10px; }
+    .manual-header h1 {
+        font-size: 2.2rem;
+        color: #134e4a; /* Teal-900 */
+        margin: 0;
+    }
 
-    .step-list { list-style: none; padding: 0; counter-reset: step-counter; }
-    .step-list li { position: relative; padding-left: 40px; margin-bottom: 15px; color: #d1d5db; }
-    .step-list li::before { counter-increment: step-counter; content: counter(step-counter); position: absolute; left: 0; top: 0; width: 28px; height: 28px; background-color: #14b8a6; color: white; border-radius: 50%; text-align: center; line-height: 28px; font-weight: bold; font-size: 0.9rem; }
+    .manual-section {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
 
-    .info-box { background-color: rgba(20, 184, 166, 0.15); border-left: 4px solid #14b8a6; padding: 15px; margin: 20px 0; color: #d1d5db; font-size: 0.95rem; border-radius: 0 8px 8px 0; }
-    .warning-box { background-color: rgba(249, 115, 22, 0.15); border-left: 4px solid #f97316; padding: 15px; margin: 20px 0; color: #d1d5db; border-radius: 0 8px 8px 0; }
-    .warning-box strong { color: #f97316; }
+    .manual-section h2 {
+        font-size: 1.5rem;
+        color: #0f766e; /* Teal-700 */
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f3f4f6;
+    }
 
-    dt { font-weight: bold; color: #34d399; margin-top: 15px; font-size: 1.05rem; }
-    dd { margin-left: 0; margin-bottom: 15px; color: #9ca3af; }
+    .manual-section h3 {
+        font-size: 1.1rem;
+        color: #374151;
+        font-weight: 700;
+        margin-top: 25px;
+        margin-bottom: 10px;
+    }
 
-    .toc { background: #1f2937; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #374151; border-left: 4px solid #4b5563; }
-    .toc ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
-    .toc li { border-bottom: 1px solid #374151; }
-    .toc li:last-child { border-bottom: none; }
-    .toc a { display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600; font-size: 1rem; transition: all 0.2s ease; }
-    .toc a:hover { color: #34d399; background-color: rgba(55, 65, 81, 0.5); border-radius: 6px; }
+    /* Listas e Passos */
+    .step-list {
+        list-style: none;
+        padding: 0;
+        counter-reset: step-counter;
+    }
+    .step-list li {
+        position: relative;
+        padding-left: 40px;
+        margin-bottom: 15px;
+    }
+    .step-list li::before {
+        counter-increment: step-counter;
+        content: counter(step-counter);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 28px;
+        height: 28px;
+        background-color: #0d9488; /* Teal */
+        color: white;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 28px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    /* Caixas de Destaque */
+    .info-box {
+        background-color: #f0fdfa; /* Teal bem claro */
+        border-left: 4px solid #0d9488;
+        padding: 15px;
+        margin: 20px 0;
+        color: #134e4a;
+        font-size: 0.95rem;
+    }
+
+    .warning-box {
+        background-color: #fff7ed; /* Laranja claro */
+        border-left: 4px solid #f97316;
+        padding: 15px;
+        margin: 20px 0;
+        color: #9a3412;
+    }
+
+    /* Glossário */
+    dt { font-weight: bold; color: #115e59; margin-top: 10px; }
+    dd { margin-left: 0; margin-bottom: 10px; color: #555; }
+
+    /* Navegação Interna */
+    .toc {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+    .toc ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .toc a {
+        text-decoration: none;
+        color: #0d9488;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    .toc a:hover { text-decoration: underline; }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="manual-container">
-    <p>Guia de referência para gestão de Narrativas, Questionários e Relatórios.</p>
+
+    <div class="manual-header">
+        <h1>Manual do Administrador</h1>
+        <p>Guia de referência para gestão de Narrativas, Questionários e Relatórios.</p>
+    </div>
 
     <div class="toc">
         <ul>
@@ -58,12 +151,16 @@
         <dl>
             <dt>Narrativa</dt>
             <dd>É a entidade principal (a jornada completa). Contém o título, a descrição, a imagem de capa e agrupa todas as cenas.</dd>
+
             <dt>Cena</dt>
             <dd>Representa uma tela individual que o paciente visualiza. Pode conter texto, vídeo ou imagem. É a unidade básica de navegação.</dd>
+
             <dt>Escolha (Botão)</dt>
             <dd>Opção de navegação criada dentro de uma Cena. Permite ligar a Cena A à Cena B, criando a interatividade.</dd>
+
             <dt>Questionário</dt>
             <dd>Formulário de coleta de dados. Pode ser vinculado a uma Cena específica para interromper a narrativa e solicitar feedback do paciente.</dd>
+
             <dt>Sessão do Paciente</dt>
             <dd>Registro técnico que identifica um acesso único. O sistema usa isso para gerar relatórios de progresso e retenção.</dd>
         </dl>
@@ -71,28 +168,30 @@
 
     <div class="manual-section" id="fluxo">
         <h2>2. Fluxo de Criação de Narrativas</h2>
-        <p>O sistema utiliza um banco de dados relacional. Isso significa que <strong style="color: #ffffff;">você não pode vincular algo que ainda não existe</strong>. Siga esta ordem lógica para evitar erros:</p>
+        <p>O sistema utiliza um banco de dados relacional. Isso significa que <strong>você não pode vincular algo que ainda não existe</strong>. Siga esta ordem lógica para evitar erros:</p>
+
         <div class="warning-box">
             <strong>Regra de Ouro:</strong> Crie o conteúdo primeiro (Cenas), depois faça as conexões (Links e Cena Inicial).
         </div>
+
         <ol class="step-list">
             <li>
-                <strong style="color: #ffffff;">Passo 1: Criar a Narrativa (Estrutura)</strong><br>
+                <strong>Passo 1: Criar a Narrativa (Estrutura)</strong><br>
                 Acesse "Narrativas" > "Adicionar". Preencha Título, Descrição e Capa. <br>
-                <em style="color: #9ca3af;">Nota: Deixe o campo "Cena Inicial" em branco neste momento.</em> Salve.
+                <em>Nota: Deixe o campo "Cena Inicial" em branco neste momento.</em> Salve.
             </li>
             <li>
-                <strong style="color: #ffffff;">Passo 2: Criar as Cenas (Conteúdo)</strong><br>
+                <strong>Passo 2: Criar as Cenas (Conteúdo)</strong><br>
                 Acesse "Cenas" > "Adicionar". Crie todas as telas da sua jornada. <br>
                 Em cada cena, selecione a Narrativa criada no Passo 1. Salve cada uma.
             </li>
             <li>
-                <strong style="color: #ffffff;">Passo 3: Criar as Conexões (Escolhas)</strong><br>
+                <strong>Passo 3: Criar as Conexões (Escolhas)</strong><br>
                 Volte para editar as Cenas criadas. No final da página de edição, use a seção "Escolhas" para criar os botões.<br>
                 Agora que todas as cenas existem, você poderá selecionar a "Cena de Destino" correta no menu.
             </li>
             <li>
-                <strong style="color: #ffffff;">Passo 4: Definir o Início</strong><br>
+                <strong>Passo 4: Definir o Início</strong><br>
                 Volte para editar a Narrativa (Passo 1). Agora selecione a "Cena Inicial" correta e salve.
             </li>
         </ol>
@@ -101,56 +200,64 @@
     <div class="manual-section" id="questionarios">
         <h2>3. Gestão de Questionários</h2>
         <p>Os questionários permitem coletar dados qualitativos e quantitativos durante a jornada.</p>
+
         <h3>Como criar e vincular:</h3>
         <ol class="step-list">
             <li>Vá em "Questionários" > "Adicionar".</li>
             <li>Defina um Título para o formulário.</li>
             <li>
-                <strong style="color: #ffffff;">Cena Associada:</strong> Selecione a cena onde este questionário deve aparecer. O formulário será exibido automaticamente abaixo do conteúdo dessa cena.
+                <strong>Cena Associada:</strong> Selecione a cena onde este questionário deve aparecer. O formulário será exibido automaticamente abaixo do conteúdo dessa cena.
             </li>
             <li>
-                <strong style="color: #ffffff;">Cena de Destino (Opcional):</strong> Para onde o paciente vai após responder? Se deixar em branco, ele permanece na mesma tela (útil se a cena tiver botões de escolha manuais).
+                <strong>Cena de Destino (Opcional):</strong> Para onde o paciente vai após responder? Se deixar em branco, ele permanece na mesma tela (útil se a cena tiver botões de escolha manuais).
             </li>
         </ol>
+
         <h3>Tipos de Pergunta:</h3>
-        <ul style="color: #d1d5db;">
-            <li><strong style="color: #ffffff;">Texto Livre:</strong> Caixa de texto aberta para opiniões.</li>
-            <li><strong style="color: #ffffff;">Escala (1 a 5):</strong> Sistema de estrelas para avaliação.</li>
-            <li><strong style="color: #ffffff;">Única Escolha:</strong> Botões de rádio (apenas uma opção válida).</li>
-            <li><strong style="color: #ffffff;">Múltipla Escolha:</strong> Caixas de seleção (várias opções válidas).</li>
+        <ul>
+            <li><strong>Texto Livre:</strong> Caixa de texto aberta para opiniões.</li>
+            <li><strong>Escala (1 a 5):</strong> Sistema de estrelas para avaliação.</li>
+            <li><strong>Única Escolha:</strong> Botões de rádio (apenas uma opção válida).</li>
+            <li><strong>Múltipla Escolha:</strong> Caixas de seleção (várias opções válidas).</li>
         </ul>
+
         <div class="info-box">
-            <strong style="color: #14b8a6;">Dica:</strong> Para perguntas de múltipla escolha, você deve adicionar as "Opções de Resposta" clicando no botão "Adicionar outro(a) Opção" dentro da tela de edição da Pergunta.
+            <strong>Dica:</strong> Para perguntas de múltipla escolha, você deve adicionar as "Opções de Resposta" clicando no botão "Adicionar outro(a) Opção" dentro da tela de edição da Pergunta.
         </div>
     </div>
 
     <div class="manual-section" id="distribuicao">
         <h2>4. Distribuição e Acesso</h2>
+
         <h3>Menu de Narrativas (Hub)</h3>
         <p>Link que exibe todas as narrativas disponíveis. Ideal para enviar ao paciente e deixá-lo escolher.</p>
-        <ul style="color: #d1d5db;">
-            <li>No Painel Administrativo, clique no botão <strong style="color: #ffffff;">"Compartilhar Acesso Geral"</strong> no topo da tela.</li>
+        <ul>
+            <li>No Painel Administrativo, clique no botão <strong>"Compartilhar Acesso Geral"</strong> no topo da tela.</li>
         </ul>
+
         <h3>Link Direto (Narrativa Específica)</h3>
         <p>Link que abre uma jornada específica imediatamente.</p>
-        <ul style="color: #d1d5db;">
+        <ul>
             <li>Clique na narrativa desejada para ver os Detalhes.</li>
-            <li>Use o botão cinza <strong style="color: #ffffff;">"Copiar Link"</strong> ou o botão verde <strong style="color: #ffffff;">"Encaminhar"</strong> (mobile).</li>
+            <li>Use o botão cinza <strong>"Copiar Link"</strong> ou o botão verde <strong>"Encaminhar"</strong> (mobile).</li>
         </ul>
     </div>
 
     <div class="manual-section" id="relatorios">
         <h2>5. Relatórios e Dados</h2>
+
         <h3>Dashboard (Visão Geral)</h3>
-        <p>Acesse clicando em "Dashboard" no menu lateral. Mostra KPIs de acessos totais, gráfico de retenção de 30 dias e as narrativas mais populares.</p>
+        <p>Acesse clicando em "Dashboard" no menu superior. Mostra KPIs de acessos totais, gráfico de retenção de 30 dias e as narrativas mais populares.</p>
+
         <h3>Relatório de Respostas (Exportação)</h3>
         <p>Para baixar os dados em Excel (XLSX):</p>
-        <ol style="color: #d1d5db;">
+        <ol>
             <li>Vá em "Questionários".</li>
             <li>Na lista, localize o questionário desejado.</li>
-            <li>Clique em <strong style="color: #ffffff;">"Ver Resumo"</strong>.</li>
+            <li>Clique em <strong>"Ver Resumo"</strong>.</li>
             <li>Na tela de resumo, use os botões de "Exportar" no topo para baixar a planilha consolidada (onde cada linha é um paciente).</li>
         </ol>
     </div>
+
 </div>
 {% endblock %}

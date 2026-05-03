@@ -278,7 +278,7 @@ class AdminFAQView(LoginRequiredMixin, TemplateView):
 
 
 class DashboardView(LoginRequiredMixin, TemplateView):
-    template_name = "admin/dashboard.html"
+    template_name = "admin/_dashboard.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
