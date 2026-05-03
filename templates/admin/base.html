@@ -3,50 +3,77 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* FORÇANDO A IDENTIDADE VISUAL DARK MODE NO ADMIN */
+    /* =====================================================================
+       1. IDENTIDADE VISUAL E CORES GERAIS
+       ===================================================================== */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
+    .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; }
 
-    /* REMOVENDO A LOGO E QUALQUER LINHA/BORDA BRANCA DO TOPO */
+    /* Remove a logo e textos do canto superior esquerdo */
+    .brand-link { display: none !important; }
+
+    /* =====================================================================
+       2. LIMPEZA TOTAL DO MENU SUPERIOR (SÓ AS PESQUISAS FICAM)
+       ===================================================================== */
     .main-header { background-color: #1f2937 !important; border-bottom: none !important; box-shadow: none !important; }
     .content-header { border-bottom: none !important; padding-top: 0 !important; }
-    .brand-link { display: none !important; }
-    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; }
 
-    /* ESCONDENDO OS MENUS REDUNDANTES DO TOPO (Hambúrguer e Usuário Direito) */
+    /* ESCONDE O HAMBÚRGUER E O USUÁRIO DO TOPO */
     .main-header .nav-item[data-widget="pushmenu"],
-    .main-header .user-menu { display: none !important; }
+    .main-header .user-menu,
+    .main-header .dropdown.user.user-menu {
+        display: none !important;
+    }
 
-    /* EMPURRANDO A PESQUISA PARA A DIREITA */
-    .main-header .navbar-nav:first-of-type { flex-grow: 1; justify-content: flex-end; padding-right: 0 !important; margin-right: 0 !important; }
-    .main-header form.form-inline { margin-right: 15px !important; border: none !important; }
+    /* Puxa as pesquisas para a direita e ajusta alinhamento */
+    .main-header .navbar-nav { width: 100%; justify-content: flex-end; padding-right: 15px; }
+    .main-header form.form-inline { margin: 0 5px !important; border: none !important; }
 
-    /* MENU LATERAL (Corrigindo cores e removendo negrito do manual) */
+    /* =====================================================================
+       3. TABELAS (CORRIGINDO O VÃO GIGANTE E AS CORES DOS BOTÕES)
+       ===================================================================== */
+    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
+
+    /* Faz a coluna dos botões ocupar só o espaço exato, colando-os no texto */
+    .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
+
+    /* Botões com alto contraste */
+    .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; }
+    .btn-success:hover { background-color: #059669 !important; }
+
+    .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; }
+    .btn-info:hover { background-color: #2563eb !important; }
+
+    .btn-success i, .btn-info i { color: #ffffff !important; } /* Força ícones brancos */
+
+    /* =====================================================================
+       4. RESTAURANDO O MANUAL (FAQ) BONITO E LEGÍVEL
+       ===================================================================== */
+    .content-wrapper .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
+    .content-wrapper .card-body { color: #d1d5db !important; }
+
+    /* Títulos em branco absoluto */
+    .content-wrapper .card-body h1, .content-wrapper .card-body h2, .content-wrapper .card-body h3,
+    .content-wrapper .card-body h4, .content-wrapper .card-body h5, .content-wrapper .card-body strong,
+    .content-wrapper .card-body b {
+        color: #ffffff !important;
+    }
+
+    /* Textos (como o glossário cinza) forçados para cinza claro legível */
+    .content-wrapper .card-body p, .content-wrapper .card-body li, .content-wrapper .card-body span, .text-muted {
+        color: #d1d5db !important;
+    }
+
+    .content-wrapper .card-body a { color: #34d399 !important; font-weight: bold; } /* Links em destaque verde */
+
+    /* =====================================================================
+       5. MENU LATERAL E INPUTS GERAIS
+       ===================================================================== */
     .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
     .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
 
-    /* ======== REGRA "TRATOR" PARA O MANUAL (FAQ) ======== */
-    .content-wrapper [class*="bg-"], .content-wrapper [class*="alert"], .content-wrapper [class*="callout"], .content-wrapper .card, .content-wrapper .info-box {
-        background-color: #1f2937 !important; border: 1px solid #374151 !important; color: #d1d5db !important;
-    }
-    /* Força textos específicos a ficarem legíveis e remove fundos brancos residuais */
-    .content-wrapper .card-body p, .content-wrapper .card-body span, .content-wrapper .card-body li, .content-wrapper .card-body div {
-        color: #d1d5db !important; background-color: transparent !important;
-    }
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5, .content-wrapper strong, .content-wrapper b {
-        color: #ffffff !important; background-color: transparent !important;
-    }
-    .content-wrapper a { color: #14b8a6 !important; }
-
-    /* BOTÕES GERAIS E SELECTS */
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
     a:hover { color: #0d9488; text-decoration: none; }
-    .btn, .btn * { color: white !important; border: none !important;}
-    .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; }
-    .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
-    .btn-success { background-color: #10b981 !important; }
-    .btn-success:hover { background-color: #059669 !important; }
-    .btn-danger { background-color: #ef4444 !important; }
-    .btn-danger:hover { background-color: #dc2626 !important; }
 
     .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
@@ -57,15 +84,13 @@
     .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
     .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
     .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
-    .main-header .input-group .btn { background-color: #4b5563 !important; }
-
-    .table td, .table th { border-top: 1px solid #374151 !important; border-bottom: none !important; }
+    .main-header .input-group .btn { background-color: #4b5563 !important; color: white !important; border: none !important; }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. ALINHAMENTO DA FLECHINHA NO E-MAIL ---
+        // --- 1. ALINHAMENTO PERFEITO DA FLECHINHA LATERAL ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
@@ -84,7 +109,7 @@
                 userPanel.appendChild(info);
             }
 
-            // Flechinha nova
+            // Flechinha (Substituta do hambúrguer)
             const arrowBtn = document.createElement('a');
             arrowBtn.href = '#';
             arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -96,7 +121,7 @@
             userPanel.appendChild(arrowBtn);
         }
 
-        // --- 2. NOVO MENU DE CONTA E SAIR NO FINAL DA BARRA LATERAL ---
+        // --- 2. SESSÃO DE CONTA NA BARRA LATERAL ---
         const sidebarMenu = document.querySelector('.nav-sidebar');
         if (sidebarMenu) {
             const contaHtml = `
@@ -115,15 +140,6 @@
                 </li>
             `;
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
-        }
-
-        // --- 3. CORRIGINDO O "Dica:Para" SEM PRECISAR MUDAR NO BANCO DE DADOS ---
-        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-        let node;
-        while (node = walker.nextNode()) {
-            if (node.nodeValue.includes("Dica:Para")) {
-                node.nodeValue = node.nodeValue.replace("Dica:Para", "Dica: Para");
-            }
         }
     });
 </script>
