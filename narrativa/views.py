@@ -43,6 +43,7 @@ class LoginView(DjangoLoginView):
         return reverse_lazy("narrativa:narrativas")
 
 
+@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def custom_logout(request):
     logout(request)
