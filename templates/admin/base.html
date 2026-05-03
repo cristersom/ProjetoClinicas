@@ -4,76 +4,69 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. IDENTIDADE VISUAL E CORES GERAIS
+       1. IDENTIDADE VISUAL DARK MODE
        ===================================================================== */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; }
-
-    /* Remove a logo e textos do canto superior esquerdo */
     .brand-link { display: none !important; }
 
     /* =====================================================================
-       2. LIMPEZA TOTAL DO MENU SUPERIOR (SÓ AS PESQUISAS FICAM)
+       2. O TOPO: LIMPÍSSIMO, SEM BOTÕES E COM PESQUISA GRANDE
        ===================================================================== */
-    .main-header { background-color: #1f2937 !important; border-bottom: none !important; box-shadow: none !important; }
-    .content-header { border-bottom: none !important; padding-top: 0 !important; }
+    .main-header { background-color: #111827 !important; border-bottom: none !important; box-shadow: none !important; }
+    .content-header { display: none !important; }
 
-    /* ESCONDE O HAMBÚRGUER E O USUÁRIO DO TOPO */
-    .main-header .nav-item[data-widget="pushmenu"],
-    .main-header .user-menu,
-    .main-header .dropdown.user.user-menu {
+    /* MATA os ícones de hambúrguer e usuário do cabeçalho */
+    .main-header [data-widget="pushmenu"],
+    .main-header .user-menu {
         display: none !important;
     }
 
-    /* Puxa as pesquisas para a direita e ajusta alinhamento */
+    /* Alinha à direita e aumenta o tamanho do campo de pesquisa */
     .main-header .navbar-nav { width: 100%; justify-content: flex-end; padding-right: 15px; }
-    .main-header form.form-inline { margin: 0 5px !important; border: none !important; }
+    .main-header form.form-inline { margin-right: 15px !important; border: none !important; }
+    .main-header .form-inline .input-group { width: 350px; }
 
     /* =====================================================================
-       3. TABELAS (CORRIGINDO O VÃO GIGANTE E AS CORES DOS BOTÕES)
+       3. TABELAS (SEM VÃO GIGANTE E COM BOTÕES LEGÍVEIS)
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
+    .table td a { color: #f3f4f6 !important; font-weight: bold; } /* Nome da tabela claro */
 
-    /* Faz a coluna dos botões ocupar só o espaço exato, colando-os no texto */
+    /* Puxa os botões pra perto do texto */
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
-    /* Botões com alto contraste */
-    .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; }
-    .btn-success:hover { background-color: #059669 !important; }
-
-    .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; }
-    .btn-info:hover { background-color: #2563eb !important; }
-
-    .btn-success i, .btn-info i { color: #ffffff !important; } /* Força ícones brancos */
+    /* Cores de alta leitura para botões da tabela */
+    .table .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
+    .table .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
+    .table .btn-success:hover { background-color: #059669 !important; }
+    .table .btn-info:hover { background-color: #2563eb !important; }
+    .table .btn i { color: #ffffff !important; }
 
     /* =====================================================================
-       4. RESTAURANDO O MANUAL (FAQ) BONITO E LEGÍVEL
+       4. O MANUAL (FAQ) - ANULANDO FUNDOS BRANCOS
        ===================================================================== */
-    .content-wrapper .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
-    .content-wrapper .card-body { color: #d1d5db !important; }
-
-    /* Títulos em branco absoluto */
-    .content-wrapper .card-body h1, .content-wrapper .card-body h2, .content-wrapper .card-body h3,
-    .content-wrapper .card-body h4, .content-wrapper .card-body h5, .content-wrapper .card-body strong,
-    .content-wrapper .card-body b {
-        color: #ffffff !important;
+    .content-wrapper .card, .content-wrapper .info-box, .content-wrapper .callout {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px;
     }
 
-    /* Textos (como o glossário cinza) forçados para cinza claro legível */
-    .content-wrapper .card-body p, .content-wrapper .card-body li, .content-wrapper .card-body span, .text-muted {
-        color: #d1d5db !important;
-    }
+    /* Força os textos comuns a serem cinza claro */
+    .content-wrapper .card *, .content-wrapper .info-box * { color: #d1d5db !important; background-color: transparent !important; }
 
-    .content-wrapper .card-body a { color: #34d399 !important; font-weight: bold; } /* Links em destaque verde */
+    /* Títulos em branco absoluto pra destacar do cinza */
+    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
+    .content-wrapper strong, .content-wrapper b, .content-wrapper .card-title {
+        color: #ffffff !important; font-weight: bold;
+    }
+    .content-wrapper a { color: #34d399 !important; font-weight: bold; }
 
     /* =====================================================================
-       5. MENU LATERAL E INPUTS GERAIS
+       5. INPUTS E MENU LATERAL
        ===================================================================== */
     .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
     .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
 
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
-    a:hover { color: #0d9488; text-decoration: none; }
 
     .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
@@ -90,13 +83,12 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. ALINHAMENTO PERFEITO DA FLECHINHA LATERAL ---
+        // --- 1. ALINHAMENTO DA FLECHINHA LATERAL E E-MAIL ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
             userPanel.innerHTML = '';
 
-            // Flexbox para jogar o e-mail pra esquerda e a seta pra direita
             userPanel.style.display = 'flex';
             userPanel.style.justifyContent = 'space-between';
             userPanel.style.alignItems = 'center';
@@ -109,7 +101,6 @@
                 userPanel.appendChild(info);
             }
 
-            // Flechinha (Substituta do hambúrguer)
             const arrowBtn = document.createElement('a');
             arrowBtn.href = '#';
             arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -121,11 +112,11 @@
             userPanel.appendChild(arrowBtn);
         }
 
-        // --- 2. SESSÃO DE CONTA NA BARRA LATERAL ---
+        // --- 2. MENU DE CONTA E SAIR ---
         const sidebarMenu = document.querySelector('.nav-sidebar');
-        if (sidebarMenu) {
+        if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
-                <li class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
+                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
                 <li class="nav-item">
                     <a href="/admin/password_change/" class="nav-link">
                         <i class="nav-icon fas fa-key" style="color: #9ca3af;"></i>
@@ -140,6 +131,14 @@
                 </li>
             `;
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
+        }
+
+        // --- 3. EXTERMINADOR DE CLASSES DO BOOTSTRAP NO MANUAL ---
+        if (window.location.href.includes('faq')) {
+            // Arranca as classes brancas nativas do bootstrap que estão bloqueando o CSS
+            document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted').forEach(el => {
+                el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted');
+            });
         }
     });
 </script>
