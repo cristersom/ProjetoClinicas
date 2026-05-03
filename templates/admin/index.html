@@ -1,0 +1,86 @@
+{% extends "jazzmin/index.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Esconde a barra lateral inútil de ações recentes */
+    #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
+    .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
+
+    /* Estilização do Mega Dashboard de SaaS */
+    .dashboard-header {
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #374151;
+    }
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+    .kpi-card {
+        background-color: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    .kpi-card:hover { transform: translateY(-5px); }
+    .kpi-card::before {
+        content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
+    }
+    .border-blue::before { background-color: #3b82f6; }
+    .border-purple::before { background-color: #a855f7; }
+    .border-teal::before { background-color: #14b8a6; }
+    .border-orange::before { background-color: #f97316; }
+
+    .kpi-title { color: #9ca3af; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.05em; }
+    .kpi-value { color: #f3f4f6; font-size: 2.5rem; font-weight: 900; margin-bottom: 5px; line-height: 1; }
+    .kpi-desc { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;}
+    
+    .text-success-metric { color: #34d399; } /* Verde para métricas boas */
+    .text-warning-metric { color: #fbbf24; } /* Amarelo para alertas */
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard-header">
+        <h2 style="color: #f3f4f6; font-weight: 800; margin: 0;">Visão Geral do Engajamento</h2>
+        <p style="color: #9ca3af; margin-top: 5px;">Acompanhe o progresso dos pacientes nas narrativas.</p>
+    </div>
+
+    <!-- GRID DE KPI -->
+    <div class="kpi-grid">
+        <div class="kpi-card border-blue">
+            <div class="kpi-title">Acessos Totais</div>
+            <div class="kpi-value">{{ kpi_sessoes|default:"0" }}</div>
+            <div class="kpi-desc text-success-metric"><ion-icon name="trending-up-outline"></ion-icon> Pacientes únicos iniciados</div>
+        </div>
+
+        <div class="kpi-card border-purple">
+            <div class="kpi-title">Narrativas Concluídas</div>
+            <div class="kpi-value">{{ kpi_finalizadas|default:"0" }}</div>
+            <div class="kpi-desc text-success-metric"><ion-icon name="checkmark-circle-outline"></ion-icon> Chegaram até o fim</div>
+        </div>
+
+        <div class="kpi-card border-teal">
+            <div class="kpi-title">Taxa de Conclusão</div>
+            <div class="kpi-value">{{ taxa_conclusao|default:"0" }}%</div>
+            <div class="kpi-desc text-warning-metric"><ion-icon name="pie-chart-outline"></ion-icon> Engajamento geral</div>
+        </div>
+
+        <div class="kpi-card border-orange">
+            <div class="kpi-title">Pesquisas Respondidas</div>
+            <div class="kpi-value">{{ kpi_respostas|default:"0" }}</div>
+            <div class="kpi-desc text-success-metric"><ion-icon name="chatbubbles-outline"></ion-icon> Volume de dados coletados</div>
+        </div>
+    </div>
+
+    <!-- Mantém as tabelas originais do sistema embaixo -->
+    {{ block.super }}
+
+{% endblock %}
