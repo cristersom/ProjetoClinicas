@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO ABSOLUTO E REMOÇÃO DE LINHAS DO TOPO
+       1. MODO ESCURO GERAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer {
         background-color: #111827 !important; color: #f3f4f6 !important;
@@ -18,59 +18,36 @@
         .main-header { display: none !important; }
         .content-wrapper { padding-top: 30px !important; margin-top: 0 !important; }
     }
-    /* No Mobile, esconde botoes mas mantem a barra pro hambúrguer */
     @media (max-width: 991px) {
         .main-header { background-color: #111827 !important; border: none !important; box-shadow: none !important; }
         .main-header .navbar-nav { display: none !important; }
     }
 
     /* =====================================================================
-       2. TÍTULOS PADRONIZADOS (MANUAL E DASHBOARD IDÊNTICOS)
+       2. TÍTULOS PADRONIZADOS
        ===================================================================== */
     .content-wrapper h1, .content-header h1 {
-        font-family: inherit !important;
-        font-size: 2rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        margin-bottom: 5px !important;
-        border: none !important;
+        font-family: inherit !important; font-size: 2rem !important; font-weight: 800 !important;
+        color: #ffffff !important; margin-bottom: 5px !important; border: none !important;
     }
     .content-wrapper > p, .content-header p, p.text-muted {
-        font-family: inherit !important;
-        font-size: 0.95rem !important;
-        color: #9ca3af !important;
-        margin-top: 5px !important;
+        font-family: inherit !important; font-size: 0.95rem !important; color: #9ca3af !important; margin-top: 5px !important;
     }
 
     /* =====================================================================
        3. CSS NUCLEAR CONTRA O FUNDO BRANCO DOS CARDS
        ===================================================================== */
-    .content-wrapper .card,
-    .content-wrapper .card-body,
-    .content-wrapper .info-box,
-    .content-wrapper .callout {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 12px;
+    .content-wrapper .card, .content-wrapper .card-body, .content-wrapper .info-box, .content-wrapper .callout {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px;
     }
+    .content-wrapper .card-body *, .content-wrapper .info-box * { color: #d1d5db !important; }
 
-    /* Textos gerais dentro dos cards */
-    .content-wrapper .card-body *, .content-wrapper .info-box * {
-        color: #d1d5db !important;
+    .content-wrapper .card-body h2, .content-wrapper .card-body h3, .content-wrapper .card-body h4,
+    .content-wrapper .card-body h5, .content-wrapper .card-body strong, .content-wrapper .card-body b {
+        color: #ffffff !important; font-weight: bold !important;
     }
-
-    /* Subtítulos dentro dos cards em branco absoluto */
-    .content-wrapper .card-body h2, .content-wrapper .card-body h3,
-    .content-wrapper .card-body h4, .content-wrapper .card-body h5,
-    .content-wrapper .card-body strong, .content-wrapper .card-body b {
-        color: #ffffff !important;
-        font-weight: bold !important;
-    }
-
-    /* Links (Verde Água) */
     .content-wrapper a { color: #34d399 !important; font-weight: bold; }
 
-    /* Bordas coloridas para dar vida aos cards do Manual */
     .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
     .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
     .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
@@ -78,16 +55,33 @@
     .content-wrapper .card:nth-of-type(5) { border-left: 4px solid #14b8a6 !important; }
 
     /* =====================================================================
-       4. TABELAS (CORES E BOTÕES)
+       4. TABELAS E BOTÕES (O NOVO "ADICIONAR" VIBRANTE)
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
-    .table .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
-    .table .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
-    .table .btn-success:hover { background-color: #059669 !important; }
-    .table .btn-info:hover { background-color: #2563eb !important; }
-    .table .btn i { color: #ffffff !important; }
+    /* Novo botão ADICIONAR destacado e vibrante */
+    .btn-success, a.btn-success[href*="/add/"] {
+        background-color: #10b981 !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        padding: 6px 16px !important;
+        box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
+        transition: all 0.2s ease;
+    }
+    .btn-success:hover, a.btn-success[href*="/add/"]:hover {
+        background-color: #059669 !important;
+        box-shadow: 0 6px 8px -1px rgba(16, 185, 129, 0.5) !important;
+        transform: translateY(-1px);
+    }
+    .btn-success i { color: #ffffff !important; margin-right: 5px; }
+
+    .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
+    .btn-info:hover { background-color: #2563eb !important; }
+
     .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600; }
 
     /* =====================================================================
@@ -102,7 +96,6 @@
     .select2-results__option--highlighted, .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; color: white !important; }
     .select2-search--dropdown .select2-search__field { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-    /* Tira negrito do menu e cor do botão ativo */
     .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
     .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
@@ -111,7 +104,16 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. ALINHAMENTO DA FLECHINHA E MENU LATERAL ---
+        // --- 1. PADRONIZAÇÃO DO TEXTO DO BOTÃO "ADICIONAR" ---
+        const addButtons = document.querySelectorAll('a.btn-success[href*="/add/"]');
+        addButtons.forEach(btn => {
+            // Se o botão tiver a palavra adicionar, ele corta o resto e deixa só "Adicionar"
+            if (btn.innerText.toLowerCase().includes('adicionar')) {
+                btn.innerHTML = '<i class="fas fa-plus"></i> ADICIONAR';
+            }
+        });
+
+        // --- 2. ALINHAMENTO DA FLECHINHA E MENU LATERAL ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
@@ -139,7 +141,7 @@
             userPanel.appendChild(arrowBtn);
         }
 
-        // --- 2. CRIAÇÃO DO MENU DE CONTA E SAIR ---
+        // --- 3. CRIAÇÃO DO MENU DE CONTA E SAIR ---
         const sidebarMenu = document.querySelector('.nav-sidebar');
         if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
@@ -160,14 +162,11 @@
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
 
-        // --- 3. JAVASCRIPT TRATOR PARA O MANUAL (FAQ) ---
+        // --- 4. JAVASCRIPT TRATOR PARA O MANUAL (FAQ) ---
         if (window.location.href.includes('faq')) {
-            // Remove as classes malditas do Bootstrap
             document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted, .text-black').forEach(el => {
                 el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted', 'text-black');
             });
-
-            // Varre TODOS os elementos para arrancar cores de fundo (background: white) chumbadas no HTML
             document.querySelectorAll('.content-wrapper *').forEach(el => {
                 if (el.style.backgroundColor === 'white' || el.style.backgroundColor === '#ffffff' || el.style.backgroundColor === 'rgb(255, 255, 255)') {
                     el.style.backgroundColor = 'transparent';
@@ -177,7 +176,6 @@
                 }
             });
 
-            // Converte os links do índice (primeiro card) em uma lista vertical
             const primeiroCard = document.querySelector('.content-wrapper .card .card-body');
             if (primeiroCard) {
                 const linksIndice = primeiroCard.querySelectorAll('a');
@@ -187,7 +185,7 @@
                     link.style.borderBottom = '1px solid #374151';
                     link.style.width = '100%';
                     if (index === linksIndice.length - 1) {
-                        link.style.borderBottom = 'none'; // Tira a linha do último item
+                        link.style.borderBottom = 'none';
                     }
                 });
             }
