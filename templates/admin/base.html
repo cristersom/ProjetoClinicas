@@ -3,48 +3,74 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* FORÇANDO O DARK MODE NO ADMIN */
+    /* FORÇANDO O DARK MODE E A COR TEAL NO ADMIN */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
     .main-header { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
-    .main-sidebar { background-color: #030712 !important; }
+    .main-sidebar, .brand-link { background-color: #030712 !important; }
 
-    /* ======== 1. REMOVENDO A LOGO COMPLETAMENTE ======== */
-    .brand-link { height: 57px; border-bottom: 1px solid #1f2937 !important; display: block; }
-    .brand-link * { display: none !important; } /* Esconde o "A" e a palavra "Administração" */
+    /* 1. REMOVENDO A LOGO */
+    .brand-link { border-bottom: 1px solid #1f2937 !important; display: block !important; height: 57px; }
+    .brand-link * { display: none !important; }
 
-    /* ======== 2. EMPURRANDO A PESQUISA PARA A DIREITA ======== */
-    .main-header .navbar-nav:first-of-type { flex-grow: 1; justify-content: flex-end; padding-right: 15px; }
+    /* 2. EMPURRANDO A PESQUISA PARA A DIREITA EXTREMA */
+    .main-header .navbar-nav:first-of-type {
+        flex-grow: 1;
+        justify-content: flex-end;
+        padding-right: 0 !important;
+        margin-right: 0 !important;
+    }
+    .main-header .navbar-nav.ml-auto { margin-left: 10px !important; }
 
-    /* ======== 3. CORES LEITURA DO MANUAL (TEXTOS E FUNDOS) ======== */
-    /* Força os fundos das caixas que estavam brancas a ficarem cinza escuro */
-    .content-wrapper .card, .content-wrapper .info-box, .content-wrapper .callout {
+    /* 3. DESTAQUE NO MENU LATERAL PARA O MANUAL */
+    .nav-sidebar .nav-item a[href*="faq"] p {
+        font-weight: 900 !important;
+        color: #34d399 !important; /* Verde brilhante */
+    }
+    .nav-sidebar .nav-item a[href*="faq"] i { color: #34d399 !important; }
+
+    /* 4. EXTIRPANDO O FUNDO BRANCO DO FAQ E CORRIGINDO LEITURA */
+    .content-wrapper .bg-white,
+    .content-wrapper .bg-light,
+    .content-wrapper .card {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
-        color: #f3f4f6 !important;
     }
-    /* Força todos os textos do manual a ficarem claros */
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5 { color: #f3f4f6 !important; font-weight: bold; }
-    .content-wrapper p, .content-wrapper span, .content-wrapper li, .content-wrapper div { color: #d1d5db !important; }
-    .content-wrapper strong, .content-wrapper b { color: #14b8a6 !important; }
 
-    /* Estilização Geral (Inputs, Botões, Selects) */
+    /* Força textos a ficarem nítidos (Ignorando cores antigas) */
+    .content-wrapper .bg-white *,
+    .content-wrapper .card *,
+    .content-wrapper .info-box * {
+        color: #d1d5db !important; /* Cinza claro para leitura */
+    }
+
+    /* Títulos e destaques em Branco Total */
+    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
+    .content-wrapper .bg-white h1, .content-wrapper .bg-white h2, .content-wrapper .bg-white h3, .content-wrapper .bg-white h4, .content-wrapper .bg-white h5,
+    .content-wrapper strong, .content-wrapper b {
+        color: #ffffff !important;
+        font-weight: bold;
+    }
+    .content-wrapper a { color: #14b8a6 !important; }
+
+    /* 5. DEMAIS AJUSTES (BOTÕES E INPUTS) */
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
-    a { color: #14b8a6; } a:hover { color: #0d9488; text-decoration: none; }
+    a:hover { color: #0d9488; text-decoration: none; }
 
-    .btn { color: white !important; }
-    .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; border-color: #0f766e !important; color: white !important; }
+    .btn, .btn * { color: white !important; }
+    .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; border-color: #0f766e !important; }
     .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
-    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; color: white !important; }
+    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; }
     .btn-success:hover { background-color: #059669 !important; }
-    .btn-danger { background-color: #ef4444 !important; border-color: #dc2626 !important; color: white !important; }
+    .btn-danger { background-color: #ef4444 !important; border-color: #dc2626 !important; }
     .btn-danger:hover { background-color: #dc2626 !important; }
-    .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; border-color: #4b5563 !important; color: #f3f4f6 !important; }
-    .btn-default:hover, .btn-secondary:hover { background-color: #4b5563 !important; color: white !important; }
+    .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; border-color: #4b5563 !important; }
+    .btn-default:hover, .btn-secondary:hover { background-color: #4b5563 !important; }
 
     .form-control, input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; }
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
 
+    /* SELECT2 (Barras de Pesquisa) */
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f3f4f6 !important; line-height: 36px !important; }
     .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
@@ -56,32 +82,39 @@
     .table td, .table th { border-top: 1px solid #374151 !important; }
 </style>
 
-<!-- MÁGICA DA FLECHINHA LATERAL (Move o hamburger para o lado do usuário) -->
+<!-- MÁGICA DA FLECHINHA LATERAL RESPEITANDO O E-MAIL -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const toggleBtnLi = document.querySelector('[data-widget="pushmenu"]')?.parentElement;
         const userPanel = document.querySelector('.user-panel');
 
         if (toggleBtnLi && userPanel) {
-            // Remove as margens de lista
+            // Remove o estilo padrão da lista do botão
             toggleBtnLi.style.listStyle = 'none';
-            toggleBtnLi.style.margin = '0';
+            toggleBtnLi.style.margin = '0 0 0 15px';
 
-            // Troca o ícone de hambúrguer por uma flechinha elegante
+            // Troca o ícone de hambúrguer por uma flechinha
             const icon = toggleBtnLi.querySelector('i');
             if(icon) {
                 icon.className = 'fas fa-chevron-left';
                 icon.style.color = '#9ca3af';
-                icon.style.fontSize = '1.2rem';
+                icon.style.fontSize = '1.1rem';
+                icon.style.cursor = 'pointer';
             }
 
-            // Ajusta o painel lateral para alinhar e-mail e botão
+            // Formata o painel do usuário para não amassar o texto
             userPanel.style.display = 'flex';
-            userPanel.style.justifyContent = 'space-between';
             userPanel.style.alignItems = 'center';
-            userPanel.style.paddingRight = '15px';
+            userPanel.style.flexWrap = 'nowrap';
 
-            // Move o botão definitivamente para a barra lateral
+            const infoDiv = userPanel.querySelector('.info');
+            if (infoDiv) {
+                infoDiv.style.flexGrow = '1';
+                infoDiv.style.whiteSpace = 'normal';
+                infoDiv.style.wordBreak = 'break-word';
+            }
+
+            // Injeta a flechinha lado a lado
             userPanel.appendChild(toggleBtnLi);
         }
     });

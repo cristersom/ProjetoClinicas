@@ -8,8 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost',
-                 '127.0.0.1']
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas-clinicas-0108a6c374ea.herokuapp.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
@@ -23,18 +22,24 @@ JAZZMIN_SETTINGS = {
     "copyright": "Narrativas Clínicas",
     "search_model": ["narrativa.Narrativa", "narrativa.Paciente"],
 
-    # 1. Limpamos o Menu Superior, deixando apenas o link de voltar pro site
-    "topmenu_links": [
-        {"name": "Ver Site", "url": "/", "new_window": True},
-    ],
+    # 1. Esvaziamos o menu do topo para a pesquisa ir até a ponta direita
+    "topmenu_links": [],
 
-    # 2. Injetamos o Manual na barra lateral esquerda, junto com as outras tabelas
+    # 2. Injetamos o "Ver Site" e o "Manual do Sistema" na barra lateral esquerda
     "custom_links": {
-        "narrativa": [{
-            "name": "Manual do Sistema",
-            "url": "narrativa:faq",
-            "icon": "fas fa-book",
-        }]
+        "narrativa": [
+            {
+                "name": "Ver Site",
+                "url": "/",
+                "icon": "fas fa-globe",
+                "new_window": True,
+            },
+            {
+                "name": "Manual do Sistema",
+                "url": "narrativa:faq",
+                "icon": "fas fa-book",
+            }
+        ]
     },
 
     "icons": {
