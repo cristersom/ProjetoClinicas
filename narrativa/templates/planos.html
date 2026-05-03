@@ -13,7 +13,6 @@
             <p class="text-xl text-gray-400">Evolua o atendimento dos seus pacientes com jornadas interativas e acompanhamento de ponta.</p>
         </div>
 
-        <!-- Grid atualizado para 4 colunas (3 do DB + 1 Fixo) -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center max-w-7xl mx-auto">
 
             <!-- ====== PLANOS DINÂMICOS DO BANCO DE DADOS ====== -->
@@ -55,8 +54,8 @@
                     </li>
                 </ul>
 
-                <!-- LÓGICA DE BLOQUEIO CORRIGIDA -->
-                {% if user.is_authenticated and user.clinica.assinatura_ativa and plano == user.clinica.plano_atual %}
+                <!-- LÓGICA DE BLOQUEIO BASEADA EM ID MATEMÁTICO -->
+                {% if user.is_authenticated and user.clinica.assinatura_ativa and user.clinica.plano_atual and plano.id == user.clinica.plano_atual.id %}
                     <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl border border-gray-600 cursor-not-allowed flex justify-center items-center">
                         <ion-icon name="checkmark-done-outline" class="mr-2 text-xl"></ion-icon> Seu Plano Atual
                     </button>
@@ -97,7 +96,7 @@
                     </li>
                 </ul>
 
-                <a href="mailto:contato@narrativasclinicas.com.br?subject=Interesse no Plano Empresarial" class="w-full flex justify-center items-center font-bold py-3.5 rounded-xl transition-all bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg border border-indigo-500">
+                <a href="mailto:clsimionato@ucs.br?subject=Interesse no Plano Empresarial" class="w-full flex justify-center items-center font-bold py-3.5 rounded-xl transition-all bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg border border-indigo-500">
                     Falar com Consultor <ion-icon name="mail-outline" class="ml-2 text-xl"></ion-icon>
                 </a>
             </div>

@@ -30,15 +30,15 @@
                 <div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
 
-                        <!-- 1. Meu Painel -->
-                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
-
-                        <!-- 2. Admin -->
+                        <!-- 1. Admin -->
                         {% if request.user.is_staff or request.user.is_superuser %}
                         <a href="{% url 'admin:index' %}" class="text-indigo-400 hover:text-indigo-300 font-bold transition text-sm uppercase tracking-wide flex items-center gap-1">
                             <ion-icon name="settings-outline" class="text-lg"></ion-icon> Admin
                         </a>
                         {% endif %}
+
+                        <!-- 2. Meu Painel -->
+                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
 
                         <!-- 3. Planos -->
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
