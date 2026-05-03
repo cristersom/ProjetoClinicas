@@ -4,25 +4,23 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* Esconde a barra lateral inútil de ações recentes */
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* Ajustes refinados para os KPIs */
-    .dashboard-header {
-        margin-bottom: 25px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #374151;
-    }
+    .dashboard-header { margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #374151; }
 
-    /* Classes de cores personalizadas para os cards */
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 15px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
     .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-teal { border-left: 4px solid #14b8a6 !important; }
     .border-orange { border-left: 4px solid #f97316 !important; }
 
-    .info-box-icon i { font-size: 2rem; }
+    .info-box-icon i { font-size: 1.8rem; }
+
+    /* Fontes levemente menores para caber bonito em telas pequenas */
+    .kpi-label { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; color: #9ca3af; text-transform: uppercase; }
+    .kpi-number { font-size: 1.8rem; line-height: 1; font-weight: 900; color: #ffffff; }
+    .kpi-subtext { font-size: 0.75rem; margin-top: 5px; display: block; }
 </style>
 {% endblock %}
 
@@ -32,60 +30,53 @@
         <p style="color: #9ca3af; margin-top: 5px;">Acompanhe o progresso dos pacientes nas narrativas.</p>
     </div>
 
-    <!-- GRID DE KPI (Usando a estrutura nativa do framework para não quebrar layout) -->
     <div class="row mb-4">
-
-        <!-- Acessos Totais -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="info-box info-box-custom border-blue">
                 <span class="info-box-icon text-primary bg-transparent elevation-0"><i class="fas fa-chart-line" style="color: #3b82f6;"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Acessos Totais</span>
-                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_sessoes|default:"0" }}</span>
-                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-users"></i> Pacientes iniciados</span>
+                    <span class="kpi-label">Acessos Totais</span>
+                    <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
+                    <span class="kpi-subtext text-success"><i class="fas fa-users"></i> Pacientes iniciados</span>
                 </div>
             </div>
         </div>
 
-        <!-- Narrativas Concluídas -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="info-box info-box-custom border-purple">
                 <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-flag-checkered" style="color: #a855f7;"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Concluídas</span>
-                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_finalizadas|default:"0" }}</span>
-                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                    <span class="kpi-label">Concluídas</span>
+                    <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
+                    <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
                 </div>
             </div>
         </div>
 
-        <!-- Taxa de Conclusão -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="info-box info-box-custom border-teal">
                 <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-chart-pie" style="color: #14b8a6;"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Taxa de Retenção</span>
-                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ taxa_conclusao|default:"0" }}%</span>
-                    <span class="text-warning" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                    <span class="kpi-label">Retenção</span>
+                    <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
+                    <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
                 </div>
             </div>
         </div>
 
-        <!-- Pesquisas Respondidas -->
         <div class="col-12 col-sm-6 col-lg-3">
             <div class="info-box info-box-custom border-orange">
                 <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-comments" style="color: #f97316;"></i></span>
                 <div class="info-box-content">
-                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Respondidas</span>
-                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_respostas|default:"0" }}</span>
-                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-database"></i> Dados coletados</span>
+                    <span class="kpi-label">Respondidas</span>
+                    <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
+                    <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Tabela original do Django Admin -->
+    <!-- Tabela original limpa (Ocultando 'Ver Site' e 'Manual' do dashboard) -->
     {% get_side_menu using="app_list" as dashboard_list %}
     {% if dashboard_list %}
         {% for app in dashboard_list %}
@@ -97,6 +88,8 @@
                     <table class="table table-hover m-0">
                         <tbody>
                             {% for model in app.models %}
+                                <!-- ESCONDE AS CONFIGURAÇÕES PERSONALIZADAS DA TABELA -->
+                                {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
                                 <tr>
                                     <td class="align-middle pl-4">
                                         {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
@@ -112,6 +105,7 @@
                                         </div>
                                     </td>
                                 </tr>
+                                {% endif %}
                             {% endfor %}
                         </tbody>
                     </table>

@@ -3,12 +3,12 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* FORÇANDO O DARK MODE E A COR TEAL NO ADMIN */
+    /* FORÇANDO O DARK MODE PADRÃO DO SITE NO ADMIN */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
     .main-header { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
     .main-sidebar, .brand-link { background-color: #030712 !important; }
 
-    /* 1. REMOVENDO A LOGO */
+    /* 1. REMOVENDO A LOGO / NOME ADMINISTRAÇÃO */
     .brand-link { border-bottom: 1px solid #1f2937 !important; display: block !important; height: 57px; }
     .brand-link * { display: none !important; }
 
@@ -21,38 +21,14 @@
     }
     .main-header .navbar-nav.ml-auto { margin-left: 10px !important; }
 
-    /* 3. DESTAQUE NO MENU LATERAL PARA O MANUAL */
+    /* 3. MENU LATERAL: APENAS NEGRITO NO MANUAL (COMO SOLICITADO) */
     .nav-sidebar .nav-item a[href*="faq"] p {
         font-weight: 900 !important;
-        color: #34d399 !important; /* Verde brilhante */
+        color: #f3f4f6 !important;
     }
-    .nav-sidebar .nav-item a[href*="faq"] i { color: #34d399 !important; }
+    .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; } /* Tira aquele verde feio */
 
-    /* 4. EXTIRPANDO O FUNDO BRANCO DO FAQ E CORRIGINDO LEITURA */
-    .content-wrapper .bg-white,
-    .content-wrapper .bg-light,
-    .content-wrapper .card {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-    }
-
-    /* Força textos a ficarem nítidos (Ignorando cores antigas) */
-    .content-wrapper .bg-white *,
-    .content-wrapper .card *,
-    .content-wrapper .info-box * {
-        color: #d1d5db !important; /* Cinza claro para leitura */
-    }
-
-    /* Títulos e destaques em Branco Total */
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
-    .content-wrapper .bg-white h1, .content-wrapper .bg-white h2, .content-wrapper .bg-white h3, .content-wrapper .bg-white h4, .content-wrapper .bg-white h5,
-    .content-wrapper strong, .content-wrapper b {
-        color: #ffffff !important;
-        font-weight: bold;
-    }
-    .content-wrapper a { color: #14b8a6 !important; }
-
-    /* 5. DEMAIS AJUSTES (BOTÕES E INPUTS) */
+    /* 4. DEMAIS AJUSTES DE CORES (BOTÕES E INPUTS) */
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
     a:hover { color: #0d9488; text-decoration: none; }
 
@@ -70,7 +46,6 @@
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; }
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
 
-    /* SELECT2 (Barras de Pesquisa) */
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f3f4f6 !important; line-height: 36px !important; }
     .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
@@ -78,44 +53,59 @@
     .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
     .main-header .input-group .btn { background-color: #4b5563 !important; border-color: #4b5563 !important; color: white !important; }
 
+    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important; border-radius: 0.75rem !important; }
     .table { color: #d1d5db !important; }
     .table td, .table th { border-top: 1px solid #374151 !important; }
 </style>
 
-<!-- MÁGICA DA FLECHINHA LATERAL RESPEITANDO O E-MAIL -->
+<!-- SCRIPTS DE ALTA PRECISÃO PARA UI/UX -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const toggleBtnLi = document.querySelector('[data-widget="pushmenu"]')?.parentElement;
-        const userPanel = document.querySelector('.user-panel');
 
-        if (toggleBtnLi && userPanel) {
-            // Remove o estilo padrão da lista do botão
-            toggleBtnLi.style.listStyle = 'none';
-            toggleBtnLi.style.margin = '0 0 0 15px';
+        // --- 1. A FLECHINHA LATERAL (Segura e sem esmagar o e-mail) ---
+        const topToggleBtn = document.querySelector('[data-widget="pushmenu"]');
+        const userPanel = document.querySelector('.sidebar .user-panel');
 
-            // Troca o ícone de hambúrguer por uma flechinha
-            const icon = toggleBtnLi.querySelector('i');
-            if(icon) {
-                icon.className = 'fas fa-chevron-left';
-                icon.style.color = '#9ca3af';
-                icon.style.fontSize = '1.1rem';
-                icon.style.cursor = 'pointer';
-            }
+        if (topToggleBtn && userPanel) {
+            topToggleBtn.style.display = 'none'; // Some com o hambúrguer do topo
 
-            // Formata o painel do usuário para não amassar o texto
-            userPanel.style.display = 'flex';
-            userPanel.style.alignItems = 'center';
-            userPanel.style.flexWrap = 'nowrap';
+            // Cria a flechinha isolada
+            const arrowBtn = document.createElement('a');
+            arrowBtn.href = '#';
+            arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            arrowBtn.style.cssText = 'position: absolute; right: 15px; top: 18px; color: #9ca3af; font-size: 1.2rem; cursor: pointer; z-index: 1000;';
 
-            const infoDiv = userPanel.querySelector('.info');
-            if (infoDiv) {
-                infoDiv.style.flexGrow = '1';
-                infoDiv.style.whiteSpace = 'normal';
-                infoDiv.style.wordBreak = 'break-word';
-            }
+            // Clica na flechinha = Clica no hambúrguer escondido
+            arrowBtn.onclick = function(e) {
+                e.preventDefault();
+                topToggleBtn.click();
+            };
 
-            // Injeta a flechinha lado a lado
-            userPanel.appendChild(toggleBtnLi);
+            // Injeta sem quebrar o layout do e-mail
+            userPanel.style.position = 'relative';
+            userPanel.appendChild(arrowBtn);
+        }
+
+        // --- 2. O EXTERMINADOR DE FUNDOS BRANCOS (Para o Manual FAQ) ---
+        // Só roda se a URL contiver "faq"
+        if (window.location.href.includes('faq')) {
+            const elements = document.querySelectorAll('.content-wrapper *');
+            elements.forEach(el => {
+                const style = window.getComputedStyle(el);
+                // Se achar um fundo branco, forca virar cinza escuro
+                if (style.backgroundColor === 'rgb(255, 255, 255)' || style.backgroundColor === '#ffffff') {
+                    el.style.setProperty('background-color', '#1f2937', 'important');
+                    el.style.setProperty('border-color', '#374151', 'important');
+                }
+                // Se achar texto muito escuro, forca virar cinza claro
+                if (style.color === 'rgb(33, 37, 41)' || style.color === 'rgb(0, 0, 0)') {
+                    el.style.setProperty('color', '#d1d5db', 'important');
+                }
+            });
+            // Força títulos a ficarem em branco
+            document.querySelectorAll('.content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper strong').forEach(h => {
+                h.style.setProperty('color', '#ffffff', 'important');
+            });
         }
     });
 </script>
