@@ -3,47 +3,66 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* FORÇANDO O DARK MODE PADRÃO DO SITE NO ADMIN */
+    /* FORÇANDO A IDENTIDADE VISUAL DARK MODE NO ADMIN */
     body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
-    .main-header { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
-    .main-sidebar, .brand-link { background-color: #030712 !important; }
 
-    /* 1. REMOVENDO A LOGO / NOME ADMINISTRAÇÃO */
-    .brand-link { border-bottom: 1px solid #1f2937 !important; display: block !important; height: 57px; }
-    .brand-link * { display: none !important; }
+    /* REMOVENDO A LOGO E A LINHA BRANCA DO TOPO */
+    .main-header { background-color: #1f2937 !important; border-bottom: none !important; box-shadow: none !important; }
+    .brand-link { display: none !important; } /* Extermina o logo e o espaço dele de vez */
+    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; }
 
-    /* 2. EMPURRANDO A PESQUISA PARA A DIREITA EXTREMA */
-    .main-header .navbar-nav:first-of-type {
-        flex-grow: 1;
-        justify-content: flex-end;
-        padding-right: 0 !important;
-        margin-right: 0 !important;
+    /* EMPURRANDO A PESQUISA PARA A DIREITA E REMOVENDO BORDAS */
+    .main-header .navbar-nav:first-of-type { flex-grow: 1; justify-content: flex-end; padding-right: 0 !important; margin-right: 0 !important; }
+    .main-header .navbar-nav.ml-auto { margin-left: 0 !important; }
+    .main-header form.form-inline { margin-right: 15px !important; border: none !important; }
+
+    /* MENU LATERAL (Removendo o negrito do manual) */
+    .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
+    .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
+
+    /* ======== REGRA "TRATOR" PARA O MANUAL (FAQ) E LEITURA ======== */
+    /* Isso vai forçar qualquer caixa, alerta ou fundo branco a ficar cinza escuro */
+    .content-wrapper [class*="bg-"],
+    .content-wrapper [class*="alert"],
+    .content-wrapper [class*="callout"],
+    .content-wrapper .card,
+    .content-wrapper .info-box {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        color: #d1d5db !important;
     }
-    .main-header .navbar-nav.ml-auto { margin-left: 10px !important; }
 
-    /* 3. MENU LATERAL: APENAS NEGRITO NO MANUAL (COMO SOLICITADO) */
-    .nav-sidebar .nav-item a[href*="faq"] p {
-        font-weight: 900 !important;
-        color: #f3f4f6 !important;
+    /* Força textos a ficarem cinza claro para leitura perfeita */
+    .content-wrapper p, .content-wrapper span, .content-wrapper li, .content-wrapper div {
+        color: #d1d5db !important;
+        background-color: transparent !important;
     }
-    .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; } /* Tira aquele verde feio */
 
-    /* 4. DEMAIS AJUSTES DE CORES (BOTÕES E INPUTS) */
+    /* Títulos em branco absoluto */
+    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5, .content-wrapper strong, .content-wrapper b {
+        color: #ffffff !important;
+        background-color: transparent !important;
+    }
+
+    /* Destaques da identidade (Verde Água) */
+    .content-wrapper a { color: #14b8a6 !important; }
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
     a:hover { color: #0d9488; text-decoration: none; }
 
-    .btn, .btn * { color: white !important; }
-    .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; border-color: #0f766e !important; }
+    /* BOTÕES GERAIS */
+    .btn, .btn * { color: white !important; border: none !important;}
+    .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; }
     .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
-    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; }
+    .btn-success { background-color: #10b981 !important; }
     .btn-success:hover { background-color: #059669 !important; }
-    .btn-danger { background-color: #ef4444 !important; border-color: #dc2626 !important; }
+    .btn-danger { background-color: #ef4444 !important; }
     .btn-danger:hover { background-color: #dc2626 !important; }
-    .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; border-color: #4b5563 !important; }
+    .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; color: #f3f4f6 !important; }
     .btn-default:hover, .btn-secondary:hover { background-color: #4b5563 !important; }
 
-    .form-control, input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: #f3f4f6 !important; }
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; }
+    /* INPUTS E SELECT2 (Barras de Pesquisa) */
+    .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
+    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
 
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
@@ -51,61 +70,55 @@
     .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
     .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
     .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
-    .main-header .input-group .btn { background-color: #4b5563 !important; border-color: #4b5563 !important; color: white !important; }
+    .main-header .input-group .btn { background-color: #4b5563 !important; }
 
-    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important; border-radius: 0.75rem !important; }
-    .table { color: #d1d5db !important; }
-    .table td, .table th { border-top: 1px solid #374151 !important; }
+    .table td, .table th { border-top: 1px solid #374151 !important; border-bottom: none !important; }
 </style>
 
-<!-- SCRIPTS DE ALTA PRECISÃO PARA UI/UX -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
+        // --- FUNDINDO OS MENUS DE USUÁRIO E ALINHANDO A SETA ---
+        const topUserMenu = document.querySelector('.navbar-nav .user-menu'); // Bonequinho do topo direito
+        const sidebarUserPanel = document.querySelector('.sidebar .user-panel'); // Área de usuário da lateral
+        const pushMenuBtn = document.querySelector('[data-widget="pushmenu"]'); // Botão hambúrguer original
 
-        // --- 1. A FLECHINHA LATERAL (Segura e sem esmagar o e-mail) ---
-        const topToggleBtn = document.querySelector('[data-widget="pushmenu"]');
-        const userPanel = document.querySelector('.sidebar .user-panel');
+        if (sidebarUserPanel && topUserMenu) {
+            // Limpa o painel da esquerda original
+            sidebarUserPanel.innerHTML = '';
 
-        if (topToggleBtn && userPanel) {
-            topToggleBtn.style.display = 'none'; // Some com o hambúrguer do topo
+            // Estiliza o painel da esquerda para usar Flexbox e ficar alinhado
+            sidebarUserPanel.style.display = 'flex';
+            sidebarUserPanel.style.alignItems = 'center';
+            sidebarUserPanel.style.justifyContent = 'space-between';
+            sidebarUserPanel.style.padding = '15px';
+            sidebarUserPanel.style.borderBottom = '1px solid #1f2937';
+            sidebarUserPanel.style.marginBottom = '15px';
 
-            // Cria a flechinha isolada
-            const arrowBtn = document.createElement('a');
-            arrowBtn.href = '#';
-            arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            arrowBtn.style.cssText = 'position: absolute; right: 15px; top: 18px; color: #9ca3af; font-size: 1.2rem; cursor: pointer; z-index: 1000;';
+            // Pega o bonequinho funcional da direita e joga para a esquerda
+            topUserMenu.style.listStyle = 'none';
+            topUserMenu.style.margin = '0';
+            sidebarUserPanel.appendChild(topUserMenu);
 
-            // Clica na flechinha = Clica no hambúrguer escondido
-            arrowBtn.onclick = function(e) {
-                e.preventDefault();
-                topToggleBtn.click();
-            };
+            // Garante que o menu suspenso de alterar senha apareça por cima de tudo
+            const dropMenu = topUserMenu.querySelector('.dropdown-menu');
+            if(dropMenu) { dropMenu.style.zIndex = '9999'; }
 
-            // Injeta sem quebrar o layout do e-mail
-            userPanel.style.position = 'relative';
-            userPanel.appendChild(arrowBtn);
-        }
+            // Cria a flechinha perfeitamente alinhada
+            if (pushMenuBtn) {
+                pushMenuBtn.parentElement.style.display = 'none'; // Some com o hambúrguer original do topo
 
-        // --- 2. O EXTERMINADOR DE FUNDOS BRANCOS (Para o Manual FAQ) ---
-        // Só roda se a URL contiver "faq"
-        if (window.location.href.includes('faq')) {
-            const elements = document.querySelectorAll('.content-wrapper *');
-            elements.forEach(el => {
-                const style = window.getComputedStyle(el);
-                // Se achar um fundo branco, forca virar cinza escuro
-                if (style.backgroundColor === 'rgb(255, 255, 255)' || style.backgroundColor === '#ffffff') {
-                    el.style.setProperty('background-color', '#1f2937', 'important');
-                    el.style.setProperty('border-color', '#374151', 'important');
-                }
-                // Se achar texto muito escuro, forca virar cinza claro
-                if (style.color === 'rgb(33, 37, 41)' || style.color === 'rgb(0, 0, 0)') {
-                    el.style.setProperty('color', '#d1d5db', 'important');
-                }
-            });
-            // Força títulos a ficarem em branco
-            document.querySelectorAll('.content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper strong').forEach(h => {
-                h.style.setProperty('color', '#ffffff', 'important');
-            });
+                const arrowBtn = document.createElement('a');
+                arrowBtn.href = '#';
+                arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+                arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
+
+                // Ao clicar na seta, simula o clique no hambúrguer original
+                arrowBtn.onclick = function(e) {
+                    e.preventDefault();
+                    pushMenuBtn.click();
+                };
+                sidebarUserPanel.appendChild(arrowBtn);
+            }
         }
     });
 </script>

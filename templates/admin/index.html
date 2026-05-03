@@ -4,116 +4,158 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
+    /* Esconde barra lateral inútil de ações */
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    .dashboard-header { margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #374151; }
+    /* Header puxado mais para cima */
+    .dashboard-header { margin-top: -10px; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid #374151; }
 
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 15px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
-    .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-teal { border-left: 4px solid #14b8a6 !important; }
+    .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-orange { border-left: 4px solid #f97316 !important; }
 
     .info-box-icon i { font-size: 1.8rem; }
-
-    /* Fontes levemente menores para caber bonito em telas pequenas */
     .kpi-label { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; color: #9ca3af; text-transform: uppercase; }
-    .kpi-number { font-size: 1.8rem; line-height: 1; font-weight: 900; color: #ffffff; }
-    .kpi-subtext { font-size: 0.75rem; margin-top: 5px; display: block; }
+    .kpi-number { font-size: 2.2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
+    .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
+
+    /* Ações Rápidas Customizadas */
+    .quick-action-btn {
+        display: flex; align-items: center; justify-content: space-between;
+        background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
+        margin-bottom: 10px; font-weight: bold; transition: all 0.2s; border: 1px solid #4b5563;
+    }
+    .quick-action-btn:hover { background-color: #4b5563; color: white; transform: translateX(3px); }
+    .quick-action-btn i { font-size: 1.2rem; color: #14b8a6; }
 </style>
 {% endblock %}
 
 {% block content %}
     <div class="dashboard-header">
         <h2 style="color: #f3f4f6; font-weight: 800; margin: 0;">Visão Geral do Engajamento</h2>
-        <p style="color: #9ca3af; margin-top: 5px;">Acompanhe o progresso dos pacientes nas narrativas.</p>
+        <p style="color: #9ca3af; margin-top: 5px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="info-box info-box-custom border-blue">
-                <span class="info-box-icon text-primary bg-transparent elevation-0"><i class="fas fa-chart-line" style="color: #3b82f6;"></i></span>
-                <div class="info-box-content">
-                    <span class="kpi-label">Acessos Totais</span>
-                    <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
-                    <span class="kpi-subtext text-success"><i class="fas fa-users"></i> Pacientes iniciados</span>
+    <!-- Layout Dividido: Esquerda (KPIs e Tabela) / Direita (Ações) -->
+    <div class="row">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="col-lg-8">
+
+            <!-- Grid 2x2 de KPIs -->
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-blue">
+                        <span class="info-box-icon text-primary bg-transparent elevation-0"><i class="fas fa-users" style="color: #3b82f6;"></i></span>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Acessos Totais</span>
+                            <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-arrow-up"></i> Pacientes iniciados</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-teal">
+                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-chart-pie" style="color: #14b8a6;"></i></span>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Taxa de Retenção</span>
+                            <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
+                            <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="info-box info-box-custom border-purple">
-                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-flag-checkered" style="color: #a855f7;"></i></span>
-                <div class="info-box-content">
-                    <span class="kpi-label">Concluídas</span>
-                    <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
-                    <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-purple">
+                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-flag-checkered" style="color: #a855f7;"></i></span>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Narrativas Concluídas</span>
+                            <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-orange">
+                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-comments" style="color: #f97316;"></i></span>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Pesquisas Respondidas</span>
+                            <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            <!-- Tabela original limpa -->
+            {% get_side_menu using="app_list" as dashboard_list %}
+            {% if dashboard_list %}
+                {% for app in dashboard_list %}
+                    <div class="card card-primary card-outline" style="border-top: 3px solid #14b8a6;">
+                        <div class="card-header">
+                            <h5 class="m-0 text-white" style="font-weight: bold;">Gerenciamento de {{ app.name }}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover m-0">
+                                <tbody>
+                                    {% for model in app.models %}
+                                        {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
+                                        <tr>
+                                            <td class="align-middle pl-4">
+                                                {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                            </td>
+                                            <td class="text-right pr-4 py-3">
+                                                <div class="btn-group">
+                                                    {% if model.add_url %}
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> {% trans 'Add' %}</a>
+                                                    {% endif %}
+                                                    {% if model.url %}
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> {% trans 'Change' %}</a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="info-box info-box-custom border-teal">
-                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-chart-pie" style="color: #14b8a6;"></i></span>
-                <div class="info-box-content">
-                    <span class="kpi-label">Retenção</span>
-                    <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
-                    <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-12 col-sm-6 col-lg-3">
-            <div class="info-box info-box-custom border-orange">
-                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-comments" style="color: #f97316;"></i></span>
-                <div class="info-box-content">
-                    <span class="kpi-label">Respondidas</span>
-                    <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
-                    <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tabela original limpa (Ocultando 'Ver Site' e 'Manual' do dashboard) -->
-    {% get_side_menu using="app_list" as dashboard_list %}
-    {% if dashboard_list %}
-        {% for app in dashboard_list %}
-            <div class="card card-primary card-outline" style="border-top: 3px solid #14b8a6;">
+        <!-- COLUNA DIREITA: Ações Rápidas -->
+        <div class="col-lg-4">
+            <div class="card card-primary card-outline" style="border-top: 3px solid #3b82f6;">
                 <div class="card-header">
-                    <h5 class="m-0 text-white" style="font-weight: bold;">Gerenciamento de {{ app.name }}</h5>
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover m-0">
-                        <tbody>
-                            {% for model in app.models %}
-                                <!-- ESCONDE AS CONFIGURAÇÕES PERSONALIZADAS DA TABELA -->
-                                {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
-                                <tr>
-                                    <td class="align-middle pl-4">
-                                        {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
-                                    </td>
-                                    <td class="text-right pr-4 py-3">
-                                        <div class="btn-group">
-                                            {% if model.add_url %}
-                                                <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> {% trans 'Add' %}</a>
-                                            {% endif %}
-                                            {% if model.url %}
-                                                <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> {% trans 'Change' %}</a>
-                                            {% endif %}
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="card-body">
+                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn text-decoration-none">
+                        <span>Nova Jornada</span>
+                        <i class="fas fa-book-medical"></i>
+                    </a>
+                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn text-decoration-none">
+                        <span>Criar Cena</span>
+                        <i class="fas fa-desktop"></i>
+                    </a>
+                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none">
+                        <span>Novo Questionário</span>
+                        <i class="fas fa-clipboard-list"></i>
+                    </a>
+                    <hr style="border-color: #374151; margin: 20px 0;">
+                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn text-decoration-none" style="background-color: #064e3b; border-color: #065f46;">
+                        <span class="text-white"><i class="fas fa-question-circle mr-2" style="color: white;"></i>Dúvidas? Ver Manual</span>
+                    </a>
                 </div>
             </div>
-        {% endfor %}
-    {% else %}
-        <p>{% trans "You don't have permission to view or edit anything." %}</p>
-    {% endif %}
+        </div>
 
+    </div>
 {% endblock %}
