@@ -1,95 +1,78 @@
 {% extends 'base.html' %}
 
+{% block titulo %}Planos e Preços - Narrativas Clínicas{% endblock %}
+
 {% block content %}
-<div class="bg-gray-900 pt-24 pb-32">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl font-extrabold text-white tracking-tight sm:text-5xl">
-            Escolha o plano ideal para sua Clínica
-        </h1>
-        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto">
-            Comece a transformar a jornada dos seus pacientes com narrativas interativas e acompanhamento profissional.
-        </p>
-    </div>
-</div>
+<main class="min-h-screen bg-gray-900 pt-32 pb-24 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+    <!-- Efeito de fundo -->
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-900/20 via-gray-900 to-gray-900 z-0"></div>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-24 pb-24">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <div class="max-w-7xl mx-auto relative z-10">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">Escolha o plano ideal para a sua clínica</h1>
+            <p class="text-xl text-gray-400">Evolua o atendimento dos seus pacientes com jornadas interativas e acompanhamento de ponta.</p>
+        </div>
 
-        {% for plano in planos %}
-        <div class="relative bg-white rounded-2xl shadow-xl flex flex-col border-2 {% if plano.destaque %}border-teal-500{% else %}border-transparent{% endif %} hover:-translate-y-2 transition-transform duration-300">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
+            {% for plano in planos %}
 
-            {% if plano.destaque %}
-            <div class="absolute top-0 right-0 -mr-2 -mt-2 w-32 h-32 overflow-hidden">
-                <div class="absolute bg-teal-500 text-white text-xs font-bold uppercase tracking-wider py-1 w-full text-center shadow-lg transform rotate-45 translate-x-10 translate-y-6">
-                    Recomendado
-                </div>
-            </div>
+            <!-- Variável para verificar se é o plano atual do usuário -->
+            {% set is_current = False %}
+            {% if user.is_authenticated and plano_atual and plano.id == plano_atual.id and assinatura_ativa %}
+                {% set is_current = True %}
             {% endif %}
 
-            <div class="p-8 flex-1 flex flex-col">
-                <h3 class="text-2xl font-bold text-gray-900 text-center uppercase tracking-wide">{{ plano.nome }}</h3>
-                <p class="mt-2 text-sm text-gray-500 text-center flex-1">{{ plano.descricao_curta }}</p>
+            <div class="relative bg-gray-800 rounded-3xl border {% if plano.destaque %}border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.2)]{% else %}border-gray-700 shadow-xl{% endif %} p-8 flex flex-col h-full transition-transform hover:-translate-y-2 duration-300">
 
-                <div class="mt-6 text-center">
-                    <span class="text-5xl font-extrabold text-gray-900">R$ {{ plano.preco|floatformat:"0" }}</span>
-                    <span class="text-base font-medium text-gray-500">/mês</span>
+                {% if plano.destaque %}
+                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                    <span class="bg-teal-500 text-gray-900 text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-lg">
+                        Mais Escolhido
+                    </span>
+                </div>
+                {% endif %}
+
+                <h3 class="text-2xl font-bold text-white mb-2">{{ plano.nome }}</h3>
+                <p class="text-gray-400 text-sm mb-6 h-10">{{ plano.descricao_curta }}</p>
+
+                <div class="mb-8">
+                    <span class="text-4xl font-extrabold text-white">R$ {{ plano.preco }}</span>
+                    <span class="text-gray-400">/mês</span>
                 </div>
 
-                <ul class="mt-8 space-y-4">
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">{{ plano.limite_narrativas }} Narrativas ativas</span>
+                <ul class="space-y-4 mb-8 flex-1">
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
+                        <span>Crie até <b>{{ plano.limite_narrativas }} Jornadas</b> ativas</span>
                     </li>
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">Até {{ plano.limite_pacientes }} Pacientes</span>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
+                        <span>Cadastre até <b>{{ plano.limite_pacientes }} Pacientes</b></span>
                     </li>
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">Suporte Especializado</span>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
+                        <span>Questionários ilimitados</span>
+                    </li>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
+                        <span>Relatórios e Dashboards</span>
                     </li>
                 </ul>
+
+                <!-- BOTÃO INTELIGENTE DE UPSELL -->
+                {% if user.is_authenticated and plano_atual and plano.id == plano_atual.id and assinatura_ativa %}
+                    <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl border border-gray-600 cursor-not-allowed flex justify-center items-center">
+                        <ion-icon name="checkmark-done-outline" class="mr-2 text-xl"></ion-icon> Seu Plano Atual
+                    </button>
+                {% else %}
+                    <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full block text-center font-bold py-3.5 rounded-xl transition-all {% if plano.destaque %}bg-teal-500 hover:bg-teal-400 text-gray-900 shadow-lg{% else %}bg-gray-700 hover:bg-gray-600 text-white border border-gray-600{% endif %}">
+                        {% if user.is_authenticated and assinatura_ativa %}Fazer Upgrade{% else %}Assinar {{ plano.nome }}{% endif %}
+                    </a>
+                {% endif %}
+
             </div>
-            <div class="p-8 bg-gray-50 rounded-b-2xl mt-auto">
-                <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-full text-white {% if plano.destaque %}bg-teal-500 hover:bg-teal-600 shadow-md{% else %}bg-gray-800 hover:bg-gray-900{% endif %} transition-colors">
-                    Assinar {{ plano.nome }}
-                </a>
-            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-
-        <div class="bg-gray-50 rounded-2xl shadow-xl flex flex-col border border-gray-200 hover:-translate-y-2 transition-transform duration-300">
-            <div class="p-8 flex-1 flex flex-col">
-                <h3 class="text-2xl font-bold text-gray-900 text-center uppercase tracking-wide">Empresarial</h3>
-                <p class="mt-2 text-sm text-gray-500 text-center flex-1">Para clínicas de grande porte e redes franqueadas.</p>
-
-                <div class="mt-6 text-center">
-                    <span class="text-3xl font-extrabold text-gray-900">Sob Demanda</span>
-                </div>
-
-                <ul class="mt-8 space-y-4">
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">Narrativas Ilimitadas</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">Volume em escala</span>
-                    </li>
-                    <li class="flex items-start">
-                        <svg class="flex-shrink-0 h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        <span class="ml-3 text-gray-700">Gerente dedicado</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="p-8 bg-gray-100 rounded-b-2xl mt-auto">
-                <div class="w-full flex flex-col items-center justify-center px-2 py-3 border border-gray-300 bg-white rounded-xl text-center">
-                    <span class="text-xs text-gray-500 uppercase tracking-wide font-semibold mb-1">Envie um email para:</span>
-                    <span class="text-sm font-bold text-teal-600 break-all select-all">atendimento@narrativasclinicas.com.br</span>
-                </div>
-            </div>
-        </div>
-
     </div>
-</div>
+</main>
 {% endblock %}

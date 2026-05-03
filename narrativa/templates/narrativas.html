@@ -15,19 +15,18 @@
             </div>
             <a href="{% url 'narrativa:planos' %}" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-xl transition shadow-lg whitespace-nowrap">Renovar Plano</a>
         </div>
-        {% elif limite_atingido %}
+        {% elif limite_atingido and request.user.clinica.plano_atual %}
         <div class="mb-8 p-6 bg-teal-900/20 border-l-4 border-teal-500 rounded-r-2xl flex flex-col sm:flex-row justify-between items-center gap-6 shadow-lg">
             <div>
                 <h3 class="text-xl font-bold text-teal-400 mb-1 flex items-center"><ion-icon name="rocket-outline" class="mr-2 text-2xl"></ion-icon>Limite do plano atingido ({{ request.user.clinica.plano_atual.limite_narrativas }} Jornadas)</h3>
-                <p class="text-gray-300 text-sm">Sua clínica está crescendo! Faça um upgrade agora para continuar expandindo.</p>
+                <p class="text-gray-300 text-sm">Sua clínica está crescendo! Faça um upgrade para o próximo nível agora para continuar expandindo.</p>
             </div>
-            <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-xl transition shadow-[0_0_15px_rgba(13,148,136,0.4)] whitespace-nowrap">Fazer Upgrade</a>
+            <a href="{% url 'narrativa:planos' %}" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-8 rounded-xl transition shadow-[0_0_15px_rgba(13,148,136,0.4)] whitespace-nowrap">Ver Upgrade</a>
         </div>
         {% endif %}
 
         <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
 
-        <!-- Restante da tela de links igual... -->
         {% if link_portal %}
         <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
             <div>
@@ -67,7 +66,7 @@
                         <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Detalhes"><ion-icon name="information-circle-outline" class="text-xl"></ion-icon></a>
                         <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Copiar"><ion-icon name="share-social-outline" class="text-xl"></ion-icon></button>
 
-                        <!-- CORREÇÃO DO ERRO 405 (MUDOU PARA A TAG E DIRETO PRO INÍCIO) -->
+                        <!-- CORREÇÃO DO ERRO 405 -->
                         <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=narrativa.id %}" class="flex items-center justify-center border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white rounded-xl transition w-full flex-[3]">
                             <ion-icon name="play-circle-outline" class="text-xl mr-2"></ion-icon> <span class="text-sm font-medium">Percorrer</span>
                         </a>

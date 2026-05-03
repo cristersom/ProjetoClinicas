@@ -64,9 +64,9 @@
                 <span>⚠️ <b>Acesso Suspenso:</b> Assinatura inativa. A criação foi bloqueada.</span>
                 <a href="/planos/" class="saas-btn saas-btn-danger" target="_blank">Renovar Plano</a>
             </div>
-        {% elif user.clinica.atingiu_limite_narrativas %}
+        {% elif user.clinica.atingiu_limite_narrativas and user.clinica.plano_atual %}
             <div class="saas-global-banner saas-banner-warning">
-                <span>🚀 <b>Limite Atingido ({{ user.clinica.plano_atual.limite_narrativas }} jornadas)!</b> Faça upgrade para criar mais.</span>
+                <span>🚀 <b>Limite atingido ({{ user.clinica.plano_atual.limite_narrativas }} jornadas)!</b> Faça um upgrade para continuar expandindo as jornadas da clínica.</span>
                 <a href="/planos/" class="saas-btn saas-btn-warning" target="_blank">Fazer Upgrade</a>
             </div>
         {% endif %}

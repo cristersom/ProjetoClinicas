@@ -47,7 +47,6 @@ class LoginView(DjangoLoginView):
 @require_http_methods(["GET", "POST"])
 def custom_logout(request):
     logout(request)
-    # Redireciona limpo para a Home sem erro CSRF
     return redirect('narrativa:home')
 
 
@@ -108,6 +107,13 @@ class PlanosView(ListView):
     model = Plano
     template_name = 'planos.html'
     context_object_name = 'planos'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
+            context['plano_atual'] = self.request.user.clinica.plano_atual
+            context['assinatura_ativa'] = self.request.user.clinica.assinatura_ativa
+        return context
 
 
 def checkout(request, plano_id):
@@ -265,7 +271,6 @@ class PerfilView(LoginRequiredMixin, UpdateView):
 class AdminFAQView(LoginRequiredMixin, TemplateView):
     template_name = "admin/faq.html"
 
-    # INJEÇÃO DO CONTEXTO DO ADMIN PARA O MENU NÃO SUMIR
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(admin.site.each_context(self.request))
@@ -460,7 +465,6 @@ def iniciar_jornada_paciente(request, narrativa_id):
     if narrativa.cena_inicial:
         return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
     else:
-        # SE NÃO TIVER CENA INICIAL, ELE AVISA AO INVÉS DE QUEBRAR!
         messages.warning(request,
                          f"Atenção: A jornada '{narrativa.titulo}' ainda não possui uma Cena Inicial configurada. Acesse a Administração e configure.")
         return redirect('narrativa:narrativas')
