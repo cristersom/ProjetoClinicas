@@ -7,6 +7,7 @@
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
+    /* Remove linha e puxa pra cima */
     .dashboard-header { margin-top: 0; margin-bottom: 30px; padding-bottom: 0; border-bottom: none; }
 
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 20px;}
@@ -25,11 +26,13 @@
     .kpi-number { font-size: 2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
     .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
 
+    /* Ações Rápidas - Adicionado padding-left no span para desgrudar da borda */
     .quick-action-btn {
         display: flex; align-items: center; justify-content: space-between;
         background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
         margin-bottom: 10px; font-weight: bold; transition: all 0.2s; border: 1px solid #4b5563;
     }
+    .quick-action-btn span { padding-left: 10px; } /* SOLUÇÃO DO ESPAÇAMENTO AQUI */
     .quick-action-btn:hover { background-color: #4b5563; color: white; transform: translateX(3px); }
 </style>
 {% endblock %}
@@ -93,8 +96,6 @@
             {% if dashboard_list %}
                 {% for app in dashboard_list %}
                     <div class="card card-primary card-outline" style="border-top: 4px solid #14b8a6; border-radius: 12px; overflow: hidden;">
-
-                        <!-- TÍTULO DA TABELA COM DESTAQUE DIFERENTE DAS LINHAS -->
                         <div class="card-header" style="background-color: #1f2937; border-bottom: 1px solid #374151; padding: 20px;">
                             <h5 class="m-0 text-white" style="font-weight: 800; font-size: 1.25rem;">
                                 <i class="fas fa-folder-open text-teal mr-2" style="color: #14b8a6;"></i> Registros: {{ app.name }}
@@ -112,12 +113,11 @@
                                             </td>
                                             <td class="text-right pr-4 py-3">
                                                 <div class="btn-group">
-                                                    <!-- BOTÕES TRADUZIDOS -->
                                                     {% if model.add_url %}
-                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success" style="background-color: #10b981; color: white; border: none; font-weight: 600;"><i class="fas fa-plus" style="color: white;"></i> Adicionar</a>
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Adicionar</a>
                                                     {% endif %}
                                                     {% if model.url %}
-                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info" style="background-color: #3b82f6; color: white; border: none; font-weight: 600;"><i class="fas fa-edit" style="color: white;"></i> Modificar</a>
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Modificar</a>
                                                     {% endif %}
                                                 </div>
                                             </td>
