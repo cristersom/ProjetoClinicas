@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static jazzmin %}
 
-<!-- A MÁGICA AQUI TAMBÉM: O TÍTULO VAI FICAR EM CIMA DA LINHA -->
+<!-- O Título Nativo que fica em cima da linha divisória -->
 {% block content_title %}Visão Geral do Engajamento{% endblock %}
 
 {% block extrastyle %}
@@ -26,6 +26,7 @@
     .kpi-number { font-size: 2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
     .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
 
+    /* Ações Rápidas - Oculto do canto esquerdo com padding-left */
     .quick-action-btn {
         display: flex; align-items: center; justify-content: space-between;
         background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
@@ -37,6 +38,7 @@
 {% endblock %}
 
 {% block content %}
+    <!-- Subtítulo logo abaixo da linha nativa -->
     <p style="color: #9ca3af; margin-bottom: 25px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
 
     <div class="row">
@@ -91,7 +93,7 @@
             {% get_side_menu using="app_list" as dashboard_list %}
             {% if dashboard_list %}
                 {% for app in dashboard_list %}
-                    <div class="card card-primary card-outline" style="border-top: 4px solid #14b8a6; border-radius: 12px; overflow: hidden;">
+                    <div class="card card-primary card-outline" style="border-top: 4px solid #14b8a6; border-radius: 12px; overflow: hidden; background-color: #1f2937; border-color: #374151;">
                         <div class="card-header" style="background-color: #1f2937; border-bottom: 1px solid #374151; padding: 20px;">
                             <h5 class="m-0 text-white" style="font-weight: 800; font-size: 1.25rem;">
                                 <i class="fas fa-folder-open text-teal mr-2" style="color: #14b8a6;"></i> Registros: {{ app.name }}
@@ -109,11 +111,12 @@
                                             </td>
                                             <td class="text-right pr-4 py-3">
                                                 <div class="btn-group">
+                                                    <!-- BOTÕES PROPORCIONAIS (btn-sm), COM CORES DISCRETAS E TEXTOS NORMAIS -->
                                                     {% if model.add_url %}
-                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Adicionar</a>
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success" style="background-color: #0d9488; color: #ffffff; border: none; font-weight: 600;"><i class="fas fa-plus" style="margin-right: 4px;"></i> Adicionar</a>
                                                     {% endif %}
                                                     {% if model.url %}
-                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Editar</a>
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info" style="background-color: #3b82f6; color: #ffffff; border: none; font-weight: 600;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Editar</a>
                                                     {% endif %}
                                                 </div>
                                             </td>
@@ -130,7 +133,7 @@
 
         <!-- COLUNA DIREITA: Ações Rápidas -->
         <div class="col-lg-4">
-            <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6; border-radius: 12px;">
+            <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6; border-radius: 12px; background-color: #1f2937; border-color: #374151;">
                 <div class="card-header" style="border-bottom: 1px solid #374151; padding: 15px;">
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
                 </div>
@@ -155,7 +158,7 @@
             </div>
 
             <!-- Status do Sistema -->
-            <div class="card card-primary card-outline" style="border-top: 3px solid #a855f7; border-radius: 12px;">
+            <div class="card card-primary card-outline" style="border-top: 3px solid #a855f7; border-radius: 12px; background-color: #1f2937; border-color: #374151;">
                 <div class="card-header" style="border-bottom: 1px solid #374151; padding: 15px;">
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-server text-info mr-2"></i>Status do Sistema</h5>
                 </div>
