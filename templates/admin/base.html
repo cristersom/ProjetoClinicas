@@ -15,11 +15,6 @@
     .main-sidebar, .brand-link {
         background-color: #030712 !important; /* Tailwind gray-950 */
     }
-    .brand-link {
-        border-bottom: 1px solid #1f2937 !important;
-        color: #14b8a6 !important; /* Tailwind teal-500 */
-        font-weight: 900 !important;
-    }
     .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
         background-color: #0d9488 !important; /* Tailwind teal-600 */
         color: white !important;
@@ -28,6 +23,40 @@
     /* Links gerais */
     a { color: #14b8a6; }
     a:hover { color: #0d9488; text-decoration: none; }
+
+    /* ======== NOVIDADES DE LAYOUT ======== */
+
+    /* 1. Removendo a Logo 'A' e o texto 'Administração' (Fica mais limpo) */
+    .brand-link img, .brand-link .brand-text { display: none !important; }
+    .brand-link { border-bottom: none !important; height: 57px; } /* Mantém a altura pra não quebrar o menu */
+
+    /* 2. Destaque forte para o Botão do Manual no Menu Superior */
+    .main-header .nav-item a[href*="faq"] {
+        background-color: #10b981 !important; /* Verde brilhante */
+        color: white !important;
+        font-weight: 800 !important;
+        border-radius: 8px !important;
+        padding: 8px 20px !important;
+        margin-left: 15px !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        transition: all 0.3s ease;
+    }
+    .main-header .nav-item a[href*="faq"]:hover {
+        background-color: #059669 !important; /* Verde mais escuro no hover */
+        transform: translateY(-2px);
+    }
+
+    /* 3. Empurrando as Caixas de Pesquisa para a Direita */
+    .main-header form.form-inline:first-of-type { margin-left: auto !important; }
+    .main-header form.form-inline { margin-right: 15px !important; }
+
+    /* 4. Corrigindo leitura dos Títulos (Como o do Manual) */
+    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4 {
+        color: #f3f4f6 !important; /* Branco/Cinza claro */
+    }
+    .content-wrapper .text-muted, .content-wrapper p.text-muted {
+        color: #9ca3af !important; /* Cinza legível para subtítulos */
+    }
 
     /* ======== CORREÇÃO DOS BOTÕES ======== */
     .btn { color: white !important; }
@@ -71,19 +100,19 @@
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
     ::-ms-input-placeholder { color: #9ca3af !important; }
 
-    /* ======== CORREÇÃO EXCLUSIVA DO COMPONENTE SELECT2 (CAIXAS DE PESQUISA) ======== */
+    /* COMPONENTE SELECT2 (CAIXAS DE PESQUISA AVANÇADAS) */
     .select2-container--default .select2-selection--single {
         background-color: #374151 !important;
         border: 1px solid #4b5563 !important;
-        height: 38px !important; /* Altura padrão para alinhar com botões */
+        height: 38px !important;
     }
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #f3f4f6 !important; /* Cor do texto selecionado (Ex: "Hoje") */
+        color: #f3f4f6 !important;
         line-height: 36px !important;
     }
     .select2-search--dropdown .select2-search__field {
         background-color: #1f2937 !important;
-        color: white !important; /* Cor de digitação na busca */
+        color: white !important;
         border: 1px solid #4b5563 !important;
     }
     .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
@@ -96,7 +125,7 @@
     .main-header .input-group .btn:hover { background-color: #6b7280 !important; }
 
     /* Cards e Tabelas */
-    .card {
+    .card, .info-box {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
@@ -107,7 +136,7 @@
     .table { color: #d1d5db !important; }
     .table td, .table th { border-top: 1px solid #374151 !important; }
 
-    /* DESTAQUE GIGANTE PARA O MANUAL */
+    /* DESTAQUE GIGANTE PARA O MANUAL NO DASHBOARD */
     .super-manual-banner {
         background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
         border-left: 8px solid #34d399;
@@ -150,7 +179,7 @@
     .saas-btn-danger { background-color: #ef4444; }
 
     {% if request.path == '/admin/' %}
-    /* CSS EXCLUSIVO DO DASHBOARD (MATA A COLUNA E ESTILIZA OS CARDS) */
+    /* CSS EXCLUSIVO DO DASHBOARD */
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 

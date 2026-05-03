@@ -1,288 +1,104 @@
-{% extends "admin/base_site.html" %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Narrativas Clínicas{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
 
-{% block extrastyle %}
-{{ block.super }}
-<style>
-    /* FORÇANDO O DARK MODE E A COR TEAL (VERDE ÁGUA) NO ADMIN PARA FICAR IGUAL AO SITE */
-    body, .content-wrapper, .main-footer {
-        background-color: #111827 !important; /* Tailwind gray-900 */
-        color: #f3f4f6 !important; /* Tailwind gray-100 */
-    }
-    .main-header {
-        background-color: #1f2937 !important; /* Tailwind gray-800 */
-        border-bottom: 1px solid #374151 !important;
-    }
-    .main-sidebar, .brand-link {
-        background-color: #030712 !important; /* Tailwind gray-950 */
-    }
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-        background-color: #0d9488 !important; /* Tailwind teal-600 */
-        color: white !important;
-    }
+    {% block navbar %}
+    {% if 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path and 'perfil' not in request.path %}
+    <nav class="fixed w-full z-40 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
+                        <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
+                            <ion-icon name="medkit" class="text-2xl"></ion-icon>
+                        </div>
+                        <span class="text-2xl font-extrabold tracking-tight text-white">
+                            Narrativas<span class="text-teal-500">Clínicas</span>
+                        </span>
+                    </a>
+                </div>
 
-    /* Links gerais */
-    a { color: #14b8a6; }
-    a:hover { color: #0d9488; text-decoration: none; }
+                <div class="flex items-center space-x-6">
+                    {% if request.user.is_authenticated %}
 
-    /* ======== NOVIDADES DE LAYOUT ======== */
+                        <!-- 1. Admin -->
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" class="text-indigo-400 hover:text-indigo-300 font-bold transition text-sm uppercase tracking-wide flex items-center gap-1">
+                            <ion-icon name="settings-outline" class="text-lg"></ion-icon> Admin
+                        </a>
+                        {% endif %}
 
-    /* 1. Removendo a Logo 'A' e o texto 'Administração' (Fica mais limpo) */
-    .brand-link img, .brand-link .brand-text { display: none !important; }
-    .brand-link { border-bottom: none !important; height: 57px; } /* Mantém a altura pra não quebrar o menu */
+                        <!-- 2. Meu Painel -->
+                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
 
-    /* 2. Destaque forte para o Botão do Manual no Menu Superior */
-    .main-header .nav-item a[href*="faq"] {
-        background-color: #10b981 !important; /* Verde brilhante */
-        color: white !important;
-        font-weight: 800 !important;
-        border-radius: 8px !important;
-        padding: 8px 20px !important;
-        margin-left: 15px !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        transition: all 0.3s ease;
-    }
-    .main-header .nav-item a[href*="faq"]:hover {
-        background-color: #059669 !important; /* Verde mais escuro no hover */
-        transform: translateY(-2px);
-    }
+                        <!-- 3. Planos -->
+                        <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
 
-    /* 3. Empurrando as Caixas de Pesquisa para a Direita */
-    .main-header form.form-inline:first-of-type { margin-left: auto !important; }
-    .main-header form.form-inline { margin-right: 15px !important; }
+                        <!-- 4. Sair -->
+                        <a href="{% url 'narrativa:logout' %}" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</a>
 
-    /* 4. Corrigindo leitura dos Títulos (Como o do Manual) */
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4 {
-        color: #f3f4f6 !important; /* Branco/Cinza claro */
-    }
-    .content-wrapper .text-muted, .content-wrapper p.text-muted {
-        color: #9ca3af !important; /* Cinza legível para subtítulos */
-    }
-
-    /* ======== CORREÇÃO DOS BOTÕES ======== */
-    .btn { color: white !important; }
-
-    .btn-primary, .bg-primary, .btn-info, .bg-info {
-        background-color: #0d9488 !important;
-        border-color: #0f766e !important;
-        color: white !important;
-    }
-    .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
-
-    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; color: white !important; }
-    .btn-success:hover { background-color: #059669 !important; }
-
-    .btn-danger { background-color: #ef4444 !important; border-color: #dc2626 !important; color: white !important; }
-    .btn-danger:hover { background-color: #dc2626 !important; }
-
-    .btn-default, .btn-secondary, .btn-outline-secondary {
-        background-color: #374151 !important;
-        border-color: #4b5563 !important;
-        color: #f3f4f6 !important;
-    }
-    .btn-default:hover, .btn-secondary:hover {
-        background-color: #4b5563 !important;
-        color: white !important;
-    }
-
-    /* ======== CORREÇÃO DE FORMULÁRIOS E INPUTS ======== */
-    .form-control, input, select, textarea {
-        background-color: #374151 !important;
-        border-color: #4b5563 !important;
-        color: #f3f4f6 !important;
-    }
-    .form-control:focus, input:focus, select:focus, textarea:focus {
-        border-color: #14b8a6 !important;
-        background-color: #1f2937 !important;
-        color: white !important;
-    }
-
-    /* Placeholders normais */
-    ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
-    ::-ms-input-placeholder { color: #9ca3af !important; }
-
-    /* COMPONENTE SELECT2 (CAIXAS DE PESQUISA AVANÇADAS) */
-    .select2-container--default .select2-selection--single {
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        height: 38px !important;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #f3f4f6 !important;
-        line-height: 36px !important;
-    }
-    .select2-search--dropdown .select2-search__field {
-        background-color: #1f2937 !important;
-        color: white !important;
-        border: 1px solid #4b5563 !important;
-    }
-    .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
-    .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
-    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 36px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__arrow b { border-color: #9ca3af transparent transparent transparent !important; }
-
-    /* Botão de Lupa (Pesquisa do Topo) */
-    .main-header .input-group .btn { background-color: #4b5563 !important; border-color: #4b5563 !important; color: white !important; }
-    .main-header .input-group .btn:hover { background-color: #6b7280 !important; }
-
-    /* Cards e Tabelas */
-    .card, .info-box {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
-        border-radius: 0.75rem !important;
-    }
-    .card-header { border-bottom: 1px solid #374151 !important; background-color: transparent !important; }
-    .card-title { color: #f3f4f6 !important; font-weight: bold; }
-    .table { color: #d1d5db !important; }
-    .table td, .table th { border-top: 1px solid #374151 !important; }
-
-    /* DESTAQUE GIGANTE PARA O MANUAL NO DASHBOARD */
-    .super-manual-banner {
-        background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
-        border-left: 8px solid #34d399;
-        color: white;
-        padding: 30px;
-        border-radius: 12px;
-        margin: 20px 15px 30px 15px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-    .super-manual-content h2 { margin: 0 0 10px 0; font-weight: 900; font-size: 1.8rem; color: #fff; }
-    .super-manual-content p { margin: 0; font-size: 1.1rem; opacity: 0.9; }
-    .super-manual-btn {
-        background-color: #fff;
-        color: #0f766e !important;
-        padding: 15px 30px;
-        border-radius: 8px;
-        font-weight: 900;
-        font-size: 1.2rem;
-        text-transform: uppercase;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        transition: all 0.3s;
-        text-decoration: none !important;
-    }
-    .super-manual-btn:hover { background-color: #f3f4f6; transform: scale(1.05); }
-
-    /* Fix para os links do topo do admin */
-    .main-header .nav-link { color: #d1d5db !important; }
-
-    /* Banners Globais de Plano */
-    .saas-global-banner { padding: 16px 24px; margin: 0 15px 25px 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 1.1rem; }
-    .saas-banner-warning { background-color: rgba(16, 185, 129, 0.1); border-left: 6px solid #10b981; color: #34d399; }
-    .saas-banner-danger { background-color: rgba(239, 68, 68, 0.1); border-left: 6px solid #ef4444; color: #f87171; }
-    .saas-btn { padding: 10px 20px; border-radius: 6px; text-decoration: none !important; font-weight: bold; color: white !important; }
-    .saas-btn-warning { background-color: #10b981; }
-    .saas-btn-danger { background-color: #ef4444; }
-
-    {% if request.path == '/admin/' %}
-    /* CSS EXCLUSIVO DO DASHBOARD */
-    #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
-    .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
-
-    /* Ações Rápidas */
-    .quick-actions-wrapper { margin: 0 15px 30px 15px; }
-    .quick-actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .qa-card { background-color: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 10px; color: #f3f4f6 !important; text-decoration: none !important; transition: all 0.3s; }
-    .qa-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.3); background-color: #374151; }
-    .qa-card ion-icon { font-size: 2.5rem; }
-    .qa-card-blue ion-icon { color: #3b82f6; }
-    .qa-card-purple ion-icon { color: #a855f7; }
-    .qa-card-teal ion-icon { color: #14b8a6; }
-    .qa-card-orange ion-icon { color: #f97316; }
-    .qa-card span { font-weight: bold; font-size: 1rem; }
-
-    /* Passo a Passo */
-    .dash-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 0 15px 30px 15px; }
-    .dash-info-card { background-color: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-    .dash-info-icon { background-color: #0d9488; color: white; min-width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold; }
-    .dash-info-text h4 { margin: 0 0 5px 0; font-size: 1.15rem; color: #f3f4f6; font-weight: bold; }
-    .dash-info-text p { margin: 0; color: #9ca3af; font-size: 0.9rem; line-height: 1.4; }
-    {% endif %}
-</style>
-{% endblock %}
-
-{% block content %}
-
-    <!-- BANNER DE MANUAL GIGANTE EM TODAS AS TELAS -->
-    <div class="super-manual-banner">
-        <div class="super-manual-content">
-            <h2>🚀 Precisa de ajuda para criar suas Jornadas?</h2>
-            <p>Nós preparamos um passo a passo completo e ilustrado para você dominar o sistema em minutos.</p>
+                    {% else %}
+                        <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
+                        <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <a href="{% url 'narrativa:faq' %}" class="super-manual-btn">📚 Acessar o Manual</a>
+    </nav>
+    {% endif %}
+    {% endblock %}
+
+    <div class="flex-grow">
+        {% block content %}{% endblock %}
     </div>
 
-    <!-- BANNERS DE SUSPENSÃO E LIMITES -->
-    {% if user.clinica %}
-        {% if not user.clinica.assinatura_ativa %}
-            <div class="saas-global-banner saas-banner-danger">
-                <span>⚠️ <b>Acesso Suspenso:</b> Assinatura inativa. A criação foi bloqueada.</span>
-                <a href="/planos/" class="saas-btn saas-btn-danger" target="_blank">Renovar Plano</a>
+    <!-- Rodapé Padrão do Sistema -->
+    <footer class="bg-gray-900 border-t border-gray-800 py-8 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-500 text-sm">© {% now "Y" %} Narrativas Clínicas. Todos os direitos reservados.</p>
+            <div class="flex gap-6">
+                <a href="{% url 'narrativa:termos' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Termos de Uso</a>
+                <a href="{% url 'narrativa:politica' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Política de Privacidade</a>
             </div>
-        {% elif user.clinica.atingiu_limite_narrativas and user.clinica.plano_atual %}
-            <div class="saas-global-banner saas-banner-warning">
-                <span>🚀 <b>Limite atingido ({{ user.clinica.plano_atual.limite_narrativas }} jornadas)!</b> Faça um upgrade para continuar expandindo as jornadas da clínica.</span>
-                <a href="/planos/" class="saas-btn saas-btn-warning" target="_blank">Fazer Upgrade</a>
-            </div>
-        {% endif %}
-    {% endif %}
-
-    {% if request.path == '/admin/' %}
-    
-    <!-- PAINEL DE AÇÕES RÁPIDAS (NOVIDADE) -->
-    <div class="quick-actions-wrapper">
-        <h3 style="color: white; margin-bottom: 15px; font-weight: bold;">⚡ Ações Rápidas</h3>
-        <div class="quick-actions-grid">
-            <a href="/admin/narrativa/cena/add/" class="qa-card qa-card-blue">
-                <ion-icon name="film-outline"></ion-icon>
-                <span>Nova Cena</span>
-            </a>
-            <a href="/admin/narrativa/questionario/add/" class="qa-card qa-card-purple">
-                <ion-icon name="list-outline"></ion-icon>
-                <span>Novo Questionário</span>
-            </a>
-            <a href="/admin/narrativa/narrativa/" class="qa-card qa-card-teal">
-                <ion-icon name="book-outline"></ion-icon>
-                <span>Ver Jornadas</span>
-            </a>
-            <a href="/admin/narrativa/sessaopaciente/" class="qa-card qa-card-orange">
-                <ion-icon name="people-outline"></ion-icon>
-                <span>Acessos de Pacientes</span>
-            </a>
         </div>
+    </footer>
+
+    <!-- Aviso de Cookies (LGPD) -->
+    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-teal-600 p-4 md:p-6 shadow-2xl z-50 hidden flex-col md:flex-row items-center justify-between gap-4">
+        <div class="text-gray-300 text-sm md:text-base">
+            Utilizamos cookies para melhorar sua experiência em nossa plataforma. Ao continuar navegando, você concorda com nossa
+            <a href="{% url 'narrativa:politica' %}" class="text-teal-400 underline hover:text-teal-300">Política de Privacidade</a>.
+        </div>
+        <button id="aceitar-cookies" class="whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-6 rounded-lg transition">
+            Entendi e Aceito
+        </button>
     </div>
 
-    <!-- CARDS COM O PASSO A PASSO -->
-    <div class="dash-cards-grid">
-        <div class="dash-info-card">
-            <div class="dash-info-icon">1</div>
-            <div class="dash-info-text">
-                <h4>Crie as Cenas</h4>
-                <p>O primeiro passo é cadastrar os textos, imagens ou vídeos que o paciente verá durante o tratamento.</p>
-            </div>
-        </div>
-        
-        <div class="dash-info-card">
-            <div class="dash-info-icon">2</div>
-            <div class="dash-info-text">
-                <h4>Adicione Questionários</h4>
-                <p>Opcionalmente, vincule perguntas às cenas criadas para gerar interatividade e escolhas.</p>
-            </div>
-        </div>
-        
-        <div class="dash-info-card">
-            <div class="dash-info-icon">3</div>
-            <div class="dash-info-text">
-                <h4>Monte a Narrativa</h4>
-                <p>Junte as cenas em uma ordem lógica e crie a jornada final pronta para ser enviada ao paciente.</p>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    
-    {{ block.super }}
-{% endblock %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const banner = document.getElementById('cookie-banner');
+            const btnAceitar = document.getElementById('aceitar-cookies');
+
+            if (!localStorage.getItem('cookiesAceitos')) {
+                banner.classList.remove('hidden');
+                banner.classList.add('flex');
+            }
+
+            btnAceitar.addEventListener('click', function() {
+                localStorage.setItem('cookiesAceitos', 'true');
+                banner.classList.add('hidden');
+                banner.classList.remove('flex');
+            });
+        });
+    </script>
+</body>
+</html>
