@@ -8,43 +8,21 @@
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* Estilização do Mega Dashboard de SaaS */
+    /* Ajustes refinados para os KPIs */
     .dashboard-header {
-        margin-bottom: 30px;
-        padding-bottom: 15px;
+        margin-bottom: 25px;
+        padding-bottom: 10px;
         border-bottom: 1px solid #374151;
     }
-    .kpi-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 20px;
-        margin-bottom: 40px;
-    }
-    .kpi-card {
-        background-color: #1f2937;
-        border: 1px solid #374151;
-        border-radius: 16px;
-        padding: 25px;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-        position: relative;
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-    .kpi-card:hover { transform: translateY(-5px); }
-    .kpi-card::before {
-        content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%;
-    }
-    .border-blue::before { background-color: #3b82f6; }
-    .border-purple::before { background-color: #a855f7; }
-    .border-teal::before { background-color: #14b8a6; }
-    .border-orange::before { background-color: #f97316; }
 
-    .kpi-title { color: #9ca3af; font-size: 0.9rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.05em; }
-    .kpi-value { color: #f3f4f6; font-size: 2.5rem; font-weight: 900; margin-bottom: 5px; line-height: 1; }
-    .kpi-desc { font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 5px;}
+    /* Classes de cores personalizadas para os cards */
+    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 15px;}
+    .border-blue { border-left: 4px solid #3b82f6 !important; }
+    .border-purple { border-left: 4px solid #a855f7 !important; }
+    .border-teal { border-left: 4px solid #14b8a6 !important; }
+    .border-orange { border-left: 4px solid #f97316 !important; }
 
-    .text-success-metric { color: #34d399; } /* Verde para métricas boas */
-    .text-warning-metric { color: #fbbf24; } /* Amarelo para alertas */
+    .info-box-icon i { font-size: 2rem; }
 </style>
 {% endblock %}
 
@@ -54,56 +32,82 @@
         <p style="color: #9ca3af; margin-top: 5px;">Acompanhe o progresso dos pacientes nas narrativas.</p>
     </div>
 
-    <!-- GRID DE KPI -->
-    <div class="kpi-grid">
-        <div class="kpi-card border-blue">
-            <div class="kpi-title">Acessos Totais</div>
-            <div class="kpi-value">{{ kpi_sessoes|default:"0" }}</div>
-            <div class="kpi-desc text-success-metric"><ion-icon name="trending-up-outline"></ion-icon> Pacientes únicos iniciados</div>
+    <!-- GRID DE KPI (Usando a estrutura nativa do framework para não quebrar layout) -->
+    <div class="row mb-4">
+
+        <!-- Acessos Totais -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="info-box info-box-custom border-blue">
+                <span class="info-box-icon text-primary bg-transparent elevation-0"><i class="fas fa-chart-line" style="color: #3b82f6;"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Acessos Totais</span>
+                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_sessoes|default:"0" }}</span>
+                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-users"></i> Pacientes iniciados</span>
+                </div>
+            </div>
         </div>
 
-        <div class="kpi-card border-purple">
-            <div class="kpi-title">Narrativas Concluídas</div>
-            <div class="kpi-value">{{ kpi_finalizadas|default:"0" }}</div>
-            <div class="kpi-desc text-success-metric"><ion-icon name="checkmark-circle-outline"></ion-icon> Chegaram até o fim</div>
+        <!-- Narrativas Concluídas -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="info-box info-box-custom border-purple">
+                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-flag-checkered" style="color: #a855f7;"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Concluídas</span>
+                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_finalizadas|default:"0" }}</span>
+                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                </div>
+            </div>
         </div>
 
-        <div class="kpi-card border-teal">
-            <div class="kpi-title">Taxa de Conclusão</div>
-            <div class="kpi-value">{{ taxa_conclusao|default:"0" }}%</div>
-            <div class="kpi-desc text-warning-metric"><ion-icon name="pie-chart-outline"></ion-icon> Engajamento geral</div>
+        <!-- Taxa de Conclusão -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="info-box info-box-custom border-teal">
+                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-chart-pie" style="color: #14b8a6;"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Taxa de Retenção</span>
+                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ taxa_conclusao|default:"0" }}%</span>
+                    <span class="text-warning" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                </div>
+            </div>
         </div>
 
-        <div class="kpi-card border-orange">
-            <div class="kpi-title">Pesquisas Respondidas</div>
-            <div class="kpi-value">{{ kpi_respostas|default:"0" }}</div>
-            <div class="kpi-desc text-success-metric"><ion-icon name="chatbubbles-outline"></ion-icon> Volume de dados coletados</div>
+        <!-- Pesquisas Respondidas -->
+        <div class="col-12 col-sm-6 col-lg-3">
+            <div class="info-box info-box-custom border-orange">
+                <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-comments" style="color: #f97316;"></i></span>
+                <div class="info-box-content">
+                    <span class="info-box-text text-uppercase text-muted" style="font-weight: 800; font-size: 0.8rem; letter-spacing: 0.5px;">Respondidas</span>
+                    <span class="info-box-number text-white" style="font-size: 2rem; line-height: 1;">{{ kpi_respostas|default:"0" }}</span>
+                    <span class="text-success" style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-database"></i> Dados coletados</span>
+                </div>
+            </div>
         </div>
+
     </div>
 
     <!-- Tabela original do Django Admin -->
     {% get_side_menu using="app_list" as dashboard_list %}
     {% if dashboard_list %}
         {% for app in dashboard_list %}
-            <div class="card card-primary card-outline">
+            <div class="card card-primary card-outline" style="border-top: 3px solid #14b8a6;">
                 <div class="card-header">
-                    <h5 class="m-0">{{ app.name }}</h5>
+                    <h5 class="m-0 text-white" style="font-weight: bold;">Gerenciamento de {{ app.name }}</h5>
                 </div>
-                <div class="card-body">
-                    <table class="table table-sm table-hover">
+                <div class="card-body p-0">
+                    <table class="table table-hover m-0">
                         <tbody>
                             {% for model in app.models %}
                                 <tr>
-                                    <td>
-                                        {% if model.url %}<a href="{{ model.url }}">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                    <td class="align-middle pl-4">
+                                        {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right pr-4 py-3">
                                         <div class="btn-group">
                                             {% if model.add_url %}
-                                                <a href="{{ model.add_url }}" class="btn btn-sm btn-success btn-flat"><i class="fas fa-plus"></i> {% trans 'Add' %}</a>
+                                                <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> {% trans 'Add' %}</a>
                                             {% endif %}
                                             {% if model.url %}
-                                                <a href="{{ model.url }}" class="btn btn-sm btn-info btn-flat"><i class="fas fa-edit"></i> {% trans 'Change' %}</a>
+                                                <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> {% trans 'Change' %}</a>
                                             {% endif %}
                                         </div>
                                     </td>

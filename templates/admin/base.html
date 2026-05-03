@@ -3,63 +3,34 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* FORÇANDO O DARK MODE E A COR TEAL (VERDE ÁGUA) NO ADMIN */
-    body, .content-wrapper, .main-footer {
-        background-color: #111827 !important; /* Tailwind gray-900 */
-        color: #f3f4f6 !important; /* Tailwind gray-100 */
-    }
-    .main-header {
-        background-color: #1f2937 !important; /* Tailwind gray-800 */
-        border-bottom: 1px solid #374151 !important;
-    }
-    .main-sidebar, .brand-link {
-        background-color: #030712 !important; /* Tailwind gray-950 */
-    }
+    /* FORÇANDO O DARK MODE NO ADMIN */
+    body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
+    .main-header { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
+    .main-sidebar { background-color: #030712 !important; }
 
-    /* ======== CORREÇÃO DO VÃO (LOGO) ======== */
-    .brand-link {
-        border-bottom: 1px solid #1f2937 !important;
-        color: #14b8a6 !important; /* Tailwind teal-500 */
-        font-weight: 900 !important;
-        display: block !important;
-    }
-    .brand-link img { display: none !important; } /* Esconde só a imagem do "A" */
+    /* ======== 1. REMOVENDO A LOGO COMPLETAMENTE ======== */
+    .brand-link { height: 57px; border-bottom: 1px solid #1f2937 !important; display: block; }
+    .brand-link * { display: none !important; } /* Esconde o "A" e a palavra "Administração" */
 
-    /* ======== EMPURRANDO MENU E PESQUISA PARA A DIREITA ======== */
-    .main-header .navbar-nav:first-of-type {
-        flex-grow: 1;
-        justify-content: flex-end;
-        padding-right: 15px;
-    }
-    .main-header form.form-inline {
-        margin-right: 15px !important;
-    }
+    /* ======== 2. EMPURRANDO A PESQUISA PARA A DIREITA ======== */
+    .main-header .navbar-nav:first-of-type { flex-grow: 1; justify-content: flex-end; padding-right: 15px; }
 
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-        background-color: #0d9488 !important; /* Tailwind teal-600 */
-        color: white !important;
-    }
-
-    a { color: #14b8a6; }
-    a:hover { color: #0d9488; text-decoration: none; }
-
-    /* ======== CORREÇÃO GLOBAL PARA O MANUAL (FAQ) E LEITURA ======== */
-    .content-wrapper .bg-white, .content-wrapper .bg-light, .content-wrapper [style*="background-color: white"] {
+    /* ======== 3. CORES LEITURA DO MANUAL (TEXTOS E FUNDOS) ======== */
+    /* Força os fundos das caixas que estavam brancas a ficarem cinza escuro */
+    .content-wrapper .card, .content-wrapper .info-box, .content-wrapper .callout {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
-    }
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5 {
         color: #f3f4f6 !important;
-        font-weight: bold;
     }
-    .content-wrapper p, .content-wrapper span, .content-wrapper li, .content-wrapper div.text-muted {
-        color: #d1d5db !important;
-    }
-    .content-wrapper strong, .content-wrapper b {
-        color: #14b8a6 !important;
-    }
+    /* Força todos os textos do manual a ficarem claros */
+    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5 { color: #f3f4f6 !important; font-weight: bold; }
+    .content-wrapper p, .content-wrapper span, .content-wrapper li, .content-wrapper div { color: #d1d5db !important; }
+    .content-wrapper strong, .content-wrapper b { color: #14b8a6 !important; }
 
-    /* ======== CORREÇÃO DOS BOTÕES ======== */
+    /* Estilização Geral (Inputs, Botões, Selects) */
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
+    a { color: #14b8a6; } a:hover { color: #0d9488; text-decoration: none; }
+
     .btn { color: white !important; }
     .btn-primary, .bg-primary, .btn-info, .bg-info { background-color: #0d9488 !important; border-color: #0f766e !important; color: white !important; }
     .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
@@ -70,29 +41,51 @@
     .btn-default, .btn-secondary, .btn-outline-secondary { background-color: #374151 !important; border-color: #4b5563 !important; color: #f3f4f6 !important; }
     .btn-default:hover, .btn-secondary:hover { background-color: #4b5563 !important; color: white !important; }
 
-    /* ======== FORMULÁRIOS E INPUTS ======== */
     .form-control, input, select, textarea { background-color: #374151 !important; border-color: #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; }
     ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
-    ::-ms-input-placeholder { color: #9ca3af !important; }
 
-    /* COMPONENTE SELECT2 (CAIXAS DE PESQUISA) */
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f3f4f6 !important; line-height: 36px !important; }
     .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
     .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
     .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
-
     .main-header .input-group .btn { background-color: #4b5563 !important; border-color: #4b5563 !important; color: white !important; }
-    .main-header .input-group .btn:hover { background-color: #6b7280 !important; }
 
-    /* Cards e Tabelas */
-    .card, .info-box { background-color: #1f2937 !important; border: 1px solid #374151 !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important; border-radius: 0.75rem !important; }
-    .card-header { border-bottom: 1px solid #374151 !important; background-color: transparent !important; }
-    .card-title { color: #f3f4f6 !important; font-weight: bold; }
     .table { color: #d1d5db !important; }
     .table td, .table th { border-top: 1px solid #374151 !important; }
 </style>
+
+<!-- MÁGICA DA FLECHINHA LATERAL (Move o hamburger para o lado do usuário) -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const toggleBtnLi = document.querySelector('[data-widget="pushmenu"]')?.parentElement;
+        const userPanel = document.querySelector('.user-panel');
+
+        if (toggleBtnLi && userPanel) {
+            // Remove as margens de lista
+            toggleBtnLi.style.listStyle = 'none';
+            toggleBtnLi.style.margin = '0';
+
+            // Troca o ícone de hambúrguer por uma flechinha elegante
+            const icon = toggleBtnLi.querySelector('i');
+            if(icon) {
+                icon.className = 'fas fa-chevron-left';
+                icon.style.color = '#9ca3af';
+                icon.style.fontSize = '1.2rem';
+            }
+
+            // Ajusta o painel lateral para alinhar e-mail e botão
+            userPanel.style.display = 'flex';
+            userPanel.style.justifyContent = 'space-between';
+            userPanel.style.alignItems = 'center';
+            userPanel.style.paddingRight = '15px';
+
+            // Move o botão definitivamente para a barra lateral
+            userPanel.appendChild(toggleBtnLi);
+        }
+    });
+</script>
 {% endblock %}
 
 {% block content %}
