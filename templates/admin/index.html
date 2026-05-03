@@ -7,18 +7,22 @@
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* Header limpo sem linha */
-    .dashboard-header { margin-top: 0; margin-bottom: 25px; padding-bottom: 0; border-bottom: none; }
+    .dashboard-header { margin-top: 0; margin-bottom: 30px; padding-bottom: 0; border-bottom: none; }
 
-    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 15px;}
+    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 20px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
     .border-teal { border-left: 4px solid #14b8a6 !important; }
     .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-orange { border-left: 4px solid #f97316 !important; }
 
-    .info-box-icon i { font-size: 1.8rem; }
+    .icon-bg { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 15px;}
+    .bg-blue-light { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .bg-teal-light { background-color: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+    .bg-purple-light { background-color: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .bg-orange-light { background-color: rgba(249, 115, 22, 0.15); color: #f97316; }
+
     .kpi-label { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; color: #9ca3af; text-transform: uppercase; }
-    .kpi-number { font-size: 2.2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
+    .kpi-number { font-size: 2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
     .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
 
     .quick-action-btn {
@@ -27,24 +31,22 @@
         margin-bottom: 10px; font-weight: bold; transition: all 0.2s; border: 1px solid #4b5563;
     }
     .quick-action-btn:hover { background-color: #4b5563; color: white; transform: translateX(3px); }
-    .quick-action-btn i { font-size: 1.2rem; color: #14b8a6; }
 </style>
 {% endblock %}
 
 {% block content %}
     <div class="dashboard-header">
-        <h2 style="color: #f3f4f6; font-weight: 800; margin: 0;">Visão Geral do Engajamento</h2>
+        <h2 style="color: #ffffff; font-weight: 800; margin: 0;">Visão Geral do Engajamento</h2>
         <p style="color: #9ca3af; margin-top: 5px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
     </div>
 
     <div class="row">
         <!-- COLUNA ESQUERDA -->
         <div class="col-lg-8">
-            <!-- Linha 1: Acessos e Retenção (Métricas Globais) -->
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-blue">
-                        <span class="info-box-icon text-primary bg-transparent elevation-0"><i class="fas fa-users" style="color: #3b82f6;"></i></span>
+                        <div class="icon-bg bg-blue-light"><i class="fas fa-users"></i></div>
                         <div class="info-box-content">
                             <span class="kpi-label">Acessos Totais</span>
                             <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
@@ -54,7 +56,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-teal">
-                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-chart-pie" style="color: #14b8a6;"></i></span>
+                        <div class="icon-bg bg-teal-light"><i class="fas fa-chart-pie"></i></div>
                         <div class="info-box-content">
                             <span class="kpi-label">Taxa de Retenção</span>
                             <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
@@ -64,11 +66,10 @@
                 </div>
             </div>
 
-            <!-- Linha 2: Concluídas e Respondidas (Métricas de Ação) -->
             <div class="row mb-4">
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-purple">
-                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-flag-checkered" style="color: #a855f7;"></i></span>
+                        <div class="icon-bg bg-purple-light"><i class="fas fa-flag-checkered"></i></div>
                         <div class="info-box-content">
                             <span class="kpi-label">Narrativas Concluídas</span>
                             <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
@@ -78,7 +79,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-orange">
-                        <span class="info-box-icon bg-transparent elevation-0"><i class="fas fa-comments" style="color: #f97316;"></i></span>
+                        <div class="icon-bg bg-orange-light"><i class="fas fa-comments"></i></div>
                         <div class="info-box-content">
                             <span class="kpi-label">Pesquisas Respondidas</span>
                             <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
@@ -88,7 +89,6 @@
                 </div>
             </div>
 
-            <!-- Gerenciamento de Narrativas -->
             {% get_side_menu using="app_list" as dashboard_list %}
             {% if dashboard_list %}
                 {% for app in dashboard_list %}
@@ -103,15 +103,15 @@
                                         {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
                                         <tr>
                                             <td class="align-middle pl-4">
-                                                {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                                {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem; color: #f3f4f6;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
                                             </td>
                                             <td class="text-right pr-4 py-3">
                                                 <div class="btn-group">
                                                     {% if model.add_url %}
-                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> {% trans 'Add' %}</a>
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success" style="background-color: #10b981; color: white; border: none; font-weight: 600;"><i class="fas fa-plus" style="color: white;"></i> Add</a>
                                                     {% endif %}
                                                     {% if model.url %}
-                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> {% trans 'Change' %}</a>
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info" style="background-color: #3b82f6; color: white; border: none; font-weight: 600;"><i class="fas fa-edit" style="color: white;"></i> Edit</a>
                                                     {% endif %}
                                                 </div>
                                             </td>
@@ -126,26 +126,24 @@
             {% endif %}
         </div>
 
-        <!-- COLUNA DIREITA: Ações e Status -->
+        <!-- COLUNA DIREITA: Ações Rápidas -->
         <div class="col-lg-4">
-
-            <!-- Ações Rápidas -->
             <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6;">
                 <div class="card-header">
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
                 </div>
                 <div class="card-body">
-                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn text-decoration-none">
+                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn text-decoration-none border-blue">
                         <span>Nova Jornada</span>
-                        <i class="fas fa-book-medical"></i>
+                        <i class="fas fa-book-medical text-primary"></i>
                     </a>
-                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn text-decoration-none">
+                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn text-decoration-none border-teal">
                         <span>Criar Cena</span>
-                        <i class="fas fa-desktop"></i>
+                        <i class="fas fa-desktop text-info"></i>
                     </a>
-                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none">
+                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none border-purple">
                         <span>Novo Questionário</span>
-                        <i class="fas fa-clipboard-list"></i>
+                        <i class="fas fa-clipboard-list" style="color: #a855f7;"></i>
                     </a>
                     <hr style="border-color: #374151; margin: 20px 0;">
                     <a href="{% url 'narrativa:faq' %}" class="quick-action-btn text-decoration-none" style="background-color: #064e3b; border-color: #065f46;">
@@ -160,18 +158,17 @@
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-server text-info mr-2"></i>Status do Sistema</h5>
                 </div>
                 <div class="card-body">
-                    <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 15px;">Todos os serviços essenciais estão operando normalmente.</p>
+                    <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 15px;">Todos os serviços essenciais operando normalmente.</p>
                     <div style="display: flex; align-items: center; margin-bottom: 12px;">
                         <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
-                        <span style="color: #d1d5db; font-weight: 600;">Banco de Dados Integrado</span>
+                        <span style="color: #d1d5db; font-weight: 600;">Banco de Dados</span>
                     </div>
                     <div style="display: flex; align-items: center;">
                         <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
-                        <span style="color: #d1d5db; font-weight: 600;">Servidor de Narrativas</span>
+                        <span style="color: #d1d5db; font-weight: 600;">Servidor Seguro</span>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 {% endblock %}
