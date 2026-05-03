@@ -3,43 +3,90 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* Destaque Máximo para a Central de Ajuda no Admin */
-    .admin-help-banner {
-        background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);
-        color: white;
-        padding: 20px 30px;
-        border-radius: 8px;
-        margin: 15px 15px 25px 15px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    /* FORÇANDO O DARK MODE E A COR TEAL (VERDE ÁGUA) NO ADMIN PARA FICAR IGUAL AO SITE */
+    body, .content-wrapper, .main-footer {
+        background-color: #111827 !important; /* Tailwind gray-900 */
+        color: #f3f4f6 !important; /* Tailwind gray-100 */
     }
-    .admin-help-text h4 { margin: 0 0 8px 0; color: #fff; font-weight: 800; font-size: 1.3rem; }
-    .admin-help-text p { margin: 0; font-size: 0.95rem; opacity: 0.9; }
-    .admin-help-btn {
-        background-color: white;
-        color: #0f766e !important;
-        padding: 12px 24px;
-        border-radius: 6px;
-        text-decoration: none !important;
-        font-weight: bold;
-        font-size: 1.05rem;
-        transition: all 0.3s;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        white-space: nowrap;
+    .main-header {
+        background-color: #1f2937 !important; /* Tailwind gray-800 */
+        border-bottom: 1px solid #374151 !important;
     }
-    .admin-help-btn:hover { background-color: #f8fafc; transform: translateY(-2px); }
+    .main-sidebar {
+        background-color: #030712 !important; /* Tailwind gray-950 */
+    }
+    .brand-link {
+        background-color: #030712 !important;
+        border-bottom: 1px solid #1f2937 !important;
+        color: #14b8a6 !important; /* Tailwind teal-500 */
+        font-weight: 900 !important;
+    }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        background-color: #0d9488 !important; /* Tailwind teal-600 */
+        color: white !important;
+    }
+    a { color: #14b8a6; }
+    a:hover { color: #0d9488; }
 
-    /* Banners SaaS Globais */
-    .saas-global-banner {
-        padding: 16px 24px; margin: 0 15px 25px 15px; border-radius: 8px;
-        display: flex; align-items: center; justify-content: space-between;
+    /* Botões Padrões */
+    .btn-primary, .bg-primary, .btn-info, .bg-info {
+        background-color: #0d9488 !important;
+        border-color: #0f766e !important;
+        color: white !important;
     }
-    .saas-banner-warning { background-color: #ecfdf5; border-left: 6px solid #10b981; color: #065f46; }
-    .saas-banner-danger { background-color: #fef2f2; border-left: 6px solid #ef4444; color: #991b1b; }
+    .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
+    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; }
+
+    /* Cards e Tabelas */
+    .card {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+        border-radius: 0.75rem !important;
+    }
+    .card-header { border-bottom: 1px solid #374151 !important; background-color: transparent !important; }
+    .card-title { color: #f3f4f6 !important; font-weight: bold; }
+    .table { color: #d1d5db !important; }
+    .table td, .table th { border-top: 1px solid #374151 !important; }
+
+    /* DESTAQUE GIGANTE PARA O MANUAL */
+    .super-manual-banner {
+        background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%);
+        border-left: 8px solid #34d399;
+        color: white;
+        padding: 30px;
+        border-radius: 12px;
+        margin: 20px 15px 30px 15px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .super-manual-content h2 { margin: 0 0 10px 0; font-weight: 900; font-size: 1.8rem; color: #fff; }
+    .super-manual-content p { margin: 0; font-size: 1.1rem; opacity: 0.9; }
+    .super-manual-btn {
+        background-color: #fff;
+        color: #0f766e !important;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-weight: 900;
+        font-size: 1.2rem;
+        text-transform: uppercase;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: all 0.3s;
+        text-decoration: none !important;
+    }
+    .super-manual-btn:hover { background-color: #f3f4f6; transform: scale(1.05); }
+
+    /* Fix para os links do topo do admin */
+    .main-header .nav-link { color: #d1d5db !important; }
+
+    /* Banners Globais de Plano */
+    .saas-global-banner { padding: 16px 24px; margin: 0 15px 25px 15px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; font-size: 1.1rem; }
+    .saas-banner-warning { background-color: rgba(16, 185, 129, 0.1); border-left: 6px solid #10b981; color: #34d399; }
+    .saas-banner-danger { background-color: rgba(239, 68, 68, 0.1); border-left: 6px solid #ef4444; color: #f87171; }
     .saas-btn { padding: 10px 20px; border-radius: 6px; text-decoration: none !important; font-weight: bold; color: white !important; }
     .saas-btn-warning { background-color: #10b981; }
     .saas-btn-danger { background-color: #ef4444; }
@@ -48,13 +95,13 @@
 
 {% block content %}
 
-    <!-- BANNER DE MANUAL E INSTRUÇÕES EM TODAS AS TELAS -->
-    <div class="admin-help-banner">
-        <div class="admin-help-text">
-            <h4>🛠️ Central de Ajuda & Criação</h4>
-            <p>Dica de ouro: Comece criando suas <b>Cenas</b>. Depois, use as <b>Escolhas</b> para conectá-las e só então junte tudo em uma <b>Narrativa</b>.</p>
+    <!-- BANNER DE MANUAL GIGANTE EM TODAS AS TELAS -->
+    <div class="super-manual-banner">
+        <div class="super-manual-content">
+            <h2>🚀 Precisa de ajuda para criar suas Jornadas?</h2>
+            <p>Nós preparamos um passo a passo completo e ilustrado para você dominar o sistema em minutos.</p>
         </div>
-        <a href="{% url 'narrativa:faq' %}" class="admin-help-btn">📖 Ler Manual Completo</a>
+        <a href="{% url 'narrativa:faq' %}" class="super-manual-btn">📚 Acessar o Manual</a>
     </div>
 
     <!-- BANNERS DE SUSPENSÃO E LIMITES -->
