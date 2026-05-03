@@ -1,13 +1,14 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static jazzmin %}
 
+<!-- A MÁGICA AQUI TAMBÉM: O TÍTULO VAI FICAR EM CIMA DA LINHA -->
+{% block content_title %}Visão Geral do Engajamento{% endblock %}
+
 {% block extrastyle %}
 {{ block.super }}
 <style>
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
-
-    .dashboard-header { margin-top: 0; margin-bottom: 30px; padding-bottom: 0; border-bottom: none; }
 
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 20px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
@@ -36,10 +37,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="dashboard-header">
-        <h1 style="color: #ffffff; font-weight: 800; margin: 0; font-size: 2rem;">Visão Geral do Engajamento</h1>
-        <p style="color: #9ca3af; margin-top: 5px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
-    </div>
+    <p style="color: #9ca3af; margin-bottom: 25px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
 
     <div class="row">
         <!-- COLUNA ESQUERDA -->
@@ -111,7 +109,6 @@
                                             </td>
                                             <td class="text-right pr-4 py-3">
                                                 <div class="btn-group">
-                                                    <!-- BOTÕES EM FORMATO NORMAL E TRADUZIDOS -->
                                                     {% if model.add_url %}
                                                         <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Adicionar</a>
                                                     {% endif %}

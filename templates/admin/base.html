@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL E REMOÇÃO DE LINHAS/ESPAÇOS
+       1. MODO ESCURO GERAL E LIMPEZA DO TOPO
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer {
         background-color: #111827 !important; color: #f3f4f6 !important;
@@ -13,7 +13,7 @@
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
     .brand-link { display: none !important; }
 
-    /* Fim do menu superior no Desktop e puxando o conteúdo para o topo */
+    /* Remove o menu superior no Desktop */
     @media (min-width: 992px) {
         .main-header { display: none !important; }
         .content-wrapper { padding-top: 15px !important; margin-top: 0 !important; }
@@ -23,15 +23,46 @@
         .main-header .navbar-nav { display: none !important; }
     }
 
-    /* Puxa os títulos para cima para ocupar o espaço do cabeçalho */
-    .content-header { padding-top: 0 !important; padding-bottom: 15px !important; border-bottom: none !important; }
-    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; }
-    .content-wrapper > p, p.text-muted { color: #9ca3af !important; font-size: 0.95rem !important; margin-top: 5px !important; }
-
-    hr { border-top: 1px solid #374151 !important; } /* Evita linhas brancas residuais */
+    /* =====================================================================
+       2. TÍTULOS NATIVOS E LINHA DIVISÓRIA (PADRÃO PARA TODAS AS TELAS)
+       ===================================================================== */
+    .content-header {
+        border-bottom: 1px solid #374151 !important; /* A linha bonita que você queria */
+        padding-bottom: 15px !important;
+        margin-bottom: 20px !important;
+        padding-top: 0 !important;
+    }
+    .content-header h1 {
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+        border: none !important;
+    }
 
     /* =====================================================================
-       2. CARDS DO MANUAL E DO SISTEMA
+       3. BOTÕES (COM TEXTO BRANCO ABSOLUTO FORÇADO)
+       ===================================================================== */
+    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
+    .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
+
+    /* Botão Adicionar - FORÇANDO A FONTE E O ÍCONE A SEREM BRANCOS */
+    .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
+    .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
+    .btn-success i, .table td a.btn-success i { margin-right: 4px; color: #ffffff !important; }
+    .btn-success span, .table td a.btn-success span { color: #ffffff !important; } /* Blindagem extra */
+
+    /* Botão Editar */
+    .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
+    .btn-info:hover, .table td a.btn-info:hover { background-color: #2563eb !important; color: #ffffff !important; }
+    .btn-info i, .table td a.btn-info i { color: #ffffff !important; }
+
+    /* Botões Importar/Exportar */
+    .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
+    .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
+
+    /* =====================================================================
+       4. CARDS, INPUTS E MENU
        ===================================================================== */
     .content-wrapper .card, .content-wrapper .card-body, .content-wrapper .info-box, .content-wrapper .callout {
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px;
@@ -44,34 +75,13 @@
     }
     .content-wrapper a { color: #14b8a6 !important; font-weight: bold; }
 
+    /* Cores das bordas do Manual */
     .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
     .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
     .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
     .content-wrapper .card:nth-of-type(4) { border-left: 4px solid #f97316 !important; }
     .content-wrapper .card:nth-of-type(5) { border-left: 4px solid #14b8a6 !important; }
 
-    /* =====================================================================
-       3. BOTÕES PADRONIZADOS (TAMANHO NORMAL E CORES DA IDENTIDADE)
-       ===================================================================== */
-    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
-    .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
-
-    /* Botão Adicionar - Tamanho normal, cor Teal (igual à barra lateral) */
-    .btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-    .btn-success:hover { background-color: #0f766e !important; }
-    .btn-success i { margin-right: 4px; color: #ffffff !important; }
-
-    /* Botão Editar - Azul discreto */
-    .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-    .btn-info:hover { background-color: #2563eb !important; }
-
-    /* Botões Importar/Exportar */
-    .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
-    .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
-
-    /* =====================================================================
-       4. INPUTS E DROPDOWNS
-       ===================================================================== */
     .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
@@ -93,10 +103,8 @@
         const btnSuccess = document.querySelectorAll('.btn-success');
         btnSuccess.forEach(btn => {
             const text = btn.innerText.toLowerCase();
-            // Se o botão contiver a palavra adicionar (ex: "Adicionar cena", "Adicionar sessao paciente")
-            // ele trunca e deixa estritamente "Adicionar" (padrão de tamanho e texto).
             if (text.includes('adicionar')) {
-                btn.innerHTML = '<i class="fas fa-plus"></i> Adicionar';
+                btn.innerHTML = '<i class="fas fa-plus"></i> <span style="color: white !important;">Adicionar</span>';
             }
         });
 
@@ -158,24 +166,7 @@
                 if (el.style.backgroundColor === 'white' || el.style.backgroundColor === '#ffffff' || el.style.backgroundColor === 'rgb(255, 255, 255)') {
                     el.style.backgroundColor = 'transparent';
                 }
-                if (el.style.background === 'white' || el.style.background === '#ffffff' || el.style.background === 'rgb(255, 255, 255)') {
-                    el.style.background = 'transparent';
-                }
             });
-
-            const primeiroCard = document.querySelector('.content-wrapper .card .card-body');
-            if (primeiroCard) {
-                const linksIndice = primeiroCard.querySelectorAll('a');
-                linksIndice.forEach((link, index) => {
-                    link.style.display = 'block';
-                    link.style.padding = '12px 0';
-                    link.style.borderBottom = '1px solid #374151';
-                    link.style.width = '100%';
-                    if (index === linksIndice.length - 1) {
-                        link.style.borderBottom = 'none';
-                    }
-                });
-            }
         }
     });
 </script>

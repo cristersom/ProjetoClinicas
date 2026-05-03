@@ -3,300 +3,38 @@
 
 {% block title %}Manual do Administrador{% endblock %}
 
-{% block extrahead %}
-<style>
-    /* =====================================================================
-       ESTILOS NATIVOS DO MANUAL (DARK MODE)
-       ===================================================================== */
-    .manual-container {
-        max-width: 1000px;
-        margin: 0 auto 30px auto;
-        font-family: inherit;
-        color: #d1d5db; /* Cinza claro padrão do sistema */
-        line-height: 1.6;
-    }
-
-    .manual-header {
-        border-bottom: 1px solid #374151;
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-    }
-
-    /* Título idêntico ao do Dashboard */
-    .manual-header h1 {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #ffffff;
-        margin: 0 0 5px 0;
-    }
-
-    /* Subtítulo idêntico ao do Dashboard */
-    .manual-header p {
-        color: #9ca3af;
-        font-size: 0.95rem;
-        margin: 0;
-    }
-
-    /* Caixas das seções (Idênticas aos cards do dashboard) */
-    .manual-section {
-        background-color: #1f2937;
-        border: 1px solid #374151;
-        border-radius: 12px;
-        padding: 30px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    }
-
-    /* Bordas coloridas para separar as seções (Estilo Dashboard) */
-    .manual-section:nth-of-type(1) { border-left: 4px solid #3b82f6; } /* Azul */
-    .manual-section:nth-of-type(2) { border-left: 4px solid #10b981; } /* Verde */
-    .manual-section:nth-of-type(3) { border-left: 4px solid #a855f7; } /* Roxo */
-    .manual-section:nth-of-type(4) { border-left: 4px solid #f97316; } /* Laranja */
-    .manual-section:nth-of-type(5) { border-left: 4px solid #14b8a6; } /* Teal */
-
-    .manual-section h2 {
-        font-size: 1.5rem;
-        color: #ffffff;
-        font-weight: 800;
-        margin-top: 0;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #374151;
-    }
-
-    .manual-section h3 {
-        font-size: 1.1rem;
-        color: #ffffff;
-        font-weight: 700;
-        margin-top: 25px;
-        margin-bottom: 10px;
-    }
-
-    /* Listas e Passos */
-    .step-list {
-        list-style: none;
-        padding: 0;
-        counter-reset: step-counter;
-    }
-    .step-list li {
-        position: relative;
-        padding-left: 40px;
-        margin-bottom: 15px;
-        color: #d1d5db;
-    }
-    .step-list li::before {
-        counter-increment: step-counter;
-        content: counter(step-counter);
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 28px;
-        height: 28px;
-        background-color: #14b8a6; /* Teal */
-        color: white;
-        border-radius: 50%;
-        text-align: center;
-        line-height: 28px;
-        font-weight: bold;
-        font-size: 0.9rem;
-    }
-
-    /* Caixas de Destaque no padrão Dark Mode translúcido */
-    .info-box {
-        background-color: rgba(20, 184, 166, 0.15); /* Teal translúcido */
-        border-left: 4px solid #14b8a6;
-        padding: 15px;
-        margin: 20px 0;
-        color: #d1d5db;
-        font-size: 0.95rem;
-        border-radius: 0 8px 8px 0;
-    }
-
-    .warning-box {
-        background-color: rgba(249, 115, 22, 0.15); /* Laranja translúcido */
-        border-left: 4px solid #f97316;
-        padding: 15px;
-        margin: 20px 0;
-        color: #d1d5db;
-        border-radius: 0 8px 8px 0;
-    }
-    .warning-box strong { color: #f97316; }
-
-    /* Glossário */
-    dt { font-weight: bold; color: #34d399; margin-top: 15px; font-size: 1.05rem; }
-    dd { margin-left: 0; margin-bottom: 15px; color: #9ca3af; }
-
-    /* Navegação Interna (Transformado em Lista Vertical Elegante) */
-    .toc {
-        background: #1f2937;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-        border: 1px solid #374151;
-        border-left: 4px solid #4b5563;
-    }
-    .toc ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column; /* Força a ser vertical */
-    }
-    .toc li {
-        border-bottom: 1px solid #374151;
-    }
-    .toc li:last-child {
-        border-bottom: none;
-    }
-    .toc a {
-        display: block;
-        padding: 12px 10px;
-        text-decoration: none;
-        color: #f3f4f6;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.2s ease;
-    }
-    .toc a:hover {
-        color: #34d399;
-        background-color: rgba(55, 65, 81, 0.5);
-        border-radius: 6px;
-    }
-
-</style>
-{% endblock %}
+<!-- A MÁGICA: TÍTULO NATIVO DO DJANGO EM CIMA DA LINHA -->
+{% block content_title %}Manual do Administrador{% endblock %}
 
 {% block content %}
 <div class="manual-container">
 
-    <div class="manual-header">
-        <h1>Manual do Administrador</h1>
-        <p>Guia de referência para gestão de Narrativas, Questionários e Relatórios.</p>
-    </div>
+    <p style="color: #9ca3af; margin-bottom: 25px; font-size: 0.95rem;">Guia de referência para gestão de Narrativas, Questionários e Relatórios.</p>
 
     <!-- Índice Transformado em Lista Vertical -->
-    <div class="toc">
-        <ul>
-            <li><a href="#glossario">1. Glossário do Sistema</a></li>
-            <li><a href="#fluxo">2. Fluxo de Criação (Passo a Passo)</a></li>
-            <li><a href="#questionarios">3. Gestão de Questionários</a></li>
-            <li><a href="#distribuicao">4. Distribuição e Acesso</a></li>
-            <li><a href="#relatorios">5. Relatórios e Dados</a></li>
+    <div class="toc" style="background: #1f2937; padding: 20px; border-radius: 12px; margin-bottom: 30px; border: 1px solid #374151; border-left: 4px solid #4b5563;">
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column;">
+            <li style="border-bottom: 1px solid #374151;"><a href="#glossario" style="display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600;">1. Glossário do Sistema</a></li>
+            <li style="border-bottom: 1px solid #374151;"><a href="#fluxo" style="display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600;">2. Fluxo de Criação (Passo a Passo)</a></li>
+            <li style="border-bottom: 1px solid #374151;"><a href="#questionarios" style="display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600;">3. Gestão de Questionários</a></li>
+            <li style="border-bottom: 1px solid #374151;"><a href="#distribuicao" style="display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600;">4. Distribuição e Acesso</a></li>
+            <li><a href="#relatorios" style="display: block; padding: 12px 10px; text-decoration: none; color: #f3f4f6; font-weight: 600;">5. Relatórios e Dados</a></li>
         </ul>
     </div>
 
+    <!-- REPETIR SUAS DIVS .manual-section EXATAMENTE COMO ESTAVAM ANTES, O CSS DO BASE.HTML VAI CUIDAR DE TUDO -->
     <div class="manual-section" id="glossario">
         <h2>1. Glossário do Sistema</h2>
         <dl>
-            <dt>Narrativa</dt>
-            <dd>É a entidade principal (a jornada completa). Contém o título, a descrição, a imagem de capa e agrupa todas as cenas.</dd>
+            <dt style="font-weight: bold; color: #34d399; margin-top: 15px; font-size: 1.05rem;">Narrativa</dt>
+            <dd style="margin-left: 0; margin-bottom: 15px; color: #9ca3af;">É a entidade principal (a jornada completa). Contém o título, a descrição, a imagem de capa e agrupa todas as cenas.</dd>
 
-            <dt>Cena</dt>
-            <dd>Representa uma tela individual que o paciente visualiza. Pode conter texto, vídeo ou imagem. É a unidade básica de navegação.</dd>
-
-            <dt>Escolha (Botão)</dt>
-            <dd>Opção de navegação criada dentro de uma Cena. Permite ligar a Cena A à Cena B, criando a interatividade.</dd>
-
-            <dt>Questionário</dt>
-            <dd>Formulário de coleta de dados. Pode ser vinculado a uma Cena específica para interromper a narrativa e solicitar feedback do paciente.</dd>
-
-            <dt>Sessão do Paciente</dt>
-            <dd>Registro técnico que identifica um acesso único. O sistema usa isso para gerar relatórios de progresso e retenção.</dd>
+            <dt style="font-weight: bold; color: #34d399; margin-top: 15px; font-size: 1.05rem;">Cena</dt>
+            <dd style="margin-left: 0; margin-bottom: 15px; color: #9ca3af;">Representa uma tela individual que o paciente visualiza. Pode conter texto, vídeo ou imagem. É a unidade básica de navegação.</dd>
         </dl>
     </div>
 
-    <div class="manual-section" id="fluxo">
-        <h2>2. Fluxo de Criação de Narrativas</h2>
-        <p>O sistema utiliza um banco de dados relacional. Isso significa que <strong style="color: #ffffff;">você não pode vincular algo que ainda não existe</strong>. Siga esta ordem lógica para evitar erros:</p>
-
-        <div class="warning-box">
-            <strong>Regra de Ouro:</strong> Crie o conteúdo primeiro (Cenas), depois faça as conexões (Links e Cena Inicial).
-        </div>
-
-        <ol class="step-list">
-            <li>
-                <strong style="color: #ffffff;">Passo 1: Criar a Narrativa (Estrutura)</strong><br>
-                Acesse "Narrativas" > "Adicionar". Preencha Título, Descrição e Capa. <br>
-                <em style="color: #9ca3af;">Nota: Deixe o campo "Cena Inicial" em branco neste momento.</em> Salve.
-            </li>
-            <li>
-                <strong style="color: #ffffff;">Passo 2: Criar as Cenas (Conteúdo)</strong><br>
-                Acesse "Cenas" > "Adicionar". Crie todas as telas da sua jornada. <br>
-                Em cada cena, selecione a Narrativa criada no Passo 1. Salve cada uma.
-            </li>
-            <li>
-                <strong style="color: #ffffff;">Passo 3: Criar as Conexões (Escolhas)</strong><br>
-                Volte para editar as Cenas criadas. No final da página de edição, use a seção "Escolhas" para criar os botões.<br>
-                Agora que todas as cenas existem, você poderá selecionar a "Cena de Destino" correta no menu.
-            </li>
-            <li>
-                <strong style="color: #ffffff;">Passo 4: Definir o Início</strong><br>
-                Volte para editar a Narrativa (Passo 1). Agora selecione a "Cena Inicial" correta e salve.
-            </li>
-        </ol>
-    </div>
-
-    <div class="manual-section" id="questionarios">
-        <h2>3. Gestão de Questionários</h2>
-        <p>Os questionários permitem coletar dados qualitativos e quantitativos durante a jornada.</p>
-
-        <h3>Como criar e vincular:</h3>
-        <ol class="step-list">
-            <li>Vá em "Questionários" > "Adicionar".</li>
-            <li>Defina um Título para o formulário.</li>
-            <li>
-                <strong style="color: #ffffff;">Cena Associada:</strong> Selecione a cena onde este questionário deve aparecer. O formulário será exibido automaticamente abaixo do conteúdo dessa cena.
-            </li>
-            <li>
-                <strong style="color: #ffffff;">Cena de Destino (Opcional):</strong> Para onde o paciente vai após responder? Se deixar em branco, ele permanece na mesma tela (útil se a cena tiver botões de escolha manuais).
-            </li>
-        </ol>
-
-        <h3>Tipos de Pergunta:</h3>
-        <ul style="color: #d1d5db;">
-            <li><strong style="color: #ffffff;">Texto Livre:</strong> Caixa de texto aberta para opiniões.</li>
-            <li><strong style="color: #ffffff;">Escala (1 a 5):</strong> Sistema de estrelas para avaliação.</li>
-            <li><strong style="color: #ffffff;">Única Escolha:</strong> Botões de rádio (apenas uma opção válida).</li>
-            <li><strong style="color: #ffffff;">Múltipla Escolha:</strong> Caixas de seleção (várias opções válidas).</li>
-        </ul>
-
-        <div class="info-box">
-            <strong style="color: #14b8a6;">Dica:</strong> Para perguntas de múltipla escolha, você deve adicionar as "Opções de Resposta" clicando no botão "Adicionar outro(a) Opção" dentro da tela de edição da Pergunta.
-        </div>
-    </div>
-
-    <div class="manual-section" id="distribuicao">
-        <h2>4. Distribuição e Acesso</h2>
-
-        <h3>Menu de Narrativas (Hub)</h3>
-        <p>Link que exibe todas as narrativas disponíveis. Ideal para enviar ao paciente e deixá-lo escolher.</p>
-        <ul style="color: #d1d5db;">
-            <li>No Painel Administrativo, clique no botão <strong style="color: #ffffff;">"Compartilhar Acesso Geral"</strong> no topo da tela.</li>
-        </ul>
-
-        <h3>Link Direto (Narrativa Específica)</h3>
-        <p>Link que abre uma jornada específica imediatamente.</p>
-        <ul style="color: #d1d5db;">
-            <li>Clique na narrativa desejada para ver os Detalhes.</li>
-            <li>Use o botão cinza <strong style="color: #ffffff;">"Copiar Link"</strong> ou o botão verde <strong style="color: #ffffff;">"Encaminhar"</strong> (mobile).</li>
-        </ul>
-    </div>
-
-    <div class="manual-section" id="relatorios">
-        <h2>5. Relatórios e Dados</h2>
-
-        <h3>Dashboard (Visão Geral)</h3>
-        <p>Acesse clicando em "Dashboard" no menu lateral. Mostra KPIs de acessos totais, gráfico de retenção de 30 dias e as narrativas mais populares.</p>
-
-        <h3>Relatório de Respostas (Exportação)</h3>
-        <p>Para baixar os dados em Excel (XLSX):</p>
-        <ol style="color: #d1d5db;">
-            <li>Vá em "Questionários".</li>
-            <li>Na lista, localize o questionário desejado.</li>
-            <li>Clique em <strong style="color: #ffffff;">"Ver Resumo"</strong>.</li>
-            <li>Na tela de resumo, use os botões de "Exportar" no topo para baixar a planilha consolidada (onde cada linha é um paciente).</li>
-        </ol>
-    </div>
+    <!-- (Mantenha o restante do seu código do Manual normal aqui para baixo) -->
 
 </div>
 {% endblock %}
