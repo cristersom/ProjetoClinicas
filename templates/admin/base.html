@@ -4,65 +4,44 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL
+       1. IDENTIDADE VISUAL DARK MODE E REMOÇÃO DE LINHAS FANTASMAS
        ===================================================================== */
-    body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
-    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; }
+    body, html, .wrapper, .content-wrapper, .main-footer {
+        background-color: #111827 !important; color: #f3f4f6 !important;
+        border-top: none !important; box-shadow: none !important; margin-top: 0 !important;
+    }
+    .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border-top: none !important; }
+    .brand-link { display: none !important; }
 
     /* =====================================================================
-       2. EXTERMÍNIO DO TOPO E DA LOGO (NÍVEL NUCLEAR)
+       2. EXTERMINANDO O MENU SUPERIOR NO DESKTOP
        ===================================================================== */
-    .main-header { display: none !important; } /* Some com a barra superior inteira (Hambúrguer, ícone de usuário, pesquisas) */
-    .brand-link { display: none !important; } /* Some com a palavra Administração e a logo A */
-    .content-header { display: none !important; } /* Tira o espaço vazio do topo */
-    .content-wrapper { margin-top: 0 !important; padding-top: 20px !important; } /* Cola o painel no topo */
+    @media (min-width: 992px) {
+        .main-header { display: none !important; }
+        .content-wrapper { padding-top: 30px !important; margin-top: 0 !important; }
+    }
+    @media (max-width: 991px) {
+        .main-header { background-color: #111827 !important; border-bottom: none !important; box-shadow: none !important; }
+        .main-header .navbar-nav { display: none !important; }
+    }
 
     /* =====================================================================
-       3. CORRIGINDO O MANUAL (FAQ) - MORTE AOS FUNDOS BRANCOS
+       3. PADRONIZAÇÃO DE TÍTULOS E SUBTÍTULOS (MANUAL IGUAL AO DASHBOARD)
        ===================================================================== */
-    /* Força qualquer caixa a ficar cinza escura */
-    .content-wrapper .card,
-    .content-wrapper .bg-white,
-    .content-wrapper [class*="alert"],
-    .content-wrapper .info-box {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 12px !important;
+    .content-wrapper h1, .content-header h1 {
+        font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin-bottom: 5px !important;
     }
-
-    /* Força os textos comuns a serem cinza claro */
-    .content-wrapper .card *, .content-wrapper .bg-white * {
-        color: #d1d5db !important;
-        background-color: transparent !important;
+    .content-wrapper > p, .content-header p, p.text-muted {
+        color: #9ca3af !important; font-size: 0.95rem !important;
     }
-
-    /* Títulos em branco absoluto pra destacar do cinza */
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
-    .content-wrapper strong, .content-wrapper b, .content-wrapper .card-title {
-        color: #ffffff !important;
-        font-weight: bold !important;
-    }
-
-    /* Destaques para links no manual */
-    .content-wrapper a { color: #34d399 !important; font-weight: bold; }
-
-    /* Bordas coloridas sutis para os cards do manual */
-    .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
-    .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
-    .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
-    .content-wrapper .card:nth-of-type(4) { border-left: 4px solid #f97316 !important; }
-    .content-wrapper .card:nth-of-type(5) { border-left: 4px solid #14b8a6 !important; }
 
     /* =====================================================================
-       4. TABELAS (SEM VÃO GIGANTE E COM BOTÕES LEGÍVEIS)
+       4. TABELAS DE GERENCIAMENTO (BOTÕES COLADOS E LEGÍVEIS)
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
     .table td a { color: #f3f4f6 !important; font-weight: bold; }
-
-    /* Puxa os botões pra perto do texto */
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
-    /* Cores de alta leitura para botões da tabela */
     .table .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
     .table .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
     .table .btn-success:hover { background-color: #059669 !important; }
@@ -70,7 +49,40 @@
     .table .btn i { color: #ffffff !important; }
 
     /* =====================================================================
-       5. MENU LATERAL E INPUTS GERAIS
+       5. O MANUAL (FAQ) - EXTERMÍNIO DOS FUNDOS BRANCOS INTERNOS
+       ===================================================================== */
+    .content-wrapper .card, .content-wrapper .info-box, .content-wrapper .callout {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; overflow: hidden;
+    }
+
+    /* MATA O FUNDO BRANCO DE QUALQUER DIV INTERNA DOS CARDS */
+    .content-wrapper .card-body, .content-wrapper .card-body div {
+        background-color: transparent !important;
+    }
+
+    .content-wrapper .card *, .content-wrapper .info-box * { color: #d1d5db !important; }
+
+    .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
+    .content-wrapper strong, .content-wrapper b, .content-wrapper .card-title {
+        color: #ffffff !important; font-weight: bold;
+    }
+    .content-wrapper a { color: #34d399 !important; font-weight: bold; }
+
+    /* TRANSFORMA O ÍNDICE DO MANUAL (1º CARD) EM LISTA VERTICAL */
+    .content-wrapper .card:nth-of-type(1) .card-body a {
+        display: block !important; padding: 10px 0 !important; border-bottom: 1px solid #374151 !important;
+    }
+    .content-wrapper .card:nth-of-type(1) .card-body a:last-child { border-bottom: none !important; }
+
+    /* Cores das bordas dos cards do manual */
+    .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
+    .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
+    .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
+    .content-wrapper .card:nth-of-type(4) { border-left: 4px solid #f97316 !important; }
+    .content-wrapper .card:nth-of-type(5) { border-left: 4px solid #14b8a6 !important; }
+
+    /* =====================================================================
+       6. INPUTS E MENU LATERAL
        ===================================================================== */
     .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
     .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
@@ -78,21 +90,16 @@
 
     .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
     .form-control:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; color: white !important; }
-    .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
-    .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. ALINHAMENTO DA FLECHINHA LATERAL E E-MAIL ---
+        // --- ALINHAMENTO DA FLECHINHA LATERAL E E-MAIL ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
-            userPanel.innerHTML = ''; // Limpa o painel atual
-
-            // Aplica flexbox para o email ir pra esquerda e a seta pra direita
+            userPanel.innerHTML = '';
             userPanel.style.display = 'flex';
             userPanel.style.justifyContent = 'space-between';
             userPanel.style.alignItems = 'center';
@@ -102,10 +109,9 @@
 
             if(info) {
                 info.style.padding = '0';
-                userPanel.appendChild(info); // Recria o email
+                userPanel.appendChild(info);
             }
 
-            // Cria a flechinha
             const arrowBtn = document.createElement('a');
             arrowBtn.href = '#';
             arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
@@ -114,10 +120,10 @@
                 e.preventDefault();
                 document.body.classList.toggle('sidebar-collapse');
             };
-            userPanel.appendChild(arrowBtn); // Joga a seta pra direita
+            userPanel.appendChild(arrowBtn);
         }
 
-        // --- 2. MENU DE CONTA E SAIR (FIM DA BARRA LATERAL) ---
+        // --- MENU DE CONTA E SAIR ---
         const sidebarMenu = document.querySelector('.nav-sidebar');
         if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
@@ -138,14 +144,10 @@
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
 
-        // --- 3. EXTERMINADOR DE CLASSES DO BOOTSTRAP NO MANUAL ---
+        // --- LIMPEZA DE CLASSES INLINE DO BOOTSTRAP NO MANUAL ---
         if (window.location.href.includes('faq')) {
             document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted').forEach(el => {
                 el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted');
-            });
-            // Tira estilos in-line que possam estar bloqueando a cor
-            document.querySelectorAll('[style*="background-color: white"], [style*="background-color: rgb(255, 255, 255)"]').forEach(el => {
-                el.style.backgroundColor = 'transparent';
             });
         }
     });
