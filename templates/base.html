@@ -29,18 +29,23 @@
 
                 <div class="flex items-center space-x-6">
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
+
+                        <!-- 1. Meu Painel -->
                         <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
 
-                        <!-- NOVO: Botão de Administração Global no Menu -->
+                        <!-- 2. Admin -->
                         {% if request.user.is_staff or request.user.is_superuser %}
                         <a href="{% url 'admin:index' %}" class="text-indigo-400 hover:text-indigo-300 font-bold transition text-sm uppercase tracking-wide flex items-center gap-1">
                             <ion-icon name="settings-outline" class="text-lg"></ion-icon> Admin
                         </a>
                         {% endif %}
 
-                        <!-- Botão de Sair -->
+                        <!-- 3. Planos -->
+                        <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
+
+                        <!-- 4. Sair -->
                         <a href="{% url 'narrativa:logout' %}" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</a>
+
                     {% else %}
                         <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
                         <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>

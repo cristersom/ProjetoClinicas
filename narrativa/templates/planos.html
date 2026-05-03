@@ -16,12 +16,6 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
             {% for plano in planos %}
 
-            <!-- Variável para verificar se é o plano atual do usuário -->
-            {% set is_current = False %}
-            {% if user.is_authenticated and plano_atual and plano.id == plano_atual.id and assinatura_ativa %}
-                {% set is_current = True %}
-            {% endif %}
-
             <div class="relative bg-gray-800 rounded-3xl border {% if plano.destaque %}border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.2)]{% else %}border-gray-700 shadow-xl{% endif %} p-8 flex flex-col h-full transition-transform hover:-translate-y-2 duration-300">
 
                 {% if plano.destaque %}
