@@ -13,9 +13,11 @@
             <p class="text-xl text-gray-400">Evolua o atendimento dos seus pacientes com jornadas interativas e acompanhamento de ponta.</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
-            {% for plano in planos %}
+        <!-- Grid atualizado para 4 colunas (3 do DB + 1 Fixo) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-center max-w-7xl mx-auto">
 
+            <!-- ====== PLANOS DINÂMICOS DO BANCO DE DADOS ====== -->
+            {% for plano in planos %}
             <div class="relative bg-gray-800 rounded-3xl border {% if plano.destaque %}border-teal-500 shadow-[0_0_30px_rgba(20,184,166,0.2)]{% else %}border-gray-700 shadow-xl{% endif %} p-8 flex flex-col h-full transition-transform hover:-translate-y-2 duration-300">
 
                 {% if plano.destaque %}
@@ -37,11 +39,11 @@
                 <ul class="space-y-4 mb-8 flex-1">
                     <li class="flex items-center text-gray-300">
                         <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
-                        <span>Crie até <b>{{ plano.limite_narrativas }} Jornadas</b> ativas</span>
+                        <span>Crie até <b>{{ plano.limite_narrativas }} Jornadas</b></span>
                     </li>
                     <li class="flex items-center text-gray-300">
                         <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
-                        <span>Cadastre até <b>{{ plano.limite_pacientes }} Pacientes</b></span>
+                        <span>Até <b>{{ plano.limite_pacientes }} Pacientes</b></span>
                     </li>
                     <li class="flex items-center text-gray-300">
                         <ion-icon name="checkmark-circle" class="text-teal-500 text-xl mr-3"></ion-icon>
@@ -53,19 +55,53 @@
                     </li>
                 </ul>
 
-                <!-- BOTÃO INTELIGENTE DE UPSELL -->
-                {% if user.is_authenticated and plano_atual and plano.id == plano_atual.id and assinatura_ativa %}
+                <!-- LÓGICA DE BLOQUEIO CORRIGIDA -->
+                {% if user.is_authenticated and user.clinica.assinatura_ativa and plano == user.clinica.plano_atual %}
                     <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl border border-gray-600 cursor-not-allowed flex justify-center items-center">
                         <ion-icon name="checkmark-done-outline" class="mr-2 text-xl"></ion-icon> Seu Plano Atual
                     </button>
                 {% else %}
                     <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full block text-center font-bold py-3.5 rounded-xl transition-all {% if plano.destaque %}bg-teal-500 hover:bg-teal-400 text-gray-900 shadow-lg{% else %}bg-gray-700 hover:bg-gray-600 text-white border border-gray-600{% endif %}">
-                        {% if user.is_authenticated and assinatura_ativa %}Fazer Upgrade{% else %}Assinar {{ plano.nome }}{% endif %}
+                        {% if user.is_authenticated and user.clinica.assinatura_ativa %}Fazer Upgrade{% else %}Assinar {{ plano.nome }}{% endif %}
                     </a>
                 {% endif %}
 
             </div>
             {% endfor %}
+
+            <!-- ====== PLANO EMPRESARIAL (FIXO / E-MAIL) ====== -->
+            <div class="relative bg-gray-800 rounded-3xl border border-indigo-500/50 shadow-xl p-8 flex flex-col h-full transition-transform hover:-translate-y-2 duration-300">
+                <h3 class="text-2xl font-bold text-white mb-2">Empresarial</h3>
+                <p class="text-gray-400 text-sm mb-6 h-10">Ideal para redes ou clínicas com demandas exclusivas.</p>
+
+                <div class="mb-8">
+                    <span class="text-3xl font-extrabold text-white">Sob Medida</span>
+                </div>
+
+                <ul class="space-y-4 mb-8 flex-1">
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-indigo-500 text-xl mr-3"></ion-icon>
+                        <span><b>Jornadas Ilimitadas</b></span>
+                    </li>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-indigo-500 text-xl mr-3"></ion-icon>
+                        <span><b>Pacientes Ilimitados</b></span>
+                    </li>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-indigo-500 text-xl mr-3"></ion-icon>
+                        <span>Suporte prioritário 24h</span>
+                    </li>
+                    <li class="flex items-center text-gray-300">
+                        <ion-icon name="checkmark-circle" class="text-indigo-500 text-xl mr-3"></ion-icon>
+                        <span>Integração de sistemas</span>
+                    </li>
+                </ul>
+
+                <a href="mailto:contato@narrativasclinicas.com.br?subject=Interesse no Plano Empresarial" class="w-full flex justify-center items-center font-bold py-3.5 rounded-xl transition-all bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg border border-indigo-500">
+                    Falar com Consultor <ion-icon name="mail-outline" class="ml-2 text-xl"></ion-icon>
+                </a>
+            </div>
+
         </div>
     </div>
 </main>
