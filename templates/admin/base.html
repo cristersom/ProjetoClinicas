@@ -24,17 +24,50 @@
         background-color: #0d9488 !important; /* Tailwind teal-600 */
         color: white !important;
     }
-    a { color: #14b8a6; }
-    a:hover { color: #0d9488; }
 
-    /* Botões Padrões */
+    /* Links gerais */
+    a { color: #14b8a6; }
+    a:hover { color: #0d9488; text-decoration: none; }
+
+    /* ======== CORREÇÃO DOS BOTÕES INVISÍVEIS ======== */
+    .btn { color: white !important; } /* Impede que botões herdem a cor verde dos links */
+
     .btn-primary, .bg-primary, .btn-info, .bg-info {
         background-color: #0d9488 !important;
         border-color: #0f766e !important;
         color: white !important;
     }
     .btn-primary:hover, .btn-info:hover { background-color: #0f766e !important; }
-    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; }
+
+    .btn-success { background-color: #10b981 !important; border-color: #059669 !important; color: white !important; }
+    .btn-success:hover { background-color: #059669 !important; }
+
+    .btn-danger { background-color: #ef4444 !important; border-color: #dc2626 !important; color: white !important; }
+    .btn-danger:hover { background-color: #dc2626 !important; }
+
+    .btn-default, .btn-secondary, .btn-outline-secondary {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+    }
+    .btn-default:hover, .btn-secondary:hover {
+        background-color: #4b5563 !important;
+        color: white !important;
+    }
+
+    /* ======== CORREÇÃO DE FORMULÁRIOS E INPUTS ======== */
+    .form-control, input, select, textarea, .select2-selection {
+        background-color: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #f3f4f6 !important;
+    }
+    .form-control:focus, input:focus, select:focus, textarea:focus {
+        border-color: #14b8a6 !important;
+        background-color: #1f2937 !important;
+        color: white !important;
+    }
+    .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
+    .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
 
     /* Cards e Tabelas */
     .card {
