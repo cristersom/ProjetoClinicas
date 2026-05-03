@@ -54,14 +54,25 @@
                     </li>
                 </ul>
 
-                <!-- LÓGICA DE BLOQUEIO DIRETA E BLINDADA -->
-                {% if plano_atual and plano.id == plano_atual.id %}
-                    <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl border border-gray-600 cursor-not-allowed flex justify-center items-center">
-                        <ion-icon name="checkmark-done-outline" class="mr-2 text-xl"></ion-icon> Seu Plano Atual
-                    </button>
+                <!-- LÓGICA DE BLOQUEIO DIRETA E BLINDADA (VIA REQUEST.USER) -->
+                {% if request.user.is_authenticated and request.user.clinica.plano_atual %}
+
+                    {% if plano.id == request.user.clinica.plano_atual.id %}
+                        <!-- SE FOR O PLANO DELE -->
+                        <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3.5 rounded-xl border border-gray-600 cursor-not-allowed flex justify-center items-center">
+                            <ion-icon name="checkmark-done-outline" class="mr-2 text-xl"></ion-icon> Seu Plano Atual
+                        </button>
+                    {% else %}
+                        <!-- SE ELE TIVER PLANO, MAS FOR OUTRO (UPGRADE/DOWNGRADE) -->
+                        <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full block text-center font-bold py-3.5 rounded-xl transition-all {% if plano.destaque %}bg-teal-500 hover:bg-teal-400 text-gray-900 shadow-lg{% else %}bg-gray-700 hover:bg-gray-600 text-white border border-gray-600{% endif %}">
+                            Mudar para {{ plano.nome }}
+                        </a>
+                    {% endif %}
+
                 {% else %}
+                    <!-- SE FOR VISITANTE OU NÃO TIVER PLANO NENHUM -->
                     <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full block text-center font-bold py-3.5 rounded-xl transition-all {% if plano.destaque %}bg-teal-500 hover:bg-teal-400 text-gray-900 shadow-lg{% else %}bg-gray-700 hover:bg-gray-600 text-white border border-gray-600{% endif %}">
-                        {% if plano_atual %}Mudar para {{ plano.nome }}{% else %}Assinar {{ plano.nome }}{% endif %}
+                        Assinar {{ plano.nome }}
                     </a>
                 {% endif %}
 
