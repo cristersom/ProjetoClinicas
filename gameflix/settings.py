@@ -8,7 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost',
+                 '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas-clinicas-0108a6c374ea.herokuapp.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
@@ -20,12 +21,13 @@ JAZZMIN_SETTINGS = {
     "site_brand": "Administração",
     "welcome_sign": "Bem-vindo ao Painel da Clínica",
     "copyright": "Narrativas Clínicas",
-    "search_model": ["narrativa.Narrativa", "narrativa.Paciente"],
 
-    # 1. Esvaziamos o menu do topo para a pesquisa ir até a ponta direita
+    # 1. Pesquisa global removida para o topo sumir de vez.
+
+    # 2. Topo vazio
     "topmenu_links": [],
 
-    # 2. Injetamos o "Ver Site" e o "Manual do Sistema" na barra lateral esquerda
+    # 3. Injetamos o "Ver Site" e o "Manual do Sistema" na barra lateral esquerda
     "custom_links": {
         "narrativa": [
             {

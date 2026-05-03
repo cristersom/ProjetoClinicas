@@ -1,149 +1,175 @@
 {% extends "admin/base_site.html" %}
+{% load i18n static jazzmin %}
 
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* =====================================================================
-       1. IDENTIDADE VISUAL DARK MODE
-       ===================================================================== */
-    body, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
-    .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; }
-    .brand-link { display: none !important; }
+    #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
+    .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* =====================================================================
-       2. O TOPO: LIMPÍSSIMO, SEM BOTÕES E COM PESQUISA GRANDE
-       ===================================================================== */
-    .main-header { background-color: #111827 !important; border-bottom: none !important; box-shadow: none !important; }
-    .content-header { display: none !important; }
+    .dashboard-header { margin-top: 0; margin-bottom: 30px; padding-bottom: 0; border-bottom: none; }
 
-    /* MATA os ícones de hambúrguer e usuário do cabeçalho */
-    .main-header [data-widget="pushmenu"],
-    .main-header .user-menu {
-        display: none !important;
+    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 20px;}
+    .border-blue { border-left: 4px solid #3b82f6 !important; }
+    .border-teal { border-left: 4px solid #14b8a6 !important; }
+    .border-purple { border-left: 4px solid #a855f7 !important; }
+    .border-orange { border-left: 4px solid #f97316 !important; }
+
+    /* Gracinha pros ícones ficarem Premium */
+    .icon-bg { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 15px;}
+    .bg-blue-light { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .bg-teal-light { background-color: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+    .bg-purple-light { background-color: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .bg-orange-light { background-color: rgba(249, 115, 22, 0.15); color: #f97316; }
+
+    .kpi-label { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; color: #9ca3af; text-transform: uppercase; }
+    .kpi-number { font-size: 2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
+    .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
+
+    .quick-action-btn {
+        display: flex; align-items: center; justify-content: space-between;
+        background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
+        margin-bottom: 10px; font-weight: bold; transition: all 0.2s; border: 1px solid #4b5563;
     }
-
-    /* Alinha à direita e aumenta o tamanho do campo de pesquisa */
-    .main-header .navbar-nav { width: 100%; justify-content: flex-end; padding-right: 15px; }
-    .main-header form.form-inline { margin-right: 15px !important; border: none !important; }
-    .main-header .form-inline .input-group { width: 350px; }
-
-    /* =====================================================================
-       3. TABELAS (SEM VÃO GIGANTE E COM BOTÕES LEGÍVEIS)
-       ===================================================================== */
-    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
-    .table td a { color: #f3f4f6 !important; font-weight: bold; } /* Nome da tabela claro */
-
-    /* Puxa os botões pra perto do texto */
-    .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
-
-    /* Cores de alta leitura para botões da tabela */
-    .table .btn-success { background-color: #10b981 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
-    .table .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600; }
-    .table .btn-success:hover { background-color: #059669 !important; }
-    .table .btn-info:hover { background-color: #2563eb !important; }
-    .table .btn i { color: #ffffff !important; }
-
-    /* =====================================================================
-       4. O MANUAL (FAQ) - ANULANDO FUNDOS BRANCOS
-       ===================================================================== */
-    .content-wrapper .card, .content-wrapper .info-box, .content-wrapper .callout {
-        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px;
-    }
-
-    /* Força os textos comuns a serem cinza claro */
-    .content-wrapper .card *, .content-wrapper .info-box * { color: #d1d5db !important; background-color: transparent !important; }
-
-    /* Títulos em branco absoluto pra destacar do cinza */
-    .content-wrapper h1, .content-wrapper h2, .content-wrapper h3, .content-wrapper h4, .content-wrapper h5,
-    .content-wrapper strong, .content-wrapper b, .content-wrapper .card-title {
-        color: #ffffff !important; font-weight: bold;
-    }
-    .content-wrapper a { color: #34d399 !important; font-weight: bold; }
-
-    /* =====================================================================
-       5. INPUTS E MENU LATERAL
-       ===================================================================== */
-    .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
-    .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
-
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
-
-    .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
-    ::placeholder { color: #9ca3af !important; opacity: 1 !important; }
-
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f3f4f6 !important; line-height: 36px !important; }
-    .select2-search--dropdown .select2-search__field { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
-    .select2-dropdown { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important;}
-    .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; }
-    .main-header .input-group .btn { background-color: #4b5563 !important; color: white !important; border: none !important; }
+    .quick-action-btn:hover { background-color: #4b5563; color: white; transform: translateX(3px); }
 </style>
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-        // --- 1. ALINHAMENTO DA FLECHINHA LATERAL E E-MAIL ---
-        const userPanel = document.querySelector('.sidebar .user-panel');
-        if (userPanel) {
-            const info = userPanel.querySelector('.info');
-            userPanel.innerHTML = '';
-
-            userPanel.style.display = 'flex';
-            userPanel.style.justifyContent = 'space-between';
-            userPanel.style.alignItems = 'center';
-            userPanel.style.padding = '15px';
-            userPanel.style.borderBottom = '1px solid #1f2937';
-            userPanel.style.marginBottom = '15px';
-
-            if(info) {
-                info.style.padding = '0';
-                userPanel.appendChild(info);
-            }
-
-            const arrowBtn = document.createElement('a');
-            arrowBtn.href = '#';
-            arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
-            arrowBtn.onclick = function(e) {
-                e.preventDefault();
-                document.body.classList.toggle('sidebar-collapse');
-            };
-            userPanel.appendChild(arrowBtn);
-        }
-
-        // --- 2. MENU DE CONTA E SAIR ---
-        const sidebarMenu = document.querySelector('.nav-sidebar');
-        if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
-            const contaHtml = `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item">
-                    <a href="/admin/password_change/" class="nav-link">
-                        <i class="nav-icon fas fa-key" style="color: #9ca3af;"></i>
-                        <p style="color: #d1d5db;">Alterar Senha</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="/admin/logout/" class="nav-link">
-                        <i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i>
-                        <p style="color: #ef4444; font-weight: bold;">Sair</p>
-                    </a>
-                </li>
-            `;
-            sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
-        }
-
-        // --- 3. EXTERMINADOR DE CLASSES DO BOOTSTRAP NO MANUAL ---
-        if (window.location.href.includes('faq')) {
-            // Arranca as classes brancas nativas do bootstrap que estão bloqueando o CSS
-            document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted').forEach(el => {
-                el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted');
-            });
-        }
-    });
-</script>
 {% endblock %}
 
 {% block content %}
-    {{ block.super }}
+    <div class="dashboard-header">
+        <h2 style="color: #f3f4f6; font-weight: 800; margin: 0;">Visão Geral do Engajamento</h2>
+        <p style="color: #9ca3af; margin-top: 5px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
+    </div>
+
+    <div class="row">
+        <!-- COLUNA ESQUERDA -->
+        <div class="col-lg-8">
+            <div class="row mb-3">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-blue">
+                        <div class="icon-bg bg-blue-light"><i class="fas fa-users"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Acessos Totais</span>
+                            <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-arrow-up"></i> Pacientes iniciados</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-teal">
+                        <div class="icon-bg bg-teal-light"><i class="fas fa-chart-pie"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Taxa de Retenção</span>
+                            <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
+                            <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-purple">
+                        <div class="icon-bg bg-purple-light"><i class="fas fa-flag-checkered"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Narrativas Concluídas</span>
+                            <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-orange">
+                        <div class="icon-bg bg-orange-light"><i class="fas fa-comments"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Pesquisas Respondidas</span>
+                            <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% get_side_menu using="app_list" as dashboard_list %}
+            {% if dashboard_list %}
+                {% for app in dashboard_list %}
+                    <div class="card card-primary card-outline" style="border-top: 3px solid #14b8a6;">
+                        <div class="card-header">
+                            <h5 class="m-0 text-white" style="font-weight: bold;">Gerenciamento de {{ app.name }}</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover m-0">
+                                <tbody>
+                                    {% for model in app.models %}
+                                        {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
+                                        <tr>
+                                            <td class="align-middle pl-4">
+                                                {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                            </td>
+                                            <td class="text-right pr-4 py-3">
+                                                <div class="btn-group">
+                                                    {% if model.add_url %}
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Add</a>
+                                                    {% endif %}
+                                                    {% if model.url %}
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Edit</a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- COLUNA DIREITA: Ações Rápidas -->
+        <div class="col-lg-4">
+            <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6;">
+                <div class="card-header">
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn text-decoration-none border-blue">
+                        <span>Nova Jornada</span>
+                        <i class="fas fa-book-medical text-primary"></i>
+                    </a>
+                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn text-decoration-none border-teal">
+                        <span>Criar Cena</span>
+                        <i class="fas fa-desktop text-info"></i>
+                    </a>
+                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none border-purple">
+                        <span>Novo Questionário</span>
+                        <i class="fas fa-clipboard-list" style="color: #a855f7;"></i>
+                    </a>
+                    <hr style="border-color: #374151; margin: 20px 0;">
+                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn text-decoration-none" style="background-color: #064e3b; border-color: #065f46;">
+                        <span class="text-white"><i class="fas fa-question-circle mr-2" style="color: white;"></i>Dúvidas? Ver Manual</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status do Sistema -->
+            <div class="card card-primary card-outline" style="border-top: 3px solid #a855f7;">
+                <div class="card-header">
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-server text-info mr-2"></i>Status do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 15px;">Todos os serviços essenciais operando normalmente.</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Banco de Dados</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Servidor Seguro</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

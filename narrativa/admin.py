@@ -17,6 +17,7 @@ import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
 
+
 # ==========================================
 # SAAS ADMIN (ACESSO EXCLUSIVO DO DONO)
 # ==========================================
@@ -59,9 +60,13 @@ class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
 # ==========================================
 class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
+
     def has_view_permission(self, request, obj=None): return True
+
     def has_add_permission(self, request): return True
+
     def has_change_permission(self, request, obj=None): return True
+
     def has_delete_permission(self, request, obj=None): return True
 
 
@@ -112,7 +117,10 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        return format_html('<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>', url)
+        return format_html(
+            '<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>',
+            url)
+
     botao_excluir.short_description = 'Ação'
 
 
@@ -120,6 +128,9 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
+
+    # === A BARRA DE PESQUISA AGORA APARECE APENAS AQUI ===
+    search_fields = ('titulo',)
 
     # BLOQUEIO FÍSICO DO LIMITE
     def has_add_permission(self, request):
@@ -167,7 +178,10 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>', url)
+        return format_html(
+            '<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>',
+            url)
+
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
@@ -426,7 +440,8 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
 
-    def has_export_permission(self, request): return True
+    def has_export_permission(self, request):
+        return True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
