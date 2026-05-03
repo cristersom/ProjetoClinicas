@@ -27,22 +27,26 @@
 
         <h1 class="text-3xl font-extrabold text-white mb-8">Painel da Clínica</h1>
 
+        <!-- DESIGN COMPACTO E ELEGANTE DO PORTAL -->
         {% if link_portal %}
-        <div class="mb-10 p-6 bg-gray-800 rounded-2xl border border-gray-700 shadow-lg flex flex-col sm:flex-row justify-between items-center gap-6">
-            <div>
-                <h3 class="text-xl text-teal-400 font-bold mb-1">Catálogo Geral da Clínica (Portal)</h3>
-                <p class="text-sm text-gray-400">Envie o link do portal para o paciente ter acesso a todas as jornadas.</p>
+        <div class="mb-10">
+            <h3 class="text-lg text-gray-300 font-bold mb-3">Seu Catálogo Geral (Portal)</h3>
+            <div class="flex flex-col sm:flex-row items-center gap-3 max-w-3xl">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <ion-icon name="link-outline" class="text-teal-500 text-lg"></ion-icon>
+                    </div>
+                    <input type="text" readonly value="{{ link_portal }}" class="w-full bg-gray-800 border border-gray-700 text-gray-300 text-sm rounded-xl focus:ring-teal-500 focus:border-teal-500 block pl-11 p-3.5 outline-none select-all transition-colors hover:border-gray-600">
+                </div>
+                <button onclick="copiarDireto('{{ link_portal }}', this)" class="w-full sm:w-auto px-6 py-3.5 bg-teal-600 hover:bg-teal-500 text-white text-sm font-bold rounded-xl transition-all shadow-md flex items-center justify-center whitespace-nowrap">
+                    <ion-icon name="copy-outline" class="mr-2 text-lg"></ion-icon> <span>Copiar Link</span>
+                </button>
             </div>
-            <button onclick="copiarDireto('{{ link_portal }}', this)" class="bg-teal-600 hover:bg-teal-500 text-white py-3 px-8 rounded-xl font-bold transition shadow-lg w-full sm:w-auto">Copiar Link do Catálogo</button>
+            <p class="text-xs text-gray-500 mt-2 ml-1">Compartilhe este link com seus pacientes. Eles não precisam criar conta para acessar.</p>
         </div>
         {% endif %}
 
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-300">Jornadas Disponíveis</h2>
-            {% if user.is_staff or user.is_superuser %}
-                <a href="{% url 'admin:index' %}" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl transition-all shadow-md">Acessar Administração</a>
-            {% endif %}
-        </div>
+        <h2 class="text-2xl font-bold text-gray-300 mb-6">Jornadas Disponíveis</h2>
 
         <!-- MENSAGENS DE AVISO AQUI -->
         {% if messages %}
@@ -64,21 +68,23 @@
 
                     <div class="mt-auto pt-4 border-t border-gray-700 flex gap-2 w-full h-10">
                         <a href="{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Detalhes"><ion-icon name="information-circle-outline" class="text-xl"></ion-icon></a>
-                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Copiar"><ion-icon name="share-social-outline" class="text-xl"></ion-icon></button>
+                        <button onclick="copiarDireto('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:paciente_detalhes' pk=narrativa.id %}', this)" class="flex items-center justify-center bg-gray-700 hover:bg-teal-600 text-white rounded-xl transition flex-1" title="Copiar Link Específico"><ion-icon name="share-social-outline" class="text-xl"></ion-icon></button>
 
-                        <!-- CORREÇÃO DO ERRO 405 -->
                         <a href="{% url 'narrativa:iniciar_jornada_paciente' narrativa_id=narrativa.id %}" class="flex items-center justify-center border border-teal-500 text-teal-400 hover:bg-teal-600 hover:text-white rounded-xl transition w-full flex-[3]">
                             <ion-icon name="play-circle-outline" class="text-xl mr-2"></ion-icon> <span class="text-sm font-medium">Percorrer</span>
                         </a>
 
                         {% if request.user.is_staff %}
-                        <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="flex items-center justify-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white rounded-xl transition flex-1"><ion-icon name="construct-outline" class="text-xl"></ion-icon></a>
+                        <a href="{% url 'admin:narrativa_narrativa_change' narrativa.id %}" target="_blank" class="flex items-center justify-center border border-amber-600 text-amber-500 hover:bg-amber-600 hover:text-white rounded-xl transition flex-1" title="Editar no Admin"><ion-icon name="construct-outline" class="text-xl"></ion-icon></a>
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% empty %}
-            <p class="text-gray-400">Nenhuma narrativa cadastrada.</p>
+            <div class="col-span-full py-12 text-center bg-gray-800 rounded-2xl border border-gray-700">
+                <ion-icon name="folder-open-outline" class="text-6xl text-gray-600 mb-4"></ion-icon>
+                <p class="text-gray-400">Nenhuma narrativa cadastrada no sistema ainda.</p>
+            </div>
             {% endfor %}
         </div>
     </div>
@@ -87,8 +93,20 @@
 <script>
     function copiarDireto(urlTexto, botaoElemento) {
         navigator.clipboard.writeText(urlTexto).then(() => {
+            const span = botaoElemento.querySelector('span');
+            const txtOriginal = span ? span.innerText : '';
+
+            if (span) span.innerText = "Copiado!";
             botaoElemento.classList.add('bg-green-600');
-            setTimeout(() => { botaoElemento.classList.remove('bg-green-600'); }, 2000);
+            botaoElemento.classList.remove('bg-teal-600', 'bg-gray-700');
+
+            setTimeout(() => {
+                if (span) span.innerText = txtOriginal;
+                botaoElemento.classList.remove('bg-green-600');
+                // Restaura a cor correta dependendo do botão
+                if (span) botaoElemento.classList.add('bg-teal-600');
+                else botaoElemento.classList.add('bg-gray-700');
+            }, 2000);
         });
     }
 </script>

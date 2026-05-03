@@ -32,7 +32,14 @@
                         <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
                         <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
 
-                        <!-- Botão de Sair corrigido como Link Simples -->
+                        <!-- NOVO: Botão de Administração Global no Menu -->
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" class="text-indigo-400 hover:text-indigo-300 font-bold transition text-sm uppercase tracking-wide flex items-center gap-1">
+                            <ion-icon name="settings-outline" class="text-lg"></ion-icon> Admin
+                        </a>
+                        {% endif %}
+
+                        <!-- Botão de Sair -->
                         <a href="{% url 'narrativa:logout' %}" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</a>
                     {% else %}
                         <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
@@ -76,13 +83,11 @@
             const banner = document.getElementById('cookie-banner');
             const btnAceitar = document.getElementById('aceitar-cookies');
 
-            // Verifica se o usuário já aceitou os cookies
             if (!localStorage.getItem('cookiesAceitos')) {
                 banner.classList.remove('hidden');
                 banner.classList.add('flex');
             }
 
-            // Ação do botão
             btnAceitar.addEventListener('click', function() {
                 localStorage.setItem('cookiesAceitos', 'true');
                 banner.classList.add('hidden');
