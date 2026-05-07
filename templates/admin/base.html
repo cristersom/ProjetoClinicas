@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL (Respeitando os seus cards)
+       1. MODO ESCURO GERAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer {
         background-color: #111827 !important; color: #f3f4f6 !important;
@@ -23,7 +23,7 @@
     }
 
     /* =====================================================================
-       2. TÍTULOS NATIVOS ALINHADOS
+       2. TÍTULOS NATIVOS E BLINDAGEM CONTRA BORDOS
        ===================================================================== */
     .content-header {
         border-bottom: 1px solid #374151 !important;
@@ -34,21 +34,23 @@
         width: 100% !important;
     }
     .content-header h1 {
-        font-size: 1.8rem !important;
+        font-size: 2rem !important;
         font-weight: 800 !important;
         color: #ffffff !important;
         margin: 0 !important;
         border: none !important;
+        border-right: 0px solid transparent !important; /* Mata o border do Jazzmin */
     }
+    .content-header h1::after { content: none !important; display: none !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
-    /* Fix Tela de Login/Logout Branca */
+    /* Fix Ecrã de Login/Logout Branco */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
     .login-logo a, .login-box-msg { color: #ffffff !important; }
 
     /* =====================================================================
-       3. BOTÕES PADRONIZADOS
+       3. BOTÕES PADRONIZADOS (ADICIONAR, EDITAR, SALVAR)
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
@@ -59,7 +61,7 @@
     .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-info:hover, .table td a.btn-info:hover { background-color: #2563eb !important; color: #ffffff !important; }
 
-    /* Botão de Salvar/Submit Moderno */
+    /* O Botão Salvar (Submit) Arredondado e Bonito */
     input[name="_save"], .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
         background-color: #0d9488 !important;
         color: #ffffff !important;
@@ -83,13 +85,17 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. MATA O "|" NO TÍTULO COM TIMEOUT (Garante que o Jazzmin já carregou) ---
-        setTimeout(() => {
+        // --- 1. CAÇA-FANTASMAS DO "|" (Vigia o título por 1 segundo) ---
+        function limparTraco() {
             const pageTitle = document.querySelector('.content-header h1');
-            if (pageTitle && pageTitle.innerHTML.includes('|')) {
-                pageTitle.innerHTML = pageTitle.innerHTML.split('|')[0].trim();
+            if (pageTitle && pageTitle.textContent.includes('|')) {
+                pageTitle.textContent = pageTitle.textContent.replace(/\|/g, '').trim();
             }
-        }, 50);
+        }
+        limparTraco();
+        setTimeout(limparTraco, 100);
+        setTimeout(limparTraco, 500);
+        setTimeout(limparTraco, 1000);
 
         // --- 2. PADRONIZAÇÃO BOTÃO ADICIONAR ---
         const btnSuccess = document.querySelectorAll('.btn-success');
@@ -140,18 +146,6 @@
             `;
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
-
-        // --- 5. LÓGICA DO MANUAL (FAQ) ---
-        if (window.location.href.includes('faq')) {
-            document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted, .text-black').forEach(el => {
-                el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted', 'text-black');
-            });
-            document.querySelectorAll('.content-wrapper *').forEach(el => {
-                if (el.style.backgroundColor === 'white' || el.style.backgroundColor === '#ffffff' || el.style.backgroundColor === 'rgb(255, 255, 255)') {
-                    el.style.backgroundColor = 'transparent';
-                }
-            });
-        }
     });
 </script>
 {% endblock %}
@@ -160,20 +154,20 @@
     {{ block.super }}
 
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
-    <div class="alert alert-danger shadow-sm" style="background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
+    <div class="alert shadow-sm" style="background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <i class="fas fa-lock mr-2 text-red-600"></i>
-            <strong style="color: #991b1b;">Assinatura Inativa:</strong> Seu plano encontra-se cancelado ou aguardando pagamento. O sistema foi bloqueado.
+            <strong style="color: #991b1b;">Ação Necessária:</strong> A sua assinatura está inativa ou a aguardar pagamento. O sistema foi bloqueado.
         </div>
         <a href="{% url 'narrativa:planos' %}" class="btn btn-sm" style="background-color: #ef4444; color: white; font-weight: bold; border-radius: 6px;">RENOVAR</a>
     </div>
     {% endif %}
 
     {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
-    <div class="alert alert-warning shadow-sm" style="background-color: #fef3c7; border: 1px solid #fbbf24; color: #92400e; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
+    <div class="alert shadow-sm" style="background-color: #fef3c7; border: 1px solid #fbbf24; color: #92400e; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <i class="fas fa-arrow-circle-up mr-2 text-yellow-600"></i>
-            <strong style="color: #92400e;">Limite Atingido:</strong> Você atingiu a cota máxima de jornadas do seu plano.
+            <strong style="color: #92400e;">Limite Atingido:</strong> Atingiu a quota máxima de jornadas do seu plano.
         </div>
         <a href="{% url 'narrativa:planos' %}" class="btn btn-sm" style="background-color: #f59e0b; color: white; font-weight: bold; border-radius: 6px;">FAZER UPGRADE</a>
     </div>
