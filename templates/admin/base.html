@@ -41,11 +41,12 @@
     .login-logo a, .login-box-msg { color: #ffffff !important; }
 
     /* =====================================================================
-       3. BOTÕES
+       3. BOTÕES GERAIS E BOTÃO DE SALVAR
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
+    /* Botões das Listagens (Adicionar/Editar) */
     .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
     .btn-success i, .table td a.btn-success i, .btn-success span, .table td a.btn-success span { color: #ffffff !important; }
@@ -56,6 +57,26 @@
 
     .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
     .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
+
+    /* NOVO: Botões de SALVAR (Submit) nativos do Django */
+    .submit-row input, .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
+        background-color: #0d9488 !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        padding: 8px 24px !important;
+        border-radius: 8px !important;
+        box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3) !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+    }
+    .submit-row input:hover, .paginator input[type="submit"]:hover, input[type="submit"].default:hover, button[type="submit"].default:hover {
+        background-color: #0f766e !important;
+        box-shadow: 0 6px 8px -1px rgba(13, 148, 136, 0.5) !important;
+        transform: translateY(-2px) !important;
+    }
 
     /* =====================================================================
        4. CARDS E INPUTS
@@ -172,11 +193,11 @@
             <i class="fas fa-lock fa-2x" style="margin-right: 20px;"></i>
             <div>
                 <h4 style="margin: 0; font-weight: 900; font-size: 1.15rem; text-transform: uppercase;">Ação Necessária: Assinatura Inativa</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Seu plano encontra-se cancelado ou aguardando pagamento. O sistema foi bloqueado.</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Seu plano encontra-se cancelado ou aguardando pagamento. O sistema foi bloqueado para edições e criação.</p>
             </div>
         </div>
         <div>
-            <a href="{% url 'narrativa:planos' %}" class="btn" style="background-color: #ffffff; color: #ef4444; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Renovar Assinatura</a>
+            <a href="{% url 'narrativa:planos' %}" class="btn" style="background-color: #ffffff; color: #ef4444; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Renovar / Upgrade</a>
         </div>
     </div>
     {% endif %}
