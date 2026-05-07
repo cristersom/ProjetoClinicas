@@ -56,7 +56,7 @@ class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
 
 
 # ==========================================
-# ISOLAMENTO MULTI-TENANT E LÓGICA DE CLÍNICA PRINCIPAL
+# ISOLAMENTO MULTI-TENANT
 # ==========================================
 class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
@@ -69,8 +69,6 @@ class TenantPermissionsMixin:
 
     def has_delete_permission(self, request, obj=None): return True
 
-
-# --- JORNADA CLINICA ---
 
 class EscolhaInline(admin.TabularInline):
     model = Escolha
@@ -118,26 +116,39 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
         return format_html(
-            '<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>',
+            '<a class="btn btn-sm" style="background-color:#ef4444; color:white; border:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>',
             url)
 
-    botao_excluir.short_description = 'Ação'
+    botao_excluir.short_description = 'Excluir'
 
 
 @admin.register(Narrativa)
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
-
-    # === A BARRA DE PESQUISA AGORA APARECE APENAS AQUI ===
     search_fields = ('titulo',)
 
-    # BLOQUEIO FÍSICO DO LIMITE
+    # === LÓGICA DE LIMITE E ASSINATURA BLINDADA ===
     def has_add_permission(self, request):
-        if not request.user.is_superuser and hasattr(request.user, 'clinica'):
-            if request.user.clinica:
-                if not request.user.clinica.assinatura_ativa or request.user.clinica.atingiu_limite_narrativas():
+        if request.user.is_superuser:
+            return True
+
+        if hasattr(request.user, 'clinica') and request.user.clinica:
+            clinica = request.user.clinica
+
+            # Bloqueia se a assinatura estiver cancelada
+            if not clinica.assinatura_ativa:
+                return False
+
+            # Conta narrativas reais para barrar o limite
+            try:
+                limite_plano = clinica.plano_atual.limite_narrativas
+                qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
+                if qtd_atual >= limite_plano:
                     return False
+            except Exception:
+                pass  # Previne erro caso plano seja nulo
+
         return super().has_add_permission(request)
 
     def get_exclude(self, request, obj=None):
@@ -172,24 +183,27 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
         ]
         return custom_urls + urls
 
+    # === BOTÕES APENAS COM ÍCONES ===
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
-        return format_html('<a class="button" href="{}">Relatório de Percurso</a>', url_percurso)
+        return format_html(
+            '<a class="btn btn-sm" style="background-color:#14b8a6; color:white; border:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i></a>',
+            url_percurso)
+
+    links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
         return format_html(
-            '<a class="button" style="background-color:#dc3545; color:white; border-radius:4px; padding:4px 8px; font-weight:bold; text-decoration:none;" href="{}">Excluir</a>',
+            '<a class="btn btn-sm" style="background-color:#ef4444; color:white; border:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>',
             url)
 
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
         narrativa_atual = self.get_object(request, object_id)
-
         if not request.user.is_superuser and narrativa_atual.clinica != request.user.clinica:
             return HttpResponse("Acesso negado.", status=403)
-
         todos_os_perfis = Narrativa.objects.filter(
             clinica=narrativa_atual.clinica) if narrativa_atual.clinica else Narrativa.objects.none()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')
@@ -290,15 +304,17 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<a class="button" style="display:block; margin-bottom:5px;" href="{}">Ver Detalhado</a>'
-            '<a class="button" style="display:block;" href="{}">Ver Resumo</a>',
+            '<a class="btn btn-sm" style="background-color:#3b82f6; color:white; border:none; margin-right:5px;" href="{}" title="Detalhado"><i class="fas fa-list"></i></a>'
+            '<a class="btn btn-sm" style="background-color:#14b8a6; color:white; border:none;" href="{}" title="Resumo"><i class="fas fa-chart-pie"></i></a>',
             url_detalhe, url_resumo)
 
+    links_relatorios.short_description = 'Relatórios'
+
+    # Funcoes de resumo...
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica:
             return HttpResponse("Acesso negado.", status=403)
-
         todos_os_perfis = Narrativa.objects.filter(clinica=request.user.clinica) if hasattr(request.user,
                                                                                             'clinica') else Narrativa.objects.all()
         perfis_selecionados_ids = request.GET.getlist('narrativa_perfil_id')

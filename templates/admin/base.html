@@ -13,7 +13,6 @@
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
     .brand-link { display: none !important; }
 
-    /* Remove o menu superior no Desktop */
     @media (min-width: 992px) {
         .main-header { display: none !important; }
         .content-wrapper { padding-top: 15px !important; margin-top: 0 !important; }
@@ -24,21 +23,19 @@
     }
 
     /* =====================================================================
-       2. TÍTULOS NATIVOS E LINHA DIVISÓRIA (PADRÃO PARA TODAS AS TELAS)
+       2. TÍTULOS NATIVOS E REMOÇÃO ABSOLUTA DO TRAÇO (|)
        ===================================================================== */
     .content-header {
-        border-bottom: 1px solid #374151 !important; /* A linha bonita que você queria */
+        border-bottom: 1px solid #374151 !important;
         padding-bottom: 15px !important;
         margin-bottom: 20px !important;
         padding-top: 0 !important;
     }
-    .content-header h1 {
-        font-size: 1.8rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        margin: 0 !important;
-        border: none !important;
-    }
+    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; }
+
+    /* ESCONDE O TRAÇO E O CAMINHO VAZIO */
+    .content-header h1::after { display: none !important; content: "" !important; }
+    .breadcrumb { display: none !important; }
 
     /* =====================================================================
        3. BOTÕES (COM TEXTO BRANCO ABSOLUTO FORÇADO)
@@ -46,18 +43,15 @@
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
-    /* Botão Adicionar - FORÇANDO A FONTE E O ÍCONE A SEREM BRANCOS */
     .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
     .btn-success i, .table td a.btn-success i { margin-right: 4px; color: #ffffff !important; }
-    .btn-success span, .table td a.btn-success span { color: #ffffff !important; } /* Blindagem extra */
+    .btn-success span, .table td a.btn-success span { color: #ffffff !important; }
 
-    /* Botão Editar */
     .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-info:hover, .table td a.btn-info:hover { background-color: #2563eb !important; color: #ffffff !important; }
     .btn-info i, .table td a.btn-info i { color: #ffffff !important; }
 
-    /* Botões Importar/Exportar */
     .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
     .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
 
@@ -68,14 +62,12 @@
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px;
     }
     .content-wrapper .card-body *, .content-wrapper .info-box * { color: #d1d5db !important; }
-
     .content-wrapper .card-body h2, .content-wrapper .card-body h3, .content-wrapper .card-body h4,
     .content-wrapper .card-body h5, .content-wrapper .card-body strong, .content-wrapper .card-body b {
         color: #ffffff !important; font-weight: bold !important;
     }
     .content-wrapper a { color: #14b8a6 !important; font-weight: bold; }
 
-    /* Cores das bordas do Manual */
     .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
     .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
     .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
@@ -98,8 +90,6 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
-        // --- 1. PADRONIZAÇÃO INTELIGENTE DO BOTÃO "ADICIONAR" EM TODAS AS TELAS ---
         const btnSuccess = document.querySelectorAll('.btn-success');
         btnSuccess.forEach(btn => {
             const text = btn.innerText.toLowerCase();
@@ -108,7 +98,6 @@
             }
         });
 
-        // --- 2. ALINHAMENTO DA FLECHINHA E MENU LATERAL ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
@@ -136,7 +125,6 @@
             userPanel.appendChild(arrowBtn);
         }
 
-        // --- 3. CRIAÇÃO DO MENU DE CONTA E SAIR ---
         const sidebarMenu = document.querySelector('.nav-sidebar');
         if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
@@ -157,7 +145,6 @@
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
 
-        // --- 4. JAVASCRIPT TRATOR PARA O MANUAL (FAQ) ---
         if (window.location.href.includes('faq')) {
             document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted, .text-black').forEach(el => {
                 el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted', 'text-black');
@@ -171,7 +158,4 @@
     });
 </script>
 {% endblock %}
-
-{% block content %}
-    {{ block.super }}
-{% endblock %}
+{% block content %}{{ block.super }}{% endblock %}
