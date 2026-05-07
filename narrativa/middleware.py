@@ -10,12 +10,26 @@ class SaaSControlMiddleware:
     def __call__(self, request):
         path = request.path
 
-        # 1. INJEÇÃO DE DADOS EM TEMPO REAL (MATA O CACHE DO DJANGO)
+        # 1. INJEÇÃO DE DADOS EM TEMPO REAL E CÁLCULO DE LIMITE GLOBAL
         request.clinica_realtime = None
+        request.limite_atingido = False
+
         if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
-            from narrativa.models import Clinica
+            from narrativa.models import Clinica, Narrativa
             try:
-                request.clinica_realtime = Clinica.objects.get(id=request.user.clinica.id)
+                clinica = Clinica.objects.get(id=request.user.clinica.id)
+                request.clinica_realtime = clinica
+
+                # Calcula se o limite foi atingido para usar no Frontend e Backend
+                if clinica.plano_atual:
+                    try:
+                        limite = int(
+                            clinica.plano_atual.limite_narrativas) if clinica.plano_atual.limite_narrativas else 0
+                    except (ValueError, TypeError):
+                        limite = 0
+                    qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
+                    request.limite_atingido = (qtd_atual >= limite)
+
             except Clinica.DoesNotExist:
                 pass
 
@@ -53,15 +67,11 @@ class SaaSControlMiddleware:
                                            'Bloqueado: Sua assinatura está inativa ou cancelada. Regularize para voltar a editar.')
                             return redirect('/admin/')
 
-                        # TRAVA 2: Limite Exato de Narrativas do Plano
+                        # TRAVA 2: Limite de Narrativas Atingido (Só bloqueia a ROTA de Adicionar Narrativa)
                         if '/admin/narrativa/narrativa/add/' in path:
-                            limite = clinica.plano_atual.limite_narrativas if clinica.plano_atual else 0
-                            from narrativa.models import Narrativa
-                            qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
-
-                            if qtd_atual >= limite:
+                            if request.limite_atingido:
                                 messages.error(request,
-                                               f'Bloqueado: Você atingiu o limite de {limite} narrativas do seu plano atual.')
+                                               'Bloqueado: Você atingiu o limite de narrativas do seu plano atual. Faça um Upgrade.')
                                 return redirect('/admin/')
 
             return self.get_response(request)

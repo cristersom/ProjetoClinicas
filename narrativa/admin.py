@@ -47,7 +47,8 @@ class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
 # ==========================================
 class TenantPermissionsMixin:
     def get_clinica_atualizada(self, request):
-        # Bate no banco em tempo real, ignorando a sessão cacheada
+        if hasattr(request, 'clinica_realtime') and request.clinica_realtime:
+            return request.clinica_realtime
         if hasattr(request.user, 'clinica') and request.user.clinica:
             return Clinica.objects.get(id=request.user.clinica.id)
         return None
@@ -55,21 +56,18 @@ class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
     def has_view_permission(self, request, obj=None): return True
 
-    # Bloqueia qualquer criação (Cena, Questionário, etc) se o plano estiver cancelado
     def has_add_permission(self, request):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
         if c and not c.assinatura_ativa: return False
         return True
 
-    # Bloqueia qualquer edição se o plano estiver cancelado
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
         if c and not c.assinatura_ativa: return False
         return True
 
-    # Bloqueia qualquer exclusão se o plano estiver cancelado
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
@@ -124,7 +122,6 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_filter = ('categoria',)
     search_fields = ('titulo',)
 
-    # Blindagem Dupla: Checa cancelamento e limite de narrativas
     def has_add_permission(self, request):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
@@ -132,8 +129,9 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
             if not c.assinatura_ativa:
                 return False
             try:
+                limite = int(c.plano_atual.limite_narrativas) if c.plano_atual and c.plano_atual.limite_narrativas else 0
                 qtd_atual = Narrativa.objects.filter(clinica=c).count()
-                if qtd_atual >= c.plano_atual.limite_narrativas:
+                if qtd_atual >= limite:
                     return False
             except Exception:
                 pass
@@ -356,6 +354,7 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
         return render(request, 'admin/relatorio_questionario_detalhe.html', {**self.admin_site.each_context(request), 'questionario': questionario, 'dados_do_relatorio': dados})
+
 
 class RespostaResource(resources.ModelResource):
     class Meta:
