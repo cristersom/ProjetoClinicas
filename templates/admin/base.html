@@ -23,15 +23,23 @@
     }
 
     /* =====================================================================
-       2. TÍTULOS NATIVOS E LINHA (FIM DO BREADCRUMB VAZIO)
+       2. PADRONIZAÇÃO ABSOLUTA DE TODOS OS TÍTULOS DO SISTEMA
        ===================================================================== */
     .content-header {
         border-bottom: 1px solid #374151 !important;
         padding-bottom: 15px !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 25px !important;
         padding-top: 0 !important;
+        display: block !important;
+        width: 100% !important;
     }
-    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; }
+    .content-header h1 {
+        font-size: 2rem !important; /* Tamanho único para todas as telas */
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+        border: none !important;
+    }
 
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
@@ -41,12 +49,11 @@
     .login-logo a, .login-box-msg { color: #ffffff !important; }
 
     /* =====================================================================
-       3. BOTÕES GERAIS E BOTÃO DE SALVAR
+       3. BOTÕES (INCLUINDO O NOVO BOTÃO DE SALVAR)
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
-    /* Botões das Listagens (Adicionar/Editar) */
     .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
     .btn-success i, .table td a.btn-success i, .btn-success span, .table td a.btn-success span { color: #ffffff !important; }
@@ -58,23 +65,22 @@
     .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
     .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
 
-    /* NOVO: Botões de SALVAR (Submit) nativos do Django */
-    .submit-row input, .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
+    /* NOVO: PADRONIZAÇÃO DO BOTÃO "SALVAR" DO DJANGO (Ex: Tela de Planos) */
+    input[name="_save"], .paginator input[type="submit"] {
         background-color: #0d9488 !important;
         color: #ffffff !important;
         border: none !important;
         font-weight: 800 !important;
         text-transform: uppercase !important;
-        letter-spacing: 0.5px !important;
         padding: 8px 24px !important;
         border-radius: 8px !important;
-        box-shadow: 0 4px 6px -1px rgba(13, 148, 136, 0.3) !important;
+        font-size: 0.9rem !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important;
         transition: all 0.2s ease !important;
         cursor: pointer !important;
     }
-    .submit-row input:hover, .paginator input[type="submit"]:hover, input[type="submit"].default:hover, button[type="submit"].default:hover {
+    input[name="_save"]:hover, .paginator input[type="submit"]:hover {
         background-color: #0f766e !important;
-        box-shadow: 0 6px 8px -1px rgba(13, 148, 136, 0.5) !important;
         transform: translateY(-2px) !important;
     }
 
@@ -85,39 +91,25 @@
     .content-wrapper .card-body *, .content-wrapper .info-box * { color: #d1d5db !important; }
     .content-wrapper .card-body h2, .content-wrapper .card-body h3, .content-wrapper .card-body h4, .content-wrapper .card-body h5, .content-wrapper .card-body strong, .content-wrapper .card-body b { color: #ffffff !important; font-weight: bold !important; }
     .content-wrapper a { color: #14b8a6 !important; font-weight: bold; }
-    .content-wrapper .card:nth-of-type(1) { border-left: 4px solid #3b82f6 !important; }
-    .content-wrapper .card:nth-of-type(2) { border-left: 4px solid #10b981 !important; }
-    .content-wrapper .card:nth-of-type(3) { border-left: 4px solid #a855f7 !important; }
-    .content-wrapper .card:nth-of-type(4) { border-left: 4px solid #f97316 !important; }
-    .content-wrapper .card:nth-of-type(5) { border-left: 4px solid #14b8a6 !important; }
-
-    .form-control, input, select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; }
-    .form-control:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; height: 38px !important; }
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f3f4f6 !important; line-height: 36px !important; }
-    .select2-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; }
-    .select2-results__option { background-color: #1f2937 !important; color: #d1d5db !important; }
-    .select2-results__option--highlighted, .select2-results__option[aria-selected="true"] { background-color: #0d9488 !important; color: white !important; }
-    .select2-search--dropdown .select2-search__field { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
-    .nav-sidebar .nav-item a[href*="faq"] p { font-weight: normal !important; color: #f3f4f6 !important; }
-    .nav-sidebar .nav-item a[href*="faq"] { background-color: transparent !important; }
-    .nav-pills .nav-link.active, .nav-pills .show > .nav-link { background-color: #0d9488 !important; color: white !important; }
+    .form-control, input[type="text"], input[type="number"], select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; border-radius: 6px !important;}
+    .form-control:focus, input:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. MATA O "|" NO TÍTULO COM JAVASCRIPT ---
+        // --- 1. MATA O "|" NO TÍTULO DEFINITIVAMENTE ---
         const pageTitle = document.querySelector('.content-header h1');
-        if (pageTitle && pageTitle.innerHTML.includes('|')) {
-            pageTitle.innerHTML = pageTitle.innerHTML.replace('|', '').trim();
+        if (pageTitle) {
+            // Corta o texto no | e mantém só a parte da esquerda
+            const tituloLimpo = pageTitle.innerHTML.split('|')[0].trim();
+            pageTitle.innerHTML = tituloLimpo;
         }
 
         // --- 2. PADRONIZAÇÃO BOTÃO ADICIONAR ---
         const btnSuccess = document.querySelectorAll('.btn-success');
         btnSuccess.forEach(btn => {
-            const text = btn.innerText.toLowerCase();
-            if (text.includes('adicionar')) {
+            if (btn.innerText.toLowerCase().includes('adicionar')) {
                 btn.innerHTML = '<i class="fas fa-plus"></i> <span style="color: white !important;">Adicionar</span>';
             }
         });
@@ -133,20 +125,13 @@
             userPanel.style.padding = '15px';
             userPanel.style.borderBottom = '1px solid #1f2937';
             userPanel.style.marginBottom = '15px';
-
-            if(info) {
-                info.style.padding = '0';
-                userPanel.appendChild(info);
-            }
+            if(info) { info.style.padding = '0'; userPanel.appendChild(info); }
 
             const arrowBtn = document.createElement('a');
             arrowBtn.href = '#';
             arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
             arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
-            arrowBtn.onclick = function(e) {
-                e.preventDefault();
-                document.body.classList.toggle('sidebar-collapse');
-            };
+            arrowBtn.onclick = function(e) { e.preventDefault(); document.body.classList.toggle('sidebar-collapse'); };
             userPanel.appendChild(arrowBtn);
         }
 
@@ -170,25 +155,15 @@
             `;
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
-
-        // --- 5. LÓGICA DO MANUAL (FAQ) ---
-        if (window.location.href.includes('faq')) {
-            document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted, .text-black').forEach(el => {
-                el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted', 'text-black');
-            });
-            document.querySelectorAll('.content-wrapper *').forEach(el => {
-                if (el.style.backgroundColor === 'white' || el.style.backgroundColor === '#ffffff' || el.style.backgroundColor === 'rgb(255, 255, 255)') {
-                    el.style.backgroundColor = 'transparent';
-                }
-            });
-        }
     });
 </script>
 {% endblock %}
 
-{% block content %}
+{% block messages %}
+    {{ block.super }}
+
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
-    <div class="alert" style="background-color: #ef4444; border: 1px solid #b91c1c; color: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);">
+    <div style="background-color: #ef4444; border: 1px solid #b91c1c; color: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);">
         <div style="display: flex; align-items: center;">
             <i class="fas fa-lock fa-2x" style="margin-right: 20px;"></i>
             <div>
@@ -197,13 +172,13 @@
             </div>
         </div>
         <div>
-            <a href="{% url 'narrativa:planos' %}" class="btn" style="background-color: #ffffff; color: #ef4444; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Renovar / Upgrade</a>
+            <a href="{% url 'narrativa:planos' %}" style="background-color: #ffffff; color: #ef4444; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Renovar / Upgrade</a>
         </div>
     </div>
     {% endif %}
 
     {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
-    <div class="alert" style="background-color: #f59e0b; border: 1px solid #d97706; color: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+    <div style="background-color: #f59e0b; border: 1px solid #d97706; color: white; border-radius: 12px; padding: 20px; margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
         <div style="display: flex; align-items: center;">
             <i class="fas fa-arrow-circle-up fa-2x" style="margin-right: 20px;"></i>
             <div>
@@ -212,10 +187,9 @@
             </div>
         </div>
         <div>
-            <a href="{% url 'narrativa:planos' %}" class="btn" style="background-color: #ffffff; color: #f59e0b; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Fazer Upgrade</a>
+            <a href="{% url 'narrativa:planos' %}" style="background-color: #ffffff; color: #f59e0b; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-transform: uppercase; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap;">Fazer Upgrade</a>
         </div>
     </div>
     {% endif %}
 
-    {{ block.super }}
 {% endblock %}

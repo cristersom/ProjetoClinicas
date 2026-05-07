@@ -3,75 +3,96 @@
 
 {% block content_title %}Resumo de Atividades: {{ request.clinica_realtime.nome|default:"Clínica" }}{% endblock %}
 
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* Limpeza de colunas laterais nativas */
+    #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
+    .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
+
+    /* Estilização dos Cards baseada no seu Dashboard original */
+    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; margin-bottom: 1.5rem; }
+    .card-body { padding: 1.5rem; }
+
+    .text-xs { font-size: 0.75rem; letter-spacing: 0.5px; text-transform: uppercase; }
+    .font-weight-bold { font-weight: 800 !important; }
+    .text-gray-800 { color: #ffffff !important; font-size: 2rem !important; line-height: 1; }
+    .text-gray-300 { color: #4b5563 !important; }
+
+    /* Bordas coloridas laterais */
+    .border-left-primary { border-left: 4px solid #3b82f6 !important; }
+    .border-left-success { border-left: 4px solid #10b981 !important; }
+    .border-left-info { border-left: 4px solid #14b8a6 !important; }
+
+    /* Botão Adicionar com fonte branca absoluta */
+    .btn-nova-jornada {
+        background-color: #0d9488 !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 800 !important;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+    .btn-nova-jornada:hover { background-color: #0f766e !important; transform: translateY(-1px); color: white !important;}
+</style>
+{% endblock %}
+
 {% block content %}
-{{ block.super }} <div class="row mt-4">
-    <div class="col-lg-8">
-        <div class="row">
-            <div class="col-sm-4 mb-4">
-                <div class="card border-left-primary shadow h-100 py-2" style="border-left: 4px solid #3b82f6 !important;">
-                    <div class="card-body">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Jornadas</div>
-                        <div class="h5 mb-0 font-weight-bold text-white" style="font-size: 1.8rem;">{{ kpi_narrativas }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 mb-4">
-                <div class="card border-left-success shadow h-100 py-2" style="border-left: 4px solid #10b981 !important;">
-                    <div class="card-body">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pacientes</div>
-                        <div class="h5 mb-0 font-weight-bold text-white" style="font-size: 1.8rem;">{{ kpi_sessoes }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-4 mb-4">
-                <div class="card border-left-info shadow h-100 py-2" style="border-left: 4px solid #14b8a6 !important;">
-                    <div class="card-body">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Respostas</div>
-                        <div class="h5 mb-0 font-weight-bold text-white" style="font-size: 1.8rem;">{{ kpi_respostas }}</div>
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary mb-1">Suas Jornadas Criadas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_narrativas|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book-medical fa-2x text-gray-300"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {% get_side_menu using="app_list" as dashboard_list %}
-        {% for app in dashboard_list %}
-        <div class="card mt-2" style="border-top: 3px solid #14b8a6;">
-            <div class="card-header"><h5 class="m-0 text-white font-weight-bold">Registros: {{ app.name }}</h5></div>
-            <div class="card-body p-0">
-                <table class="table table-hover m-0">
-                    <tbody>
-                        {% for model in app.models %}
-                        {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
-                        <tr>
-                            <td class="pl-4"><a href="{{ model.url }}" class="font-weight-bold">{{ model.name }}</a></td>
-                            <td class="text-right pr-4 py-2">
-                                <div class="btn-group">
-                                    {% if model.add_url %}<a href="{{ model.add_url }}" class="btn btn-sm btn-success"><i class="fas fa-plus"></i> Adicionar</a>{% endif %}
-                                    {% if model.url %}<a href="{{ model.url }}" class="btn btn-sm btn-info"><i class="fas fa-edit"></i> Editar</a>{% endif %}
-                                </div>
-                            </td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success mb-1">Pacientes que Iniciaram</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_sessoes|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-injured fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info mb-1">Respostas Coletadas</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ kpi_respostas|default:"0" }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="card" style="border-top: 3px solid #3b82f6;">
-            <div class="card-header"><h5 class="m-0 text-white font-weight-bold">Ações Rápidas</h5></div>
-            <div class="card-body">
-                <a href="/admin/narrativa/narrativa/add/" class="btn btn-block btn-outline-primary mb-2 text-left p-3">
-                    <i class="fas fa-book-medical mr-2"></i> Nova Jornada
-                </a>
-                <a href="/admin/narrativa/cena/add/" class="btn btn-block btn-outline-info mb-2 text-left p-3">
-                    <i class="fas fa-desktop mr-2"></i> Criar Cena
-                </a>
-            </div>
-        </div>
+    <div class="mt-2">
+        <a href="/admin/narrativa/narrativa/add/" class="btn btn-nova-jornada"><i class="fas fa-plus"></i> CRIAR NOVA JORNADA</a>
     </div>
 </div>
 {% endblock %}
