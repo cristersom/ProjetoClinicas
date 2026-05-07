@@ -10,9 +10,16 @@ class SaaSControlMiddleware:
     def __call__(self, request):
         path = request.path
 
-        # ==========================================
-        # 1. ROTAS TOTALMENTE LIVRES (PACIENTES E PÚBLICO)
-        # ==========================================
+        # 1. INJEÇÃO DE DADOS EM TEMPO REAL (MATA O CACHE DO DJANGO)
+        request.clinica_realtime = None
+        if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
+            from narrativa.models import Clinica
+            try:
+                request.clinica_realtime = Clinica.objects.get(id=request.user.clinica.id)
+            except Clinica.DoesNotExist:
+                pass
+
+        # 2. ROTAS PÚBLICAS E DO PACIENTE (LIVRES)
         rotas_publicas = [
             reverse('narrativa:home'),
             reverse('narrativa:login'),
@@ -30,46 +37,40 @@ class SaaSControlMiddleware:
                 path.startswith('/portal/')):
             return self.get_response(request)
 
-        # ==========================================
-        # 2. BLINDAGEM DE ALTA SEGURANÇA (PAINEL ADMIN)
-        # ==========================================
+        # 3. BLINDAGEM DO PAINEL DE ADMINISTRAÇÃO
         if path.startswith('/admin/'):
-            # Se for o dono do sistema (Superuser), passa livre
             if request.user.is_authenticated and not request.user.is_superuser:
-                # Verifica se o usuário está tentando salvar, criar, editar ou deletar algo
-                is_admin_action = ('/add/' in path or '/change/' in path or '/delete/' in path)
-                is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
+                clinica = request.clinica_realtime
 
-                if is_admin_action or is_post_method:
-                    if hasattr(request.user, 'clinica') and request.user.clinica:
-                        from narrativa.models import Clinica
-                        # BUSCA NO BANCO EM TEMPO REAL (Ignora o cache do login antigo)
-                        try:
-                            clinica_realtime = Clinica.objects.get(id=request.user.clinica.id)
-                            if not clinica_realtime.assinatura_ativa:
+                if clinica:
+                    is_admin_action = ('/add/' in path or '/change/' in path or '/delete/' in path)
+                    is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
+
+                    if is_admin_action or is_post_method:
+                        # TRAVA 1: Assinatura Cancelada pelo Stripe
+                        if not clinica.assinatura_ativa:
+                            messages.error(request,
+                                           'Bloqueado: Sua assinatura está inativa ou cancelada. Regularize para voltar a editar.')
+                            return redirect('/admin/')
+
+                        # TRAVA 2: Limite Exato de Narrativas do Plano
+                        if '/admin/narrativa/narrativa/add/' in path:
+                            limite = clinica.plano_atual.limite_narrativas if clinica.plano_atual else 0
+                            from narrativa.models import Narrativa
+                            qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
+
+                            if qtd_atual >= limite:
                                 messages.error(request,
-                                               'Operação Bloqueada: Sua assinatura está inativa ou aguardando pagamento.')
-                                return redirect('/admin/')  # Chuta o usuário de volta para o Dashboard
-                        except Clinica.DoesNotExist:
-                            pass
+                                               f'Bloqueado: Você atingiu o limite de {limite} narrativas do seu plano atual.')
+                                return redirect('/admin/')
 
-            # Se não estiver fazendo nenhuma ação proibida (ou se o block acima já rodou), segue o fluxo nativo do admin
             return self.get_response(request)
 
-        # ==========================================
-        # 3. ÁREA RESTRITA DO FRONTEND (RESTO DO SITE)
-        # ==========================================
+        # 4. BLINDAGEM DA ÁREA RESTRITA FRONTEND
         if not request.user.is_authenticated:
             return redirect('narrativa:login')
 
-        if hasattr(request.user, 'clinica') and request.user.clinica:
-            from narrativa.models import Clinica
-            # Busca em tempo real também para o frontend, garantindo que o cancelamento expulse o usuário na hora
-            try:
-                clinica_realtime = Clinica.objects.get(id=request.user.clinica.id)
-                if not clinica_realtime.assinatura_ativa:
-                    return redirect('narrativa:planos')
-            except Clinica.DoesNotExist:
-                pass
+        if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa:
+            return redirect('narrativa:planos')
 
         return self.get_response(request)

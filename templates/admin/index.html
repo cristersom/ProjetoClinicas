@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static jazzmin %}
 
-{% block content_title %}Resumo de Atividades: {{ request.user.clinica.nome|default:"Clínica" }}{% endblock %}
+{% block content_title %}Resumo de Atividades: {{ request.clinica_realtime.nome|default:"Clínica" }}{% endblock %}
 
 {% block extrastyle %}
 {{ block.super }}
@@ -37,13 +37,20 @@
 {% block content %}
 <div class="container-fluid">
 
-    <!-- ALERTA DE CANCELAMENTO STRIPE -->
-    {% if request.user.clinica and not request.user.clinica.assinatura_ativa %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert" style="background-color: #ef4444; border: none; color: white; border-radius: 8px; padding: 15px; margin-bottom: 25px;">
+                <i class="fas fa-exclamation-circle" style="margin-right: 10px;"></i> {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
     <div class="alert" style="background-color: #ef4444; border: none; color: white; border-radius: 8px; padding: 15px; margin-bottom: 25px; display: flex; align-items: center;">
         <i class="fas fa-exclamation-triangle fa-2x" style="margin-right: 15px;"></i>
         <div>
             <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem;">Assinatura Inativa</h4>
-            <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Seu plano foi cancelado ou aguarda pagamento. Você não pode mais adicionar ou editar narrativas. <a href="#" style="color: #111827; text-decoration: underline; font-weight: bold;">Renovar Plano</a></p>
+            <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Seu plano foi cancelado ou aguarda pagamento. Você não pode adicionar ou editar narrativas. <a href="{% url 'narrativa:planos' %}" style="color: #ffffff; text-decoration: underline; font-weight: bold;">Renovar Plano</a></p>
         </div>
     </div>
     {% endif %}
