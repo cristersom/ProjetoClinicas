@@ -58,21 +58,35 @@ class CriarContaView(CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        email_pre = self.request.GET.get('email') or self.request.session.get('email_pagamento')
+        # Resgata dados que o usuário já tinha digitado caso ele não tenha pago e volte pra tela
+        registro = self.request.session.get('registro_pendente', {})
+        email_pre = self.request.GET.get('email') or self.request.session.get('email_pagamento') or registro.get(
+            'email')
+
         if email_pre:
             initial['email'] = email_pre
+        initial['username'] = registro.get('username')
+        initial['nome_clinica'] = registro.get('nome_clinica')
         return initial
 
     def form_valid(self, form):
         email_digitado = form.cleaned_data.get('email')
-
         pagamento = PagamentoPendente.objects.filter(email__iexact=email_digitado, utilizado=False).first()
 
         if not pagamento:
-            form.add_error('email',
-                           "Nenhum plano contratado para este e-mail. Por favor, escolha um plano antes de criar sua conta.")
-            return self.form_invalid(form)
+            # === A MÁGICA COMEÇA AQUI ===
+            # Ele não pagou ainda, então vamos esconder os dados digitados na Sessão do Navegador
+            self.request.session['registro_pendente'] = {
+                'username': form.cleaned_data.get('username'),
+                'email': email_digitado,
+                'nome_clinica': self.request.POST.get('nome_clinica'),
+                'senha1': self.request.POST.get('senha1'),
+                'senha2': self.request.POST.get('senha2'),
+            }
+            messages.info(self.request, "Dados salvos! Escolha um plano agora para finalizar a criação da sua conta.")
+            return redirect('narrativa:planos')
 
+        # Se ele pagou por fora e tá tentando criar a conta direto
         response = super().form_valid(form)
         user = self.object
 
@@ -81,12 +95,13 @@ class CriarContaView(CreateView):
             user.clinica.plano_atual = pagamento.plano
             user.clinica.stripe_customer_id = pagamento.stripe_customer_id
             user.clinica.save()
-
             pagamento.utilizado = True
             pagamento.save()
 
             if 'email_pagamento' in self.request.session:
                 del self.request.session['email_pagamento']
+            if 'registro_pendente' in self.request.session:
+                del self.request.session['registro_pendente']
 
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
         messages.success(self.request, "Conta criada e assinatura ativada com sucesso! Bem-vindo ao seu painel.")
@@ -121,17 +136,23 @@ def checkout(request, plano_id):
     domain_url = request.build_absolute_uri('/')[:-1]
 
     try:
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[{
-                'price': plano.stripe_price_id,
-                'quantity': 1,
-            }],
-            mode='subscription',
-            success_url=domain_url + reverse('narrativa:sucesso_pagamento') + '?session_id={CHECKOUT_SESSION_ID}',
-            cancel_url=domain_url + reverse('narrativa:planos'),
-            metadata={'plano_id': plano.id}
-        )
+        # Se ele tiver digitado o e-mail no registro pendente, já joga no Stripe preenchido
+        registro = request.session.get('registro_pendente', {})
+        customer_email = registro.get('email') if registro else None
+
+        checkout_kwargs = {
+            'payment_method_types': ['card'],
+            'line_items': [{'price': plano.stripe_price_id, 'quantity': 1}],
+            'mode': 'subscription',
+            'success_url': domain_url + reverse('narrativa:sucesso_pagamento') + '?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url': domain_url + reverse('narrativa:planos'),
+            'metadata': {'plano_id': plano.id}
+        }
+
+        if customer_email:
+            checkout_kwargs['customer_email'] = customer_email
+
+        checkout_session = stripe.checkout.Session.create(**checkout_kwargs)
         return redirect(checkout_session.url)
     except Exception as e:
         messages.error(request, str(e))
@@ -161,6 +182,7 @@ def sucesso_pagamento(request):
         user = Usuario.objects.filter(email=email).first()
 
         if user:
+            # Usuário já existia
             if hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
                 user.clinica.plano_atual = plano
@@ -172,9 +194,33 @@ def sucesso_pagamento(request):
                 pagamento.save()
 
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            return render(request, 'pagamento_sucesso.html', {'user': user, 'novo_usuario': False})
+            return render(request, 'pagamento_sucesso.html', {'criado_agora': False})
         else:
-            messages.info(request, "Pagamento confirmado! Crie sua conta com o mesmo e-mail usado na compra.")
+            # === A MÁGICA TERMINA AQUI ===
+            # Não tem conta, mas vamos ver se tem os dados pendentes no navegador!
+            registro = request.session.get('registro_pendente')
+
+            if registro:
+                registro['email'] = email  # Garante que vai usar o email do Stripe, pra não ter furo de segurança
+                form = CadastroForm(registro)
+                if form.is_valid():
+                    novo_user = form.save()
+                    if hasattr(novo_user, 'clinica') and novo_user.clinica:
+                        novo_user.clinica.assinatura_ativa = True
+                        novo_user.clinica.plano_atual = plano
+                        novo_user.clinica.stripe_customer_id = session.customer
+                        novo_user.clinica.save()
+
+                        pagamento = PagamentoPendente.objects.get(email=email)
+                        pagamento.utilizado = True
+                        pagamento.save()
+
+                    login(request, novo_user, backend='django.contrib.auth.backends.ModelBackend')
+                    del request.session['registro_pendente']
+                    return render(request, 'pagamento_sucesso.html', {'criado_agora': True})
+
+            # Fallback de segurança (Se o cliente pagou de outro PC ou aba anônima)
+            messages.info(request, "Pagamento confirmado! Digite uma senha agora para criar sua conta.")
             return redirect(f"{reverse('narrativa:criarconta')}?email={email}")
 
     except Exception as e:

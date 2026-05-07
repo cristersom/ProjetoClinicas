@@ -1,45 +1,36 @@
-{% extends "homepage.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <div class="card shadow-lg border-0 rounded-4 p-5">
-                <div class="mb-4">
-                    <i class="fas fa-check-circle text-success" style="font-size: 5rem;"></i>
-                </div>
-                <h2 class="display-5 fw-bold mb-3">Assinatura Confirmada!</h2>
-                <p class="lead text-muted mb-4">
-                    Parabéns! Sua clínica agora tem acesso completo ao <strong>Narrativas Clínicas</strong>. 
-                    Estamos processando os detalhes finais e seu painel já está sendo liberado.
-                </p>
-                <hr class="my-4">
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                    <a href="{% url 'narrativa:narrativas' %}" class="btn btn-primary btn-lg px-4 gap-3 rounded-pill">
-                        Começar Agora
-                    </a>
-                    <a href="{% url 'narrativa:dashboard_admin' %}" class="btn btn-outline-secondary btn-lg px-4 rounded-pill">
-                        Ver Dashboard
-                    </a>
-                </div>
-                <p class="mt-4 text-small text-muted">
-                    Um recibo foi enviado para o e-mail cadastrado. <br>
-                    Dúvidas? <a href="mailto:suporte@narrativasclinicas.com.br">Fale com nosso suporte</a>.
-                </p>
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md">
+        <div class="bg-white py-10 px-6 shadow-xl sm:rounded-2xl sm:px-10 text-center border border-gray-100 relative overflow-hidden">
+
+            <div class="absolute top-0 inset-x-0 h-2 bg-teal-500"></div>
+
+            <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-teal-50 mb-8 mt-2">
+                <svg class="h-12 w-12 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
             </div>
+
+            <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Pagamento Aprovado!</h2>
+
+            <p class="text-lg text-gray-500 mb-8">
+                {% if criado_agora %}
+                    Sua conta foi criada, sua senha salva, e a assinatura ativada com sucesso! Bem-vindo(a) ao Narrativas Clínicas!
+                {% else %}
+                    Sua assinatura foi ativada com sucesso. Bem-vindo(a) de volta!
+                {% endif %}
+            </p>
+
+            <hr class="border-gray-100 mb-8">
+
+            <a href="{% url 'narrativa:narrativas' %}" class="w-full flex items-center justify-center py-4 px-4 border border-transparent rounded-full shadow-md text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all transform hover:-translate-y-1">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Acessar Meu Painel
+            </a>
+
         </div>
     </div>
 </div>
-
-<style>
-    body { background-color: #f8f9fa; }
-    .card { background: white; }
-    i.fa-check-circle {
-        animation: scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes scaleIn {
-        from { transform: scale(0); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
-    }
-</style>
 {% endblock %}
