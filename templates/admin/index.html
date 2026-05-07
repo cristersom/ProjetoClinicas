@@ -136,7 +136,7 @@
 
         <div class="col-lg-4">
 
-            {% if request.user.clinica and request.user.clinica.assinatura_ativa %}
+            {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa %}
             <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6; border-radius: 12px; background-color: #1f2937; border-color: #374151;">
                 <div class="card-header" style="border-bottom: 1px solid #374151; padding: 15px;">
                     <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
