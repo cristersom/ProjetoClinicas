@@ -20,26 +20,34 @@ class SaaSControlMiddleware:
                 clinica = Clinica.objects.get(id=request.user.clinica.id)
                 request.clinica_realtime = clinica
 
+                # Calcula se o limite foi atingido para usar no Frontend e Backend
                 if clinica.plano_atual:
                     try:
-                        limite = int(clinica.plano_atual.limite_narrativas)
+                        limite = int(
+                            clinica.plano_atual.limite_narrativas) if clinica.plano_atual.limite_narrativas else 0
                     except (ValueError, TypeError):
                         limite = 0
                     qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
                     request.limite_atingido = (qtd_atual >= limite)
+
             except Clinica.DoesNotExist:
                 pass
 
         # 2. ROTAS PÚBLICAS E DO PACIENTE (LIVRES)
         rotas_publicas = [
-            reverse('narrativa:home'), reverse('narrativa:login'),
-            reverse('narrativa:logout'), reverse('narrativa:criarconta'),
-            reverse('narrativa:planos'), reverse('narrativa:stripe_webhook'),
+            reverse('narrativa:home'),
+            reverse('narrativa:login'),
+            reverse('narrativa:logout'),
+            reverse('narrativa:criarconta'),
+            reverse('narrativa:planos'),
+            reverse('narrativa:stripe_webhook'),
             reverse('narrativa:sucesso_pagamento'),
         ]
 
-        if (path in rotas_publicas or path.startswith('/checkout/') or
-                path.startswith('/jornada/') or path.startswith('/cena/') or
+        if (path in rotas_publicas or
+                path.startswith('/checkout/') or
+                path.startswith('/jornada/') or
+                path.startswith('/cena/') or
                 path.startswith('/portal/')):
             return self.get_response(request)
 
@@ -47,17 +55,26 @@ class SaaSControlMiddleware:
         if path.startswith('/admin/'):
             if request.user.is_authenticated and not request.user.is_superuser:
                 clinica = request.clinica_realtime
-                if clinica:
-                    # Bloqueia QUALQUER ação de escrita (POST/DELETE) se o plano estiver inativo
-                    is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
-                    if not clinica.assinatura_ativa and is_post_method:
-                        messages.error(request, 'Operação Bloqueada: Assinatura inativa.')
-                        return redirect('/admin/')
 
-                    # Bloqueia especificamente a rota de adicionar narrativa se o limite estourou
-                    if '/admin/narrativa/narrativa/add/' in path and request.limite_atingido:
-                        messages.error(request, 'Limite atingido: Realize um upgrade.')
-                        return redirect('/admin/')
+                if clinica:
+                    is_admin_action = ('/add/' in path or '/change/' in path or '/delete/' in path)
+                    is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
+
+                    if is_admin_action or is_post_method:
+                        # TRAVA 1: Assinatura Cancelada pelo Stripe
+                        if not clinica.assinatura_ativa:
+                            messages.error(request,
+                                           'Bloqueado: Sua assinatura está inativa ou cancelada. Regularize para voltar a editar.')
+                            return redirect('/admin/')
+
+                        # TRAVA 2: Limite de Narrativas Atingido (Só bloqueia a ROTA de Adicionar Narrativa)
+                        if '/admin/narrativa/narrativa/add/' in path:
+                            if request.limite_atingido:
+                                messages.error(request,
+                                               'Bloqueado: Você atingiu o limite de narrativas do seu plano atual. Faça um Upgrade.')
+                                return redirect('/admin/')
+
+            return self.get_response(request)
 
         # 4. BLINDAGEM DA ÁREA RESTRITA FRONTEND
         if not request.user.is_authenticated:

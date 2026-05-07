@@ -4,45 +4,13 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL
+       1. MODO ESCURO GERAL (Fundo, Menu e Topo)
        ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer {
-        background-color: #111827 !important; color: #f3f4f6 !important;
-        border: none !important; box-shadow: none !important; margin-top: 0 !important;
-    }
+    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; }
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
     .brand-link { display: none !important; }
-
-    @media (min-width: 992px) {
-        .main-header { display: none !important; }
-        .content-wrapper { padding-top: 15px !important; margin-top: 0 !important; }
-    }
-    @media (max-width: 991px) {
-        .main-header { background-color: #111827 !important; border: none !important; box-shadow: none !important; }
-        .main-header .navbar-nav { display: none !important; }
-    }
-
-    /* =====================================================================
-       2. TÍTULOS NATIVOS E BLINDAGEM CONTRA BORDOS
-       ===================================================================== */
-    .content-header {
-        border-bottom: 1px solid #374151 !important;
-        padding-bottom: 15px !important;
-        margin-bottom: 25px !important;
-        padding-top: 0 !important;
-        display: block !important;
-        width: 100% !important;
-    }
-    .content-header h1 {
-        font-size: 2rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        margin: 0 !important;
-        border: none !important;
-        border-right: 0px solid transparent !important; /* Mata o border do Jazzmin */
-    }
-    .content-header h1::after { content: none !important; display: none !important; }
-    .breadcrumb, .breadcrumb-item { display: none !important; }
+    @media (min-width: 992px) { .main-header { display: none !important; } .content-wrapper { padding-top: 15px !important; margin-top: 0 !important; } }
+    @media (max-width: 991px) { .main-header { background-color: #111827 !important; border: none !important; box-shadow: none !important; } .main-header .navbar-nav { display: none !important; } }
 
     /* Fix Ecrã de Login/Logout Branco */
     body.login-page { background-color: #111827 !important; }
@@ -50,52 +18,75 @@
     .login-logo a, .login-box-msg { color: #ffffff !important; }
 
     /* =====================================================================
-       3. BOTÕES PADRONIZADOS (ADICIONAR, EDITAR, SALVAR)
+       2. TÍTULOS NATIVOS E FIM DA LINHA VERTICAL "|"
        ===================================================================== */
-    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
+    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; padding-top: 0 !important; display: block !important; width: 100% !important; }
+    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; border-right: none !important; padding-right: 0 !important; }
+    .breadcrumb, .breadcrumb-item { display: none !important; }
+
+    /* =====================================================================
+       3. RESTAURAÇÃO DA IDENTIDADE VISUAL: TABELAS E FORMULÁRIOS
+       ===================================================================== */
+    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
+    .card-header { background-color: #111827 !important; border-bottom: 1px solid #374151 !important; color: white !important;}
+    .card-title, .card-body *, .info-box * { color: #d1d5db !important; }
+    .card-body h2, .card-body h3, .card-body h4, .card-body h5, .card-body strong, .card-body b { color: #ffffff !important; font-weight: bold !important; }
+
+    /* Tabelas (Modo Escuro) */
+    .table { background-color: #1f2937 !important; color: #d1d5db !important; }
+    .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
+    .table-hover tbody tr:hover { background-color: #374151 !important; color: white !important; }
+    .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #4b5563 !important; border-top: none !important;}
+    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
 
+    /* Paginação e Filtros */
+    .paginator { border-top: 1px solid #374151 !important; background-color: #1f2937 !important; color: #9ca3af !important; }
+    .paginator a:link, .paginator a:visited { color: #3b82f6 !important; }
+    #changelist-filter { background-color: #1f2937 !important; border: 1px solid #374151 !important; }
+    #changelist-filter h2 { background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important;}
+
+    /* Inputs e Selects */
+    .form-control, input[type="text"], input[type="number"], input[type="email"], select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; border-radius: 6px !important;}
+    .form-control:focus, input:focus, select:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
+
+    /* =====================================================================
+       4. BOTÕES (ADICIONAR, EDITAR E SALVAR)
+       ===================================================================== */
     .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
-
     .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
     .btn-info:hover, .table td a.btn-info:hover { background-color: #2563eb !important; color: #ffffff !important; }
 
-    /* O Botão Salvar (Submit) Arredondado e Bonito */
+    /* Botão de Salvar/Submit Moderno */
     input[name="_save"], .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
-        background-color: #0d9488 !important;
-        color: #ffffff !important;
-        border: none !important;
-        font-weight: 800 !important;
-        text-transform: uppercase !important;
-        padding: 8px 24px !important;
-        border-radius: 8px !important;
-        font-size: 0.9rem !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
+        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important;
+        text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: all 0.2s ease !important; cursor: pointer !important;
     }
     input[name="_save"]:hover, .paginator input[type="submit"]:hover { background-color: #0f766e !important; transform: translateY(-2px) !important; }
-
-    /* Forms */
-    .form-control, input[type="text"], input[type="number"], select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; border-radius: 6px !important;}
-    .form-control:focus, input:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. CAÇA-FANTASMAS DO "|" (Vigia o título por 1 segundo) ---
-        function limparTraco() {
-            const pageTitle = document.querySelector('.content-header h1');
-            if (pageTitle && pageTitle.textContent.includes('|')) {
-                pageTitle.textContent = pageTitle.textContent.replace(/\|/g, '').trim();
+        // --- 1. A ARMA NUCLEAR CONTRA O "|" (MutationObserver) ---
+        // Fica a vigiar o DOM inteiro para apagar o | no milissegundo em que o Jazzmin o criar
+        const observer = new MutationObserver(function(mutations) {
+            const h1 = document.querySelector('.content-header h1');
+            if (h1 && h1.textContent.includes('|')) {
+                h1.textContent = h1.textContent.replace(/\|/g, '').trim();
             }
-        }
-        limparTraco();
-        setTimeout(limparTraco, 100);
-        setTimeout(limparTraco, 500);
-        setTimeout(limparTraco, 1000);
+        });
+        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+
+        // Backup simples caso o observer falhe
+        setTimeout(() => {
+            const pageTitle = document.querySelector('.content-header h1');
+            if (pageTitle && pageTitle.innerHTML.includes('|')) {
+                pageTitle.innerHTML = pageTitle.innerHTML.split('|')[0].trim();
+            }
+        }, 100);
 
         // --- 2. PADRONIZAÇÃO BOTÃO ADICIONAR ---
         const btnSuccess = document.querySelectorAll('.btn-success');
@@ -157,13 +148,13 @@
     <div class="alert shadow-sm" style="background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <i class="fas fa-lock mr-2 text-red-600"></i>
-            <strong style="color: #991b1b;">Ação Necessária:</strong> A sua assinatura está inativa ou a aguardar pagamento. O sistema foi bloqueado.
+            <strong style="color: #991b1b;">Assinatura Inativa:</strong> O seu plano foi cancelado ou aguarda pagamento. O sistema foi bloqueado para edições.
         </div>
         <a href="{% url 'narrativa:planos' %}" class="btn btn-sm" style="background-color: #ef4444; color: white; font-weight: bold; border-radius: 6px;">RENOVAR</a>
     </div>
     {% endif %}
 
-    {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
+    {% if request.clinica_realtime and request.limite_atingido %}
     <div class="alert shadow-sm" style="background-color: #fef3c7; border: 1px solid #fbbf24; color: #92400e; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <i class="fas fa-arrow-circle-up mr-2 text-yellow-600"></i>
