@@ -23,7 +23,7 @@
     }
 
     /* =====================================================================
-       2. PADRONIZAÇÃO ABSOLUTA DE TODOS OS TÍTULOS DO SISTEMA
+       2. TÍTULOS NATIVOS E REMOÇÃO ABSOLUTA DO BORD (O FALSO "|")
        ===================================================================== */
     .content-header {
         border-bottom: 1px solid #374151 !important;
@@ -34,22 +34,24 @@
         width: 100% !important;
     }
     .content-header h1 {
-        font-size: 2rem !important; /* Tamanho único para todas as telas */
+        font-size: 2rem !important;
         font-weight: 800 !important;
         color: #ffffff !important;
         margin: 0 !important;
         border: none !important;
+        border-right: 0 !important; /* <--- MATA O "|" DO ADMINLTE */
+        padding-right: 0 !important;
     }
 
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
-    /* Fix Tela de Login/Logout Branca */
+    /* Fix Ecrã de Login/Logout Branco */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
     .login-logo a, .login-box-msg { color: #ffffff !important; }
 
     /* =====================================================================
-       3. BOTÕES (INCLUINDO O NOVO BOTÃO DE SALVAR)
+       3. BOTÕES GERAIS E BOTÃO DE GUARDAR
        ===================================================================== */
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; border-bottom: none !important;}
     .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
@@ -65,7 +67,7 @@
     .btn-default, .import_link, .export_link { background-color: #374151 !important; color: #f3f4f6 !important; border: 1px solid #4b5563 !important; font-weight: 600 !important; }
     .btn-default:hover, .import_link:hover, .export_link:hover { background-color: #4b5563 !important; color: white !important; }
 
-    /* NOVO: PADRONIZAÇÃO DO BOTÃO "SALVAR" DO DJANGO (Ex: Tela de Planos) */
+    /* --- PADRONIZAÇÃO DO BOTÃO "SALVAR" DO DJANGO --- */
     input[name="_save"], .paginator input[type="submit"] {
         background-color: #0d9488 !important;
         color: #ffffff !important;
@@ -98,12 +100,10 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // --- 1. MATA O "|" NO TÍTULO DEFINITIVAMENTE ---
+        // --- 1. MATA QUALQUER "|" RESTANTE NO TÍTULO VIA JS POR SEGURANÇA ---
         const pageTitle = document.querySelector('.content-header h1');
         if (pageTitle) {
-            // Corta o texto no | e mantém só a parte da esquerda
-            const tituloLimpo = pageTitle.innerHTML.split('|')[0].trim();
-            pageTitle.innerHTML = tituloLimpo;
+            pageTitle.innerHTML = pageTitle.innerHTML.replace(/\|/g, '').trim();
         }
 
         // --- 2. PADRONIZAÇÃO BOTÃO ADICIONAR ---
@@ -114,7 +114,7 @@
             }
         });
 
-        // --- 3. MENU LATERAL E FLECHA ---
+        // --- 3. MENU LATERAL E SETA ---
         const userPanel = document.querySelector('.sidebar .user-panel');
         if (userPanel) {
             const info = userPanel.querySelector('.info');
@@ -155,6 +155,18 @@
             `;
             sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
         }
+
+        // --- 5. LÓGICA DO MANUAL (FAQ) ---
+        if (window.location.href.includes('faq')) {
+            document.querySelectorAll('.bg-white, .bg-light, .text-dark, .text-muted, .text-black').forEach(el => {
+                el.classList.remove('bg-white', 'bg-light', 'text-dark', 'text-muted', 'text-black');
+            });
+            document.querySelectorAll('.content-wrapper *').forEach(el => {
+                if (el.style.backgroundColor === 'white' || el.style.backgroundColor === '#ffffff' || el.style.backgroundColor === 'rgb(255, 255, 255)') {
+                    el.style.backgroundColor = 'transparent';
+                }
+            });
+        }
     });
 </script>
 {% endblock %}
@@ -168,7 +180,7 @@
             <i class="fas fa-lock fa-2x" style="margin-right: 20px;"></i>
             <div>
                 <h4 style="margin: 0; font-weight: 900; font-size: 1.15rem; text-transform: uppercase;">Ação Necessária: Assinatura Inativa</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Seu plano encontra-se cancelado ou aguardando pagamento. O sistema foi bloqueado para edições e criação.</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">O seu plano encontra-se cancelado ou a aguardar pagamento. O sistema foi bloqueado para edições e criação.</p>
             </div>
         </div>
         <div>
@@ -183,7 +195,7 @@
             <i class="fas fa-arrow-circle-up fa-2x" style="margin-right: 20px;"></i>
             <div>
                 <h4 style="margin: 0; font-weight: 900; font-size: 1.15rem; text-transform: uppercase;">Limite de Narrativas Atingido</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Você atingiu o limite de jornadas do seu plano. O botão de nova narrativa foi desativado.</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem;">Atingiu o limite de jornadas do seu plano. O botão de nova narrativa foi desativado.</p>
             </div>
         </div>
         <div>
