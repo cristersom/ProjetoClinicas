@@ -131,8 +131,17 @@ class PlanosView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
-            context['plano_atual'] = self.request.user.clinica.plano_atual
-            context['assinatura_ativa'] = self.request.user.clinica.assinatura_ativa
+            clinica = self.request.user.clinica
+
+            # MÁGICA DE UX AQUI:
+            # Se a assinatura estiver inativa, fingimos que ele não tem plano atual
+            # Isso liberta TODOS os botões da página de planos para ele recontratar.
+            if clinica.assinatura_ativa:
+                context['plano_atual'] = clinica.plano_atual
+            else:
+                context['plano_atual'] = None
+
+            context['assinatura_ativa'] = clinica.assinatura_ativa
         return context
 
 
