@@ -18,8 +18,7 @@
     .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 
     /* =====================================================================
-       2. TÍTULOS NATIVOS E EXTINÇÃO TOTAL DO "|" (VIA CSS)
-       O "|" é na verdade um border-right inserido pelo tema. Mata-se aqui.
+       2. TÍTULOS NATIVOS E EXTINÇÃO TOTAL DO "|"
        ===================================================================== */
     .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; display: block !important; width: 100% !important; }
     .content-header h1 {
@@ -28,8 +27,8 @@
         color: #ffffff !important;
         margin: 0 !important;
         border: none !important;
-        border-right: 0px solid transparent !important; /* MATA A BORDA */
-        padding-right: 0px !important; /* TIRA O ESPAÇO */
+        border-right: 0px solid transparent !important;
+        padding-right: 0px !important;
     }
     .breadcrumb, .breadcrumb-item, .content-header h1::after { display: none !important; content: none !important; border: none !important;}
 
@@ -51,11 +50,11 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Redundância Javascript para limpar o texto caso não seja a borda
+        // CORTA A STRING AO MEIO ONDE APARECE O TRAÇO
         setInterval(function() {
             document.querySelectorAll('.content-header h1').forEach(function(h1) {
-                if (h1.textContent.includes('|')) {
-                    h1.textContent = h1.textContent.replace(/\|/g, '').trim();
+                if (h1.innerHTML.includes('|')) {
+                    h1.innerHTML = h1.innerHTML.split('|')[0].trim();
                 }
             });
         }, 50);

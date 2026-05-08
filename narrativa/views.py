@@ -116,7 +116,6 @@ class PlanosView(ListView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             clinica = self.request.user.clinica
-            # Se a assinatura estiver inativa, finge que não tem plano para liberar botões do HTML
             if clinica.assinatura_ativa:
                 context['plano_atual'] = clinica.plano_atual
             else:
