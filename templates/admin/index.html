@@ -8,18 +8,25 @@
 <style>
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
+
+    /* FORÇA ABSOLUTA PARA NÃO FICAR BRANCO */
+    .card-header, .card-body, .info-box, .bg-white { background-color: #1f2937 !important; border-color: #374151 !important; color: white !important;}
+
     .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
     .border-teal { border-left: 4px solid #14b8a6 !important; }
     .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-orange { border-left: 4px solid #f97316 !important; }
+
     .kpi-number { font-size: 2rem; font-weight: 900; color: #ffffff; }
-    .quick-action-btn { display: flex; align-items: center; justify-content: space-between; background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; border: 1px solid #4b5563; }
+    .quick-action-btn { display: flex; align-items: center; justify-content: space-between; background-color: #374151 !important; color: #f3f4f6 !important; padding: 15px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; border: 1px solid #4b5563 !important; }
 </style>
 {% endblock %}
 
 {% block content %}
-    {{ block.super }} <div class="row">
+    {{ block.super }}
+
+    <div class="row">
         <div class="col-lg-8">
             <div class="row mb-3">
                 <div class="col-sm-6">
@@ -42,10 +49,10 @@
 
             {% get_side_menu using="app_list" as dashboard_list %}
             {% for app in dashboard_list %}
-                <div class="card" style="border-top: 4px solid #14b8a6;">
-                    <div class="card-header"><h5 class="m-0 text-white font-weight-bold">Registros: {{ app.name }}</h5></div>
-                    <div class="card-body p-0">
-                        <table class="table table-hover m-0">
+                <div class="card" style="border-top: 4px solid #14b8a6; background-color: #1f2937 !important;">
+                    <div class="card-header" style="background-color: #111827 !important;"><h5 class="m-0 text-white font-weight-bold">Registros: {{ app.name }}</h5></div>
+                    <div class="card-body p-0" style="background-color: #1f2937 !important;">
+                        <table class="table table-hover m-0" style="background-color: #1f2937 !important;">
                             <tbody>
                                 {% for model in app.models %}
                                     {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
@@ -65,12 +72,12 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card" style="border-top: 3px solid #3b82f6;">
-                <div class="card-header"><h5 class="m-0 text-white font-weight-bold">Ações Rápidas</h5></div>
-                <div class="card-body">
+            <div class="card" style="border-top: 3px solid #3b82f6; background-color: #1f2937 !important;">
+                <div class="card-header" style="background-color: #111827 !important;"><h5 class="m-0 text-white font-weight-bold">Ações Rápidas</h5></div>
+                <div class="card-body" style="background-color: #1f2937 !important;">
                     <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn"><span>Nova Jornada</span><i class="fas fa-plus"></i></a>
                     <a href="/admin/narrativa/cena/add/" class="quick-action-btn"><span>Criar Cena</span><i class="fas fa-desktop"></i></a>
-                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn" style="background-color: #064e3b;"><span>Ver Manual</span><i class="fas fa-question"></i></a>
+                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn" style="background-color: #064e3b !important; border-color: #064e3b !important;"><span>Ver Manual</span><i class="fas fa-question"></i></a>
                 </div>
             </div>
         </div>

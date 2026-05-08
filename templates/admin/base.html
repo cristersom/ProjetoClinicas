@@ -3,35 +3,63 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* 1. MODO ESCURO E TABELAS */
+    /* =====================================================================
+       1. MODO ESCURO ABSOLUTO (Força esmagadora sobre o fundo branco)
+       ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; }
-    .table { background-color: #1f2937 !important; color: #d1d5db !important; }
-    .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #374151 !important; }
-    .table td { border-top: 1px solid #374151 !important; }
+    .main-sidebar { background-color: #030712 !important; border: none !important; }
 
-    /* 2. EXTERMINADOR DO TRAÇO "|" */
-    .content-header h1 {
-        font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important;
-        border-right: none !important; /* Mata o traço visual */
-        padding-right: 0 !important;
-        margin-right: 0 !important;
-    }
+    /* Cabeçalho Topo (Agora volta a ser escuro) */
+    .main-header, .main-header .navbar { background-color: #111827 !important; border-bottom: 1px solid #374151 !important; }
+    .main-header * { color: #f3f4f6 !important; }
+
+    /* Remove as classes bg-white injetadas pelo painel */
+    .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
+
+    /* =====================================================================
+       2. TÍTULOS NATIVOS E REMOÇÃO VISUAL DO "|"
+       ===================================================================== */
+    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; padding-top: 15px !important; display: block !important; width: 100% !important; }
+    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; }
     .content-header h1::after, .breadcrumb { display: none !important; content: none !important; }
 
-    /* 3. AVISO DE BLOQUEIO AGRESSIVO */
-    .blocking-overlay {
-        background-color: #ef4444 !important; border: 2px solid #b91c1c !important;
-        color: white !important; border-radius: 12px; padding: 25px; margin: 0 15px 30px 15px;
-        box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
-        display: flex; align-items: center; justify-content: space-between;
+    /* =====================================================================
+       3. TABELAS E BOTÕES
+       ===================================================================== */
+    .table { background-color: #1f2937 !important; color: #d1d5db !important; }
+    .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #374151 !important; }
+    .table td { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
+
+    .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
+    .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
+
+    input[name="_save"], .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
+        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important;
+        text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; cursor: pointer !important;
     }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Remove qualquer "|" que o Jazzmin insira via texto
-        const h1 = document.querySelector('.content-header h1');
-        if (h1) h1.innerHTML = h1.innerHTML.replace('|', '').trim();
+        // --- CAÇA FANTASMAS DO "|" (Corre em Loop contínuo) ---
+        setInterval(function() {
+            const h1 = document.querySelector('.content-header h1');
+            if (h1 && h1.innerHTML.includes('|')) {
+                h1.innerHTML = h1.innerHTML.replace(/\|/g, '').trim();
+            }
+        }, 50);
+
+        // --- MENU CONTA COM LOGOUT DIRETO ---
+        const sidebarMenu = document.querySelector('.nav-sidebar');
+        if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
+            const contaHtml = `
+                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
+                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
+                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
+            `;
+            sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
+        }
     });
 </script>
 {% endblock %}
@@ -40,24 +68,23 @@
     {{ block.super }}
 
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
-    <div class="blocking-overlay">
+    <div style="background-color: #ef4444; border: 2px solid #b91c1c; color: white; border-radius: 12px; padding: 25px; margin: 0 15px 30px 15px; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4); display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center;">
             <i class="fas fa-exclamation-circle fa-3x" style="margin-right: 20px;"></i>
             <div>
                 <h3 style="margin: 0; font-weight: 900; text-transform: uppercase;">Acesso Suspenso</h3>
-                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 600;">
-                    Não reconhecemos a realização do seu pagamento. Realize a contratação de um plano para continuar usando o sistema.
-                </p>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 600;">Não reconhecemos a realização do seu pagamento. Realize a contratação de um plano para continuar usando o sistema.</p>
             </div>
         </div>
-        <a href="{% url 'narrativa:planos' %}" class="btn btn-lg" style="background-color: white; color: #ef4444; font-weight: 900; padding: 15px 30px; border-radius: 10px; text-transform: uppercase; text-decoration: none;">Ver Planos</a>
+        <a href="{% url 'narrativa:planos' %}" style="background-color: white; color: #ef4444; font-weight: 900; padding: 15px 30px; border-radius: 10px; text-transform: uppercase; text-decoration: none;">Ver Planos</a>
     </div>
     {% endif %}
 
     {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
-    <div class="alert alert-warning" style="margin: 0 15px 20px 15px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
-        <span><i class="fas fa-arrow-up mr-2"></i> Limite de jornadas atingido. Faça um upgrade para criar mais.</span>
-        <a href="{% url 'narrativa:planos' %}" class="btn btn-sm btn-dark">UPGRADE</a>
+    <div style="background-color: #f59e0b; border: 1px solid #d97706; color: white; border-radius: 12px; padding: 20px; margin: 0 15px 25px 15px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 6px rgba(245, 158, 11, 0.3);">
+        <div><i class="fas fa-arrow-circle-up mr-2 text-xl"></i> <strong style="font-size: 1.1rem;">Limite de Narrativas Atingido:</strong> Você atingiu a quota máxima de jornadas do seu plano.</div>
+        <a href="{% url 'narrativa:planos' %}" style="background-color: #ffffff; color: #f59e0b; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; text-decoration: none;">Fazer Upgrade</a>
     </div>
     {% endif %}
+
 {% endblock %}

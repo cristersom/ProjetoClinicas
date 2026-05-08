@@ -1,3 +1,5 @@
+import stripe
+from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.contrib import messages
@@ -10,18 +12,37 @@ class SaaSControlMiddleware:
     def __call__(self, request):
         path = request.path
 
-        # 1. INJEÇÃO DE DADOS EM TEMPO REAL (Mata o cache e verifica o banco agora)
+        # 1. INJEÇÃO DE DADOS EM TEMPO REAL
         request.clinica_realtime = None
         request.limite_atingido = False
 
         if request.user.is_authenticated and hasattr(request.user, 'clinica') and request.user.clinica:
             from narrativa.models import Clinica, Narrativa
             try:
-                # Busca a clínica direto do banco para ignorar o que está guardado na sessão
                 clinica = Clinica.objects.get(id=request.user.clinica.id)
                 request.clinica_realtime = clinica
 
-                # Verifica limites de plano
+                # =================================================================
+                # VERIFICAÇÃO DIRETA NO STRIPE (Sincronização em Tempo Real)
+                # Resolve o problema do cancelamento não atualizar localmente!
+                # =================================================================
+                if clinica.stripe_customer_id and not request.session.get('stripe_synced'):
+                    stripe.api_key = settings.STRIPE_SECRET_KEY
+                    try:
+                        # Vai ao Stripe verificar se existe alguma assinatura "ativa"
+                        subs = stripe.Subscription.list(customer=clinica.stripe_customer_id, status='active', limit=1)
+                        tem_plano_ativo = len(subs.data) > 0
+
+                        if clinica.assinatura_ativa != tem_plano_ativo:
+                            clinica.assinatura_ativa = tem_plano_ativo
+                            clinica.save()
+
+                        # Guarda na sessão para não fazer a consulta a cada clique e deixar o site lento
+                        request.session['stripe_synced'] = True
+                    except Exception as e:
+                        pass
+                # =================================================================
+
                 if clinica.plano_atual:
                     try:
                         limite = int(clinica.plano_atual.limite_narrativas)
@@ -29,10 +50,11 @@ class SaaSControlMiddleware:
                         limite = 0
                     qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
                     request.limite_atingido = (qtd_atual >= limite)
+
             except Clinica.DoesNotExist:
                 pass
 
-        # 2. LIBERAÇÃO DE ROTAS PÚBLICAS (Página inicial, Login, Checkout e Pacientes)
+        # 2. ROTAS PÚBLICAS E DO PACIENTE (LIVRES)
         rotas_publicas = [
             reverse('narrativa:home'), reverse('narrativa:login'),
             reverse('narrativa:logout'), reverse('narrativa:criarconta'),
@@ -45,28 +67,31 @@ class SaaSControlMiddleware:
                 path.startswith('/portal/')):
             return self.get_response(request)
 
-        # 3. BLINDAGEM DO ADMINISTRADOR
+        # 3. BLINDAGEM DO PAINEL DE ADMINISTRAÇÃO
         if path.startswith('/admin/'):
             if request.user.is_authenticated and not request.user.is_superuser:
                 clinica = request.clinica_realtime
                 if clinica:
-                    # BLOQUEIO POR FALTA DE PAGAMENTO/CANCELAMENTO
-                    # Se o usuário tentar SALVAR ou CRIAR algo (POST) e não tiver plano, barramos na hora
-                    if not clinica.assinatura_ativa and request.method == 'POST':
-                        messages.error(request, 'Ação Negada: Não reconhecemos o pagamento do seu plano.')
+                    is_admin_action = ('/add/' in path or '/change/' in path or '/delete/' in path)
+                    is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
+
+                    # BLOQUEIO TOTAL SE A ASSINATURA ESTIVER INATIVA
+                    if not clinica.assinatura_ativa and (is_admin_action or is_post_method):
+                        messages.error(request, 'Não reconhecemos o seu pagamento. Acesso bloqueado para edições.')
                         return redirect('/admin/')
 
-                    # BLOQUEIO POR LIMITE DE PLANO
-                    if '/add/' in path and 'narrativa' in path and request.limite_atingido:
-                        messages.error(request, 'Limite atingido: Realize um upgrade para criar novas jornadas.')
+                    # BLOQUEIO DE LIMITE DE NARRATIVAS
+                    if '/admin/narrativa/narrativa/add/' in path and request.limite_atingido:
+                        messages.error(request, 'Limite atingido. Realize um upgrade para continuar.')
                         return redirect('/admin/')
 
-        # 4. BLINDAGEM DO FRONTEND (Área Logada do Site)
+            return self.get_response(request)
+
+        # 4. BLINDAGEM DA ÁREA RESTRITA FRONTEND
         if not request.user.is_authenticated:
             return redirect('narrativa:login')
 
         if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa:
-            # Se não pagou, mandamos direto para a página de planos
             return redirect('narrativa:planos')
 
         return self.get_response(request)
