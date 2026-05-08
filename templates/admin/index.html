@@ -9,75 +9,163 @@
     #recent-actions-module, .col-12.col-md-3.col-sm-4 { display: none !important; }
     .col-12.col-md-9.col-sm-8 { flex: 0 0 100% !important; max-width: 100% !important; }
 
-    /* FORÇA ABSOLUTA PARA NÃO FICAR BRANCO */
-    .card-header, .card-body, .info-box, .bg-white { background-color: #1f2937 !important; border-color: #374151 !important; color: white !important;}
-
-    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px;}
+    .info-box-custom { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.2) !important; min-height: 100px; padding: 20px;}
     .border-blue { border-left: 4px solid #3b82f6 !important; }
     .border-teal { border-left: 4px solid #14b8a6 !important; }
     .border-purple { border-left: 4px solid #a855f7 !important; }
     .border-orange { border-left: 4px solid #f97316 !important; }
 
-    .kpi-number { font-size: 2rem; font-weight: 900; color: #ffffff; }
-    .quick-action-btn { display: flex; align-items: center; justify-content: space-between; background-color: #374151 !important; color: #f3f4f6 !important; padding: 15px; border-radius: 8px; margin-bottom: 10px; font-weight: bold; border: 1px solid #4b5563 !important; }
+    .icon-bg { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-right: 15px;}
+    .bg-blue-light { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+    .bg-teal-light { background-color: rgba(20, 184, 166, 0.15); color: #14b8a6; }
+    .bg-purple-light { background-color: rgba(168, 85, 247, 0.15); color: #a855f7; }
+    .bg-orange-light { background-color: rgba(249, 115, 22, 0.15); color: #f97316; }
+
+    .kpi-label { font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; color: #9ca3af; text-transform: uppercase; }
+    .kpi-number { font-size: 2rem; line-height: 1; font-weight: 900; color: #ffffff; margin: 5px 0;}
+    .kpi-subtext { font-size: 0.8rem; margin-top: 5px; display: block; font-weight: 600;}
+
+    /* Ações Rápidas - Oculto do canto esquerdo com padding-left */
+    .quick-action-btn {
+        display: flex; align-items: center; justify-content: space-between;
+        background-color: #374151; color: #f3f4f6; padding: 15px; border-radius: 8px;
+        margin-bottom: 10px; font-weight: bold; transition: all 0.2s; border: 1px solid #4b5563;
+    }
+    .quick-action-btn span { padding-left: 10px; }
+    .quick-action-btn:hover { background-color: #4b5563; color: white; transform: translateX(3px); }
 </style>
 {% endblock %}
 
 {% block content %}
-    {{ block.super }}
+    {{ block.super }} <p style="color: #9ca3af; margin-bottom: 25px; font-size: 0.95rem;">Acompanhe o progresso geral de todas as narrativas e pacientes.</p>
 
     <div class="row">
         <div class="col-lg-8">
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-blue">
+                        <div class="icon-bg bg-blue-light"><i class="fas fa-users"></i></div>
                         <div class="info-box-content">
-                            <span style="color: #9ca3af; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Acessos Totais</span>
+                            <span class="kpi-label">Acessos Totais</span>
                             <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-arrow-up"></i> Pacientes iniciados</span>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <div class="info-box info-box-custom border-teal">
+                        <div class="icon-bg bg-teal-light"><i class="fas fa-chart-pie"></i></div>
                         <div class="info-box-content">
-                            <span style="color: #9ca3af; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;">Taxa de Retenção</span>
+                            <span class="kpi-label">Taxa de Retenção</span>
                             <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
+                            <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-purple">
+                        <div class="icon-bg bg-purple-light"><i class="fas fa-flag-checkered"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Narrativas Concluídas</span>
+                            <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-orange">
+                        <div class="icon-bg bg-orange-light"><i class="fas fa-comments"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Pesquisas Respondidas</span>
+                            <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             {% get_side_menu using="app_list" as dashboard_list %}
-            {% for app in dashboard_list %}
-                <div class="card" style="border-top: 4px solid #14b8a6; background-color: #1f2937 !important;">
-                    <div class="card-header" style="background-color: #111827 !important;"><h5 class="m-0 text-white font-weight-bold">Registros: {{ app.name }}</h5></div>
-                    <div class="card-body p-0" style="background-color: #1f2937 !important;">
-                        <table class="table table-hover m-0" style="background-color: #1f2937 !important;">
-                            <tbody>
-                                {% for model in app.models %}
-                                    {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
-                                    <tr>
-                                        <td class="pl-4 py-3"><a href="{{ model.url }}" style="font-weight: 600; color: #f3f4f6;">{{ model.name }}</a></td>
-                                        <td class="text-right pr-4">
-                                            <a href="{{ model.add_url }}" class="btn btn-sm btn-success">Adicionar</a>
-                                        </td>
-                                    </tr>
-                                    {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
+            {% if dashboard_list %}
+                {% for app in dashboard_list %}
+                    <div class="card card-primary card-outline" style="border-top: 4px solid #14b8a6; border-radius: 12px; overflow: hidden; background-color: #1f2937; border-color: #374151;">
+                        <div class="card-header" style="background-color: #1f2937; border-bottom: 1px solid #374151; padding: 20px;">
+                            <h5 class="m-0 text-white" style="font-weight: 800; font-size: 1.25rem;">
+                                <i class="fas fa-folder-open text-teal mr-2" style="color: #14b8a6;"></i> Registros: {{ app.name }}
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <table class="table table-hover m-0">
+                                <tbody>
+                                    {% for model in app.models %}
+                                        {% if model.name != 'Ver Site' and model.name != 'Manual do Sistema' %}
+                                        <tr>
+                                            <td class="align-middle pl-4">
+                                                {% if model.url %}<a href="{{ model.url }}" style="font-weight: 600; font-size: 1.1rem; color: #f3f4f6;">{{ model.name }}</a>{% else %}{{ model.name }}{% endif %}
+                                            </td>
+                                            <td class="text-right pr-4 py-3">
+                                                <div class="btn-group">
+                                                    {% if model.add_url %}
+                                                        <a href="{{ model.add_url }}" class="btn btn-sm btn-success" style="background-color: #0d9488; color: #ffffff; border: none; font-weight: 600;"><i class="fas fa-plus" style="margin-right: 4px;"></i> Adicionar</a>
+                                                    {% endif %}
+                                                    {% if model.url %}
+                                                        <a href="{{ model.url }}" class="btn btn-sm btn-info" style="background-color: #3b82f6; color: #ffffff; border: none; font-weight: 600;"><i class="fas fa-edit" style="margin-right: 4px;"></i> Editar</a>
+                                                    {% endif %}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% endif %}
         </div>
 
         <div class="col-lg-4">
-            <div class="card" style="border-top: 3px solid #3b82f6; background-color: #1f2937 !important;">
-                <div class="card-header" style="background-color: #111827 !important;"><h5 class="m-0 text-white font-weight-bold">Ações Rápidas</h5></div>
-                <div class="card-body" style="background-color: #1f2937 !important;">
-                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn"><span>Nova Jornada</span><i class="fas fa-plus"></i></a>
-                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn"><span>Criar Cena</span><i class="fas fa-desktop"></i></a>
-                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn" style="background-color: #064e3b !important; border-color: #064e3b !important;"><span>Ver Manual</span><i class="fas fa-question"></i></a>
+            <div class="card card-primary card-outline mb-4" style="border-top: 3px solid #3b82f6; border-radius: 12px; background-color: #1f2937; border-color: #374151;">
+                <div class="card-header" style="border-bottom: 1px solid #374151; padding: 15px;">
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-bolt text-warning mr-2"></i>Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn text-decoration-none border-blue">
+                        <span>Nova Jornada</span>
+                        <i class="fas fa-book-medical text-primary"></i>
+                    </a>
+                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn text-decoration-none border-teal">
+                        <span>Criar Cena</span>
+                        <i class="fas fa-desktop text-info"></i>
+                    </a>
+                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none border-purple">
+                        <span>Novo Questionário</span>
+                        <i class="fas fa-clipboard-list" style="color: #a855f7;"></i>
+                    </a>
+                    <hr style="border-color: #374151; margin: 20px 0;">
+                    <a href="{% url 'narrativa:faq' %}" class="quick-action-btn text-decoration-none" style="background-color: #064e3b; border-color: #065f46;">
+                        <span class="text-white"><i class="fas fa-question-circle mr-2" style="color: white;"></i>Dúvidas? Ver Manual</span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="card card-primary card-outline" style="border-top: 3px solid #a855f7; border-radius: 12px; background-color: #1f2937; border-color: #374151;">
+                <div class="card-header" style="border-bottom: 1px solid #374151; padding: 15px;">
+                    <h5 class="m-0 text-white" style="font-weight: bold;"><i class="fas fa-server text-info mr-2"></i>Status do Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <p style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 15px;">Todos os serviços essenciais operando normalmente.</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Banco de Dados</span>
+                    </div>
+                    <div style="display: flex; align-items: center;">
+                        <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px; font-size: 1.2rem;"></i>
+                        <span style="color: #d1d5db; font-weight: 600;">Servidor Seguro</span>
+                    </div>
                 </div>
             </div>
         </div>
