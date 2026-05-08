@@ -3,140 +3,35 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* =====================================================================
-       1. MODO ESCURO GERAL (Fundo, Menu e Topo)
-       ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; }
-    .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
-    .brand-link { display: none !important; }
-    @media (min-width: 992px) { .main-header { display: none !important; } .content-wrapper { padding-top: 15px !important; margin-top: 0 !important; } }
-    @media (max-width: 991px) { .main-header { background-color: #111827 !important; border: none !important; box-shadow: none !important; } .main-header .navbar-nav { display: none !important; } }
-
-    /* Fix Ecrã de Login/Logout Branco */
-    body.login-page { background-color: #111827 !important; }
-    .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
-    .login-logo a, .login-box-msg { color: #ffffff !important; }
-
-    /* =====================================================================
-       2. TÍTULOS NATIVOS E FIM DA LINHA VERTICAL "|"
-       ===================================================================== */
-    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; padding-top: 0 !important; display: block !important; width: 100% !important; }
-    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; border-right: none !important; padding-right: 0 !important; }
-    .breadcrumb, .breadcrumb-item { display: none !important; }
-
-    /* =====================================================================
-       3. RESTAURAÇÃO DA IDENTIDADE VISUAL: TABELAS E FORMULÁRIOS
-       ===================================================================== */
-    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
-    .card-header { background-color: #111827 !important; border-bottom: 1px solid #374151 !important; color: white !important;}
-    .card-title, .card-body *, .info-box * { color: #d1d5db !important; }
-    .card-body h2, .card-body h3, .card-body h4, .card-body h5, .card-body strong, .card-body b { color: #ffffff !important; font-weight: bold !important; }
-
-    /* Tabelas (Modo Escuro) */
+    /* 1. MODO ESCURO E TABELAS */
+    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; }
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
-    .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
-    .table-hover tbody tr:hover { background-color: #374151 !important; color: white !important; }
-    .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #4b5563 !important; border-top: none !important;}
-    .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
-    .table td.text-right { width: 1%; white-space: nowrap; padding-right: 1.5rem !important; }
+    .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #374151 !important; }
+    .table td { border-top: 1px solid #374151 !important; }
 
-    /* Paginação e Filtros */
-    .paginator { border-top: 1px solid #374151 !important; background-color: #1f2937 !important; color: #9ca3af !important; }
-    .paginator a:link, .paginator a:visited { color: #3b82f6 !important; }
-    #changelist-filter { background-color: #1f2937 !important; border: 1px solid #374151 !important; }
-    #changelist-filter h2 { background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important;}
-
-    /* Inputs e Selects */
-    .form-control, input[type="text"], input[type="number"], input[type="email"], select, textarea { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: #f3f4f6 !important; border-radius: 6px !important;}
-    .form-control:focus, input:focus, select:focus { border-color: #14b8a6 !important; background-color: #1f2937 !important; color: white !important; box-shadow: none !important; }
-
-    /* =====================================================================
-       4. BOTÕES (ADICIONAR, EDITAR E SALVAR)
-       ===================================================================== */
-    .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-    .btn-success:hover, .table td a.btn-success:hover { background-color: #0f766e !important; color: #ffffff !important; }
-    .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-    .btn-info:hover, .table td a.btn-info:hover { background-color: #2563eb !important; color: #ffffff !important; }
-
-    /* Botão de Salvar/Submit Moderno */
-    input[name="_save"], .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
-        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important;
-        text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important; transition: all 0.2s ease !important; cursor: pointer !important;
+    /* 2. EXTERMINADOR DO TRAÇO "|" */
+    .content-header h1 {
+        font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important;
+        border-right: none !important; /* Mata o traço visual */
+        padding-right: 0 !important;
+        margin-right: 0 !important;
     }
-    input[name="_save"]:hover, .paginator input[type="submit"]:hover { background-color: #0f766e !important; transform: translateY(-2px) !important; }
+    .content-header h1::after, .breadcrumb { display: none !important; content: none !important; }
+
+    /* 3. AVISO DE BLOQUEIO AGRESSIVO */
+    .blocking-overlay {
+        background-color: #ef4444 !important; border: 2px solid #b91c1c !important;
+        color: white !important; border-radius: 12px; padding: 25px; margin: 0 15px 30px 15px;
+        box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.4);
+        display: flex; align-items: center; justify-content: space-between;
+    }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
-        // --- 1. A ARMA NUCLEAR CONTRA O "|" (MutationObserver) ---
-        // Fica a vigiar o DOM inteiro para apagar o | no milissegundo em que o Jazzmin o criar
-        const observer = new MutationObserver(function(mutations) {
-            const h1 = document.querySelector('.content-header h1');
-            if (h1 && h1.textContent.includes('|')) {
-                h1.textContent = h1.textContent.replace(/\|/g, '').trim();
-            }
-        });
-        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
-
-        // Backup simples caso o observer falhe
-        setTimeout(() => {
-            const pageTitle = document.querySelector('.content-header h1');
-            if (pageTitle && pageTitle.innerHTML.includes('|')) {
-                pageTitle.innerHTML = pageTitle.innerHTML.split('|')[0].trim();
-            }
-        }, 100);
-
-        // --- 2. PADRONIZAÇÃO BOTÃO ADICIONAR ---
-        const btnSuccess = document.querySelectorAll('.btn-success');
-        btnSuccess.forEach(btn => {
-            if (btn.innerText.toLowerCase().includes('adicionar')) {
-                btn.innerHTML = '<i class="fas fa-plus"></i> <span style="color: white !important;">Adicionar</span>';
-            }
-        });
-
-        // --- 3. MENU LATERAL E SETA ---
-        const userPanel = document.querySelector('.sidebar .user-panel');
-        if (userPanel) {
-            const info = userPanel.querySelector('.info');
-            userPanel.innerHTML = '';
-            userPanel.style.display = 'flex';
-            userPanel.style.justifyContent = 'space-between';
-            userPanel.style.alignItems = 'center';
-            userPanel.style.padding = '15px';
-            userPanel.style.borderBottom = '1px solid #1f2937';
-            userPanel.style.marginBottom = '15px';
-            if(info) { info.style.padding = '0'; userPanel.appendChild(info); }
-
-            const arrowBtn = document.createElement('a');
-            arrowBtn.href = '#';
-            arrowBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
-            arrowBtn.style.cssText = 'color: #9ca3af; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; padding-left: 10px;';
-            arrowBtn.onclick = function(e) { e.preventDefault(); document.body.classList.toggle('sidebar-collapse'); };
-            userPanel.appendChild(arrowBtn);
-        }
-
-        // --- 4. MENU CONTA COM LOGOUT DIRETO (Evita erro 405) ---
-        const sidebarMenu = document.querySelector('.nav-sidebar');
-        if (sidebarMenu && !document.querySelector('#menu-conta-custom')) {
-            const contaHtml = `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item">
-                    <a href="/admin/password_change/" class="nav-link">
-                        <i class="nav-icon fas fa-key" style="color: #9ca3af;"></i>
-                        <p style="color: #d1d5db;">Alterar Senha</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'narrativa:logout' %}" class="nav-link">
-                        <i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i>
-                        <p style="color: #ef4444; font-weight: bold;">Sair</p>
-                    </a>
-                </li>
-            `;
-            sidebarMenu.insertAdjacentHTML('beforeend', contaHtml);
-        }
+        // Remove qualquer "|" que o Jazzmin insira via texto
+        const h1 = document.querySelector('.content-header h1');
+        if (h1) h1.innerHTML = h1.innerHTML.replace('|', '').trim();
     });
 </script>
 {% endblock %}
@@ -145,23 +40,24 @@
     {{ block.super }}
 
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
-    <div class="alert shadow-sm" style="background-color: #fee2e2; border: 1px solid #f87171; color: #991b1b; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-            <i class="fas fa-lock mr-2 text-red-600"></i>
-            <strong style="color: #991b1b;">Assinatura Inativa:</strong> O seu plano foi cancelado ou aguarda pagamento. O sistema foi bloqueado para edições.
+    <div class="blocking-overlay">
+        <div style="display: flex; align-items: center;">
+            <i class="fas fa-exclamation-circle fa-3x" style="margin-right: 20px;"></i>
+            <div>
+                <h3 style="margin: 0; font-weight: 900; text-transform: uppercase;">Acesso Suspenso</h3>
+                <p style="margin: 5px 0 0 0; font-size: 1.1rem; font-weight: 600;">
+                    Não reconhecemos a realização do seu pagamento. Realize a contratação de um plano para continuar usando o sistema.
+                </p>
+            </div>
         </div>
-        <a href="{% url 'narrativa:planos' %}" class="btn btn-sm" style="background-color: #ef4444; color: white; font-weight: bold; border-radius: 6px;">RENOVAR</a>
+        <a href="{% url 'narrativa:planos' %}" class="btn btn-lg" style="background-color: white; color: #ef4444; font-weight: 900; padding: 15px 30px; border-radius: 10px; text-transform: uppercase; text-decoration: none;">Ver Planos</a>
     </div>
     {% endif %}
 
-    {% if request.clinica_realtime and request.limite_atingido %}
-    <div class="alert shadow-sm" style="background-color: #fef3c7; border: 1px solid #fbbf24; color: #92400e; border-radius: 8px; margin: 0 15px 20px 15px; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-            <i class="fas fa-arrow-circle-up mr-2 text-yellow-600"></i>
-            <strong style="color: #92400e;">Limite Atingido:</strong> Atingiu a quota máxima de jornadas do seu plano.
-        </div>
-        <a href="{% url 'narrativa:planos' %}" class="btn btn-sm" style="background-color: #f59e0b; color: white; font-weight: bold; border-radius: 6px;">FAZER UPGRADE</a>
+    {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
+    <div class="alert alert-warning" style="margin: 0 15px 20px 15px; border-radius: 8px; font-weight: bold; display: flex; align-items: center; justify-content: space-between;">
+        <span><i class="fas fa-arrow-up mr-2"></i> Limite de jornadas atingido. Faça um upgrade para criar mais.</span>
+        <a href="{% url 'narrativa:planos' %}" class="btn btn-sm btn-dark">UPGRADE</a>
     </div>
     {% endif %}
-
 {% endblock %}

@@ -16,8 +16,10 @@ from django.utils import timezone
 from datetime import timedelta
 import json
 
-from .models import Plano, Narrativa, Clinica, Cena, Questionario, Resposta, SessaoPaciente, LogVisitaCena, \
-    ConfiguracaoClinica, PagamentoPendente
+from .models import (
+    Plano, Narrativa, Clinica, Cena, Questionario, Resposta,
+    SessaoPaciente, LogVisitaCena, ConfiguracaoClinica, PagamentoPendente
+)
 from .forms import CadastroForm
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -25,7 +27,9 @@ Usuario = get_user_model()
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
-# --- INSTITUCIONAL E AUTENTICAÇÃO ---
+# ==========================================
+# 1. INSTITUCIONAL E AUTENTICAÇÃO
+# ==========================================
 
 class HomeView(TemplateView):
     template_name = "homepage.html"
@@ -58,10 +62,11 @@ class CriarContaView(CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        # Resgata dados que o usuário já tinha digitado caso ele não tenha pago e volte pra tela
+        # Resgata dados da sessão caso o utilizador tenha voltado da página de planos
         registro = self.request.session.get('registro_pendente', {})
-        email_pre = self.request.GET.get('email') or self.request.session.get('email_pagamento') or registro.get(
-            'email')
+        email_pre = (self.request.GET.get('email') or
+                     self.request.session.get('email_pagamento') or
+                     registro.get('email'))
 
         if email_pre:
             initial['email'] = email_pre
@@ -74,8 +79,7 @@ class CriarContaView(CreateView):
         pagamento = PagamentoPendente.objects.filter(email__iexact=email_digitado, utilizado=False).first()
 
         if not pagamento:
-            # === A MÁGICA COMEÇA AQUI ===
-            # Ele não pagou ainda, então vamos esconder os dados digitados na Sessão do Navegador
+            # MEMÓRIA DE SESSÃO: Guarda os dados para não apagar o formulário e manda para os Planos
             self.request.session['registro_pendente'] = {
                 'username': form.cleaned_data.get('username'),
                 'email': email_digitado,
@@ -83,10 +87,10 @@ class CriarContaView(CreateView):
                 'senha1': self.request.POST.get('senha1'),
                 'senha2': self.request.POST.get('senha2'),
             }
-            messages.info(self.request, "Dados salvos! Escolha um plano agora para finalizar a criação da sua conta.")
+            messages.info(self.request, "Dados guardados! Escolha um plano para ativar a sua conta.")
             return redirect('narrativa:planos')
 
-        # Se ele pagou por fora e tá tentando criar a conta direto
+        # Se já existe um pagamento pendente para este email, cria a conta normalmente
         response = super().form_valid(form)
         user = self.object
 
@@ -95,16 +99,15 @@ class CriarContaView(CreateView):
             user.clinica.plano_atual = pagamento.plano
             user.clinica.stripe_customer_id = pagamento.stripe_customer_id
             user.clinica.save()
+
             pagamento.utilizado = True
             pagamento.save()
 
-            if 'email_pagamento' in self.request.session:
-                del self.request.session['email_pagamento']
-            if 'registro_pendente' in self.request.session:
-                del self.request.session['registro_pendente']
+            self.request.session.pop('email_pagamento', None)
+            self.request.session.pop('registro_pendente', None)
 
         login(self.request, user, backend='django.contrib.auth.backends.ModelBackend')
-        messages.success(self.request, "Conta criada e assinatura ativada com sucesso! Bem-vindo ao seu painel.")
+        messages.success(self.request, "Conta criada e assinatura ativada! Bem-vindo.")
         return response
 
 
@@ -116,7 +119,9 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
-# --- SAAS E PAGAMENTOS ---
+# ==========================================
+# 2. SAAS E PAGAMENTOS (STRIPE)
+# ==========================================
 
 class PlanosView(ListView):
     model = Plano
@@ -136,9 +141,8 @@ def checkout(request, plano_id):
     domain_url = request.build_absolute_uri('/')[:-1]
 
     try:
-        # Se ele tiver digitado o e-mail no registro pendente, já joga no Stripe preenchido
         registro = request.session.get('registro_pendente', {})
-        customer_email = registro.get('email') if registro else None
+        customer_email = registro.get('email')
 
         checkout_kwargs = {
             'payment_method_types': ['card'],
@@ -155,7 +159,7 @@ def checkout(request, plano_id):
         checkout_session = stripe.checkout.Session.create(**checkout_kwargs)
         return redirect(checkout_session.url)
     except Exception as e:
-        messages.error(request, str(e))
+        messages.error(request, f"Erro ao conectar com Stripe: {str(e)}")
         return redirect('narrativa:planos')
 
 
@@ -170,38 +174,34 @@ def sucesso_pagamento(request):
         plano_id = session.metadata.get('plano_id')
         plano = Plano.objects.filter(id=plano_id).first()
 
+        # Garante o registo do pagamento pendente no banco
         PagamentoPendente.objects.update_or_create(
             email=email,
-            defaults={
-                'plano': plano,
-                'stripe_customer_id': session.customer,
-                'utilizado': False
-            }
+            defaults={'plano': plano, 'stripe_customer_id': session.customer, 'utilizado': False}
         )
 
         user = Usuario.objects.filter(email=email).first()
 
         if user:
-            # Usuário já existia
+            # Caso o utilizador já existisse, apenas ativamos a clínica
             if hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
                 user.clinica.plano_atual = plano
                 user.clinica.stripe_customer_id = session.customer
                 user.clinica.save()
 
-                pagamento = PagamentoPendente.objects.get(email=email)
-                pagamento.utilizado = True
-                pagamento.save()
+                p_pendente = PagamentoPendente.objects.filter(email=email).first()
+                if p_pendente:
+                    p_pendente.utilizado = True
+                    p_pendente.save()
 
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return render(request, 'pagamento_sucesso.html', {'criado_agora': False})
         else:
-            # === A MÁGICA TERMINA AQUI ===
-            # Não tem conta, mas vamos ver se tem os dados pendentes no navegador!
+            # FLUXO MÁGICO: Cria a conta automaticamente usando a memória da sessão
             registro = request.session.get('registro_pendente')
-
             if registro:
-                registro['email'] = email  # Garante que vai usar o email do Stripe, pra não ter furo de segurança
+                registro['email'] = email
                 form = CadastroForm(registro)
                 if form.is_valid():
                     novo_user = form.save()
@@ -211,16 +211,17 @@ def sucesso_pagamento(request):
                         novo_user.clinica.stripe_customer_id = session.customer
                         novo_user.clinica.save()
 
-                        pagamento = PagamentoPendente.objects.get(email=email)
-                        pagamento.utilizado = True
-                        pagamento.save()
+                        p_pendente = PagamentoPendente.objects.filter(email=email).first()
+                        if p_pendente:
+                            p_pendente.utilizado = True
+                            p_pendente.save()
 
                     login(request, novo_user, backend='django.contrib.auth.backends.ModelBackend')
-                    del request.session['registro_pendente']
+                    request.session.pop('registro_pendente', None)
                     return render(request, 'pagamento_sucesso.html', {'criado_agora': True})
 
-            # Fallback de segurança (Se o cliente pagou de outro PC ou aba anônima)
-            messages.info(request, "Pagamento confirmado! Digite uma senha agora para criar sua conta.")
+            # Se não houver dados na sessão, manda para criar conta com o email preenchido
+            messages.info(request, "Pagamento confirmado! Finalize a sua conta abaixo.")
             return redirect(f"{reverse('narrativa:criarconta')}?email={email}")
 
     except Exception as e:
@@ -236,11 +237,10 @@ def stripe_webhook(request):
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, settings.STRIPE_WEBHOOK_SECRET)
-    except ValueError as e:
-        return HttpResponse(status=400)
-    except stripe.error.SignatureVerificationError as e:
+    except Exception:
         return HttpResponse(status=400)
 
+    # 1. Pagamento Concluído
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email = session.get('customer_details', {}).get('email')
@@ -248,28 +248,20 @@ def stripe_webhook(request):
 
         if email and plano_id:
             plano = Plano.objects.filter(id=plano_id).first()
-
             PagamentoPendente.objects.update_or_create(
                 email=email,
-                defaults={
-                    'plano': plano,
-                    'stripe_customer_id': session.get('customer'),
-                    'utilizado': False
-                }
+                defaults={'plano': plano, 'stripe_customer_id': session.get('customer'), 'utilizado': False}
             )
 
-            user = Usuario.objects.filter(email=email).first()
-            if user and hasattr(user, 'clinica') and user.clinica:
-                user.clinica.assinatura_ativa = True
-                user.clinica.plano_atual = plano
-                user.clinica.stripe_customer_id = session.get('customer')
-                user.clinica.save()
+            clinica = Clinica.objects.filter(usuario__email=email).first()
+            if clinica:
+                clinica.assinatura_ativa = True
+                clinica.plano_atual = plano
+                clinica.stripe_customer_id = session.get('customer')
+                clinica.save()
 
-                pagamento = PagamentoPendente.objects.get(email=email)
-                pagamento.utilizado = True
-                pagamento.save()
-
-    elif event['type'] == 'customer.subscription.deleted':
+    # 2. Assinatura Cancelada ou Falha de Cobrança (BLOQUEIA O PAINEL)
+    elif event['type'] in ['customer.subscription.deleted', 'invoice.payment_failed']:
         subscription = event['data']['object']
         customer_id = subscription.get('customer')
         clinica = Clinica.objects.filter(stripe_customer_id=customer_id).first()
@@ -280,7 +272,9 @@ def stripe_webhook(request):
     return HttpResponse(status=200)
 
 
-# --- PAINEL DA CLÍNICA ---
+# ==========================================
+# 3. PAINEL DA CLÍNICA
+# ==========================================
 
 class MinhasNarrativasView(LoginRequiredMixin, ListView):
     model = Narrativa
@@ -294,11 +288,13 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if hasattr(self.request.user, 'clinica') and self.request.user.clinica:
+        clinica = getattr(self.request.user, 'clinica', None)
+        if clinica:
             context['link_portal'] = self.request.build_absolute_uri(
-                reverse('narrativa:portal_paciente', args=[self.request.user.clinica.id])
+                reverse('narrativa:portal_paciente', args=[clinica.id])
             )
-            context['limite_atingido'] = self.request.user.clinica.atingiu_limite_narrativas()
+            # request.limite_atingido é injetado pelo Middleware
+            context['limite_atingido'] = getattr(self.request, 'limite_atingido', False)
         return context
 
 
@@ -350,9 +346,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context['chart_top_labels'] = json.dumps([n.titulo for n in top_narrativas])
             context['chart_top_data'] = json.dumps([n.visualizacoes for n in top_narrativas])
         else:
-            context.update({'kpi_sessoes': 0, 'kpi_respostas': 0, 'kpi_narrativas': 0, 'kpi_finalizadas': 0,
-                            'chart_dias_labels': '[]', 'chart_dias_data': '[]', 'chart_top_labels': '[]',
-                            'chart_top_data': '[]'})
+            context.update({'kpi_sessoes': 0, 'kpi_respostas': 0, 'kpi_narrativas': 0, 'kpi_finalizadas': 0})
         return context
 
 
@@ -367,7 +361,9 @@ class Pesquisa(ListView):
         return Narrativa.objects.none()
 
 
-# --- PORTAL PÚBLICO E PACIENTE ---
+# ==========================================
+# 4. PORTAL PÚBLICO E PACIENTE
+# ==========================================
 
 class PortalPacienteView(ListView):
     template_name = 'portal_paciente.html'
@@ -391,12 +387,10 @@ class LerTermosView(TemplateView):
             pk = kwargs.get('narrativa_pk')
             if pk: return redirect('narrativa:paciente_detalhes', pk=pk)
             return redirect('narrativa:home')
-        self.narrativa_pk = kwargs.get('narrativa_pk')
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        aceite = request.POST.get('aceite')
-        if aceite == 'true':
+        if request.POST.get('aceite') == 'true':
             request.session[TERMOS_ACEITOS_KEY] = True
             pk = kwargs.get('narrativa_pk')
             if pk: return redirect('narrativa:paciente_detalhes', pk=pk)
@@ -413,28 +407,32 @@ class PacienteDetalhesView(DetailView):
         narrativa = self.get_object()
         narrativa.visualizacoes += 1
         narrativa.save()
-        if not request.session.session_key: request.session.create()
-        SessaoPaciente.objects.get_or_create(session_key=request.session.session_key,
-                                             defaults={'narrativa_perfil': narrativa})
-        return response
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['relacionados'] = Narrativa.objects.filter(clinica=self.object.clinica).exclude(pk=self.object.pk)[:4]
-        return context
+        if not request.session.session_key: request.session.create()
+        SessaoPaciente.objects.get_or_create(
+            session_key=request.session.session_key,
+            defaults={'narrativa_perfil': narrativa}
+        )
+        return response
 
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
     if not request.session.session_key: request.session.create()
-    LogVisitaCena.objects.create(session_key=request.session.session_key, cena_visitada=cena,
-                                 narrativa_associada=cena.narrativa)
+
+    LogVisitaCena.objects.create(
+        session_key=request.session.session_key,
+        cena_visitada=cena,
+        narrativa_associada=cena.narrativa
+    )
 
     quest = cena.questionarios.first()
     if quest:
-        respostas_existentes = Resposta.objects.filter(session_key=request.session.session_key,
-                                                       pergunta__questionario=quest).exists()
-        if not respostas_existentes:
+        respondido = Resposta.objects.filter(
+            session_key=request.session.session_key,
+            pergunta__questionario=quest
+        ).exists()
+        if not respondido:
             return redirect('narrativa:responder_questionario', cena_id=cena.id, questionario_id=quest.id)
 
     return render(request, 'cena_paciente.html', {'cena': cena})
@@ -444,16 +442,17 @@ def exibir_cena_paciente(request, cena_id):
 def responder_questionario(request, cena_id, questionario_id):
     cena = get_object_or_404(Cena, id=cena_id)
     questionario = get_object_or_404(Questionario, id=questionario_id)
-
     if not request.session.session_key: request.session.create()
-    session_key = request.session.session_key
 
     if request.method == 'POST':
         for pergunta in questionario.perguntas.all():
             valores = request.POST.getlist(f"pergunta_{pergunta.id}")
-            if valores:
-                for valor in valores:
-                    Resposta.objects.create(pergunta=pergunta, session_key=session_key, texto_resposta=valor)
+            for valor in valores:
+                Resposta.objects.create(
+                    pergunta=pergunta,
+                    session_key=request.session.session_key,
+                    texto_resposta=valor
+                )
         if questionario.cena_destino:
             return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena.id)
@@ -463,45 +462,35 @@ def responder_questionario(request, cena_id, questionario_id):
 
 def perfil_sessao(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
-    if not request.session.session_key: request.session.create()
-    session_key = request.session.session_key
+    sk = request.session.session_key
 
     nome_perfil = "Paciente"
     try:
-        sessao = SessaoPaciente.objects.get(session_key=session_key)
+        sessao = SessaoPaciente.objects.get(session_key=sk)
         if sessao.narrativa_perfil: nome_perfil = sessao.narrativa_perfil.titulo
-    except SessaoPaciente.DoesNotExist:
+    except:
         pass
 
-    cenas_visitadas = LogVisitaCena.objects.filter(session_key=session_key, narrativa_associada=narrativa).values(
+    visitadas = LogVisitaCena.objects.filter(session_key=sk, narrativa_associada=narrativa).values(
         'cena_visitada').distinct().count()
-    total_cenas = narrativa.cenas.count()
-    progresso_cenas_pct = int((cenas_visitadas / total_cenas) * 100) if total_cenas > 0 else 0
+    total = narrativa.cenas.count()
+    prog_cenas = int((visitadas / total) * 100) if total > 0 else 0
 
-    questionarios_respondidos = Resposta.objects.filter(session_key=session_key,
-                                                        pergunta__questionario__cena_associada__narrativa=narrativa).values(
+    respondidos = Resposta.objects.filter(session_key=sk,
+                                          pergunta__questionario__cena_associada__narrativa=narrativa).values(
         'pergunta__questionario').distinct().count()
-    total_questionarios = Questionario.objects.filter(cena_associada__narrativa=narrativa).count()
-    progresso_questionarios_pct = int(
-        (questionarios_respondidos / total_questionarios) * 100) if total_questionarios > 0 else 0
+    total_q = Questionario.objects.filter(cena_associada__narrativa=narrativa).count()
+    prog_q = int((respondidos / total_q) * 100) if total_q > 0 else 0
 
     return render(request, 'perfil_sessao.html', {
-        'narrativa': narrativa,
-        'nome_perfil': nome_perfil,
-        'cenas_visitadas': cenas_visitadas,
-        'total_cenas': total_cenas,
-        'progresso_cenas_pct': progresso_cenas_pct,
-        'questionarios_respondidos': questionarios_respondidos,
-        'total_questionarios': total_questionarios,
-        'progresso_questionarios_pct': progresso_questionarios_pct,
+        'narrativa': narrativa, 'nome_perfil': nome_perfil, 'progresso_cenas_pct': prog_cenas,
+        'progresso_questionarios_pct': prog_q
     })
 
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
-
-    if not request.session.session_key:
-        request.session.create()
+    if not request.session.session_key: request.session.create()
 
     SessaoPaciente.objects.get_or_create(
         session_key=request.session.session_key,
@@ -510,10 +499,9 @@ def iniciar_jornada_paciente(request, narrativa_id):
 
     if narrativa.cena_inicial:
         return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
-    else:
-        messages.warning(request,
-                         f"Atenção: A jornada '{narrativa.titulo}' ainda não possui uma Cena Inicial configurada. Acesse a Administração e configure.")
-        return redirect('narrativa:narrativas')
+
+    messages.warning(request, "Esta jornada ainda não tem uma Cena Inicial configurada.")
+    return redirect('narrativa:narrativas')
 
 
 def paciente_narrativas_fallback(request):
@@ -521,5 +509,4 @@ def paciente_narrativas_fallback(request):
         sessao = SessaoPaciente.objects.filter(session_key=request.session.session_key).first()
         if sessao and sessao.narrativa_perfil and sessao.narrativa_perfil.clinica:
             return redirect('narrativa:portal_paciente', clinica_id=sessao.narrativa_perfil.clinica.id)
-
     return redirect('narrativa:home')
