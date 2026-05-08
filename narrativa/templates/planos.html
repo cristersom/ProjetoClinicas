@@ -49,22 +49,17 @@
 
                 <div>
                     {% if plano.preco == 0 %}
-                        <a href="mailto:contato@suaclinica.com" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-lg flex items-center justify-center transition">
-                            Falar com Consultor <ion-icon name="mail-outline" class="ml-2"></ion-icon>
-                        </a>
+                        <div class="w-full text-center p-4 rounded-lg bg-gray-700 border border-gray-600">
+                            <p class="text-xs text-gray-400 mb-1">Falar com Consultor:</p>
+                            <span class="text-sm font-semibold text-white">suporte@suaclinica.com</span>
+                        </div>
                     {% else %}
                         {% if request.user.is_authenticated and request.user.clinica %}
 
-                            {% if plano == plano_atual and assinatura_ativa %}
+                            {% if plano == user.clinica.plano_atual %}
                                 <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 rounded-lg flex items-center justify-center cursor-not-allowed">
                                     <ion-icon name="checkmark-outline" class="mr-2"></ion-icon> Seu Plano Atual
                                 </button>
-
-                            {% elif plano == request.user.clinica.plano_atual and not assinatura_ativa %}
-                                <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg flex items-center justify-center transition shadow-lg">
-                                    Renovar {{ plano.nome }}
-                                </a>
-
                             {% else %}
                                 <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 rounded-lg flex items-center justify-center transition">
                                     Mudar para {{ plano.nome }}
