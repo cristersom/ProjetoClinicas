@@ -12,7 +12,7 @@ class SaaSControlMiddleware:
     def __call__(self, request):
         path = request.path
 
-        # 1. INJEÇÃO DE DADOS EM TEMPO REAL
+        # 1. INJEÇÃO DE DADOS
         request.clinica_realtime = None
         request.limite_atingido = False
 
@@ -22,7 +22,7 @@ class SaaSControlMiddleware:
                 clinica = Clinica.objects.get(id=request.user.clinica.id)
                 request.clinica_realtime = clinica
 
-                # Sincronização com Stripe (apenas uma vez por sessão para performance)
+                # Sincronização com Stripe
                 if clinica.stripe_customer_id and not request.session.get('stripe_synced'):
                     stripe.api_key = settings.STRIPE_SECRET_KEY
                     try:
@@ -59,7 +59,7 @@ class SaaSControlMiddleware:
                 path.startswith('/portal/')):
             return self.get_response(request)
 
-        # 3. BLINDAGEM DO ADMINISTRADOR (Bloqueia apenas AÇÕES, não a visão)
+        # 3. BLINDAGEM DO ADMINISTRADOR (Deixa ver a tela, mas bloqueia ações)
         if path.startswith('/admin/'):
             if request.user.is_authenticated and not request.user.is_superuser:
                 clinica = request.clinica_realtime
@@ -78,7 +78,7 @@ class SaaSControlMiddleware:
 
             return self.get_response(request)
 
-        # 4. ÁREA RESTRITA FRONTEND (Livre acesso, os avisos aparecem via template)
+        # 4. ÁREA RESTRITA FRONTEND
         if not request.user.is_authenticated:
             return redirect('narrativa:login')
 
