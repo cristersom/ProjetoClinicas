@@ -4,14 +4,16 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL E REMOÇÃO DA BARRA SUPERIOR
+       1. MODO ESCURO GERAL
        ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; margin-top: 0 !important; }
+    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
-    /* ESCONDE A BARRA SUPERIOR (HAMBÚRGUER E ÍCONE DE USUÁRIO) COMO ERA ANTES */
-    .main-header { display: none !important; }
-    .content-wrapper { padding-top: 20px !important; margin-top: 0 !important; }
+    /* MANTÉM O CABEÇALHO (HAMBÚRGUER E ÍCONE) VISÍVEL COMO VOCÊ PEDIU */
+    .main-header { background-color: #111827 !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
+    .main-header * { color: #f3f4f6 !important; }
+    .content-wrapper { margin-top: 0 !important; }
+    .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
 
     /* Fix Tela de Login/Logout Branca */
     body.login-page { background-color: #111827 !important; }
@@ -21,18 +23,13 @@
     /* =====================================================================
        2. TÍTULOS NATIVOS (SEM O "|")
        ===================================================================== */
-    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; padding-top: 0 !important; display: block !important; width: 100% !important; }
-    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border: none !important; padding-right: 0 !important; }
-    .content-header h1::after, .breadcrumb { display: none !important; content: none !important; }
+    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; display: block !important; width: 100% !important; }
+    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; }
+    .breadcrumb { display: none !important; }
 
     /* =====================================================================
        3. TABELAS E BOTÕES PADRONIZADOS
        ===================================================================== */
-    .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
-    .card-header { background-color: #111827 !important; border-bottom: 1px solid #374151 !important; color: white !important;}
-    .card-title, .card-body *, .info-box * { color: #d1d5db !important; }
-    .card-body h2, .card-body h3, .card-body h4, .card-body h5, .card-body strong, .card-body b { color: #ffffff !important; font-weight: bold !important; }
-
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
     .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
     .table-hover tbody tr:hover { background-color: #374151 !important; color: white !important; }
@@ -112,10 +109,10 @@
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
     <div style="background-color: #1f2937; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 0 15px 25px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center;">
-            <i class="fas fa-info-circle fa-2x" style="color: #f59e0b; margin-right: 15px;"></i>
+            <i class="fas fa-exclamation-triangle fa-2x" style="color: #f59e0b; margin-right: 15px;"></i>
             <div>
-                <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Assinatura Pendente</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Olá! Percebemos que o seu plano está inativo no momento. Para continuar utilizando todos os recursos e criando novas jornadas, por favor, regularize a sua assinatura.</p>
+                <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Pagamento Pendente</h4>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento. Realize a renovação para continuar acessando nossos serviços.</p>
             </div>
         </div>
         <a href="{% url 'narrativa:planos' %}" class="btn" style="background-color: #f59e0b; color: white; font-weight: bold; padding: 10px 20px; border-radius: 6px; text-decoration: none;">Ver Planos</a>

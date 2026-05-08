@@ -62,7 +62,6 @@ class CriarContaView(CreateView):
 
     def get_initial(self):
         initial = super().get_initial()
-        # Resgata dados da sessão caso o utilizador tenha voltado da página de planos
         registro = self.request.session.get('registro_pendente', {})
         email_pre = (self.request.GET.get('email') or
                      self.request.session.get('email_pagamento') or
@@ -79,7 +78,6 @@ class CriarContaView(CreateView):
         pagamento = PagamentoPendente.objects.filter(email__iexact=email_digitado, utilizado=False).first()
 
         if not pagamento:
-            # MEMÓRIA DE SESSÃO: Guarda os dados para não apagar o formulário e manda para os Planos
             self.request.session['registro_pendente'] = {
                 'username': form.cleaned_data.get('username'),
                 'email': email_digitado,
@@ -90,7 +88,6 @@ class CriarContaView(CreateView):
             messages.info(self.request, "Dados guardados! Escolha um plano para ativar a sua conta.")
             return redirect('narrativa:planos')
 
-        # Se já existe um pagamento pendente para este email, cria a conta normalmente
         response = super().form_valid(form)
         user = self.object
 
@@ -133,9 +130,8 @@ class PlanosView(ListView):
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             clinica = self.request.user.clinica
 
-            # MÁGICA DE UX AQUI:
-            # Se a assinatura estiver inativa, fingimos que ele não tem plano atual
-            # Isso liberta TODOS os botões da página de planos para ele recontratar.
+            # Se a assinatura estiver inativa, fingimos que não tem plano atual
+            # para habilitar todos os botões de recontratação
             if clinica.assinatura_ativa:
                 context['plano_atual'] = clinica.plano_atual
             else:
@@ -183,7 +179,6 @@ def sucesso_pagamento(request):
         plano_id = session.metadata.get('plano_id')
         plano = Plano.objects.filter(id=plano_id).first()
 
-        # Garante o registo do pagamento pendente no banco
         PagamentoPendente.objects.update_or_create(
             email=email,
             defaults={'plano': plano, 'stripe_customer_id': session.customer, 'utilizado': False}
@@ -192,7 +187,6 @@ def sucesso_pagamento(request):
         user = Usuario.objects.filter(email=email).first()
 
         if user:
-            # Caso o utilizador já existisse, apenas ativamos a clínica
             if hasattr(user, 'clinica') and user.clinica:
                 user.clinica.assinatura_ativa = True
                 user.clinica.plano_atual = plano
@@ -207,7 +201,6 @@ def sucesso_pagamento(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return render(request, 'pagamento_sucesso.html', {'criado_agora': False})
         else:
-            # FLUXO MÁGICO: Cria a conta automaticamente usando a memória da sessão
             registro = request.session.get('registro_pendente')
             if registro:
                 registro['email'] = email
@@ -229,7 +222,6 @@ def sucesso_pagamento(request):
                     request.session.pop('registro_pendente', None)
                     return render(request, 'pagamento_sucesso.html', {'criado_agora': True})
 
-            # Se não houver dados na sessão, manda para criar conta com o email preenchido
             messages.info(request, "Pagamento confirmado! Finalize a sua conta abaixo.")
             return redirect(f"{reverse('narrativa:criarconta')}?email={email}")
 
@@ -249,7 +241,6 @@ def stripe_webhook(request):
     except Exception:
         return HttpResponse(status=400)
 
-    # 1. Pagamento Concluído
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email = session.get('customer_details', {}).get('email')
@@ -269,7 +260,6 @@ def stripe_webhook(request):
                 clinica.stripe_customer_id = session.get('customer')
                 clinica.save()
 
-    # 2. Assinatura Cancelada ou Falha de Cobrança (BLOQUEIA O PAINEL)
     elif event['type'] in ['customer.subscription.deleted', 'invoice.payment_failed']:
         subscription = event['data']['object']
         customer_id = subscription.get('customer')
@@ -302,7 +292,6 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
             context['link_portal'] = self.request.build_absolute_uri(
                 reverse('narrativa:portal_paciente', args=[clinica.id])
             )
-            # request.limite_atingido é injetado pelo Middleware
             context['limite_atingido'] = getattr(self.request, 'limite_atingido', False)
         return context
 

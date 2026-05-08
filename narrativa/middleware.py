@@ -22,27 +22,20 @@ class SaaSControlMiddleware:
                 clinica = Clinica.objects.get(id=request.user.clinica.id)
                 request.clinica_realtime = clinica
 
-                # =================================================================
-                # VERIFICAÇÃO DIRETA NO STRIPE (Sincronização em Tempo Real)
-                # Resolve o problema do cancelamento não atualizar localmente!
-                # =================================================================
+                # Sincronização com Stripe (apenas uma vez por sessão para performance)
                 if clinica.stripe_customer_id and not request.session.get('stripe_synced'):
                     stripe.api_key = settings.STRIPE_SECRET_KEY
                     try:
-                        # Vai ao Stripe verificar se existe alguma assinatura "ativa"
                         subs = stripe.Subscription.list(customer=clinica.stripe_customer_id, status='active', limit=1)
                         tem_plano_ativo = len(subs.data) > 0
-
                         if clinica.assinatura_ativa != tem_plano_ativo:
                             clinica.assinatura_ativa = tem_plano_ativo
                             clinica.save()
-
-                        # Guarda na sessão para não fazer a consulta a cada clique e deixar o site lento
                         request.session['stripe_synced'] = True
-                    except Exception as e:
+                    except Exception:
                         pass
-                # =================================================================
 
+                # Cálculo de limites
                 if clinica.plano_atual:
                     try:
                         limite = int(clinica.plano_atual.limite_narrativas)
@@ -50,11 +43,10 @@ class SaaSControlMiddleware:
                         limite = 0
                     qtd_atual = Narrativa.objects.filter(clinica=clinica).count()
                     request.limite_atingido = (qtd_atual >= limite)
-
             except Clinica.DoesNotExist:
                 pass
 
-        # 2. ROTAS PÚBLICAS E DO PACIENTE (LIVRES)
+        # 2. ROTAS PÚBLICAS
         rotas_publicas = [
             reverse('narrativa:home'), reverse('narrativa:login'),
             reverse('narrativa:logout'), reverse('narrativa:criarconta'),
@@ -67,7 +59,7 @@ class SaaSControlMiddleware:
                 path.startswith('/portal/')):
             return self.get_response(request)
 
-        # 3. BLINDAGEM DO PAINEL DE ADMINISTRAÇÃO
+        # 3. BLINDAGEM DO ADMINISTRADOR (Bloqueia apenas AÇÕES, não a visão)
         if path.startswith('/admin/'):
             if request.user.is_authenticated and not request.user.is_superuser:
                 clinica = request.clinica_realtime
@@ -75,23 +67,19 @@ class SaaSControlMiddleware:
                     is_admin_action = ('/add/' in path or '/change/' in path or '/delete/' in path)
                     is_post_method = request.method in ['POST', 'PUT', 'DELETE', 'PATCH']
 
-                    # BLOQUEIO TOTAL SE A ASSINATURA ESTIVER INATIVA
                     if not clinica.assinatura_ativa and (is_admin_action or is_post_method):
-                        messages.error(request, 'Não reconhecemos o seu pagamento. Acesso bloqueado para edições.')
+                        messages.error(request,
+                                       'Não identificamos seu pagamento. Realize a renovação para continuar editando.')
                         return redirect('/admin/')
 
-                    # BLOQUEIO DE LIMITE DE NARRATIVAS
                     if '/admin/narrativa/narrativa/add/' in path and request.limite_atingido:
-                        messages.error(request, 'Limite atingido. Realize um upgrade para continuar.')
+                        messages.error(request, 'Limite de plano atingido.')
                         return redirect('/admin/')
 
             return self.get_response(request)
 
-        # 4. BLINDAGEM DA ÁREA RESTRITA FRONTEND
+        # 4. ÁREA RESTRITA FRONTEND (Livre acesso, os avisos aparecem via template)
         if not request.user.is_authenticated:
             return redirect('narrativa:login')
-
-        if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa:
-            return redirect('narrativa:planos')
 
         return self.get_response(request)
