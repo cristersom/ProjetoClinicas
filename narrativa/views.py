@@ -505,10 +505,12 @@ def iniciar_jornada_paciente(request, narrativa_id):
     SessaoPaciente.objects.get_or_create(session_key=request.session.session_key,
                                          defaults={'narrativa_perfil': narrativa})
 
-    # -----------------------------------------------------
-    # LÓGICA INTELIGENTE: Pega a cena inicial OU a primeira cena vinculada
-    # -----------------------------------------------------
+    # =================================================================================
+    # LÓGICA INTELIGENTE: Pega a cena inicial OU a primeira cena vinculada à jornada
+    # =================================================================================
     cena_alvo = narrativa.cena_inicial
+
+    # Se não houver cena inicial explícita, pega a primeira cena vinculada
     if not cena_alvo and narrativa.cenas.exists():
         cena_alvo = narrativa.cenas.first()
 

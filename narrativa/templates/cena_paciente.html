@@ -1,79 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block titulo %}{{ cena.titulo }} - Narrativas Clínicas{% endblock %}
+
+{% block extrastyle %}
+<style>
+    /* =====================================================================
+       1. AJUSTE DO FILTRO DE FUNDO (IMAGE_29.PNG)
+       ===================================================================== */
+    /* Removemos o filtro de escurecimento exagerado para dar destaque ao fundo */
+    .journey-container::before {
+        content: '';
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.3) !important; /* Opacidade reduzida para 30% */
+        backdrop-filter: blur(2px); /* Mantém um desfoque leve para foco */
+        z-index: -1;
+    }
+
+    /* Garante que o fundo colorido (image_29.png) fique visível */
+    .journey-container {
+        min-height: 100vh;
+        width: 100%;
+        position: relative;
+        background: url('{% static "img/jornada_bg.png" %}') no-repeat center center fixed;
+        background-size: cover;
+        z-index: 1;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 40px 20px;
+    }
+
+    /* =====================================================================
+       2. BOTÃO CENTRALIZADO E REFRESCADO (IMAGE_27.PNG)
+       ===================================================================== */
+    .centered-button {
+        display: inline-flex !important; align-items: center; justify-content: center;
+        width: auto !important; min-width: 200px;
+        background-color: transparent !important; color: #14b8a6 !important;
+        border: 2px solid #14b8a6 !important; border-radius: 9999px !important;
+        font-weight: bold; font-size: 1rem; text-transform: none;
+        padding: 10px 24px; margin-top: 15px; transition: all 0.3s ease;
+        text-decoration: none; outline: none !important; box-shadow: none !important;
+    }
+    .centered-button:hover { background-color: rgba(20, 184, 166, 0.1) !important; color: #14b8a6 !important; text-decoration: none; transform: translateY(-2px); }
+    .centered-button ion-icon { font-size: 1.4rem; margin-right: 8px; }
+
+    /* Estilo do cartão de conteúdo */
+    .content-card {
+        background-color: rgba(31, 41, 55, 0.95);
+        border: 1px solid #374151; border-radius: 24px;
+        padding: 30px; margin-top: -100px; /* Ajuste para não cobrir a cabeçalho do fundo */
+        width: 100%; max-width: 800px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+    }
+    .card-title { font-size: 2.2rem; font-weight: 800; color: #ffffff; margin-bottom: 20px; text-align: center; }
+    .card-text { font-size: 1.1rem; color: #d1d5db; line-height: 1.7; margin-bottom: 15px; }
+</style>
+{% endblock %}
+
 {% block content %}
-<main class="min-h-screen bg-gray-900 text-white py-10" style="background-image: url('{% static 'images/background.png' %}'); background-size: cover; background-position: center;">
+<div class="journey-container">
 
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h1 style="font-size: 5rem; font-weight: 900; color: #ffffff; opacity: 0.1; position: absolute; top: 100px; text-transform: uppercase;">{{ cena.narrativa.titulo }}</h1>
 
-        <div class="mb-8 flex justify-between items-center">
-            <a href="{% url 'narrativa:perfil_sessao' narrativa_id=cena.narrativa.id %}" class="text-teal-400 hover:text-teal-300 flex items-center transition font-semibold">
-                <ion-icon name="arrow-back-outline" class="mr-2"></ion-icon> Resumo da Sessão
-            </a>
+    <div class="content-card">
+        <h2 class="card-title">{{ cena.titulo }}</h2>
 
-            {% if request.user.is_staff %}
-            <a href="{% url 'admin:narrativa_cena_change' cena.id %}" target="_blank" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-sm font-bold flex items-center shadow-lg transition">
-                <ion-icon name="create-outline" class="mr-1"></ion-icon> Editar Cena
-            </a>
-            {% endif %}
+        <div class="card-text">
+            {{ cena.conteudo_textual|safe|default:"(Esta cena não contém descrição textual)" }}
         </div>
 
-        <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-8 text-center text-teal-400 drop-shadow-md">
-            {{ cena.titulo }}
-        </h1>
-
-        {% if cena.imagem %}
-        <div class="mb-8 rounded-2xl overflow-hidden shadow-2xl border border-gray-700 bg-gray-800">
-            <img src="{{ cena.imagem.url }}" alt="{{ cena.titulo }}" class="w-full h-auto object-cover max-h-[500px]">
-        </div>
-        {% endif %}
-
-        {% if cena.conteudo_textual %}
-            <div class="prose prose-invert prose-lg mx-auto text-gray-300 leading-relaxed bg-gray-900/60 p-6 md:p-8 rounded-2xl shadow-xl backdrop-blur-sm border border-gray-800">
-                {{ cena.conteudo_textual|linebreaks }}
-            </div>
-        {% endif %}
-
-        <div class="mt-8 space-y-8">
-
-            {% for questionario in cena.questionarios.all %}
-                <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700 transform transition hover:-translate-y-1">
-                    <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
-                    <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Pesquisa Rápida</p>
-                    <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=questionario.id %}" class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
-                        <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon> Responder Agora
-                    </a>
-                </div>
-            {% endfor %}
-
-            {% if cena.escolhas.all %}
-                <div class="pt-4">
-                    {% if not cena.questionarios.all %}
-                        <h3 class="text-center text-gray-400 mb-6 uppercase tracking-widest text-sm font-bold">O que você faz agora?</h3>
-                    {% endif %}
-
-                    <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
-                        {% for escolha in cena.escolhas.all %}
-                            {% if escolha.cena_destino %}
-                                <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}" class="flex-1 min-w-[200px] text-center bg-teal-600 hover:bg-teal-500 border border-teal-500 text-white text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
-                                    {{ escolha.texto_da_opcao }}
-                                </a>
-                            {% else %}
-                                <button class="flex-1 min-w-[200px] text-center bg-gray-800 border border-gray-700 text-gray-400 text-lg font-medium py-4 px-6 rounded-xl shadow-md opacity-75 cursor-not-allowed">
-                                    {{ escolha.texto_da_opcao }} (Em construção)
-                                </button>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-            {% elif not cena.questionarios.all %}
-                <div class="mt-8 p-6 bg-red-900/20 border border-red-500/50 rounded-xl text-center">
-                    <p class="text-red-400 font-bold mb-1">Fim da Linha</p>
-                    <p class="text-gray-400 text-sm">Esta cena não possui escolhas cadastradas para continuar a jornada.</p>
-                </div>
-            {% endif %}
-
+        <div class="text-center">
+            <a href="{% url 'narrativa:perfil_sessao' cena.narrativa.id %}" class="centered-button">
+                <ion-icon name="arrow-back-outline"></ion-icon> Resumo da Sessão
+            </a>
         </div>
     </div>
-</main>
+
+</div>
 {% endblock %}

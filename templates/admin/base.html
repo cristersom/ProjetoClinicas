@@ -9,9 +9,11 @@
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
+    /* ESCONDE A BARRA SUPERIOR */
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; opacity: 0 !important; pointer-events: none !important;}
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
+    /* MATA A MARCA "ADMINISTRAÇÃO" COMPLETAMENTE */
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden !important; opacity: 0 !important; visibility: hidden !important; }
 
     /* =====================================================================
@@ -50,26 +52,22 @@
     .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
 
     /* =====================================================================
-       3. CONTRASTE DE FORMULÁRIOS (Corrigindo os textos cinzas)
+       3. CORREÇÃO DE LEITURA IMPORTAR/EXPORTAR (IMAGE_7.PNG)
+       Força o estilo verde esmeralda para os botões do grupo
        ===================================================================== */
-    /* Fundo dos formulários */
-    .content, .container-fluid, .card, .card-body, fieldset, .form-group { background-color: #1f2937 !important; color: #f3f4f6 !important; }
-
-    /* Textos (Labels) bem visíveis */
-    label, .col-form-label, .form-group label { color: #d1d5db !important; font-weight: 600 !important; }
-
-    /* Campos de Input */
-    .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; }
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #3b82f6 !important; background-color: #1f2937 !important; color: #ffffff !important; }
-
-    /* Ajuste pro Select2 (Caixas de seleção com busca do Jazzmin) */
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; }
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
+    .btn-light, .btn-group .btn-light {
+        background-color: #0d9488 !important; /* Mesma cor do btn-success */
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease;
+    }
+    .btn-light:hover, .btn-group .btn-light:hover { background-color: #11ac9d !important; transform: translateY(-1px); }
 
     /* =====================================================================
-       4. TABELAS E BOTÕES
+       4. RESTANTE DO MODO ESCURO
        ===================================================================== */
-    .bg-white, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
+    .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
     .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
     .table-hover tbody tr:hover { background-color: #374151 !important; color: white !important; }
@@ -84,6 +82,7 @@
         text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important; cursor: pointer !important;
     }
 
+    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -98,6 +97,7 @@
                 h1.classList.remove('border-right', 'pr-3', 'mr-3');
                 h1.style.borderRight = "none";
             }
+
             var brand = document.querySelector('.brand-link');
             if (brand) { brand.style.display = "none"; }
         }, 50);
