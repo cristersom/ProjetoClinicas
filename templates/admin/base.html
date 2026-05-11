@@ -4,114 +4,84 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL, FIM DO CABEÇALHO E DA "ADMINISTRAÇÃO"
+       1. MODO ESCURO GERAL, FIM DO CABEÇALHO E DA MARCA
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
+    /* Esconde a barra superior e o logo da marcação */
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; opacity: 0 !important; pointer-events: none !important;}
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden !important; opacity: 0 !important; visibility: hidden !important; }
 
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
     /* =====================================================================
-       2. ALINHAMENTO MILIMÉTRICO DAS LINHAS E EXTINÇÃO DO "|"
+       2. ALINHAMENTO MILIMÉTRICO DAS LINHAS E EXTINÇÃO DA BORDA ("|")
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
+    /* O TRUQUE: Tira a borda que formava o | */
     .content-header h1, h1.border-right, .border-right { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
 
     /* =====================================================================
-       3. RESGATE DOS INLINES (ABAS, ESCOLHAS E PERGUNTAS) - CORREÇÃO MÁXIMA
+       3. CORES DOS FORMULÁRIOS, INLINES E ABAS
        ===================================================================== */
-    /* Resgata as Abas do Jazzmin (que estavam invisíveis) */
-    .nav-tabs { border-bottom: 1px solid #374151 !important; margin-bottom: 15px !important; display: flex !important; visibility: visible !important;}
-    .nav-tabs .nav-item { margin-bottom: -1px !important; }
-    .nav-tabs .nav-link {
-        background-color: #374151 !important;
-        color: #9ca3af !important;
-        border: 1px solid #4b5563 !important;
-        margin-right: 5px !important;
-        font-weight: bold !important;
-        border-radius: 8px 8px 0 0 !important;
-        padding: 10px 20px !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-    }
-    /* Aba Ativa (Destacada) */
-    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
-        background-color: #1f2937 !important;
-        color: #14b8a6 !important;
-        border-color: #14b8a6 #14b8a6 transparent !important;
-        border-bottom: 3px solid #1f2937 !important;
-    }
+    /* Fundos */
+    .card, .card-body, .tab-content, .tab-pane, fieldset, .bg-white { background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important; }
 
-    /* Resgata os Inlines Nativos do Django (quando não usam abas) */
-    .inline-group { display: block !important; visibility: visible !important; opacity: 1 !important; background-color: #1f2937 !important; border: 1px solid #4b5563 !important; margin-top: 25px !important; border-radius: 8px !important; padding: 15px !important; }
-    .inline-group h2, .inline-related h2, .inline-group h3, .inline-related h3 { display: block !important; background-color: #111827 !important; color: #14b8a6 !important; padding: 12px 15px !important; margin: -15px -15px 15px -15px !important; border-radius: 8px 8px 0 0 !important; font-weight: bold !important; border-bottom: 1px solid #4b5563 !important; font-size: 1.2rem !important; visibility: visible !important;}
+    /* Abas do Jazzmin (que guardam as Escolhas/Questionários) */
+    .nav-tabs { border-bottom: 1px solid #374151 !important; }
+    .nav-tabs .nav-link { background-color: #374151 !important; color: #9ca3af !important; border: 1px solid #4b5563 !important; font-weight: bold !important; }
+    .nav-tabs .nav-link.active { background-color: #1f2937 !important; color: #14b8a6 !important; border-bottom-color: #1f2937 !important; }
 
-    .inline-related { background-color: #111827 !important; border: 1px solid #374151 !important; margin-bottom: 15px !important; padding: 15px !important; border-radius: 8px !important; display: block !important; visibility: visible !important;}
+    /* Inlines Nativos e Tabelas Internas */
+    .inline-group, .inline-related { background-color: #111827 !important; border-color: #4b5563 !important; }
+    .inline-group h2, .inline-group h3 { background-color: #111827 !important; color: #14b8a6 !important; border-bottom: 1px solid #4b5563 !important; }
     .tabular.inline-related tbody tr { background-color: #1f2937 !important; }
-    .tabular.inline-related tbody tr:nth-child(even) { background-color: #111827 !important; }
-    .tabular.inline-related th { background-color: #111827 !important; color: white !important; font-weight: bold !important; border-bottom: 2px solid #4b5563 !important; }
-    .tabular.inline-related td { border-bottom: 1px solid #374151 !important; }
+    .tabular.inline-related th { background-color: #111827 !important; color: white !important; }
+    .add-row a, .add-row td a { color: #14b8a6 !important; font-weight: bold !important; font-size: 1.1rem !important; }
 
-    /* Botões "Adicionar nova escolha / pergunta" (Fundo Verde) */
-    .add-row { background-color: #1f2937 !important; border-top: 1px solid #374151 !important; padding: 15px !important; display: block !important; visibility: visible !important;}
-    .add-row a, .add-row td a { display: inline-block !important; background-color: #0d9488 !important; color: white !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: bold !important; text-decoration: none !important; visibility: visible !important; opacity: 1 !important;}
-    .add-row a:hover, .add-row td a:hover { background-color: #0f766e !important; }
+    /* Textos (Labels) */
+    label, .col-form-label, .form-group label, .fieldBox label, .help-block { color: #ffffff !important; font-weight: 700 !important; }
 
-    /* =====================================================================
-       4. CONTRASTE GERAL DE FORMULÁRIOS
-       ===================================================================== */
-    .card, .card-body, .tab-content, .tab-pane, fieldset, .bg-white { background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important; visibility: visible !important;}
-    label, .col-form-label, .form-group label, .fieldBox label, .help-block { color: #ffffff !important; font-weight: 700 !important; opacity: 1 !important; }
+    /* Campos de Digitação */
     .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; }
+
+    /* Select2 (Menus dropdown) */
     .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border-color: #4b5563 !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered, .select2-results__option { color: #ffffff !important; }
     .select2-dropdown { background-color: #1f2937 !important; border-color: #4b5563 !important; color: white !important; }
 
     /* =====================================================================
-       5. BOTÕES IMPORTAR/EXPORTAR E FERRAMENTAS DO TOPO
+       4. BOTÕES IMPORTAR/EXPORTAR E FERRAMENTAS
        ===================================================================== */
     .object-tools a, .object-tools .btn, .btn-outline-secondary, .btn-default, .btn-light {
-        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; padding: 8px 20px !important; border-radius: 6px !important; transition: all 0.2s; visibility: visible !important; opacity: 1 !important;
+        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; padding: 6px 16px !important; border-radius: 6px !important;
     }
-    .object-tools a:hover, .btn-outline-secondary:hover { background-color: #0f766e !important; color: white !important; }
+    .object-tools a:hover, .btn-outline-secondary:hover { background-color: #0f766e !important; }
 
+    /* Botões Principais */
     .btn-success, .btn-info, input[name="_save"], .paginator input[type="submit"] { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important; }
     .btn-info { background-color: #3b82f6 !important; }
 
+    /* Tabelas Padrão */
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
     .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #4b5563 !important; border-top: none !important;}
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
 
+    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // MATA QUALQUER RESQUÍCIO DO TRAÇO E DA MARCAÇÃO
-        setInterval(function() {
-            var h1 = document.querySelector('.content-header h1');
-            if (h1) {
-                h1.classList.remove('border-right', 'pr-3', 'mr-3');
-                h1.style.borderRight = "none";
-                h1.childNodes.forEach(function(node) {
-                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes('|')) {
-                        node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
-                    }
-                });
-            }
-            var brand = document.querySelector('.brand-link');
-            if (brand) { brand.style.display = "none"; }
-        }, 50);
 
-        // MENU CONTA (Senha e Logout)
+        // SCRIPT LIMPO E SEGURO: Apenas adiciona o Menu Conta no final da barra lateral.
+        // O Javascript destrutivo que quebrava o Jazzmin foi removido.
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
