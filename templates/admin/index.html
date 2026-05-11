@@ -44,6 +44,7 @@
                         <div class="info-box-content">
                             <span class="kpi-label">Acessos Totais</span>
                             <span class="kpi-number">{{ kpi_sessoes|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-arrow-up"></i> Pacientes iniciados</span>
                         </div>
                     </div>
                 </div>
@@ -53,6 +54,30 @@
                         <div class="info-box-content">
                             <span class="kpi-label">Taxa de Retenção</span>
                             <span class="kpi-number">{{ taxa_conclusao|default:"0" }}%</span>
+                            <span class="kpi-subtext text-warning"><i class="fas fa-exclamation-circle"></i> Engajamento geral</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-purple">
+                        <div class="icon-bg bg-purple-light"><i class="fas fa-flag-checkered"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Narrativas Concluídas</span>
+                            <span class="kpi-number">{{ kpi_finalizadas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-check-circle"></i> Chegaram ao fim</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="info-box info-box-custom border-orange">
+                        <div class="icon-bg bg-orange-light"><i class="fas fa-comments"></i></div>
+                        <div class="info-box-content">
+                            <span class="kpi-label">Pesquisas Respondidas</span>
+                            <span class="kpi-number">{{ kpi_respostas|default:"0" }}</span>
+                            <span class="kpi-subtext text-success"><i class="fas fa-database"></i> Dados coletados</span>
                         </div>
                     </div>
                 </div>
@@ -95,6 +120,9 @@
                 </div>
                 <div class="card-body">
                     <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn border-blue"><span>Nova Jornada</span><i class="fas fa-plus"></i></a>
+                    <a href="/admin/narrativa/cena/add/" class="quick-action-btn border-teal"><span>Criar Cena</span><i class="fas fa-desktop"></i></a>
+                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn border-purple"><span>Novo Questionário</span><i class="fas fa-clipboard-list"></i></a>
+                    <hr style="border-color: #374151; margin: 15px 0;">
                     <a href="{% url 'narrativa:faq' %}" class="quick-action-btn" style="background-color: #064e3b; border-color: #065f46;"><span class="text-white">Ver Manual</span></a>
 
                     {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa %}
