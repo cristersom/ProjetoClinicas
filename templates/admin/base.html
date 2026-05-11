@@ -15,42 +15,41 @@
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
     /* =====================================================================
-       2. ALINHAMENTO DAS LINHAS E EXTINÇÃO DO "|" (Sem Javascript!)
+       2. ALINHAMENTO DAS LINHAS E EXTINÇÃO DO "|"
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
-    /* Remove a borda que o Jazzmin insere (o famoso "|") */
     .content-header h1, h1.border-right, .border-right { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
 
     /* =====================================================================
-       3. CONTRASTE DE FORMULÁRIOS, ABAS E INLINES
+       3. RESGATE E CORES DAS ABAS, INLINES E FORMULÁRIOS
+       *Sem usar regras de "display" para não quebrar o JS do Jazzmin*
        ===================================================================== */
     .card, .card-body, .tab-content, .tab-pane, fieldset, .bg-white {
         background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important;
     }
 
-    /* Abas */
+    /* Abas do Jazzmin (que você estava sem conseguir ver) */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; border-top: none !important; margin-bottom: 20px !important; }
     .nav-tabs .nav-link { color: #9ca3af !important; background-color: transparent !important; border: none !important; border-bottom: 3px solid transparent !important; font-weight: bold !important; padding: 10px 20px !important; font-size: 1.05rem; }
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    /* Inlines (Onde você adiciona escolhas e perguntas) */
+    /* Caixas Internas (Inlines de Escolhas e Perguntas) */
     .inline-group { border: 1px solid #4b5563 !important; border-radius: 8px !important; overflow: hidden; margin-top: 15px;}
     .inline-group h2, .inline-group h3 { background-color: #111827 !important; color: #14b8a6 !important; padding: 12px 15px !important; margin: 0 !important; font-size: 1.1rem !important; border-bottom: 1px solid #4b5563 !important; }
     .tabular.inline-related tbody tr { background-color: #1f2937 !important; }
     .tabular.inline-related tbody tr:nth-child(even) { background-color: #111827 !important; }
     .tabular.inline-related th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #4b5563 !important; }
     .tabular.inline-related td { border-bottom: 1px solid #374151 !important; }
-
     .add-row { background-color: #1f2937 !important; border-top: 1px solid #374151 !important; padding: 12px !important; }
     .add-row a, .add-row td a { color: #14b8a6 !important; font-weight: bold !important; text-decoration: none !important; }
     .add-row a:hover { color: #0d9488 !important; }
 
-    /* Campos de input e textos */
-    label, .col-form-label, .form-group label, .fieldBox label, .help-block { color: #ffffff !important; font-weight: 700 !important; }
+    /* Campos de Input */
+    label, .col-form-label, .form-group label { color: #ffffff !important; font-weight: 700 !important; }
     .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; }
     .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border-color: #4b5563 !important; }
@@ -58,27 +57,35 @@
     .select2-dropdown { background-color: #1f2937 !important; border-color: #4b5563 !important; color: white !important; }
 
     /* =====================================================================
-       4. BOTÕES (IMPORTAR/EXPORTAR, HISTÓRICO, SALVAR)
+       4. CORREÇÃO DEFINITIVA DOS BOTÕES BRANCOS (HISTÓRICO / IMPORTAR / EXPORTAR)
        ===================================================================== */
 
-    /* Ferramentas do Topo (Importar / Exportar) */
-    .object-tools { display: flex !important; gap: 10px !important; flex-wrap: wrap; margin-bottom: 15px !important; }
-    .object-tools a, .object-tools .btn { border-radius: 6px !important; font-weight: 600 !important; padding: 8px 16px !important; border: none !important; display: inline-flex !important; align-items: center !important; transition: all 0.2s ease !important; }
-    .object-tools .btn-success { background-color: #0d9488 !important; color: #ffffff !important; }
-
-    /* Botões secundários e Histórico (Correção de Leitura) */
-    .object-tools .btn-light, .object-tools .btn-default, .object-tools .btn-outline-secondary,
-    .btn-light, .btn-default, .btn-outline-secondary, .submit-row .btn-light {
-        background-color: #4b5563 !important; /* Cinza Escuro */
-        color: #ffffff !important; /* Letra Branca */
-        border: 1px solid #6b7280 !important;
+    /* Pega todo e qualquer botão .btn-light, .btn-default ou links de ferramentas do topo */
+    a.btn-light, button.btn-light, input.btn-light,
+    a.btn-default, button.btn-default, input.btn-default,
+    .object-tools a, .object-tools .btn {
+        background-color: #374151 !important; /* Fundo Cinza Escuro */
+        color: #ffffff !important; /* Texto Branco */
+        border: 1px solid #4b5563 !important;
         font-weight: 600 !important;
+        border-radius: 6px !important;
+        padding: 8px 16px !important;
+        transition: all 0.2s;
     }
-    .object-tools .btn-light:hover, .btn-light:hover, .btn-outline-secondary:hover { background-color: #6b7280 !important; color: #ffffff !important; }
+    a.btn-light:hover, button.btn-light:hover, .object-tools a:hover {
+        background-color: #4b5563 !important;
+        color: #ffffff !important;
+    }
 
-    /* Botões Principais de Salvar */
-    .btn-success, input[name="_save"], .paginator input[type="submit"] { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important; }
+    /* Protege o botão Adicionar (Verde) e Salvar */
+    .object-tools a.btn-success, .btn-success, input[name="_save"] { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important; }
+    .object-tools a.btn-success:hover, .btn-success:hover { background-color: #0f766e !important; }
+
+    /* Botões de continuar editando (Azuis) */
     .btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
+
+    /* Espaçamento se tiver vários botões juntos (como Importar / Exportar) */
+    .object-tools { display: flex !important; gap: 10px !important; flex-wrap: wrap; margin-bottom: 15px !important; }
 
     /* =====================================================================
        5. TABELAS DE LISTAGEM
@@ -93,9 +100,32 @@
 </style>
 
 <script>
-    // JS Seguro! Apenas insere o botão da Conta e nada mais.
-    // O script que estava a travar o painel foi eliminado.
     document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. TRADUZ O "GENERAL" PARA "PRINCIPAL"
+        document.querySelectorAll('.nav-link').forEach(function(el) {
+            if (el.textContent.trim() === 'General') {
+                el.textContent = 'Principal';
+            }
+        });
+
+        // 2. MATA OS RESQUÍCIOS DO | (Agora via classe, sem quebrar o JS principal)
+        setInterval(function() {
+            var h1 = document.querySelector('.content-header h1');
+            if (h1) {
+                h1.classList.remove('border-right', 'pr-3', 'mr-3');
+                h1.style.borderRight = "none";
+                h1.childNodes.forEach(function(node) {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes('|')) {
+                        node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
+                    }
+                });
+            }
+            var brand = document.querySelector('.brand-link');
+            if (brand) { brand.style.display = "none"; }
+        }, 50);
+
+        // 3. MENU CONTA
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
