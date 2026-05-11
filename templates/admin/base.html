@@ -4,83 +4,93 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL E ANIQUILAÇÃO DA NAV SUPERIOR
+       1. MODO ESCURO GERAL, FIM DO CABEÇALHO E DA "ADMINISTRAÇÃO"
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
-    /* ESCONDE A BARRA SUPERIOR */
+    /* Esconde a barra superior e o logo da marcação */
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; opacity: 0 !important; pointer-events: none !important;}
-    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
-
-    /* MATA A MARCA "ADMINISTRAÇÃO" COMPLETAMENTE */
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; border: none !important; overflow: hidden !important; opacity: 0 !important; visibility: hidden !important; }
 
+    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
+
     /* =====================================================================
-       2. ALINHAMENTO MILIMÉTRICO DAS LINHAS (TÍTULO E USUÁRIO)
+       2. ALINHAMENTO MILIMÉTRICO DAS LINHAS E EXTINÇÃO DO "|"
        ===================================================================== */
-    .content-header {
-        height: 70px !important;
-        min-height: 70px !important;
-        display: flex !important;
-        align-items: center !important;
-        border-bottom: 1px solid #374151 !important;
-        padding: 0 20px !important;
-        margin: 0 0 25px 0 !important;
-    }
+    .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
+    aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
-    aside.main-sidebar .user-panel {
-        height: 70px !important;
-        min-height: 70px !important;
-        display: flex !important;
-        align-items: center !important;
-        border-bottom: 1px solid #374151 !important;
-        padding: 0 15px !important;
-        margin: 0 0 25px 0 !important;
-        border-top: none !important;
-    }
-
-    .content-header h1, h1.border-right, .border-right {
-        font-size: 1.8rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        margin: 0 !important;
-        border-right: none !important;
-        padding-right: 0 !important;
-        margin-right: 0 !important;
-    }
+    .content-header h1, h1.border-right, .border-right { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
 
     /* =====================================================================
-       3. CORREÇÃO DE LEITURA IMPORTAR/EXPORTAR (IMAGE_7.PNG)
-       Força o estilo verde esmeralda para os botões do grupo
+       3. RESGATE DO CONTRASTE DOS FORMULÁRIOS E INLINES (A GRANDE CORREÇÃO)
        ===================================================================== */
-    .btn-light, .btn-group .btn-light {
-        background-color: #0d9488 !important; /* Mesma cor do btn-success */
+
+    /* Força o fundo escuro em todas as caixas brancas teimosas do Jazzmin */
+    .card, .card-body, .tab-content, .tab-pane, fieldset, .bg-white {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+        color: #f3f4f6 !important;
+    }
+
+    /* RESSUSCITA OS INLINES (Onde você adiciona escolhas e perguntas) */
+    .inline-group, .inline-related, .tabular, .inline-group .card-body {
+        background-color: #111827 !important;
+        border: 1px solid #4b5563 !important;
+    }
+    .inline-group h2, .inline-group h3 { background-color: #374151 !important; color: white !important; padding: 10px !important; }
+    .tabular tr.has_original td, .tabular tr.form-row td, .tabular th {
+        background-color: #1f2937 !important;
+        color: white !important;
+        border-color: #374151 !important;
+    }
+    .add-row a, .add-row td { color: #14b8a6 !important; font-weight: bold !important; font-size: 1.1rem !important; }
+
+    /* Força a cor Branca em todas as Labels (Títulos dos campos) */
+    label, .col-form-label, .form-group label, .fieldBox label, .help-block {
+        color: #ffffff !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+
+    /* Campos de Digitação (Inputs, Textareas, Selects) */
+    .form-control, input, select, textarea {
+        background-color: #374151 !important;
+        color: #ffffff !important;
+        border: 1px solid #4b5563 !important;
+    }
+    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; }
+
+    /* Select2 (Menus dropdown bonitinhos do Django) */
+    .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border-color: #4b5563 !important; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered, .select2-results__option { color: #ffffff !important; }
+    .select2-dropdown { background-color: #1f2937 !important; border-color: #4b5563 !important; color: white !important; }
+
+    /* =====================================================================
+       4. BOTÕES IMPORTAR/EXPORTAR E FERRAMENTAS
+       ===================================================================== */
+    /* Captura todos os botões estranhos do topo e pinta de verde esmeralda */
+    .object-tools a, .object-tools .btn, .btn-outline-secondary, .btn-default, .btn-light {
+        background-color: #0d9488 !important;
         color: #ffffff !important;
         border: none !important;
         font-weight: 600 !important;
-        transition: all 0.2s ease;
+        padding: 6px 16px !important;
+        border-radius: 6px !important;
+        transition: all 0.2s;
     }
-    .btn-light:hover, .btn-group .btn-light:hover { background-color: #11ac9d !important; transform: translateY(-1px); }
+    .object-tools a:hover, .btn-outline-secondary:hover { background-color: #0f766e !important; color: white !important; }
 
-    /* =====================================================================
-       4. RESTANTE DO MODO ESCURO
-       ===================================================================== */
-    .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
+    /* Botões de Salvar Principais */
+    .btn-success, .btn-info, input[name="_save"], .paginator input[type="submit"] { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important; }
+    .btn-info { background-color: #3b82f6 !important; } /* Azul para o botão de Editar/Continuar Editando */
+
+    /* Tabelas Padrão */
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
-    .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
-    .table-hover tbody tr:hover { background-color: #374151 !important; color: white !important; }
     .table thead th { background-color: #111827 !important; color: white !important; border-bottom: 2px solid #4b5563 !important; border-top: none !important;}
     .table td, .table th { border-top: 1px solid #374151 !important; vertical-align: middle !important; }
-
-    .btn-success, .table td a.btn-success { background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-    .btn-info, .table td a.btn-info { background-color: #3b82f6 !important; color: #ffffff !important; border: none !important; font-weight: 600 !important; }
-
-    input[name="_save"], .paginator input[type="submit"], input[type="submit"].default, button[type="submit"].default {
-        background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important;
-        text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important; cursor: pointer !important;
-    }
 
     /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
@@ -96,13 +106,17 @@
             if (h1) {
                 h1.classList.remove('border-right', 'pr-3', 'mr-3');
                 h1.style.borderRight = "none";
+                h1.childNodes.forEach(function(node) {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes('|')) {
+                        node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
+                    }
+                });
             }
-
             var brand = document.querySelector('.brand-link');
             if (brand) { brand.style.display = "none"; }
         }, 50);
 
-        // MENU CONTA
+        // MENU CONTA (Senha e Logout)
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `
