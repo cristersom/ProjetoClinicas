@@ -3,27 +3,34 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
+    /* =====================================================================
+       1. MODO ESCURO GERAL, FIM DO CABEÇALHO E DA "ADMINISTRAÇÃO"
+       ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
-    .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
-    /* ESCONDE A BARRA SUPERIOR E TUDO O QUE HÁ NELA */
+    /* ESCONDE A BARRA SUPERIOR */
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; opacity: 0 !important; pointer-events: none !important;}
-    body.sidebar-mini .wrapper .content-wrapper { margin-top: 0 !important; padding-top: 20px !important; }
 
+    /* ESCONDE O "ADMINISTRAÇÃO" NA BARRA LATERAL (BRAND) */
+    .brand-link, .brand-text, .brand-link * { display: none !important; opacity: 0 !important; width: 0 !important; height: 0 !important; overflow: hidden !important; padding: 0 !important; margin: 0 !important; }
+    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
+
+    body.sidebar-mini .wrapper .content-wrapper { margin-top: 0 !important; padding-top: 20px !important; }
     .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
 
+    /* Fix Tela de Login/Logout Branca */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 
     /* =====================================================================
-       TÍTULOS NATIVOS
+       2. TÍTULOS NATIVOS (LIMPEZA VISUAL DO "|")
        ===================================================================== */
     .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; display: block !important; width: 100% !important; }
-    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; }
-    .breadcrumb, .breadcrumb-item, .content-header h1::after { display: none !important; content: none !important; border: none !important;}
+    .content-header h1 { font-size: 2rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important;}
+    .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
 
     /* =====================================================================
-       TABELAS E BOTÕES
+       3. TABELAS E BOTÕES
        ===================================================================== */
     .table { background-color: #1f2937 !important; color: #d1d5db !important; }
     .table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.03) !important; }
@@ -42,37 +49,16 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-
-        // 1. EXTIRPADOR DO "|" NOS NÓS DE TEXTO (Preciso e não quebra HTML interno)
+        // TÁTICA FINAL CONTRA O "|": Lê o HTML interno, destrói e substitui
         setInterval(function() {
-            document.querySelectorAll('.content-header h1').forEach(function(h1) {
-                h1.childNodes.forEach(function(node) {
-                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes('|')) {
-                        node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
-                    }
-                });
-            });
+            var h1 = document.querySelector('.content-header h1');
+            if (h1) {
+                var text = h1.innerHTML;
+                if (text.includes('|')) {
+                    h1.innerHTML = text.split('|')[0].trim();
+                }
+            }
         }, 50);
-
-        // 2. RECUPERAÇÃO DO MENU CONTA (Sair e Senha)
-        // Usamos um seletor mais genérico e agressivo para colar o menu no final da barra lateral
-        const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
-        if (sidebar && !document.querySelector('#menu-conta-custom')) {
-            const contaHtml = `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item">
-                    <a href="/admin/password_change/" class="nav-link">
-                        <i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{% url 'narrativa:logout' %}" class="nav-link">
-                        <i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p>
-                    </a>
-                </li>
-            `;
-            sidebar.insertAdjacentHTML('beforeend', contaHtml);
-        }
     });
 </script>
 {% endblock %}
@@ -86,7 +72,7 @@
             <i class="fas fa-exclamation-triangle fa-2x" style="color: #f59e0b; margin-right: 15px;"></i>
             <div>
                 <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Pagamento Pendente</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento. Realize a renovação para continuar acessando nossos serviços e editando conteúdos.</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento, realize a renovação para continuar acessando nossos serviços e editando conteúdos.</p>
             </div>
         </div>
         <a href="{% url 'narrativa:planos' %}" style="background-color: #f59e0b; color: white; font-weight: 800; padding: 12px 25px; border-radius: 6px; text-decoration: none; text-align: center; white-space: nowrap !important; min-width: 140px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">VER PLANOS</a>

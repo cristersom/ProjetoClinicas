@@ -27,6 +27,10 @@ Usuario = get_user_model()
 TERMOS_ACEITOS_KEY = getattr(settings, 'TERMOS_ACEITOS_KEY', 'termo_aceite_session')
 
 
+# ==========================================
+# 1. INSTITUCIONAL E AUTENTICAÇÃO
+# ==========================================
+
 class HomeView(TemplateView):
     template_name = "homepage.html"
 
@@ -59,9 +63,12 @@ class CriarContaView(CreateView):
     def get_initial(self):
         initial = super().get_initial()
         registro = self.request.session.get('registro_pendente', {})
-        email_pre = (self.request.GET.get('email') or self.request.session.get('email_pagamento') or registro.get(
-            'email'))
-        if email_pre: initial['email'] = email_pre
+        email_pre = (self.request.GET.get('email') or
+                     self.request.session.get('email_pagamento') or
+                     registro.get('email'))
+
+        if email_pre:
+            initial['email'] = email_pre
         initial['username'] = registro.get('username')
         initial['nome_clinica'] = registro.get('nome_clinica')
         return initial
@@ -89,8 +96,10 @@ class CriarContaView(CreateView):
             user.clinica.plano_atual = pagamento.plano
             user.clinica.stripe_customer_id = pagamento.stripe_customer_id
             user.clinica.save()
+
             pagamento.utilizado = True
             pagamento.save()
+
             self.request.session.pop('email_pagamento', None)
             self.request.session.pop('registro_pendente', None)
 
@@ -107,13 +116,17 @@ class PoliticaView(TemplateView):
     template_name = "politica.html"
 
 
+# ==========================================
+# 2. SAAS E PAGAMENTOS (STRIPE)
+# ==========================================
+
 class PlanosView(ListView):
     model = Plano
     template_name = 'planos.html'
     context_object_name = 'planos'
 
-    # NOVA LÓGICA DO PORTAL DO STRIPE (Previne Assinaturas Duplas e Permite Cancelar)
     def get(self, request, *args, **kwargs):
+        # Atalho para o Portal de Gestão da Stripe
         if request.GET.get('gerenciar') == '1' and request.user.is_authenticated:
             clinica = getattr(request.user, 'clinica', None)
             if clinica and clinica.stripe_customer_id:
@@ -124,14 +137,16 @@ class PlanosView(ListView):
                         return_url=domain_url + reverse('narrativa:planos')
                     )
                     return redirect(portalSession.url)
-                except Exception as e:
-                    messages.error(request, "Não foi possível abrir o portal de assinaturas.")
+                except Exception:
+                    messages.error(request, "Não foi possível aceder ao portal de gestão.")
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             clinica = self.request.user.clinica
+            # Se a assinatura não estiver ativa, limpamos o plano_atual no contexto
+            # para que os botões de recontratação fiquem disponíveis no HTML
             if clinica.assinatura_ativa:
                 context['plano_atual'] = clinica.plano_atual
             else:
@@ -144,12 +159,23 @@ def checkout(request, plano_id):
     plano = get_object_or_404(Plano, id=plano_id)
     domain_url = request.build_absolute_uri('/')[:-1]
 
-    # BLOQUEIO DE DUPLA ASSINATURA: Se já tem ativa, manda pro portal gerenciar!
+    # FLUXO DE UPGRADE AUTOMÁTICO:
+    # Se o utilizador já tem assinatura ativa, enviamos para o Portal da Stripe
+    # Lá ele altera o plano sem ter de cancelar o anterior ou digitar o cartão de novo.
     if request.user.is_authenticated and hasattr(request.user, 'clinica'):
         clinica = request.user.clinica
         if clinica.assinatura_ativa and clinica.stripe_customer_id:
-            return redirect(reverse('narrativa:planos') + "?gerenciar=1")
+            try:
+                portalSession = stripe.billing_portal.Session.create(
+                    customer=clinica.stripe_customer_id,
+                    return_url=domain_url + reverse('narrativa:planos')
+                )
+                return redirect(portalSession.url)
+            except Exception:
+                messages.error(request, "Erro ao processar a atualização do plano.")
+                return redirect('narrativa:planos')
 
+    # NOVO CHECKOUT (Para novas contas ou renovação de contas canceladas)
     try:
         registro = request.session.get('registro_pendente', {})
         customer_email = registro.get('email')
@@ -166,15 +192,17 @@ def checkout(request, plano_id):
         if customer_email:
             checkout_kwargs['customer_email'] = customer_email
 
-        # Tenta usar o cliente stripe existente se a pessoa estiver apenas renovando uma conta cancelada
+        # Reutiliza o Customer ID caso ele já exista (renovação)
         if request.user.is_authenticated and hasattr(request.user,
                                                      'clinica') and request.user.clinica.stripe_customer_id:
             checkout_kwargs['customer'] = request.user.clinica.stripe_customer_id
+            # Se usarmos 'customer', não podemos enviar 'customer_email'
+            checkout_kwargs.pop('customer_email', None)
 
         checkout_session = stripe.checkout.Session.create(**checkout_kwargs)
         return redirect(checkout_session.url)
     except Exception as e:
-        messages.error(request, f"Erro ao conectar com Stripe: {str(e)}")
+        messages.error(request, f"Erro ao ligar à Stripe: {str(e)}")
         return redirect('narrativa:planos')
 
 
@@ -190,7 +218,8 @@ def sucesso_pagamento(request):
         plano = Plano.objects.filter(id=plano_id).first()
 
         PagamentoPendente.objects.update_or_create(
-            email=email, defaults={'plano': plano, 'stripe_customer_id': session.customer, 'utilizado': False}
+            email=email,
+            defaults={'plano': plano, 'stripe_customer_id': session.customer, 'utilizado': False}
         )
 
         user = Usuario.objects.filter(email=email).first()
@@ -250,6 +279,7 @@ def stripe_webhook(request):
     except Exception:
         return HttpResponse(status=400)
 
+    # 1. Pagamento Novo Concluído
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         email = session.get('customer_details', {}).get('email')
@@ -257,9 +287,10 @@ def stripe_webhook(request):
 
         if email and plano_id:
             plano = Plano.objects.filter(id=plano_id).first()
-            PagamentoPendente.objects.update_or_create(email=email, defaults={'plano': plano,
-                                                                              'stripe_customer_id': session.get(
-                                                                                  'customer'), 'utilizado': False})
+            PagamentoPendente.objects.update_or_create(
+                email=email,
+                defaults={'plano': plano, 'stripe_customer_id': session.get('customer'), 'utilizado': False}
+            )
             clinica = Clinica.objects.filter(usuario__email=email).first()
             if clinica:
                 clinica.assinatura_ativa = True
@@ -267,6 +298,21 @@ def stripe_webhook(request):
                 clinica.stripe_customer_id = session.get('customer')
                 clinica.save()
 
+    # 2. Upgrade/Downgrade Detetado
+    elif event['type'] == 'customer.subscription.updated':
+        subscription = event['data']['object']
+        customer_id = subscription.get('customer')
+        price_id = subscription.get('items', {}).get('data', [{}])[0].get('price', {}).get('id')
+
+        clinica = Clinica.objects.filter(stripe_customer_id=customer_id).first()
+        if clinica and price_id:
+            novo_plano = Plano.objects.filter(stripe_price_id=price_id).first()
+            if novo_plano:
+                clinica.plano_atual = novo_plano
+                clinica.assinatura_ativa = (subscription.get('status') == 'active')
+                clinica.save()
+
+    # 3. Cancelamento ou Falha de Cobrança
     elif event['type'] in ['customer.subscription.deleted', 'invoice.payment_failed']:
         subscription = event['data']['object']
         customer_id = subscription.get('customer')
@@ -277,6 +323,10 @@ def stripe_webhook(request):
 
     return HttpResponse(status=200)
 
+
+# ==========================================
+# 3. PAINEL DA CLÍNICA (ADMINISTRAÇÃO)
+# ==========================================
 
 class MinhasNarrativasView(LoginRequiredMixin, ListView):
     model = Narrativa
@@ -293,7 +343,8 @@ class MinhasNarrativasView(LoginRequiredMixin, ListView):
         clinica = getattr(self.request.user, 'clinica', None)
         if clinica:
             context['link_portal'] = self.request.build_absolute_uri(
-                reverse('narrativa:portal_paciente', args=[clinica.id]))
+                reverse('narrativa:portal_paciente', args=[clinica.id])
+            )
             context['limite_atingido'] = getattr(self.request, 'limite_atingido', False)
         return context
 
@@ -336,12 +387,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             context['kpi_finalizadas'] = 0
 
             trinta_dias = timezone.now() - timedelta(days=30)
-            acessos = LogVisitaCena.objects.filter(narrativa_associada__clinica=clinica,
-                                                   timestamp__gte=trinta_dias).annotate(
-                dia=TruncDay('timestamp')).values('dia').annotate(total=Count('id')).order_by('dia')
+            acessos = LogVisitaCena.objects.filter(narrativa_associada__clinica=clinica, timestamp__gte=trinta_dias) \
+                .annotate(dia=TruncDay('timestamp')).values('dia').annotate(total=Count('id')).order_by('dia')
 
             context['chart_dias_labels'] = json.dumps([item['dia'].strftime('%d/%m') for item in acessos])
             context['chart_dias_data'] = json.dumps([item['total'] for item in acessos])
+
             top_narrativas = Narrativa.objects.filter(clinica=clinica).order_by('-visualizacoes')[:5]
             context['chart_top_labels'] = json.dumps([n.titulo for n in top_narrativas])
             context['chart_top_data'] = json.dumps([n.visualizacoes for n in top_narrativas])
@@ -360,6 +411,10 @@ class Pesquisa(ListView):
             return Narrativa.objects.filter(titulo__icontains=termo, clinica=self.request.user.clinica)
         return Narrativa.objects.none()
 
+
+# ==========================================
+# 4. PORTAL PÚBLICO E PACIENTE
+# ==========================================
 
 class PortalPacienteView(ListView):
     template_name = 'portal_paciente.html'
@@ -403,23 +458,34 @@ class PacienteDetalhesView(DetailView):
         narrativa = self.get_object()
         narrativa.visualizacoes += 1
         narrativa.save()
+
         if not request.session.session_key: request.session.create()
-        SessaoPaciente.objects.get_or_create(session_key=request.session.session_key,
-                                             defaults={'narrativa_perfil': narrativa})
+        SessaoPaciente.objects.get_or_create(
+            session_key=request.session.session_key,
+            defaults={'narrativa_perfil': narrativa}
+        )
         return response
 
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
     if not request.session.session_key: request.session.create()
-    LogVisitaCena.objects.create(session_key=request.session.session_key, cena_visitada=cena,
-                                 narrativa_associada=cena.narrativa)
+
+    LogVisitaCena.objects.create(
+        session_key=request.session.session_key,
+        cena_visitada=cena,
+        narrativa_associada=cena.narrativa
+    )
+
     quest = cena.questionarios.first()
     if quest:
-        respondido = Resposta.objects.filter(session_key=request.session.session_key,
-                                             pergunta__questionario=quest).exists()
+        respondido = Resposta.objects.filter(
+            session_key=request.session.session_key,
+            pergunta__questionario=quest
+        ).exists()
         if not respondido:
             return redirect('narrativa:responder_questionario', cena_id=cena.id, questionario_id=quest.id)
+
     return render(request, 'cena_paciente.html', {'cena': cena})
 
 
@@ -428,48 +494,63 @@ def responder_questionario(request, cena_id, questionario_id):
     cena = get_object_or_404(Cena, id=cena_id)
     questionario = get_object_or_404(Questionario, id=questionario_id)
     if not request.session.session_key: request.session.create()
+
     if request.method == 'POST':
         for pergunta in questionario.perguntas.all():
             valores = request.POST.getlist(f"pergunta_{pergunta.id}")
             for valor in valores:
-                Resposta.objects.create(pergunta=pergunta, session_key=request.session.session_key,
-                                        texto_resposta=valor)
+                Resposta.objects.create(
+                    pergunta=pergunta,
+                    session_key=request.session.session_key,
+                    texto_resposta=valor
+                )
         if questionario.cena_destino:
             return redirect('narrativa:exibir_cena_paciente', cena_id=questionario.cena_destino.id)
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena.id)
+
     return render(request, 'questionario.html', {'cena': cena, 'questionario': questionario})
 
 
 def perfil_sessao(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     sk = request.session.session_key
+
     nome_perfil = "Paciente"
     try:
         sessao = SessaoPaciente.objects.get(session_key=sk)
         if sessao.narrativa_perfil: nome_perfil = sessao.narrativa_perfil.titulo
     except:
         pass
+
     visitadas = LogVisitaCena.objects.filter(session_key=sk, narrativa_associada=narrativa).values(
         'cena_visitada').distinct().count()
     total = narrativa.cenas.count()
     prog_cenas = int((visitadas / total) * 100) if total > 0 else 0
+
     respondidos = Resposta.objects.filter(session_key=sk,
                                           pergunta__questionario__cena_associada__narrativa=narrativa).values(
         'pergunta__questionario').distinct().count()
     total_q = Questionario.objects.filter(cena_associada__narrativa=narrativa).count()
     prog_q = int((respondidos / total_q) * 100) if total_q > 0 else 0
-    return render(request, 'perfil_sessao.html',
-                  {'narrativa': narrativa, 'nome_perfil': nome_perfil, 'progresso_cenas_pct': prog_cenas,
-                   'progresso_questionarios_pct': prog_q})
+
+    return render(request, 'perfil_sessao.html', {
+        'narrativa': narrativa, 'nome_perfil': nome_perfil, 'progresso_cenas_pct': prog_cenas,
+        'progresso_questionarios_pct': prog_q
+    })
 
 
 def iniciar_jornada_paciente(request, narrativa_id):
     narrativa = get_object_or_404(Narrativa, id=narrativa_id)
     if not request.session.session_key: request.session.create()
-    SessaoPaciente.objects.get_or_create(session_key=request.session.session_key,
-                                         defaults={'narrativa_perfil': narrativa})
+
+    SessaoPaciente.objects.get_or_create(
+        session_key=request.session.session_key,
+        defaults={'narrativa_perfil': narrativa}
+    )
+
     if narrativa.cena_inicial:
         return redirect('narrativa:exibir_cena_paciente', cena_id=narrativa.cena_inicial.id)
+
     messages.warning(request, "Esta jornada ainda não tem uma Cena Inicial configurada.")
     return redirect('narrativa:narrativas')
 

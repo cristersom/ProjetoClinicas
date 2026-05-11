@@ -24,40 +24,33 @@
                     </div>
 
                     <ul class="space-y-4 mb-8">
-                        <li class="flex items-center text-gray-300">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon>
-                            <span>Crie até <strong class="text-white">{{ plano.limite_narrativas }} Jornadas</strong></span>
-                        </li>
-                        <li class="flex items-center text-gray-300">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon>
-                            <span>Até <strong class="text-white">{{ plano.limite_pacientes }} Pacientes</strong></span>
-                        </li>
-                        <li class="flex items-center text-gray-300">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon>
-                            <span>Questionários ilimitados</span>
-                        </li>
-                        <li class="flex items-center text-gray-300">
-                            <ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon>
-                            <span>Relatórios e Dashboards</span>
-                        </li>
+                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Crie até <strong class="text-white">{{ plano.limite_narrativas }} Jornadas</strong></span></li>
+                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Até <strong class="text-white">{{ plano.limite_pacientes }} Pacientes</strong></span></li>
+                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Questionários ilimitados</span></li>
+                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Relatórios e Dashboards</span></li>
                     </ul>
                 </div>
 
                 <div>
                     {% if request.user.is_authenticated and request.user.clinica %}
-                        {% if plano == plano_atual and assinatura_ativa %}
-                            <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 px-2 rounded-lg flex items-center justify-center cursor-not-allowed text-sm whitespace-nowrap">
-                                <ion-icon name="checkmark-outline" class="mr-2"></ion-icon> Seu Plano
-                            </button>
-                        {% elif plano == request.user.clinica.plano_atual and not assinatura_ativa %}
+
+                        {% if assinatura_ativa %}
+                            {% if plano == plano_atual %}
+                                <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 px-2 rounded-lg flex items-center justify-center cursor-not-allowed text-sm whitespace-nowrap">
+                                    <ion-icon name="checkmark-outline" class="mr-2"></ion-icon> Seu Plano Atual
+                                </button>
+                            {% else %}
+                                <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
+                                    Atualizar para {{ plano.nome }}
+                                </a>
+                            {% endif %}
+
+                        {% else %}
                             <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition shadow-lg text-sm whitespace-nowrap">
                                 Renovar {{ plano.nome }}
                             </a>
-                        {% else %}
-                            <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
-                                Mudar para {{ plano.nome }}
-                            </a>
                         {% endif %}
+
                     {% else %}
                         <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
                             Assinar {{ plano.nome }}
@@ -79,17 +72,13 @@
                         <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-indigo-500 mr-2 text-xl"></ion-icon><span class="text-white">Integração de sistemas</span></li>
                     </ul>
                 </div>
-
                 <div>
                     <div class="w-full text-center py-3 px-2 rounded-lg bg-indigo-600 border border-indigo-500 shadow-lg">
                         <p class="text-xs text-indigo-200 font-bold mb-1 uppercase tracking-wider">Falar com Consultor:</p>
-                        <span class="text-xs sm:text-sm font-bold text-white block break-all">
-                            atendimento@narrativasclinicas.com.br
-                        </span>
+                        <span class="text-xs sm:text-sm font-bold text-white block break-all">atendimento@narrativasclinicas.com.br</span>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
