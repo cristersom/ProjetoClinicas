@@ -1,36 +1,25 @@
 {% extends 'base.html' %}
+{% block titulo %}Sucesso - Narrativas Clínicas{% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="bg-white py-10 px-6 shadow-xl sm:rounded-2xl sm:px-10 text-center border border-gray-100 relative overflow-hidden">
+<div class="min-h-[85vh] flex items-center justify-center bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-gray-800 rounded-2xl shadow-2xl p-10 text-center border-t-8 border-teal-500 transform transition-all hover:scale-105">
 
-            <div class="absolute top-0 inset-x-0 h-2 bg-teal-500"></div>
-
-            <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-teal-50 mb-8 mt-2">
-                <svg class="h-12 w-12 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-            </div>
-
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">Pagamento Aprovado!</h2>
-
-            <p class="text-lg text-gray-500 mb-8">
-                {% if criado_agora %}
-                    Sua conta foi criada, sua senha salva, e a assinatura ativada com sucesso! Bem-vindo(a) ao Narrativas Clínicas!
-                {% else %}
-                    Sua assinatura foi ativada com sucesso. Bem-vindo(a) de volta!
-                {% endif %}
-            </p>
-
-            <hr class="border-gray-100 mb-8">
-
-            <a href="{% url 'narrativa:narrativas' %}" class="w-full flex items-center justify-center py-4 px-4 border border-transparent rounded-full shadow-md text-lg font-bold text-white bg-teal-500 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all transform hover:-translate-y-1">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                Acessar Meu Painel
-            </a>
-
+        <div class="mx-auto flex items-center justify-center h-24 w-24 rounded-full bg-teal-900 mb-6 shadow-inner">
+            <ion-icon name="checkmark-outline" class="text-5xl text-teal-400"></ion-icon>
         </div>
+
+        <h2 class="text-3xl font-extrabold text-white mb-4">Pagamento Aprovado!</h2>
+
+        {% if criado_agora %}
+            <p class="text-gray-400 mb-8 text-lg">Sua conta foi criada e a assinatura está ativa. Tudo pronto para começar!</p>
+        {% else %}
+            <p class="text-gray-400 mb-8 text-lg">Sua assinatura foi ativada com sucesso. Bem-vindo(a) de volta!</p>
+        {% endif %}
+
+        <a href="{% url 'narrativa:narrativas' %}" class="w-full flex justify-center items-center px-6 py-4 border border-transparent text-lg font-bold rounded-lg text-white bg-teal-500 hover:bg-teal-600 transition-colors shadow-lg">
+            <ion-icon name="flash" class="mr-2"></ion-icon> Acessar Meu Painel
+        </a>
     </div>
 </div>
 {% endblock %}

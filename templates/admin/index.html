@@ -143,14 +143,18 @@
                         <span>Criar Cena</span>
                         <i class="fas fa-desktop text-info"></i>
                     </a>
-                    <a href="/admin/narrativa/questionario/add/" class="quick-action-btn text-decoration-none border-purple">
-                        <span>Novo Questionário</span>
-                        <i class="fas fa-clipboard-list" style="color: #a855f7;"></i>
-                    </a>
-                    <hr style="border-color: #374151; margin: 20px 0;">
+
+                    <hr style="border-color: #374151; margin: 15px 0;">
+
                     <a href="{% url 'narrativa:faq' %}" class="quick-action-btn text-decoration-none" style="background-color: #064e3b; border-color: #065f46;">
-                        <span class="text-white"><i class="fas fa-question-circle mr-2" style="color: white;"></i>Dúvidas? Ver Manual</span>
+                        <span class="text-white"><i class="fas fa-question-circle mr-2" style="color: white;"></i>Ver Manual</span>
                     </a>
+
+                    {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa %}
+                    <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="quick-action-btn text-decoration-none mt-2" style="background-color: #7f1d1d; border-color: #991b1b;">
+                        <span class="text-white"><i class="fas fa-credit-card mr-2" style="color: white;"></i>Gerenciar Plano</span>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
 

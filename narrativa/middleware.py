@@ -22,8 +22,8 @@ class SaaSControlMiddleware:
                 clinica = Clinica.objects.get(id=request.user.clinica.id)
                 request.clinica_realtime = clinica
 
-                # Sincronização com Stripe
-                if clinica.stripe_customer_id and not request.session.get('stripe_synced'):
+                # Sincronização Absoluta com Stripe (Sem cache local, resolve o delay)
+                if clinica.stripe_customer_id:
                     stripe.api_key = settings.STRIPE_SECRET_KEY
                     try:
                         subs = stripe.Subscription.list(customer=clinica.stripe_customer_id, status='active', limit=1)
@@ -31,7 +31,6 @@ class SaaSControlMiddleware:
                         if clinica.assinatura_ativa != tem_plano_ativo:
                             clinica.assinatura_ativa = tem_plano_ativo
                             clinica.save()
-                        request.session['stripe_synced'] = True
                     except Exception:
                         pass
 
@@ -69,7 +68,7 @@ class SaaSControlMiddleware:
 
                     if not clinica.assinatura_ativa and (is_admin_action or is_post_method):
                         messages.error(request,
-                                       'Não identificamos seu pagamento, realize a renovação para continuar editando.')
+                                       'Não identificamos seu pagamento. Realize a renovação para continuar editando.')
                         return redirect('/admin/')
 
                     if '/admin/narrativa/narrativa/add/' in path and request.limite_atingido:

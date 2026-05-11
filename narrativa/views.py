@@ -112,6 +112,22 @@ class PlanosView(ListView):
     template_name = 'planos.html'
     context_object_name = 'planos'
 
+    # NOVA LÓGICA DO PORTAL DO STRIPE (Previne Assinaturas Duplas e Permite Cancelar)
+    def get(self, request, *args, **kwargs):
+        if request.GET.get('gerenciar') == '1' and request.user.is_authenticated:
+            clinica = getattr(request.user, 'clinica', None)
+            if clinica and clinica.stripe_customer_id:
+                try:
+                    domain_url = request.build_absolute_uri('/')[:-1]
+                    portalSession = stripe.billing_portal.Session.create(
+                        customer=clinica.stripe_customer_id,
+                        return_url=domain_url + reverse('narrativa:planos')
+                    )
+                    return redirect(portalSession.url)
+                except Exception as e:
+                    messages.error(request, "Não foi possível abrir o portal de assinaturas.")
+        return super().get(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
@@ -128,6 +144,12 @@ def checkout(request, plano_id):
     plano = get_object_or_404(Plano, id=plano_id)
     domain_url = request.build_absolute_uri('/')[:-1]
 
+    # BLOQUEIO DE DUPLA ASSINATURA: Se já tem ativa, manda pro portal gerenciar!
+    if request.user.is_authenticated and hasattr(request.user, 'clinica'):
+        clinica = request.user.clinica
+        if clinica.assinatura_ativa and clinica.stripe_customer_id:
+            return redirect(reverse('narrativa:planos') + "?gerenciar=1")
+
     try:
         registro = request.session.get('registro_pendente', {})
         customer_email = registro.get('email')
@@ -143,6 +165,11 @@ def checkout(request, plano_id):
 
         if customer_email:
             checkout_kwargs['customer_email'] = customer_email
+
+        # Tenta usar o cliente stripe existente se a pessoa estiver apenas renovando uma conta cancelada
+        if request.user.is_authenticated and hasattr(request.user,
+                                                     'clinica') and request.user.clinica.stripe_customer_id:
+            checkout_kwargs['customer'] = request.user.clinica.stripe_customer_id
 
         checkout_session = stripe.checkout.Session.create(**checkout_kwargs)
         return redirect(checkout_session.url)
