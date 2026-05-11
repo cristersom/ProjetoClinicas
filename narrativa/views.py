@@ -126,7 +126,7 @@ class PlanosView(ListView):
     context_object_name = 'planos'
 
     def get(self, request, *args, **kwargs):
-        # Atalho para o Portal de Gestão da Stripe
+        # Atalho para o Portal de Gestão da Stripe (usado no botão "Gerenciar Plano")
         if request.GET.get('gerenciar') == '1' and request.user.is_authenticated:
             clinica = getattr(request.user, 'clinica', None)
             if clinica and clinica.stripe_customer_id:
@@ -146,7 +146,7 @@ class PlanosView(ListView):
         if self.request.user.is_authenticated and hasattr(self.request.user, 'clinica') and self.request.user.clinica:
             clinica = self.request.user.clinica
             # Se a assinatura não estiver ativa, limpamos o plano_atual no contexto
-            # para que os botões de recontratação fiquem disponíveis no HTML
+            # para que os botões de recontratação fiquem laranja (Renovar) no HTML
             if clinica.assinatura_ativa:
                 context['plano_atual'] = clinica.plano_atual
             else:
@@ -159,18 +159,43 @@ def checkout(request, plano_id):
     plano = get_object_or_404(Plano, id=plano_id)
     domain_url = request.build_absolute_uri('/')[:-1]
 
-    # FLUXO DE UPGRADE AUTOMÁTICO:
-    # Se o utilizador já tem assinatura ativa, enviamos para o Portal da Stripe
-    # Lá ele altera o plano sem ter de cancelar o anterior ou digitar o cartão de novo.
+    # FLUXO DE UPGRADE DIRETO:
+    # Se o utilizador já tem assinatura ativa, enviamos para a tela de confirmação de troca na Stripe
     if request.user.is_authenticated and hasattr(request.user, 'clinica'):
         clinica = request.user.clinica
         if clinica.assinatura_ativa and clinica.stripe_customer_id:
             try:
-                portalSession = stripe.billing_portal.Session.create(
-                    customer=clinica.stripe_customer_id,
-                    return_url=domain_url + reverse('narrativa:planos')
-                )
-                return redirect(portalSession.url)
+                # Obtém a assinatura atual na Stripe para gerar o fluxo de confirmação direto
+                subs = stripe.Subscription.list(customer=clinica.stripe_customer_id, status='active', limit=1)
+
+                if subs.data:
+                    sub_id = subs.data[0].id
+                    sub_item_id = subs.data[0]['items']['data'][0]['id']
+
+                    # Cria a sessão do portal direcionada à alteração específica do plano selecionado
+                    portalSession = stripe.billing_portal.Session.create(
+                        customer=clinica.stripe_customer_id,
+                        return_url=domain_url + reverse('narrativa:planos'),
+                        flow_data={
+                            "type": "subscription_update_confirm",
+                            "subscription_update_confirm": {
+                                "subscription": sub_id,
+                                "items": [{
+                                    "id": sub_item_id,
+                                    "price": plano.stripe_price_id,
+                                    "quantity": 1
+                                }]
+                            }
+                        }
+                    )
+                    return redirect(portalSession.url)
+                else:
+                    # Fallback para o portal geral caso não encontre a sub ativa por algum motivo
+                    portalSession = stripe.billing_portal.Session.create(
+                        customer=clinica.stripe_customer_id,
+                        return_url=domain_url + reverse('narrativa:planos')
+                    )
+                    return redirect(portalSession.url)
             except Exception:
                 messages.error(request, "Erro ao processar a atualização do plano.")
                 return redirect('narrativa:planos')
@@ -196,7 +221,6 @@ def checkout(request, plano_id):
         if request.user.is_authenticated and hasattr(request.user,
                                                      'clinica') and request.user.clinica.stripe_customer_id:
             checkout_kwargs['customer'] = request.user.clinica.stripe_customer_id
-            # Se usarmos 'customer', não podemos enviar 'customer_email'
             checkout_kwargs.pop('customer_email', None)
 
         checkout_session = stripe.checkout.Session.create(**checkout_kwargs)
@@ -298,7 +322,7 @@ def stripe_webhook(request):
                 clinica.stripe_customer_id = session.get('customer')
                 clinica.save()
 
-    # 2. Upgrade/Downgrade Detetado
+    # 2. Upgrade/Downgrade Detetado (Sincroniza o banco local)
     elif event['type'] == 'customer.subscription.updated':
         subscription = event['data']['object']
         customer_id = subscription.get('customer')

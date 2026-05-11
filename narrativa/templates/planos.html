@@ -33,7 +33,6 @@
 
                 <div>
                     {% if request.user.is_authenticated and request.user.clinica %}
-
                         {% if assinatura_ativa %}
                             {% if plano == plano_atual %}
                                 <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 px-2 rounded-lg flex items-center justify-center cursor-not-allowed text-sm whitespace-nowrap">
@@ -44,13 +43,11 @@
                                     Atualizar para {{ plano.nome }}
                                 </a>
                             {% endif %}
-
                         {% else %}
                             <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition shadow-lg text-sm whitespace-nowrap">
                                 Renovar {{ plano.nome }}
                             </a>
                         {% endif %}
-
                     {% else %}
                         <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
                             Assinar {{ plano.nome }}

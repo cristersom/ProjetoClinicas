@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL E ANIQUILAÇÃO DA NAV SUPERIOR (CABEÇALHO)
+       1. MODO ESCURO GERAL E ANIQUILAÇÃO DO CABEÇALHO SUPERIOR
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar, .brand-link { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
@@ -12,34 +12,44 @@
     /* ESCONDE A BARRA SUPERIOR */
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; opacity: 0 !important; pointer-events: none !important;}
 
-    /* ESCONDE O "ADMINISTRAÇÃO" NA BARRA LATERAL (BRAND) */
-    .brand-link, .brand-text, .brand-link * { display: none !important; opacity: 0 !important; width: 0 !important; height: 0 !important; overflow: hidden !important; padding: 0 !important; margin: 0 !important; }
-    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
-
-    body.sidebar-mini .wrapper .content-wrapper { margin-top: 0 !important; padding-top: 20px !important; }
+    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
     .bg-white, .card-body, .card-header, .info-box { background-color: #1f2937 !important; color: #f3f4f6 !important; border-color: #374151 !important; }
 
-    /* Fix Tela de Login/Logout Branca */
-    body.login-page { background-color: #111827 !important; }
-    .login-box, .register-box, .login-card-body, .register-card-body { background-color: #1f2937 !important; color: #f3f4f6 !important; border: 1px solid #374151 !important; border-radius: 12px; }
-
     /* =====================================================================
-       2. TÍTULOS NATIVOS E A EXTINÇÃO DO BORDER-RIGHT ("|")
+       2. ALINHAMENTO MILIMÉTRICO DAS LINHAS (TÍTULO E USUÁRIO)
+       Forçamos a altura e os espaçamentos para serem idênticos
        ===================================================================== */
-    .content-header { border-bottom: 1px solid #374151 !important; padding-bottom: 15px !important; margin-bottom: 25px !important; display: block !important; width: 100% !important; }
 
-    /* AQUI ESTÁ A MÁGICA BASEADA NO SEU PRINT:
-       Mata a borda, o padding e a margem que o Jazzmin injeta no H1 */
-    .content-header h1, h1.border-right {
-        font-size: 2rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
-        border-right: none !important;
-        padding-right: 0 !important;
-        margin-right: 0 !important;
+    /* Área do Título */
+    .content-header {
+        height: 75px !important;
+        display: flex !important;
+        align-items: center !important;
+        border-bottom: 1px solid #374151 !important;
+        padding: 0 20px !important;
+        margin-bottom: 25px !important;
     }
 
+    .content-header h1 {
+        font-size: 1.8rem !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        margin: 0 !important;
+        border-right: none !important;
+        padding-right: 0 !important;
+    }
     .breadcrumb, .breadcrumb-item, .content-header h1::after, .content-header h1 small { display: none !important; content: none !important; border: none !important;}
+
+    /* Área do Usuário (Barra Lateral) */
+    .sidebar .user-panel {
+        height: 75px !important;
+        display: flex !important;
+        align-items: center !important;
+        border-bottom: 1px solid #374151 !important;
+        padding: 0 15px !important;
+        margin-bottom: 25px !important;
+        border-top: none !important;
+    }
 
     /* =====================================================================
        3. TABELAS E BOTÕES
@@ -57,20 +67,27 @@
         background-color: #0d9488 !important; color: #ffffff !important; border: none !important; font-weight: 800 !important;
         text-transform: uppercase !important; padding: 8px 24px !important; border-radius: 8px !important; font-size: 0.9rem !important; cursor: pointer !important;
     }
+
+    /* Fix Tela Login */
+    body.login-page { background-color: #111827 !important; }
+    .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
-        // PADRONIZAÇÃO BOTÃO ADICIONAR DAS TABELAS
-        const btnSuccess = document.querySelectorAll('.btn-success');
-        btnSuccess.forEach(btn => {
-            if (btn.innerText.toLowerCase().includes('adicionar')) {
-                btn.innerHTML = '<i class="fas fa-plus"></i> <span style="color: white !important;">Adicionar</span>';
-            }
-        });
+        // 1. EXTIRPADOR DO "|" NOS NÓS DE TEXTO (Preciso e não quebra HTML)
+        setInterval(function() {
+            document.querySelectorAll('.content-header h1').forEach(function(h1) {
+                h1.childNodes.forEach(function(node) {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.includes('|')) {
+                        node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
+                    }
+                });
+            });
+        }, 50);
 
-        // MENU CONTA COM LOGOUT DIRETO (Evita erro 405)
+        // 2. RECUPERAÇÃO DO MENU CONTA (Sair e Senha)
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             const contaHtml = `

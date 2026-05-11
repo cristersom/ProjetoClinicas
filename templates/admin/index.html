@@ -96,6 +96,12 @@
                 <div class="card-body">
                     <a href="/admin/narrativa/narrativa/add/" class="quick-action-btn border-blue"><span>Nova Jornada</span><i class="fas fa-plus"></i></a>
                     <a href="{% url 'narrativa:faq' %}" class="quick-action-btn" style="background-color: #064e3b; border-color: #065f46;"><span class="text-white">Ver Manual</span></a>
+
+                    {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa %}
+                    <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="quick-action-btn mt-2" style="background-color: #7f1d1d; border-color: #991b1b;">
+                        <span class="text-white">Gerenciar Plano</span><i class="fas fa-credit-card"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
