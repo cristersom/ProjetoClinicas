@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL BÁSICO E ALINHAMENTO
+       1. MODO ESCURO GERAL BÁSICO
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
@@ -31,79 +31,137 @@
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     label, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
-    .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; }
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; }
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; }
+    .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; }
+    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; outline: none !important; }
+    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       3. ESTRUTURA DOS INLINES EM BLOCO (STACKED) - A NOVA EXPERIÊNCIA
+       3. ANIQUILANDO O NESTED_ADMIN (A PLÁSTICA FLUIDA)
+       O uso de "body .classe" aumenta a prioridade e força a nossa vontade.
        ===================================================================== */
-    /* Container principal do grupo de inlines */
-    .inline-group, .djn-group {
-        background-color: transparent !important;
+
+    /* Remove o fundo fantasma principal */
+    body .inline-group, body .djn-group {
+        background: transparent !important;
         border: none !important;
-        margin-top: 15px;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 15px !important;
     }
 
-    /* Cada "Cartão" de opção ou pergunta */
-    .inline-related, .djn-item {
+    /* O Cartão da Pergunta ou Escolha */
+    body .inline-related, body .djn-item {
         background-color: #1f2937 !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 8px !important;
-        margin-bottom: 20px !important;
-        overflow: hidden;
+        border: 1px solid #374151 !important;
+        border-radius: 12px !important;
+        margin-bottom: 24px !important;
+        padding: 0 !important;
     }
 
-    /* Cabeçalho do Cartão */
-    .inline-related h3, .djn-item h3 {
+    /* O Cabeçalho do Cartão (Onde fica o Título e o botão Remover) */
+    body .inline-related > h3, body .djn-item > h3 {
         background-color: #111827 !important;
         color: #14b8a6 !important;
-        padding: 12px 15px !important;
+        padding: 16px 20px !important;
         margin: 0 !important;
+        border-bottom: 1px solid #374151 !important;
+        border-radius: 12px 12px 0 0 !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
         font-size: 1.1rem !important;
-        border-bottom: 1px solid #4b5563 !important;
-        display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* Espaçamento interno dos campos */
-    .inline-related fieldset, .djn-item fieldset { padding: 20px !important; }
+    /* Esconde o quadradinho feio de arraste do nested_admin */
+    body .djn-drag-handler { display: none !important; }
+    body .djn-item > h3 > b, body .inline-related > h3 > b { font-weight: bold !important; background: transparent !important; border: none !important; padding: 0 !important;}
 
-    /* Botões de Adicionar */
-    .add-row, .djn-add-item { margin-top: 15px; text-align: left; background: transparent !important; border: none !important;}
-    .add-row a, .djn-add-item a {
-        background-color: #0d9488 !important;
-        color: #ffffff !important;
-        padding: 10px 24px !important;
-        border-radius: 8px !important;
-        font-weight: 700 !important;
-        text-decoration: none !important;
-        display: inline-block !important;
+    /* Corpo onde ficam os campos de digitar */
+    body .djn-fieldset, body .inline-related > fieldset {
+        padding: 24px !important;
+        background: transparent !important;
         border: none !important;
-        transition: 0.2s;
     }
-    .add-row a:hover, .djn-add-item a:hover { background-color: #0f766e !important; }
 
-    /* Botão Vermelho de Remover no cabeçalho */
-    .inline-deletelink, .djn-remove-handler {
-        background-color: #ef4444 !important; color: white !important; border-radius: 4px !important; padding: 4px 10px !important; font-size: 0.85rem !important; text-decoration: none !important; float: right;
+    /* Sub-bloco: "Opcao respostas" (Destaca sem poluir) */
+    body .djn-group-nested {
+        background-color: #111827 !important; /* Mais escuro */
+        border: 1px dashed #4b5563 !important; /* Borda tracejada elegante */
+        border-radius: 12px !important;
+        padding: 20px !important;
+        margin-top: 15px !important;
     }
-    .inline-deletelink:hover, .djn-remove-handler:hover { background-color: #dc2626 !important; }
+    body .djn-group-nested > h2 {
+        background: transparent !important;
+        color: #9ca3af !important;
+        border: none !important;
+        border-bottom: 1px solid #374151 !important;
+        padding: 0 0 10px 0 !important;
+        margin-bottom: 20px !important;
+        font-size: 0.9rem !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
 
     /* =====================================================================
-       4. BOTÕES DO TOPO E SALVAR
+       4. BOTÕES E UX
        ===================================================================== */
-    .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 15px !important; flex-wrap: wrap; }
-    .object-tools a, .btn-light, .btn-default, .btn-outline-secondary {
-        background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s;
+
+    /* Botão Remover Discreto (Ghost Button) */
+    body .djn-remove-handler, body .inline-deletelink {
+        background-color: transparent !important;
+        color: #ef4444 !important;
+        border: 1px solid #ef4444 !important;
+        padding: 6px 16px !important;
+        border-radius: 6px !important;
+        font-size: 0.85rem !important;
+        font-weight: 800 !important;
+        text-transform: uppercase !important;
+        text-decoration: none !important;
     }
+    body .djn-remove-handler:hover, body .inline-deletelink:hover {
+        background-color: #ef4444 !important;
+        color: white !important;
+    }
+
+    /* BOTÕES ADICIONAR (Full-Width, Grandes e Claros) */
+    body .djn-add-item, body .add-row {
+        background: transparent !important;
+        border: none !important;
+        padding: 0 !important;
+        margin-top: 15px !important;
+    }
+    body .djn-add-item a, body .add-row a, body .djn-add-handler {
+        display: block !important;
+        width: 100% !important;
+        background-color: #14b8a6 !important;
+        color: white !important;
+        text-align: center !important;
+        padding: 14px !important;
+        border-radius: 8px !important;
+        font-size: 1rem !important;
+        font-weight: bold !important;
+        text-decoration: none !important;
+        box-sizing: border-box !important;
+        transition: all 0.2s ease !important;
+    }
+    body .djn-add-item a:hover, body .add-row a:hover, body .djn-add-handler:hover {
+        background-color: #0d9488 !important;
+        transform: translateY(-2px);
+    }
+
+    /* Botões do Topo (Importar, Exportar, Salvar) */
+    .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
+    .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
 
-    .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; }
+    .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important; }
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
-    .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; }
+    .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
 
+    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
