@@ -13,8 +13,9 @@
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
+    /* Aba principal sem bordas extras */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
-        background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important;
+        background-color: #1f2937 !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important;
     }
 
     /* =====================================================================
@@ -38,7 +39,7 @@
        3. CONTRASTE DE ABAS E INPUTS
        ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; }
+    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
@@ -50,31 +51,29 @@
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. ANIQUILAÇÃO DOS CABEÇALHOS E PADDINGS FANTASMAS (Baseado no Print)
+       4. O VERDADEIRO FLAT DESIGN (Zero Caixas, Zero Bordas)
        ===================================================================== */
 
-    /* Zera os paddings que estavam a criar a caixa verde no DevTools */
+    /* Zera TUDO das caixas (Backgrounds, bordas, sombras e paddings fantasmas) */
     .inline-group > fieldset.card,
     .inline-group > fieldset.card > .card-body,
     .djn-group > fieldset.card,
     .djn-group > fieldset.card > .card-body,
-    .inline-group, .djn-group, fieldset.card-outline {
+    .inline-group, .djn-group, fieldset.card-outline,
+    .inline-related, .djn-item, .inline-related fieldset, .djn-fieldset {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
         padding: 0 !important;
         margin: 0 !important;
+        border-radius: 0 !important;
     }
 
-    /* Oculta os cabeçalhos específicos do Bootstrap/Jazzmin (.card-header e .panel-heading) */
-    .inline-related .card-header,
-    .inline-related .panel-heading,
-    .inline-related > h3,
-    .inline-related > legend,
-    .djn-item .card-header,
-    .djn-item .panel-heading,
-    .djn-item > h3,
-    .djn-item > legend,
+    /* Oculta completamente todos os títulos repetitivos */
+    .inline-related .card-header, .inline-related .panel-heading,
+    .inline-related > h3, .inline-related > legend,
+    .djn-item .card-header, .djn-item .panel-heading,
+    .djn-item > h3, .djn-item > legend,
     .inline_label {
         display: none !important;
         visibility: hidden !important;
@@ -86,53 +85,48 @@
         padding: 0 !important;
     }
 
-    /* =====================================================================
-       5. O VERDADEIRO CARTÃO DA OPÇÃO
-       ===================================================================== */
+    /* LAYOUT PLANO: Campos diretamente na tela, separados por uma linha subtil */
     .inline-related, .djn-item {
-        background-color: #1f2937 !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 12px !important;
-        margin-top: 15px !important;
-        margin-bottom: 25px !important;
         position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Respiro em baixo para o botão Remover */
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        padding: 20px 0 60px 0 !important; /* 60px no fundo dão respiro ao botão Remover */
+        border-bottom: 1px solid #374151 !important; /* Linha de separação entre as escolhas/perguntas */
     }
 
-    .inline-related fieldset, .djn-fieldset {
-        padding: 0 !important;
-        margin: 0 !important;
+    /* A última escolha não precisa da linha separadora */
+    .inline-related.last-related, .djn-item:last-of-type {
+        border-bottom: none !important;
+    }
+
+    /* SUB-NÍVEL (ex: Opções dentro das Perguntas) ganham apenas um pequeno recuo visual */
+    .djn-group-nested {
         background: transparent !important;
         border: none !important;
-    }
-
-    .djn-group-nested {
-        background-color: #111827 !important;
-        border: 1px dashed #6b7280 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
+        border-left: 3px solid #4b5563 !important; /* Traço lateral elegante para indicar hierarquia */
+        border-radius: 0 !important;
+        padding: 10px 0 10px 20px !important;
         margin-top: 20px !important;
     }
     .djn-group-nested > h2 {
         background: transparent !important; color: #9ca3af !important; border: none !important;
-        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.9rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
+        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
     }
 
     /* =====================================================================
-       6. BOTÕES
+       5. BOTÕES DE AÇÃO
        ===================================================================== */
+
+    /* BOTÃO REMOVER: Discreto e alinhado ao canto direito */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
-        right: 15px !important;
+        right: 0 !important; /* Agora que não há caixa, alinha à extrema direita */
         z-index: 99 !important;
         background-color: transparent !important;
         color: #ef4444 !important;
         border: 1px solid #ef4444 !important;
         border-radius: 6px !important;
-        padding: 6px 16px !important;
-        font-size: 0.85rem !important;
+        padding: 4px 12px !important;
+        font-size: 0.8rem !important;
         text-decoration: none !important;
         font-weight: bold !important;
         text-transform: uppercase !important;
@@ -142,18 +136,17 @@
     .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover {
         background-color: #ef4444 !important; color: white !important;
     }
-
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; color: inherit !important;}
-    .delete label::after { content: "Remover"; font-size: 0.85rem !important; }
+    .delete label::after { content: "Remover"; font-size: 0.8rem !important; }
 
-    .add-row, .djn-add-item {
-        margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important;
-    }
+    /* BOTÃO ADICIONAR LARGO */
+    .add-row, .djn-add-item { margin-top: 20px !important; padding: 0 !important; background: transparent !important; border: none !important; }
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px 20px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important;
+        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s;
     }
-    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; transform: translateY(-1px); }
+    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
 
+    /* Botões do Topo e Salvar */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
@@ -161,6 +154,7 @@
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
 
+    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -170,6 +164,7 @@
 {{ block.super }}
 <script>
     window.addEventListener('load', function() {
+        // Remove a sujeira do título " | "
         const h1 = document.querySelector('.content-header h1');
         if (h1 && h1.innerHTML.includes('|')) {
             h1.innerHTML = h1.innerHTML.split('|')[0].trim();
