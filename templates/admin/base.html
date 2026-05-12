@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL BÁSICO
+       1. MODO ESCURO GERAL BÁSICO E ALINHAMENTO
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
@@ -17,16 +17,13 @@
         background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important;
     }
 
-    /* =====================================================================
-       2. ALINHAMENTO MILIMÉTRICO
-       ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
     .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
-       3. CONTRASTE DE ABAS E INPUTS
+       2. CONTRASTE DE ABAS E INPUTS
        ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; }
@@ -41,66 +38,63 @@
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. PLÁSTICA DOS INLINES E NESTED ADMIN (Escolhas e Perguntas)
+       3. ESTRUTURA DOS INLINES EM BLOCO (STACKED) - A NOVA EXPERIÊNCIA
        ===================================================================== */
-    /* Remove as bordas brancas e ajusta o fundo geral */
-    .inline-group, .djn-group, .djn-group-nested, .inline-related {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        margin-bottom: 15px !important;
-        box-shadow: none !important;
+    /* Container principal do grupo de inlines */
+    .inline-group, .djn-group {
+        background-color: transparent !important;
+        border: none !important;
+        margin-top: 15px;
     }
 
-    /* Fundo dos cabeçalhos dos Inlines */
-    .inline-group h2, .djn-group h2 {
+    /* Cada "Cartão" de opção ou pergunta */
+    .inline-related, .djn-item {
+        background-color: #1f2937 !important;
+        border: 1px solid #4b5563 !important;
+        border-radius: 8px !important;
+        margin-bottom: 20px !important;
+        overflow: hidden;
+    }
+
+    /* Cabeçalho do Cartão */
+    .inline-related h3, .djn-item h3 {
         background-color: #111827 !important;
         color: #14b8a6 !important;
-        border-bottom: 1px solid #374151 !important;
-        margin: 0 !important; padding: 12px 15px !important;
+        padding: 12px 15px !important;
+        margin: 0 !important;
+        font-size: 1.1rem !important;
+        border-bottom: 1px solid #4b5563 !important;
+        display: flex; justify-content: space-between; align-items: center;
     }
 
-    /* As "caixinhas" dentro das Perguntas (Opções de Resposta) */
-    .djn-item, .djn-items, fieldset.djn-fieldset {
-        background-color: #111827 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 6px !important;
-        padding: 5px !important;
-    }
+    /* Espaçamento interno dos campos */
+    .inline-related fieldset, .djn-item fieldset { padding: 20px !important; }
 
-    /* Fim do scrollbar horizontal nojento */
-    .table-responsive, .tabular { overflow-x: visible !important; width: 100% !important; }
-    .tabular.inline-related table, table.djn-table { width: 100% !important; margin: 0 !important; background-color: transparent !important; }
-
-    /* Cabeçalhos e Linhas das Tabelas */
-    .tabular.inline-related th, table.djn-table th { background-color: #111827 !important; color: #d1d5db !important; border-bottom: 2px solid #374151 !important; font-weight: bold !important; padding: 10px !important;}
-    .tabular.inline-related td, table.djn-table td { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; padding: 10px !important; vertical-align: middle !important;}
-    .tabular.inline-related tbody tr:hover td { background-color: #374151 !important; }
-
-    /* Estética dos Botões "Adicionar outro(a)" */
-    .add-row, .djn-add-item { background-color: transparent !important; border: none !important; padding: 15px 0 !important; text-align: left !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler {
+    /* Botões de Adicionar */
+    .add-row, .djn-add-item { margin-top: 15px; text-align: left; background: transparent !important; border: none !important;}
+    .add-row a, .djn-add-item a {
         background-color: #0d9488 !important;
         color: #ffffff !important;
-        padding: 8px 20px !important;
-        border-radius: 6px !important;
+        padding: 10px 24px !important;
+        border-radius: 8px !important;
         font-weight: 700 !important;
         text-decoration: none !important;
         display: inline-block !important;
         border: none !important;
         transition: 0.2s;
     }
-    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0f766e !important; color: white !important; }
+    .add-row a:hover, .djn-add-item a:hover { background-color: #0f766e !important; }
 
-    /* Botão Vermelho de Remover */
-    .djn-remove-handler, .inline-deletelink { background-color: #ef4444 !important; color: white !important; border-radius: 4px !important; padding: 6px 12px !important; border: none !important; font-weight: bold !important;}
-    .djn-remove-handler:hover, .inline-deletelink:hover { background-color: #dc2626 !important; color: white !important; }
+    /* Botão Vermelho de Remover no cabeçalho */
+    .inline-deletelink, .djn-remove-handler {
+        background-color: #ef4444 !important; color: white !important; border-radius: 4px !important; padding: 4px 10px !important; font-size: 0.85rem !important; text-decoration: none !important; float: right;
+    }
+    .inline-deletelink:hover, .djn-remove-handler:hover { background-color: #dc2626 !important; }
 
     /* =====================================================================
-       5. BOTÕES DO TOPO (IMPORTAR/EXPORTAR E SALVAR)
+       4. BOTÕES DO TOPO E SALVAR
        ===================================================================== */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 15px !important; flex-wrap: wrap; }
-
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary {
         background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s;
     }
@@ -110,7 +104,6 @@
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; }
 
-    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -143,31 +136,16 @@
 
 {% block messages %}
     {{ block.super }}
-
     {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
     <div style="background-color: #1f2937; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 0 15px 25px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap;">
         <div style="display: flex; align-items: center; padding-right: 15px;">
             <i class="fas fa-exclamation-triangle fa-2x" style="color: #f59e0b; margin-right: 15px;"></i>
             <div>
                 <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Pagamento Pendente</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento, realize a renovação para continuar acessando nossos serviços e editando conteúdos.</p>
+                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento.</p>
             </div>
         </div>
-        <a href="{% url 'narrativa:planos' %}" style="background-color: #f59e0b; color: white; font-weight: 800; padding: 12px 25px; border-radius: 6px; text-decoration: none; text-align: center; white-space: nowrap !important; min-width: 140px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">VER PLANOS</a>
+        <a href="{% url 'narrativa:planos' %}" style="background-color: #f59e0b; color: white; font-weight: 800; padding: 12px 25px; border-radius: 6px; text-decoration: none; text-align: center;">VER PLANOS</a>
     </div>
     {% endif %}
-
-    {% if request.clinica_realtime and request.clinica_realtime.assinatura_ativa and request.limite_atingido %}
-    <div style="background-color: #1f2937; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 20px; margin: 0 15px 25px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap;">
-        <div style="display: flex; align-items: center; padding-right: 15px;">
-            <i class="fas fa-arrow-circle-up fa-2x" style="color: #3b82f6; margin-right: 15px;"></i>
-            <div>
-                <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Limite Atingido</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Você alcançou o número máximo de jornadas do seu plano. Faça um upgrade para expandir.</p>
-            </div>
-        </div>
-        <a href="{% url 'narrativa:planos' %}" style="background-color: #3b82f6; color: white; font-weight: 800; padding: 12px 25px; border-radius: 6px; text-decoration: none; text-align: center; white-space: nowrap !important; min-width: 160px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">FAZER UPGRADE</a>
-    </div>
-    {% endif %}
-
 {% endblock %}

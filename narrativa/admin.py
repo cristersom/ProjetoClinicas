@@ -56,8 +56,6 @@ class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
     def has_view_permission(self, request, obj=None): return True
 
-    # Usamos *args e **kwargs porque o Django envia argumentos diferentes
-    # para a página principal (ModelAdmin) e para as opções internas (InlineModelAdmin)
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
@@ -77,21 +75,23 @@ class TenantPermissionsMixin:
         return True
 
 
-# AQUI ESTAVA O SEU PROBLEMA: O TenantPermissionsMixin foi adicionado para dar permissão!
-class EscolhaInline(TenantPermissionsMixin, admin.TabularInline):
+# ==========================================
+# INLINES ESTRUTURADOS EM BLOCO (STACKED) PARA MELHOR UX
+# ==========================================
+class EscolhaInline(TenantPermissionsMixin, admin.StackedInline):
     model = Escolha
     fk_name = 'cena_origem'
-    extra = 1
+    extra = 0
 
-class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedTabularInline):
+class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
 
-class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedTabularInline):
+class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = Pergunta
     fk_name = 'questionario'
-    extra = 1
+    extra = 0
     inlines = [OpcaoRespostaInline]
 
 
