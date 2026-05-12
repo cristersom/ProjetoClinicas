@@ -56,7 +56,9 @@ class TenantPermissionsMixin:
     def has_module_permission(self, request): return True
     def has_view_permission(self, request, obj=None): return True
 
-    def has_add_permission(self, request):
+    # Usamos *args e **kwargs porque o Django envia argumentos diferentes
+    # para a página principal (ModelAdmin) e para as opções internas (InlineModelAdmin)
+    def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
         if c and not c.assinatura_ativa: return False
@@ -75,17 +77,18 @@ class TenantPermissionsMixin:
         return True
 
 
-class EscolhaInline(admin.TabularInline):
+# AQUI ESTAVA O SEU PROBLEMA: O TenantPermissionsMixin foi adicionado para dar permissão!
+class EscolhaInline(TenantPermissionsMixin, admin.TabularInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 1
 
-class OpcaoRespostaInline(nested_admin.NestedTabularInline):
+class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedTabularInline):
     model = OpcaoResposta
     extra = 0
     fk_name = 'pergunta'
 
-class PerguntaInline(nested_admin.NestedTabularInline):
+class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedTabularInline):
     model = Pergunta
     fk_name = 'questionario'
     extra = 1
@@ -122,7 +125,7 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_filter = ('categoria',)
     search_fields = ('titulo',)
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
         if c:
@@ -135,7 +138,7 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
                     return False
             except Exception:
                 pass
-        return super().has_add_permission(request)
+        return super().has_add_permission(request, *args, **kwargs)
 
     def get_exclude(self, request, obj=None):
         if request.user.is_superuser: return ('visualizacoes',)
