@@ -13,7 +13,6 @@
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
-    /* Aba principal */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
         background-color: #1f2937 !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important;
     }
@@ -36,7 +35,7 @@
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
-       3. CONTRASTE DE ABAS E INPUTS
+       3. CONTRASTE DE ABAS E INPUTS GERAIS
        ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important;}
@@ -44,65 +43,82 @@
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     label, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
-    .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; outline: none !important;}
+
+    /* Pega todos os inputs nativos do Django (.vTextField, etc) e força o escuro */
+    body .form-control, body input, body select, body textarea,
+    body .vTextField, body .vLargeTextField, body .vURLField, body .vNumberField {
+        background-color: #374151 !important;
+        color: #ffffff !important;
+        border: 1px solid #4b5563 !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        box-sizing: border-box !important;
+    }
+    body .form-control:focus, body input:focus, body select:focus, body textarea:focus { border-color: #14b8a6 !important; outline: none !important;}
+
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. O MEIO-TERMO PERFEITO (Cartões Únicos e Limpos)
+       4. ESTRUTURA DO CARTÃO (O MEIO-TERMO PERFEITO)
        ===================================================================== */
 
-    /* 4.1 Zera APENAS os wrappers inúteis do Jazzmin/Nested Admin */
-    .inline-group > fieldset.card,
-    .inline-group > fieldset.card > .card-body,
-    .djn-group > fieldset.card,
-    .djn-group > fieldset.card > .card-body,
+    /* Zera os wrappers inúteis do Jazzmin/Nested Admin */
+    .inline-group > fieldset.card, .inline-group > fieldset.card > .card-body,
+    .djn-group > fieldset.card, .djn-group > fieldset.card > .card-body,
     .inline-group, .djn-group, fieldset.card-outline {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        border-radius: 0 !important;
+        background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important;
     }
 
-    /* 4.2 Oculta os cabeçalhos chatos e repetitivos */
+    /* Oculta os cabeçalhos chatos e O TÍTULO GERAL DO GRUPO (ex: "Perguntas") */
+    body .inline-group > h2, body .djn-group > h2,
     .inline-related .card-header, .inline-related .panel-heading,
     .inline-related > h3, .inline-related > legend,
     .djn-item .card-header, .djn-item .panel-heading,
-    .djn-item > h3, .djn-item > legend,
-    .inline_label {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        height: 0 !important;
-        position: absolute !important;
-        pointer-events: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    .djn-item > h3, .djn-item > legend, .inline_label {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; position: absolute !important; pointer-events: none !important; margin: 0 !important; padding: 0 !important;
     }
 
-    /* 4.3 O NOVO CARTÃO: Devolvemos a forma, com elegância */
+    /* O NOVO CARTÃO: Suave e elegante */
     .inline-related, .djn-item {
-        background-color: #273548 !important; /* Levemente mais claro que o fundo da aba */
+        background-color: #273548 !important;
         border: 1px solid #4b5563 !important;
         border-radius: 12px !important;
         position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Espaço inferior para o botão Remover */
+        padding: 24px 24px 70px 24px !important; /* Espaço para o botão Remover */
         margin-bottom: 24px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* Remove padding dos fields para colarem certinho dentro do novo cartão */
     .inline-related fieldset, .djn-fieldset {
         padding: 0 !important; margin: 0 !important; background: transparent !important; border: none !important;
     }
 
-    /* 4.4 Sub-nível (ex: Opções dentro das Perguntas) ganham destaque sem virar caixote */
+    /* 4.5 FORMULÁRIO MODERNO (Layout SaaS) */
+    /* Transforma as linhas em colunas: Etiqueta em cima, Caixa de texto larga em baixo */
+    body .inline-related .form-row, body .djn-item .form-row {
+        display: flex !important;
+        flex-direction: column !important;
+        border-bottom: none !important;
+        padding: 10px 0 !important;
+    }
+    body .inline-related .form-row label, body .djn-item .form-row label {
+        width: 100% !important;
+        text-align: left !important;
+        padding: 0 0 8px 0 !important;
+        font-size: 0.9rem !important;
+    }
+    body .inline-related .vTextField, body .djn-item .vTextField,
+    body .inline-related .vLargeTextField, body .djn-item .vLargeTextField,
+    body .inline-related select, body .djn-item select {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Sub-nível (ex: Opções dentro das Perguntas) */
     .djn-group-nested {
-        background-color: #1f2937 !important; /* Um tom ligeiramente mais escuro que o cartão pai */
+        background-color: #1f2937 !important;
         border: 1px dashed #6b7280 !important;
         border-radius: 8px !important;
         padding: 20px !important;
@@ -117,7 +133,7 @@
        5. BOTÕES DE AÇÃO
        ===================================================================== */
 
-    /* BOTÃO REMOVER: Discreto e ancorado dentro do novo Cartão */
+    /* BOTÃO REMOVER: Fixo no canto inferior direito do Cartão */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
