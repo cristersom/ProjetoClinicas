@@ -13,7 +13,7 @@
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
-    /* Aba principal sem bordas extras */
+    /* Aba principal */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
         background-color: #1f2937 !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important;
     }
@@ -51,16 +51,15 @@
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. O VERDADEIRO FLAT DESIGN (Zero Caixas, Zero Bordas)
+       4. O MEIO-TERMO PERFEITO (Cartões Únicos e Limpos)
        ===================================================================== */
 
-    /* Zera TUDO das caixas (Backgrounds, bordas, sombras e paddings fantasmas) */
+    /* 4.1 Zera APENAS os wrappers inúteis do Jazzmin/Nested Admin */
     .inline-group > fieldset.card,
     .inline-group > fieldset.card > .card-body,
     .djn-group > fieldset.card,
     .djn-group > fieldset.card > .card-body,
-    .inline-group, .djn-group, fieldset.card-outline,
-    .inline-related, .djn-item, .inline-related fieldset, .djn-fieldset {
+    .inline-group, .djn-group, fieldset.card-outline {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -69,7 +68,7 @@
         border-radius: 0 !important;
     }
 
-    /* Oculta completamente todos os títulos repetitivos */
+    /* 4.2 Oculta os cabeçalhos chatos e repetitivos */
     .inline-related .card-header, .inline-related .panel-heading,
     .inline-related > h3, .inline-related > legend,
     .djn-item .card-header, .djn-item .panel-heading,
@@ -85,25 +84,28 @@
         padding: 0 !important;
     }
 
-    /* LAYOUT PLANO: Campos diretamente na tela, separados por uma linha subtil */
+    /* 4.3 O NOVO CARTÃO: Devolvemos a forma, com elegância */
     .inline-related, .djn-item {
+        background-color: #273548 !important; /* Levemente mais claro que o fundo da aba */
+        border: 1px solid #4b5563 !important;
+        border-radius: 12px !important;
         position: relative !important;
-        padding: 20px 0 60px 0 !important; /* 60px no fundo dão respiro ao botão Remover */
-        border-bottom: 1px solid #374151 !important; /* Linha de separação entre as escolhas/perguntas */
+        padding: 24px 24px 70px 24px !important; /* Espaço inferior para o botão Remover */
+        margin-bottom: 24px !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
     }
 
-    /* A última escolha não precisa da linha separadora */
-    .inline-related.last-related, .djn-item:last-of-type {
-        border-bottom: none !important;
+    /* Remove padding dos fields para colarem certinho dentro do novo cartão */
+    .inline-related fieldset, .djn-fieldset {
+        padding: 0 !important; margin: 0 !important; background: transparent !important; border: none !important;
     }
 
-    /* SUB-NÍVEL (ex: Opções dentro das Perguntas) ganham apenas um pequeno recuo visual */
+    /* 4.4 Sub-nível (ex: Opções dentro das Perguntas) ganham destaque sem virar caixote */
     .djn-group-nested {
-        background: transparent !important;
-        border: none !important;
-        border-left: 3px solid #4b5563 !important; /* Traço lateral elegante para indicar hierarquia */
-        border-radius: 0 !important;
-        padding: 10px 0 10px 20px !important;
+        background-color: #1f2937 !important; /* Um tom ligeiramente mais escuro que o cartão pai */
+        border: 1px dashed #6b7280 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
         margin-top: 20px !important;
     }
     .djn-group-nested > h2 {
@@ -115,17 +117,17 @@
        5. BOTÕES DE AÇÃO
        ===================================================================== */
 
-    /* BOTÃO REMOVER: Discreto e alinhado ao canto direito */
+    /* BOTÃO REMOVER: Discreto e ancorado dentro do novo Cartão */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
-        right: 0 !important; /* Agora que não há caixa, alinha à extrema direita */
+        right: 15px !important;
         z-index: 99 !important;
         background-color: transparent !important;
         color: #ef4444 !important;
         border: 1px solid #ef4444 !important;
         border-radius: 6px !important;
-        padding: 4px 12px !important;
+        padding: 4px 16px !important;
         font-size: 0.8rem !important;
         text-decoration: none !important;
         font-weight: bold !important;
