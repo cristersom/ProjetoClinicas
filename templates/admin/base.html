@@ -18,12 +18,11 @@
     }
 
     /* =====================================================================
-       2. TÍTULO E EXTINÇÃO ABSOLUTA DA BORDA DIREITA (Conforme DevTools)
+       2. TÍTULO E EXTINÇÃO ABSOLUTA DA BORDA DIREITA
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
-    /* Regra Nuclear contra a classe do Bootstrap detectada no print */
     h1, .content-header h1, h1.border-right, .border-right {
         border-right: none !important;
         padding-right: 0 !important;
@@ -51,60 +50,63 @@
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. EXTINÇÃO DO TEXTO E DOS WRAPPERS REPETITIVOS (Sem prefixos fantasmas)
+       4. ANIQUILAÇÃO DOS CABEÇALHOS E PADDINGS FANTASMAS (Baseado no Print)
        ===================================================================== */
 
-    /* Oculta COMPLETAMENTE todos os títulos redundantes ("+ Novo Escolha") */
+    /* Zera os paddings que estavam a criar a caixa verde no DevTools */
+    .inline-group > fieldset.card,
+    .inline-group > fieldset.card > .card-body,
+    .djn-group > fieldset.card,
+    .djn-group > fieldset.card > .card-body,
+    .inline-group, .djn-group, fieldset.card-outline {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Oculta os cabeçalhos específicos do Bootstrap/Jazzmin (.card-header e .panel-heading) */
+    .inline-related .card-header,
+    .inline-related .panel-heading,
     .inline-related > h3,
+    .inline-related > legend,
+    .djn-item .card-header,
+    .djn-item .panel-heading,
     .djn-item > h3,
-    .djn-group-nested > h2,
+    .djn-item > legend,
     .inline_label {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
         position: absolute !important;
         pointer-events: none !important;
-    }
-
-    /* Remove o Fundo Cinza dos Wrappers externos apontados no seu print */
-    .inline-group,
-    .djn-group,
-    .inline-group .card-body,
-    .djn-group .card-body,
-    fieldset.card-outline {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
+        margin: 0 !important;
         padding: 0 !important;
-        margin-top: 10px !important;
     }
 
-    /* O CARTÃO PRINCIPAL (Limpo e Minimalista) */
-    .inline-related,
-    .djn-item {
+    /* =====================================================================
+       5. O VERDADEIRO CARTÃO DA OPÇÃO
+       ===================================================================== */
+    .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #4b5563 !important;
         border-radius: 12px !important;
+        margin-top: 15px !important;
         margin-bottom: 25px !important;
         position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Espaço para o botão Remover */
+        padding: 24px 24px 70px 24px !important; /* Respiro em baixo para o botão Remover */
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-        display: block !important;
     }
 
-    /* Tira os recuos dentro do cartão */
-    .inline-related fieldset,
-    .djn-fieldset {
+    .inline-related fieldset, .djn-fieldset {
         padding: 0 !important;
         margin: 0 !important;
         background: transparent !important;
         border: none !important;
     }
 
-    /* Sub-cartão das Respostas */
     .djn-group-nested {
         background-color: #111827 !important;
         border: 1px dashed #6b7280 !important;
@@ -112,16 +114,19 @@
         padding: 20px !important;
         margin-top: 20px !important;
     }
+    .djn-group-nested > h2 {
+        background: transparent !important; color: #9ca3af !important; border: none !important;
+        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.9rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
+    }
 
     /* =====================================================================
-       5. BOTÕES: REMOVER E ADICIONAR
+       6. BOTÕES
        ===================================================================== */
-    /* BOTÃO REMOVER: Fica preso no canto inferior direito */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
         right: 15px !important;
-        z-index: 10 !important;
+        z-index: 99 !important;
         background-color: transparent !important;
         color: #ef4444 !important;
         border: 1px solid #ef4444 !important;
@@ -141,14 +146,14 @@
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; color: inherit !important;}
     .delete label::after { content: "Remover"; font-size: 0.85rem !important; }
 
-    /* BOTÃO ADICIONAR: Largo e fácil de clicar */
-    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; }
+    .add-row, .djn-add-item {
+        margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important;
+    }
     .add-row a, .djn-add-item a, .djn-add-handler {
         background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px 20px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; transform: translateY(-1px); }
 
-    /* Botões do Topo e Salvar */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
@@ -156,7 +161,6 @@
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
 
-    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -166,13 +170,9 @@
 {{ block.super }}
 <script>
     window.addEventListener('load', function() {
-        // Limpa o texto original da tag do título e da breadcrumb, mantendo apenas o H1 puro
         const h1 = document.querySelector('.content-header h1');
-        if (h1) {
-            h1.classList.remove('border-right');
-            if (h1.innerHTML.includes('|')) {
-                h1.innerHTML = h1.innerHTML.split('|')[0].trim();
-            }
+        if (h1 && h1.innerHTML.includes('|')) {
+            h1.innerHTML = h1.innerHTML.split('|')[0].trim();
         }
 
         document.querySelectorAll('.nav-link').forEach(function(el) {
