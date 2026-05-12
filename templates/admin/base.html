@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL BÁSICO
+       1. BASE E MODO ESCURO GERAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
@@ -18,149 +18,148 @@
     }
 
     /* =====================================================================
-       2. TÍTULO E EXTINÇÃO ABSOLUTA DA BORDA DIREITA
+       2. TOPO LIMPO
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
     h1, .content-header h1, h1.border-right, .border-right {
-        border-right: none !important;
-        padding-right: 0 !important;
-        margin-right: 0 !important;
-        font-size: 1.8rem !important;
-        font-weight: 800 !important;
-        color: #ffffff !important;
+        border-right: none !important; padding-right: 0 !important; margin-right: 0 !important;
+        font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
     }
     .pr-3, .mr-3 { padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
-       3. CONTRASTE DE ABAS E INPUTS GERAIS
+       3. ABAS
        ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    label, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
-
-    /* Pega todos os inputs nativos do Django (.vTextField, etc) e força o escuro */
-    body .form-control, body input, body select, body textarea,
-    body .vTextField, body .vLargeTextField, body .vURLField, body .vNumberField {
-        background-color: #374151 !important;
-        color: #ffffff !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 6px !important;
-        padding: 8px 12px !important;
-        box-sizing: border-box !important;
-    }
-    body .form-control:focus, body input:focus, body select:focus, body textarea:focus { border-color: #14b8a6 !important; outline: none !important;}
-
-    .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
-    .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
-
     /* =====================================================================
-       4. ESTRUTURA DO CARTÃO (O MEIO-TERMO PERFEITO)
+       4. RECONSTRUÇÃO TOTAL DOS FORMULÁRIOS (O Fim do Desastre)
        ===================================================================== */
 
-    /* Zera os wrappers inúteis do Jazzmin/Nested Admin */
-    .inline-group > fieldset.card, .inline-group > fieldset.card > .card-body,
-    .djn-group > fieldset.card, .djn-group > fieldset.card > .card-body,
-    .inline-group, .djn-group, fieldset.card-outline {
-        background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important;
+    /* 4.1. Limpeza dos contentores lixo do Jazzmin */
+    .inline-group > fieldset, .djn-group > fieldset, .card-outline, .inline-group > h2, .djn-group > h2 {
+        display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important;
     }
+    .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important;}
 
-    /* Oculta os cabeçalhos chatos e O TÍTULO GERAL DO GRUPO (ex: "Perguntas") */
-    body .inline-group > h2, body .djn-group > h2,
-    .inline-related .card-header, .inline-related .panel-heading,
-    .inline-related > h3, .inline-related > legend,
-    .djn-item .card-header, .djn-item .panel-heading,
-    .djn-item > h3, .djn-item > legend, .inline_label {
-        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; position: absolute !important; pointer-events: none !important; margin: 0 !important; padding: 0 !important;
-    }
-
-    /* O NOVO CARTÃO: Suave e elegante */
+    /* 4.2. O CARTÃO PRINCIPAL (Pergunta / Escolha) */
     .inline-related, .djn-item {
         background-color: #273548 !important;
         border: 1px solid #4b5563 !important;
         border-radius: 12px !important;
         position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Espaço para o botão Remover */
-        margin-bottom: 24px !important;
+        padding: 20px 20px 70px 20px !important; /* 70px no fundo para o botão de remover não bater nos campos */
+        margin-bottom: 25px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important; /* IMPEDE O SCROLL HORIZONTAL */
     }
 
-    .inline-related fieldset, .djn-fieldset {
-        padding: 0 !important; margin: 0 !important; background: transparent !important; border: none !important;
+    /* 4.3. Esconde títulos repetidos internos */
+    .inline-related h3, .djn-item h3, .inline-related .card-header, .djn-item .card-header, legend {
+        display: none !important;
     }
 
-    /* 4.5 FORMULÁRIO MODERNO (Layout SaaS) */
-    /* Transforma as linhas em colunas: Etiqueta em cima, Caixa de texto larga em baixo */
+    /* 4.4. A Mágica do Layout (Campos a 100% de largura, um debaixo do outro) */
     body .inline-related .form-row, body .djn-item .form-row {
         display: flex !important;
-        flex-direction: column !important;
-        border-bottom: none !important;
-        padding: 10px 0 !important;
+        flex-direction: column !important; /* Etiqueta em cima, input em baixo */
+        margin: 0 0 15px 0 !important; /* Margem apenas para baixo, NUNCA lateral (evita scroll) */
+        padding: 0 !important;
+        border: none !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
-    body .inline-related .form-row label, body .djn-item .form-row label {
+
+    /* As etiquetas (Nomes dos campos) */
+    body .inline-related label, body .djn-item label {
+        color: #d1d5db !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        margin: 0 0 8px 0 !important;
+        padding: 0 !important;
         width: 100% !important;
         text-align: left !important;
-        padding: 0 0 8px 0 !important;
-        font-size: 0.9rem !important;
     }
-    body .inline-related .vTextField, body .djn-item .vTextField,
-    body .inline-related .vLargeTextField, body .djn-item .vLargeTextField,
+
+    /* Os campos de digitar e selecionar (Fim do select gigante!) */
+    body .inline-related input, body .djn-item input,
+    body .inline-related textarea, body .djn-item textarea,
     body .inline-related select, body .djn-item select {
         width: 100% !important;
         max-width: 100% !important;
+        background-color: #374151 !important;
+        color: #ffffff !important;
+        border: 1px solid #4b5563 !important;
+        border-radius: 6px !important;
+        padding: 10px 15px !important;
+        box-sizing: border-box !important;
+        font-size: 0.95rem !important;
+    }
+    body .inline-related input:focus, body .djn-item input:focus,
+    body .inline-related textarea:focus, body .djn-item textarea:focus,
+    body .inline-related select:focus, body .djn-item select:focus {
+        border-color: #14b8a6 !important; outline: none !important;
     }
 
-    /* Sub-nível (ex: Opções dentro das Perguntas) */
+    /* FIX DEFINITIVO PARA AQUELE DROPDOWN GIGANTE FEIO */
+    body select:not([multiple]) {
+        height: 42px !important; /* Trava a altura para não virar listbox */
+        appearance: auto !important; /* Força a setinha do select aparecer */
+    }
+
+    /* Sub-cartões (Ex: Opções de Resposta) */
     .djn-group-nested {
         background-color: #1f2937 !important;
-        border: 1px dashed #6b7280 !important;
+        border: 1px solid #4b5563 !important;
+        border-left: 4px solid #14b8a6 !important; /* Detalhe lateral verde para mostrar hierarquia */
         border-radius: 8px !important;
         padding: 20px !important;
         margin-top: 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .djn-group-nested > h2 {
-        background: transparent !important; color: #9ca3af !important; border: none !important;
-        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
+        display: block !important; visibility: visible !important; height: auto !important; position: static !important;
+        color: #9ca3af !important; background: transparent !important; border: none !important;
+        padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
     }
 
     /* =====================================================================
        5. BOTÕES DE AÇÃO
        ===================================================================== */
 
-    /* BOTÃO REMOVER: Fixo no canto inferior direito do Cartão */
+    /* BOTÃO REMOVER: Fixo em baixo, à direita */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
-        right: 15px !important;
-        z-index: 99 !important;
-        background-color: transparent !important;
-        color: #ef4444 !important;
-        border: 1px solid #ef4444 !important;
+        right: 20px !important;
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+        border: none !important;
         border-radius: 6px !important;
-        padding: 4px 16px !important;
-        font-size: 0.8rem !important;
-        text-decoration: none !important;
+        padding: 8px 16px !important;
+        font-size: 0.85rem !important;
         font-weight: bold !important;
         text-transform: uppercase !important;
-        transition: 0.2s ease;
-        display: inline-flex !important; align-items: center; justify-content: center; margin: 0 !important;
+        text-decoration: none !important;
+        z-index: 10 !important;
     }
-    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover {
-        background-color: #ef4444 !important; color: white !important;
-    }
-    .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; color: inherit !important;}
-    .delete label::after { content: "Remover"; font-size: 0.8rem !important; }
+    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #dc2626 !important; color: white !important; }
+    .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
+    .delete label::after { content: "Remover"; font-size: 0.85rem !important; color: white !important;}
 
-    /* BOTÃO ADICIONAR LARGO */
-    .add-row, .djn-add-item { margin-top: 20px !important; padding: 0 !important; background: transparent !important; border: none !important; }
+    /* BOTÃO ADICIONAR (Largo, visível, limpo) */
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; width: 100% !important;}
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s;
+        background-color: #14b8a6 !important; color: #ffffff !important; padding: 14px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important; width: 100% !important; box-sizing: border-box !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
 
@@ -171,6 +170,12 @@
     .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important; }
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
+
+    /* Select2 UI Fixes */
+    .select2-container { width: 100% !important; }
+    .select2-container--default .select2-selection--single { height: 42px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important;}
+    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; }
 
     /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
@@ -188,10 +193,12 @@
             h1.innerHTML = h1.innerHTML.split('|')[0].trim();
         }
 
+        // Renomeia Aba General
         document.querySelectorAll('.nav-link').forEach(function(el) {
             if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; }
         });
 
+        // Adiciona Menu de Conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
