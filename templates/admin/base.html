@@ -18,16 +18,13 @@
     }
 
     /* =====================================================================
-       2. TOPO E EXTINÇÃO DA BORDA DIREITA
+       2. TÍTULO E EXTINÇÃO ABSOLUTA DA BORDA DIREITA (Conforme DevTools)
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
-    /* Morte à borda (Removendo de qualquer elemento que a tente forçar) */
-    .content-header h1,
-    .content-header .border-right,
-    .content-header h1.border-right,
-    .content-header .col-sm-6 {
+    /* Regra Nuclear contra a classe do Bootstrap detectada no print */
+    h1, .content-header h1, h1.border-right, .border-right {
         border-right: none !important;
         padding-right: 0 !important;
         margin-right: 0 !important;
@@ -35,6 +32,7 @@
         font-weight: 800 !important;
         color: #ffffff !important;
     }
+    .pr-3, .mr-3 { padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
@@ -53,55 +51,60 @@
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. REMOÇÃO DOS WRAPPERS (O "BOX-CEPTION" DO JAZZMIN)
+       4. EXTINÇÃO DO TEXTO E DOS WRAPPERS REPETITIVOS (Sem prefixos fantasmas)
        ===================================================================== */
-    /* Apaga o fieldset e o card-body externos que o Jazzmin injeta */
-    .inline-group > fieldset.card,
-    .inline-group > fieldset.card > .card-body,
-    .inline-group > fieldset.card > .card-header,
-    .djn-group > fieldset.card,
-    .djn-group > fieldset.card > .card-body {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
 
-    /* Esconde os títulos repetitivos (seja h2, h3 ou legend) */
-    .inline-related > h3, .inline-related > legend,
-    .djn-item > h3, .djn-item > legend,
+    /* Oculta COMPLETAMENTE todos os títulos redundantes ("+ Novo Escolha") */
+    .inline-related > h3,
+    .djn-item > h3,
+    .djn-group-nested > h2,
     .inline_label {
         display: none !important;
         visibility: hidden !important;
         opacity: 0 !important;
         height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
         position: absolute !important;
         pointer-events: none !important;
     }
 
-    /* =====================================================================
-       5. O VERDADEIRO CARTÃO DA OPÇÃO (FLUIDO E LIMPO)
-       ===================================================================== */
-    .inline-related, .djn-item {
-        background-color: #1f2937 !important; /* Cor suave alinhada com as abas */
+    /* Remove o Fundo Cinza dos Wrappers externos apontados no seu print */
+    .inline-group,
+    .djn-group,
+    .inline-group .card-body,
+    .djn-group .card-body,
+    fieldset.card-outline {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 10px !important;
+    }
+
+    /* O CARTÃO PRINCIPAL (Limpo e Minimalista) */
+    .inline-related,
+    .djn-item {
+        background-color: #1f2937 !important;
         border: 1px solid #4b5563 !important;
         border-radius: 12px !important;
         margin-bottom: 25px !important;
         position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Respiro em baixo para o botão Remover */
+        padding: 24px 24px 70px 24px !important; /* Espaço para o botão Remover */
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        display: block !important;
     }
 
-    /* Remove recuos dos form fields para encostar bonito no cartão */
-    .inline-related fieldset, .djn-fieldset {
+    /* Tira os recuos dentro do cartão */
+    .inline-related fieldset,
+    .djn-fieldset {
         padding: 0 !important;
         margin: 0 !important;
         background: transparent !important;
         border: none !important;
     }
 
-    /* Sub-cartão (Para Opções de Resposta aninhadas) */
+    /* Sub-cartão das Respostas */
     .djn-group-nested {
         background-color: #111827 !important;
         border: 1px dashed #6b7280 !important;
@@ -109,20 +112,16 @@
         padding: 20px !important;
         margin-top: 20px !important;
     }
-    .djn-group-nested > h2 {
-        background: transparent !important; color: #9ca3af !important; border: none !important;
-        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.9rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
-    }
 
     /* =====================================================================
-       6. BOTÕES (REMOVER FLUTUANTE E ADICIONAR LARGO)
+       5. BOTÕES: REMOVER E ADICIONAR
        ===================================================================== */
     /* BOTÃO REMOVER: Fica preso no canto inferior direito */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
         right: 15px !important;
-        z-index: 99 !important;
+        z-index: 10 !important;
         background-color: transparent !important;
         color: #ef4444 !important;
         border: 1px solid #ef4444 !important;
@@ -133,20 +132,17 @@
         font-weight: bold !important;
         text-transform: uppercase !important;
         transition: 0.2s ease;
-        display: flex !important; align-items: center; justify-content: center;
+        display: inline-flex !important; align-items: center; justify-content: center; margin: 0 !important;
     }
     .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover {
         background-color: #ef4444 !important; color: white !important;
     }
 
-    /* Arruma o botão nativo do Django */
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; color: inherit !important;}
     .delete label::after { content: "Remover"; font-size: 0.85rem !important; }
 
     /* BOTÃO ADICIONAR: Largo e fácil de clicar */
-    .add-row, .djn-add-item {
-        margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important;
-    }
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; }
     .add-row a, .djn-add-item a, .djn-add-handler {
         background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px 20px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important;
     }
@@ -170,18 +166,19 @@
 {{ block.super }}
 <script>
     window.addEventListener('load', function() {
-        // 1. Remove o " | " injetado no HTML do Título
+        // Limpa o texto original da tag do título e da breadcrumb, mantendo apenas o H1 puro
         const h1 = document.querySelector('.content-header h1');
-        if (h1 && h1.innerHTML.includes('|')) {
-            h1.innerHTML = h1.innerHTML.split('|')[0].trim();
+        if (h1) {
+            h1.classList.remove('border-right');
+            if (h1.innerHTML.includes('|')) {
+                h1.innerHTML = h1.innerHTML.split('|')[0].trim();
+            }
         }
 
-        // 2. Traduz a Aba General
         document.querySelectorAll('.nav-link').forEach(function(el) {
             if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; }
         });
 
-        // 3. Adiciona o Menu de Conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
