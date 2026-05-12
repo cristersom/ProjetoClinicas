@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL BÁSICO
+       1. MODO ESCURO GERAL BÁSICO E TOPO
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
@@ -17,9 +17,12 @@
         background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important;
     }
 
+    /* Alinhamento Milimétrico do Topo */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
-    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
+
+    /* Remoção da Borda Direita do Título */
+    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
@@ -32,91 +35,105 @@
 
     label, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
     .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
-    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2) !important;}
+    .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2) !important; outline: none !important;}
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       3. A PLÁSTICA DEFINITIVA DOS INLINES (NUCLEAR CSS)
+       3. FIM DO "BOX-CEPTION" (Limpeza Absoluta do Nested Admin)
        ===================================================================== */
-    body .inline-group, body .djn-group { background: transparent !important; border: none !important; margin-top: 10px !important; padding: 0 !important; box-shadow: none !important; }
 
-    /* O CARTÃO PRINCIPAL: Fundo diferente, bordas arredondadas e espaço no fundo */
-    body .inline-related, body .djn-item {
-        background-color: #273548 !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 12px !important;
-        margin-bottom: 25px !important;
-        position: relative !important;
-        padding: 24px 24px 70px 24px !important; /* Espaço vital de 70px em baixo para o botão Remover */
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
-    }
-
-    /* ESCONDE O CABEÇALHO COMPLETO E OS TEXTOS NATIVOS */
-    body .inline-related > h3, body .djn-item > h3 {
-        background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; height: 0 !important; overflow: hidden !important;
-    }
-    body .inline-related > h3 > b, body .inline-related > h3 > span.inline_label,
-    body .djn-item > h3 > b, body .djn-item > h3 > font, body .djn-item > h3 > span.inline_label {
-        display: none !important; opacity: 0 !important; visibility: hidden !important;
-    }
-
-    /* Tira os recuos nativos chatos dos campos */
-    body .inline-related fieldset, body .djn-fieldset { padding: 0 !important; margin: 0 !important; background: transparent !important; border: none !important; }
-
-    /* SUB-CARTÃO ("Opcao respostas") */
+    /* 3.1 Transparência total nos contentores "pais" */
+    body .inline-group,
+    body .djn-group,
+    body .djn-items,
+    body .djn-fieldset,
     body .djn-group-nested {
-        background-color: #1f2937 !important;
-        border: 1px dashed #6b7280 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        margin-top: 20px !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
+
+    /* 3.2 Oculta COMPLETAMENTE todos os títulos repetitivos (+ Novo Escolha, Pergunta #1, etc) */
+    body .inline-related > h3,
+    body .djn-item > h3,
     body .djn-group-nested > h2 {
-        background: transparent !important; color: #9ca3af !important; border: none !important;
-        padding: 0 0 10px 0 !important; margin-bottom: 15px !important; font-size: 0.9rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
+        display: none !important;
+    }
+
+    /* 3.3 Apenas o "Item Real" ganha um cartão */
+    body .inline-related,
+    body .djn-item {
+        background-color: #1f2937 !important; /* Cor idêntica à aba principal */
+        border: 1px solid #4b5563 !important;
+        border-radius: 8px !important;
+        margin-top: 15px !important;
+        margin-bottom: 15px !important;
+        padding: 24px 24px 70px 24px !important; /* 70px em baixo para o botão Remover */
+        position: relative !important;
+    }
+
+    /* 3.4 Diferenciação para itens aninhados (Ex: Respostas dentro das Perguntas) */
+    body .djn-group-nested .djn-item {
+        background-color: #111827 !important; /* Fundo mais escuro para dar profundidade */
+        border: 1px dashed #6b7280 !important;
+        padding: 15px 15px 60px 15px !important;
     }
 
     /* =====================================================================
-       4. BOTÕES: REMOVER E ADICIONAR (POSIÇÃO ABSOLUTA)
+       4. BOTÕES: REMOVER E ADICIONAR
        ===================================================================== */
 
-    /* REMOVER: Pregado no canto inferior direito do Cartão */
+    /* BOTÃO REMOVER: Discreto e ancorado no fundo */
     body .inline-deletelink, body .djn-remove-handler, body .delete {
         position: absolute !important;
         bottom: 15px !important;
         right: 15px !important;
-        z-index: 99 !important;
+        z-index: 10 !important;
         background-color: transparent !important;
         color: #ef4444 !important;
         border: 1px solid #ef4444 !important;
         border-radius: 6px !important;
         padding: 6px 16px !important;
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         text-decoration: none !important;
         font-weight: bold !important;
         text-transform: uppercase !important;
         transition: 0.2s ease;
-        display: flex !important; align-items: center; justify-content: center;
+        display: inline-flex !important; align-items: center; margin: 0 !important;
     }
-    body .inline-deletelink:hover, body .djn-remove-handler:hover, body .delete:hover { background-color: #ef4444 !important; color: white !important; }
+    body .inline-deletelink:hover, body .djn-remove-handler:hover, body .delete:hover {
+        background-color: #ef4444 !important; color: white !important;
+    }
 
-    /* Remove os textos estranhos do checkbox nativo do Django */
-    body .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; }
-    body .delete label::after { content: "Remover"; font-size: 0.85rem !important; }
+    /* Arruma o checkbox nativo de "Deletar" do Django */
+    body .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer; color: inherit !important;}
+    body .delete label::after { content: "Remover"; font-size: 0.8rem !important; }
 
-    /* ADICIONAR: Botões largos e evidentes */
-    body .add-row, body .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; }
+    /* BOTÕES ADICIONAR (Largos e evidentes) */
+    body .add-row, body .djn-add-item { margin-top: 20px !important; padding: 0 !important; background: transparent !important; border: none !important; }
     body .add-row a, body .djn-add-item a, body .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px 20px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important;
+        background-color: #14b8a6 !important;
+        color: #ffffff !important;
+        padding: 12px !important;
+        border-radius: 8px !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        display: block !important; /* 100% de largura */
+        text-align: center !important;
+        border: none !important;
+        transition: 0.2s;
     }
-    body .add-row a:hover, body .djn-add-item a:hover, body .djn-add-handler:hover { background-color: #0d9488 !important; transform: translateY(-1px); }
+    body .add-row a:hover, body .djn-add-item a:hover, body .djn-add-handler:hover { background-color: #0d9488 !important; }
 
     /* Botões do Topo e Salvar */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
+
     .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important; }
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
@@ -130,44 +147,19 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    // =====================================================================
-    // O EXTERMINADOR DE TEXTOS REDUNDANTES DO NESTED_ADMIN
-    // =====================================================================
-    function matarTextosRepetidos() {
-        // Encontra todos os cabeçalhos das caixas do nested_admin
-        document.querySelectorAll('.inline-related h3, .djn-item h3').forEach(h3 => {
-            // Vasculha tudo dentro do cabeçalho
-            Array.from(h3.childNodes).forEach(node => {
-                // Se for um nó de texto (como "+ Novo Escolha" ou "#1"), ele apaga
-                if (node.nodeType === Node.TEXT_NODE) {
-                    node.nodeValue = '';
-                }
-            });
-        });
-    }
-
     window.addEventListener('load', function() {
-        // 1. Aplica o exterminador logo que a página carrega
-        matarTextosRepetidos();
-
-        // 2. Cria um "Olheiro" (MutationObserver) para o nested_admin
-        // Sempre que o utilizador clicar em "Adicionar" e o plugin tentar injetar HTML novo,
-        // este olheiro deteta e manda o exterminador apagar o texto redundante instantaneamente!
-        const observer = new MutationObserver(matarTextosRepetidos);
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        // 3. Remove o " | " do título principal
+        // 1. Remove o " | " injetado no HTML do Título
         const h1 = document.querySelector('.content-header h1');
-        if (h1 && h1.innerText.includes('|')) {
-            h1.innerText = h1.innerText.split('|')[0].trim();
+        if (h1 && h1.innerHTML.includes('|')) {
+            h1.innerHTML = h1.innerHTML.split('|')[0].trim();
         }
 
-        // 4. Traduz as Abas
+        // 2. Traduz a Aba General
         document.querySelectorAll('.nav-link').forEach(function(el) {
             if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; }
         });
 
-        // 5. Menu da Conta
+        // 3. Adiciona o Menu de Conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
