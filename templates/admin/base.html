@@ -4,86 +4,108 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. MODO ESCURO GERAL (Apenas Cores, Sem Quebrar a Estrutura do Jazzmin)
+       1. MODO ESCURO GERAL BÁSICO
        ===================================================================== */
-    body, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; }
-    .main-sidebar { background-color: #030712 !important; }
+    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; }
+    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
-    /* Esconde barra superior e logo */
-    nav.main-header, .brand-link { display: none !important; height: 0 !important; visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
+    nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important;}
+    a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
-    /* =====================================================================
-       2. ANIQUILAÇÃO DA BORDA DIREITA ("|") E ALINHAMENTO
-       O Bootstrap força a borda com !important. Vencemos ele aqui com especificidade.
-       ===================================================================== */
-    h1.border-right, .content-header .border-right, .border-right {
-        border-right: 0px solid transparent !important;
-        padding-right: 0px !important;
-        margin-right: 0px !important;
-    }
-
-    /* Alinhamento do Título e Painel do Usuário */
-    .content-header, aside.main-sidebar .user-panel {
-        height: 70px !important; min-height: 70px !important;
-        display: flex !important; align-items: center !important;
-        border-bottom: 1px solid #374151 !important;
-        margin: 0 0 25px 0 !important;
-    }
-    aside.main-sidebar .user-panel { border-top: none !important; }
-    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; }
-    .breadcrumb, .breadcrumb-item { display: none !important; }
-
-    /* =====================================================================
-       3. CONTRASTE DE FORMULÁRIOS, ABAS E INLINES (MUITO SEGURO)
-       Apenas pintamos o fundo. Não tocamos em "display" ou "visibility"
-       ===================================================================== */
-    .card, .card-body, .info-box, .bg-white, fieldset {
+    .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
         background-color: #1f2937 !important; border-color: #374151 !important; color: #f3f4f6 !important;
     }
 
-    /* Textos Gerais e Inputs */
-    label, th, td, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
+    /* =====================================================================
+       2. ALINHAMENTO MILIMÉTRICO
+       ===================================================================== */
+    .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
+    aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
+    .content-header h1 { font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important; margin: 0 !important; border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; }
+    .breadcrumb, .breadcrumb-item { display: none !important; }
+
+    /* =====================================================================
+       3. CONTRASTE DE ABAS E INPUTS
+       ===================================================================== */
+    .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
+    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; }
+    .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
+    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
+
+    label, .col-form-label, .help-block { color: #d1d5db !important; font-weight: 600 !important; }
     .form-control, input, select, textarea { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; }
     .form-control:focus, input:focus, select:focus, textarea:focus { border-color: #14b8a6 !important; }
-
-    /* Select2 (Menus dropdown) */
     .select2-container--default .select2-selection--single { background-color: #374151 !important; border: 1px solid #4b5563 !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; }
     .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-    /* Abas do Jazzmin (Que guardam as Escolhas/Questionários) */
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; border: none !important; background: transparent !important; }
-    .nav-tabs .nav-link:hover { color: #d1d5db !important; }
-    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; background-color: transparent !important; }
+    /* =====================================================================
+       4. PLÁSTICA DOS INLINES E NESTED ADMIN (Escolhas e Perguntas)
+       ===================================================================== */
+    /* Remove as bordas brancas e ajusta o fundo geral */
+    .inline-group, .djn-group, .djn-group-nested, .inline-related {
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        margin-bottom: 15px !important;
+        box-shadow: none !important;
+    }
 
-    /* Inlines (Tabelas de opções) */
-    .tabular.inline-related th { background-color: #111827 !important; border-bottom: 2px solid #4b5563 !important; }
-    .tabular.inline-related tbody tr { background-color: #1f2937 !important; }
-    .add-row { background-color: #1f2937 !important; }
-    .add-row a { color: #14b8a6 !important; font-weight: bold !important; }
+    /* Fundo dos cabeçalhos dos Inlines */
+    .inline-group h2, .djn-group h2 {
+        background-color: #111827 !important;
+        color: #14b8a6 !important;
+        border-bottom: 1px solid #374151 !important;
+        margin: 0 !important; padding: 12px 15px !important;
+    }
+
+    /* As "caixinhas" dentro das Perguntas (Opções de Resposta) */
+    .djn-item, .djn-items, fieldset.djn-fieldset {
+        background-color: #111827 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 6px !important;
+        padding: 5px !important;
+    }
+
+    /* Fim do scrollbar horizontal nojento */
+    .table-responsive, .tabular { overflow-x: visible !important; width: 100% !important; }
+    .tabular.inline-related table, table.djn-table { width: 100% !important; margin: 0 !important; background-color: transparent !important; }
+
+    /* Cabeçalhos e Linhas das Tabelas */
+    .tabular.inline-related th, table.djn-table th { background-color: #111827 !important; color: #d1d5db !important; border-bottom: 2px solid #374151 !important; font-weight: bold !important; padding: 10px !important;}
+    .tabular.inline-related td, table.djn-table td { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; padding: 10px !important; vertical-align: middle !important;}
+    .tabular.inline-related tbody tr:hover td { background-color: #374151 !important; }
+
+    /* Estética dos Botões "Adicionar outro(a)" */
+    .add-row, .djn-add-item { background-color: transparent !important; border: none !important; padding: 15px 0 !important; text-align: left !important; }
+    .add-row a, .djn-add-item a, .djn-add-handler {
+        background-color: #0d9488 !important;
+        color: #ffffff !important;
+        padding: 8px 20px !important;
+        border-radius: 6px !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        display: inline-block !important;
+        border: none !important;
+        transition: 0.2s;
+    }
+    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0f766e !important; color: white !important; }
+
+    /* Botão Vermelho de Remover */
+    .djn-remove-handler, .inline-deletelink { background-color: #ef4444 !important; color: white !important; border-radius: 4px !important; padding: 6px 12px !important; border: none !important; font-weight: bold !important;}
+    .djn-remove-handler:hover, .inline-deletelink:hover { background-color: #dc2626 !important; color: white !important; }
 
     /* =====================================================================
-       4. BOTÕES (IMPORTAR/EXPORTAR CORRIGIDOS)
+       5. BOTÕES DO TOPO (IMPORTAR/EXPORTAR E SALVAR)
        ===================================================================== */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 15px !important; flex-wrap: wrap; }
 
-    /* Botões Secundários (Importar, Exportar, Histórico, Remover) */
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary {
-        background-color: #374151 !important;
-        color: #ffffff !important;
-        border: 1px solid #6b7280 !important;
-        font-weight: 600 !important;
-        padding: 8px 16px !important;
-        border-radius: 6px !important;
-        transition: 0.2s;
+        background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s;
     }
-    .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover {
-        background-color: #4b5563 !important; color: white !important;
-    }
+    .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
 
-    /* Botões Principais (Salvar, Adicionar) */
     .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; }
     .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
     .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; }
@@ -97,14 +119,16 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    window.addEventListener('load', function() {
+        const h1 = document.querySelector('.content-header h1');
+        if (h1 && h1.innerText.includes('|')) {
+            h1.innerText = h1.innerText.split('|')[0].trim();
+        }
 
-        // Traduz o "General" para "Principal"
         document.querySelectorAll('.nav-link').forEach(function(el) {
             if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; }
         });
 
-        // Insere o Menu da Conta (Sair/Senha) de forma segura
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
