@@ -11,11 +11,11 @@
 
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important;}
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
-    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
+    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; overflow-x: hidden !important; }
 
-    /* Remove fundos de cartões principais (como o wrapper inteiro das abas) */
+    /* Remove fundos de cartões principais */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
-        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
+        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important; overflow-x: hidden !important;
     }
 
     /* =====================================================================
@@ -40,21 +40,29 @@
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       4. RECONSTRUÇÃO DOS FORMULÁRIOS (Sem redundâncias e sem caixas duplas)
+       4. EXTINÇÃO DA BARRA DE ROLAGEM HORIZONTAL E CAIXOTES
        ===================================================================== */
 
-    /* 4.1. ESCONDE TÍTULOS REDUNDANTES (Perguntas, Escolhas, #1, etc) */
-    .inline-group > h2, .djn-group > h2,
+    /* 4.1 Fim das margens negativas que causavam o scroll horizontal */
+    .form-row, .row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; box-sizing: border-box !important;}
+    .inline-group, .djn-group, .inline-related, .djn-item { box-sizing: border-box !important; max-width: 100% !important; }
+
+    /* 4.2 ESCONDE O TÍTULO "PERGUNTAS" REDUNDANTE NO TOPO DO GRUPO */
+    .inline-group > h2, .djn-group > h2, h2.inline-heading {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important;
+    }
+
+    /* 4.3 Outros títulos internos chatos */
     .inline-related h3, .djn-item h3,
     .inline-related .card-header, .djn-item .card-header,
     legend, .inline_label {
         display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important;
     }
 
-    /* 4.2. LIMPEZA TOTAL DOS CONTAINERS PAI (Para o cartão flutuar na tela) */
-    .inline-group > fieldset, .djn-group > fieldset, .card-outline,
-    .inline-group, .djn-group,
-    #content-main .card-body {
+    /* 4.4 LIMPEZA DO CAIXOTE CINZA EXTERNO (Apenas os filhos do inline-group) */
+    .inline-group > fieldset, .djn-group > fieldset,
+    .inline-group > fieldset > .card-body, .djn-group > fieldset > .card-body,
+    .card-outline, .inline-group, .djn-group {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -63,19 +71,20 @@
         width: 100% !important;
     }
 
-    /* 4.3. O CARTÃO PRINCIPAL (A Pergunta ou a Escolha Solta) */
+    /* =====================================================================
+       5. O CARTÃO PRINCIPAL E INPUTS (Perguntas / Escolhas)
+       ===================================================================== */
     .inline-related, .djn-item {
-        background-color: #1f2937 !important; /* Fundo suave */
+        background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
         position: relative !important;
-        padding: 24px 24px 60px 24px !important; /* Espaço para botão remover no fundo */
+        padding: 24px 24px 60px 24px !important; /* Espaço pro botão remover */
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* 4.4. O Layout dos Inputs (Um abaixo do outro, largos) */
     body .inline-related .form-row, body .djn-item .form-row {
         display: flex !important;
         flex-direction: column !important;
@@ -87,44 +96,29 @@
     }
 
     body .inline-related label, body .djn-item label {
-        color: #d1d5db !important;
-        font-weight: 600 !important;
-        font-size: 0.9rem !important;
-        margin: 0 0 8px 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        text-align: left !important;
+        color: #d1d5db !important; font-weight: 600 !important; font-size: 0.9rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; width: 100% !important; text-align: left !important;
     }
 
-    /* Força os inputs a serem bonitos e largos */
     body .inline-related input, body .djn-item input,
     body .inline-related textarea, body .djn-item textarea,
     body .inline-related select, body .djn-item select,
     body .vTextField, body .vLargeTextField {
-        width: 100% !important;
-        max-width: 100% !important;
-        background-color: #374151 !important;
-        color: #ffffff !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 6px !important;
-        padding: 10px 15px !important;
-        box-sizing: border-box !important;
-        font-size: 0.95rem !important;
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
     }
     body .inline-related input:focus, body .djn-item input:focus,
     body .inline-related textarea:focus, body .djn-item textarea:focus,
     body .inline-related select:focus, body .djn-item select:focus {
         border-color: #14b8a6 !important; outline: none !important;
     }
-
-    /* Select nativo (Força setinha) */
     body select:not([multiple]) { height: 42px !important; appearance: auto !important; }
 
-    /* 4.5 SUB-CARTÕES (Opções de Resposta dentro das Perguntas) */
+    /* =====================================================================
+       6. SUB-CARTÕES (Opções de Resposta)
+       ===================================================================== */
     .djn-group-nested {
         background-color: transparent !important;
         border: none !important;
-        border-left: 4px solid #14b8a6 !important; /* Apenas uma linha lateral para mostrar hierarquia */
+        border-left: 4px solid #14b8a6 !important;
         padding: 10px 0 10px 20px !important;
         margin-top: 20px !important;
         width: 100% !important;
@@ -135,44 +129,25 @@
         color: #9ca3af !important; background: transparent !important; border: none !important;
         padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
     }
-
-    /* Remove fundo extra dos sub-itens */
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 40px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #374151 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; }
 
     /* =====================================================================
-       5. BOTÕES DE AÇÃO
+       7. BOTÕES DE AÇÃO
        ===================================================================== */
-
-    /* BOTÃO REMOVER: Discreto e alinhado */
     .inline-deletelink, .djn-remove-handler, .delete {
-        position: absolute !important;
-        bottom: 15px !important;
-        right: 15px !important;
-        background-color: transparent !important;
-        color: #ef4444 !important;
-        border: 1px solid #ef4444 !important;
-        border-radius: 6px !important;
-        padding: 6px 16px !important;
-        font-size: 0.8rem !important;
-        font-weight: bold !important;
-        text-transform: uppercase !important;
-        text-decoration: none !important;
-        z-index: 10 !important;
-        transition: 0.2s;
+        position: absolute !important; bottom: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 6px !important; padding: 6px 16px !important; font-size: 0.8rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s;
     }
     .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #ef4444 !important; color: white !important; }
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
     .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
 
-    /* BOTÃO ADICIONAR (Elegante) */
     .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; width: 100% !important;}
     .add-row a, .djn-add-item a, .djn-add-handler {
         background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px !important; border-radius: 6px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; width: 100% !important; box-sizing: border-box !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
 
-    /* Botões do Topo e Salvar */
     .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
@@ -186,7 +161,6 @@
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
     .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; }
 
-    /* Fix Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -196,18 +170,9 @@
 {{ block.super }}
 <script>
     window.addEventListener('load', function() {
-        // Remove a sujeira do título " | "
         const h1 = document.querySelector('.content-header h1');
-        if (h1 && h1.innerHTML.includes('|')) {
-            h1.innerHTML = h1.innerHTML.split('|')[0].trim();
-        }
-
-        // Renomeia Aba General
-        document.querySelectorAll('.nav-link').forEach(function(el) {
-            if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; }
-        });
-
-        // Adiciona Menu de Conta
+        if (h1 && h1.innerHTML.includes('|')) { h1.innerHTML = h1.innerHTML.split('|')[0].trim(); }
+        document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
