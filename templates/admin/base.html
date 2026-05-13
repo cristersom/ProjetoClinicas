@@ -13,14 +13,15 @@
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
+    /* Remove fundos de cartões principais (como o wrapper inteiro das abas) */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
-        background-color: #1f2937 !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important;
+        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
     }
 
     /* =====================================================================
        2. TOPO LIMPO
        ===================================================================== */
-    .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
+    .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; background-color: #111827 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
     h1, .content-header h1, h1.border-right, .border-right {
@@ -33,25 +34,27 @@
     /* =====================================================================
        3. ABAS
        ===================================================================== */
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; }
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important;}
+    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
+    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       4. RECONSTRUÇÃO DOS FORMULÁRIOS (O Fim do Desastre e a volta dos campos!)
+       4. RECONSTRUÇÃO DOS FORMULÁRIOS (Sem redundâncias e sem caixas duplas)
        ===================================================================== */
 
-    /* 4.1. ESCONDE APENAS OS TÍTULOS (O erro de antes foi esconder o fieldset todo!) */
+    /* 4.1. ESCONDE TÍTULOS REDUNDANTES (Perguntas, Escolhas, #1, etc) */
     .inline-group > h2, .djn-group > h2,
     .inline-related h3, .djn-item h3,
     .inline-related .card-header, .djn-item .card-header,
-    legend {
-        display: none !important;
+    legend, .inline_label {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important;
     }
 
-    /* 4.2. Remove o visual da caixa externa, mas MANTÉM OS CAMPOS VISÍVEIS */
-    .inline-group > fieldset, .djn-group > fieldset, .card-outline, .inline-group, .djn-group {
+    /* 4.2. LIMPEZA TOTAL DOS CONTAINERS PAI (Para o cartão flutuar na tela) */
+    .inline-group > fieldset, .djn-group > fieldset, .card-outline,
+    .inline-group, .djn-group,
+    #content-main .card-body {
         background: transparent !important;
         border: none !important;
         box-shadow: none !important;
@@ -60,23 +63,22 @@
         width: 100% !important;
     }
 
-    /* 4.3. O CARTÃO PRINCIPAL (Pergunta / Escolha) */
+    /* 4.3. O CARTÃO PRINCIPAL (A Pergunta ou a Escolha Solta) */
     .inline-related, .djn-item {
-        background-color: #273548 !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 12px !important;
+        background-color: #1f2937 !important; /* Fundo suave */
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
         position: relative !important;
-        padding: 20px 20px 70px 20px !important; /* 70px no fundo para o botão de remover */
-        margin-bottom: 25px !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+        padding: 24px 24px 60px 24px !important; /* Espaço para botão remover no fundo */
+        margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* 4.4. A Mágica do Layout (Campos a 100% de largura, um debaixo do outro) */
+    /* 4.4. O Layout dos Inputs (Um abaixo do outro, largos) */
     body .inline-related .form-row, body .djn-item .form-row {
         display: flex !important;
-        flex-direction: column !important; /* Etiqueta em cima, input em baixo */
+        flex-direction: column !important;
         margin: 0 0 15px 0 !important;
         padding: 0 !important;
         border: none !important;
@@ -94,9 +96,11 @@
         text-align: left !important;
     }
 
+    /* Força os inputs a serem bonitos e largos */
     body .inline-related input, body .djn-item input,
     body .inline-related textarea, body .djn-item textarea,
-    body .inline-related select, body .djn-item select {
+    body .inline-related select, body .djn-item select,
+    body .vTextField, body .vLargeTextField {
         width: 100% !important;
         max-width: 100% !important;
         background-color: #374151 !important;
@@ -113,56 +117,58 @@
         border-color: #14b8a6 !important; outline: none !important;
     }
 
-    body select:not([multiple]) {
-        height: 42px !important;
-        appearance: auto !important;
-    }
+    /* Select nativo (Força setinha) */
+    body select:not([multiple]) { height: 42px !important; appearance: auto !important; }
 
-    /* Sub-cartões (Ex: Opções de Resposta) */
+    /* 4.5 SUB-CARTÕES (Opções de Resposta dentro das Perguntas) */
     .djn-group-nested {
-        background-color: #1f2937 !important;
-        border: 1px solid #4b5563 !important;
-        border-left: 4px solid #14b8a6 !important;
-        border-radius: 8px !important;
-        padding: 20px !important;
+        background-color: transparent !important;
+        border: none !important;
+        border-left: 4px solid #14b8a6 !important; /* Apenas uma linha lateral para mostrar hierarquia */
+        padding: 10px 0 10px 20px !important;
         margin-top: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
     .djn-group-nested > h2 {
-        display: block !important; visibility: visible !important; height: auto !important; position: static !important;
+        display: block !important; visibility: visible !important; height: auto !important; position: static !important; opacity: 1 !important;
         color: #9ca3af !important; background: transparent !important; border: none !important;
         padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
     }
+
+    /* Remove fundo extra dos sub-itens */
+    .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 40px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #374151 !important; border-radius: 0 !important; box-shadow: none !important; }
+    .djn-group-nested .djn-item:last-child { border-bottom: none !important; }
 
     /* =====================================================================
        5. BOTÕES DE AÇÃO
        ===================================================================== */
 
+    /* BOTÃO REMOVER: Discreto e alinhado */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important;
         bottom: 15px !important;
-        right: 20px !important;
-        background-color: #ef4444 !important;
-        color: #ffffff !important;
-        border: none !important;
+        right: 15px !important;
+        background-color: transparent !important;
+        color: #ef4444 !important;
+        border: 1px solid #ef4444 !important;
         border-radius: 6px !important;
-        padding: 8px 16px !important;
-        font-size: 0.85rem !important;
+        padding: 6px 16px !important;
+        font-size: 0.8rem !important;
         font-weight: bold !important;
         text-transform: uppercase !important;
         text-decoration: none !important;
         z-index: 10 !important;
-        display: inline-block !important;
+        transition: 0.2s;
     }
-    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #dc2626 !important; color: white !important; }
+    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #ef4444 !important; color: white !important; }
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
-    .delete label::after { content: "Remover"; font-size: 0.85rem !important; color: white !important;}
+    .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
 
-    /* BOTÃO ADICIONAR QUE SUMIU AGORA VOLTA */
+    /* BOTÃO ADICIONAR (Elegante) */
     .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; width: 100% !important;}
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 14px !important; border-radius: 8px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; box-shadow: 0 4px 6px -1px rgba(20, 184, 166, 0.2) !important; width: 100% !important; box-sizing: border-box !important;
+        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px !important; border-radius: 6px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; width: 100% !important; box-sizing: border-box !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
 
