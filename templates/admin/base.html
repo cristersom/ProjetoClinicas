@@ -4,195 +4,163 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E MODO ESCURO GERAL
+       1. BASE, FUNDO E FIM DO SCROLL HORIZONTAL
        ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer, #content-main, .tab-content, .tab-pane {
+    body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important;
-        max-width: 100vw !important; overflow-x: hidden !important; box-sizing: border-box !important;
+        overflow-x: hidden !important;
     }
-    .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
+    .main-sidebar { background-color: #030712 !important; border: none !important; }
 
-    nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important;}
-    a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
-    body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
+    /* Oculta topo padrão do Django/Jazzmin que não usamos */
+    nav.main-header, .breadcrumb { display: none !important; }
 
-    .card, .card-body, .info-box, .bg-white {
-        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
+    /* Remove fundos brancos residuais */
+    .card, .card-body, .tab-content, .tab-pane {
+        background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
     }
-
-    .row, .form-row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
 
     /* =====================================================================
-       2. TOPO LIMPO E ABAS
+       2. CABEÇALHO DA PÁGINA (H1) E ABAS
        ===================================================================== */
-    .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; background-color: #111827 !important; }
-    aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
-
-    h1, .content-header h1, h1.border-right, .border-right {
-        border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
+    .content-header {
+        height: 70px !important; display: flex !important; align-items: center !important;
+        border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important;
     }
-    .pr-3, .mr-3 { padding-right: 0 !important; margin-right: 0 !important; }
-    .breadcrumb, .breadcrumb-item { display: none !important; }
+    .content-header h1 {
+        border-right: none !important; padding: 0 !important; margin: 0 !important;
+        font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
+    }
 
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
+    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 25px !important;}
+    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
-    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
+    .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS INLINES E CAIXOTES
+       3. LIMPEZA DOS INLINES (Esconde lixo do Nested Admin)
        ===================================================================== */
-    .inline-group > h2, .djn-group > h2, h2.inline-heading, .tab-pane > h2,
-    .inline-related h3, .djn-item h3, .inline-related .card-header, .djn-item .card-header,
-    legend, .inline_label {
-        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important; overflow: hidden !important;
+    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label {
+        display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;
     }
 
-    .inline-group > fieldset, .djn-group > fieldset,
-    .inline-group > fieldset > .card-body, .djn-group > fieldset > .card-body,
-    .card-outline, .inline-group, .djn-group {
-        background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important;
+    .inline-group > fieldset, .djn-group > fieldset, .inline-group, .djn-group {
+        background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important;
     }
 
     /* =====================================================================
-       4. O CARTÃO PRINCIPAL E INPUTS (Correção do Branco Cegante)
+       4. O CARTÃO PRINCIPAL E INPUTS (Agora sim, 100% Width!)
        ===================================================================== */
     .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
-        border-radius: 8px !important;
+        border-radius: 10px !important;
         position: relative !important;
-        padding: 24px !important;
+        padding: 25px 25px 70px 25px !important; /* Espaço inferior para o botão remover */
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
+    /* O Segredo: Forçar a coluna e os divs internos a terem 100% */
     body .inline-related .form-row, body .djn-item .form-row {
-        display: flex !important; flex-direction: column !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; width: 100% !important; box-sizing: border-box !important;
+        display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important;
+    }
+    body .inline-related .form-row > div, body .djn-item .form-row > div {
+        width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important;
     }
 
     body .inline-related label, body .djn-item label {
-        color: #d1d5db !important; font-weight: 600 !important; font-size: 0.9rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; width: 100% !important; text-align: left !important;
+        color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; display: block !important;
     }
 
-    /* Inputs escuros */
-    body input, body textarea, body select, body .vTextField, body .vLargeTextField {
-        width: 100% !important; max-width: 100% !important;
-        background-color: #374151 !important;
-        color: #ffffff !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 6px !important;
-        padding: 10px 15px !important;
-        box-sizing: border-box !important;
-        font-size: 0.95rem !important;
+    /* Estilo dos Inputs */
+    input[type="text"], input[type="number"], textarea, select {
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 12px 15px !important; font-size: 1rem !important; box-sizing: border-box !important;
     }
-    body input:focus, body textarea:focus, body select:focus {
-        border-color: #14b8a6 !important; outline: none !important; background-color: #374151 !important; color: #ffffff !important;
-    }
+    input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* Força o select a ser escuro e não gigantesco */
-    body select, body select:not([multiple]), body select.form-control {
-        height: 42px !important;
-        appearance: auto !important;
-        background-color: #374151 !important;
-        color: #ffffff !important;
-    }
-    body select option { background-color: #1f2937 !important; color: white !important; }
+    /* Força o Select e o Select2 (Jazzmin) a ficarem escuros */
+    select { height: 45px !important; appearance: auto !important; }
+    .select2-container { width: 100% !important; }
+    .select2-container--default .select2-selection--single { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
+    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 43px !important; }
+    .select2-dropdown { background-color: #1f2937 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
        5. SUB-CARTÕES (Opções de Resposta)
        ===================================================================== */
     .djn-group-nested {
-        background-color: #111827 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        padding: 20px !important;
-        margin-top: 15px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+        background-color: transparent !important; border: none !important; border-left: 4px solid #14b8a6 !important; padding: 5px 0 5px 20px !important; margin-top: 20px !important; width: 100% !important; box-sizing: border-box !important;
     }
     .djn-group-nested .djn-item {
-        background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; box-shadow: none !important; border-bottom: 1px solid #374151 !important; border-radius: 0 !important; padding-bottom: 20px !important;
+        background: transparent !important; border: none !important; padding: 0 0 50px 0 !important; margin-bottom: 15px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important;
     }
-    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
+    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; }
 
     /* =====================================================================
-       6. BOTÕES: ADICIONAR E REMOVER ELEGANTES
+       6. BOTÕES ADICIONAR E REMOVER
        ===================================================================== */
-
-    /* Remover: Canto superior direito, discreto */
     .inline-deletelink, .djn-remove-handler, .delete {
-        position: absolute !important; top: 15px !important; right: 15px !important; background-color: transparent !important; color: #9ca3af !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 4px 12px !important; font-size: 0.75rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s; display: inline-block !important;
+        position: absolute !important; bottom: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 6px !important; padding: 6px 16px !important; font-size: 0.8rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s;
     }
-    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important;}
+    .inline-deletelink:hover, .djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
-    .delete label::after { content: "Remover"; font-size: 0.75rem !important;}
+    .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
 
-    /* Adicionar: Ghost button, alinhado à esquerda, sutil */
-    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; text-align: left !important;}
+    /* Botão Adicionar "Fantasma" e Largo */
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; width: 100% !important; box-sizing: border-box !important;}
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 20px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: inline-block !important; width: auto !important; transition: 0.2s;
+        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 12px !important; border-radius: 8px !important; font-weight: 700 !important; font-size: 1rem !important; text-decoration: none !important; display: block !important; text-align: center !important; transition: 0.2s; width: 100% !important; box-sizing: border-box !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
-    /* Tela Login */
-    body.login-page { background-color: #111827 !important; }
-    .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
+    /* =====================================================================
+       7. BARRA DE SALVAR (SUBMIT ROW ALINHADA À DIREITA)
+       ===================================================================== */
+    /* Captura a row de submit via ID do form gerado no painel */
+    form[id$="_form"] > div > .row:last-child, .submit-row {
+        display: flex !important; flex-direction: row !important; justify-content: flex-end !important; flex-wrap: wrap !important; gap: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 30px !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important;
+    }
+
+    form[id$="_form"] > div > .row:last-child input, .submit-row input, .submit-row a {
+        width: auto !important; margin: 0 !important; display: inline-block !important; border-radius: 6px !important; padding: 10px 25px !important; font-weight: bold !important; font-size: 0.95rem !important;
+    }
+
+    input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
+    input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
+
+    input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
+    input[name="_addanother"]:hover, input[name="_continue"]:hover { background-color: #4b5563 !important; }
+
 </style>
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function aplicarPlasticaFinal() {
-        // 1. Mata títulos residuais
+    // JS Agora APENAS apaga texto. Não mexe NUNCA no layout/grid!
+    function limparTextosInuteis() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
-
-        // 2. Mata margens negativas e scroll horizontal
-        document.querySelectorAll('.row, .form-row').forEach(el => {
-            el.style.setProperty('margin-left', '0', 'important');
-            el.style.setProperty('margin-right', '0', 'important');
-            el.style.setProperty('width', '100%', 'important');
-        });
-
-        // 3. BARRA DE SALVAR: Força o alinhamento à direita e remove o empilhamento
-        const submitRow = document.querySelector('.submit-row') || document.querySelector('#content-main > form > div:last-child');
-        if (submitRow && submitRow.tagName === 'DIV') {
-            submitRow.style.setProperty('display', 'flex', 'important');
-            submitRow.style.setProperty('flex-direction', 'row', 'important');
-            submitRow.style.setProperty('justify-content', 'flex-end', 'important');
-            submitRow.style.setProperty('flex-wrap', 'wrap', 'important');
-            submitRow.style.setProperty('gap', '10px', 'important');
-            submitRow.style.setProperty('padding', '20px 0', 'important');
-            submitRow.style.setProperty('margin-top', '20px', 'important');
-            submitRow.style.setProperty('border-top', '1px solid #374151', 'important');
-            submitRow.style.setProperty('background', 'transparent', 'important');
-
-            // Corrige os botões de salvar tirando o ".btn-block" que os deixa gigantes
-            submitRow.querySelectorAll('input, button, a').forEach(btn => {
-                btn.classList.remove('btn-block');
-                btn.style.setProperty('width', 'auto', 'important');
-                btn.style.setProperty('margin', '0', 'important');
-                btn.style.setProperty('display', 'inline-block', 'important');
-            });
-        }
     }
 
     window.addEventListener('load', function() {
-        aplicarPlasticaFinal();
-        const observer = new MutationObserver(aplicarPlasticaFinal);
+        limparTextosInuteis();
+        const observer = new MutationObserver(limparTextosInuteis);
         observer.observe(document.body, { childList: true, subtree: true });
 
+        // Limpa Título H1
         const h1 = document.querySelector('.content-header h1');
         if (h1 && h1.innerHTML.includes('|')) { h1.innerHTML = h1.innerHTML.split('|')[0].trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
+        // Menu de Conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
