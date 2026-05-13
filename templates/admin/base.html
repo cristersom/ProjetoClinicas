@@ -6,24 +6,16 @@
     /* =====================================================================
        1. BASE E MODO ESCURO GERAL
        ===================================================================== */
-    /* FORÇA BRUTA CONTRA SCROLL HORIZONTAL */
-    body, html, .wrapper, .content-wrapper, .main-footer, #content-main, .tab-content, .tab-pane {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important;
-        max-width: 100vw !important; overflow-x: hidden !important; box-sizing: border-box !important;
-    }
+    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important; }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important;}
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
-    /* Remove fundos de cartões principais */
-    .card, .card-body, .info-box, .bg-white {
+    .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
         background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
     }
-
-    /* MATA AS MARGENS NEGATIVAS DO BOOTSTRAP (Culpadas pelo scroll e pelo corte) */
-    .row, .form-row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
 
     /* =====================================================================
        2. TOPO LIMPO
@@ -39,70 +31,39 @@
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
     /* =====================================================================
-       3. ABAS
+       3. ABAS E INPUTS GERAIS
        ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    /* =====================================================================
-       4. EXTINÇÃO DO TÍTULO CORTADO E CAIXOTES
-       ===================================================================== */
-
-    /* ESCONDE O TÍTULO FANTASMA "Perguntas" ou "erguntas" */
-    .inline-group > h2, .djn-group > h2, h2.inline-heading, .tab-pane > h2,
-    .inline-related h3, .djn-item h3, .inline-related .card-header, .djn-item .card-header,
-    legend, .inline_label {
-        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important; overflow: hidden !important;
+    /* Força os inputs a serem bonitos e largos */
+    input, textarea, select, .vTextField, .vLargeTextField {
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
     }
-
-    /* LIMPEZA DO CAIXOTE CINZA EXTERNO */
-    .inline-group > fieldset, .djn-group > fieldset,
-    .inline-group > fieldset > .card-body, .djn-group > fieldset > .card-body,
-    .card-outline, .inline-group, .djn-group {
-        background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important;
-    }
+    input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
+    select:not([multiple]) { height: 42px !important; appearance: auto !important; }
 
     /* =====================================================================
-       5. O CARTÃO PRINCIPAL E INPUTS (Perguntas / Escolhas)
+       4. O CARTÃO PRINCIPAL (Pergunta / Escolha)
        ===================================================================== */
     .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
         position: relative !important;
-        padding: 24px 24px 60px 24px !important; /* Espaço pro botão remover */
+        padding: 24px 24px 60px 24px !important; /* Espaço para botão remover no fundo */
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        overflow: hidden !important; /* Impede vazamentos internos */
-    }
-
-    body .inline-related .form-row, body .djn-item .form-row {
-        display: flex !important; flex-direction: column !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; width: 100% !important; box-sizing: border-box !important;
     }
 
     body .inline-related label, body .djn-item label {
         color: #d1d5db !important; font-weight: 600 !important; font-size: 0.9rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; width: 100% !important; text-align: left !important;
     }
 
-    body .inline-related input, body .djn-item input,
-    body .inline-related textarea, body .djn-item textarea,
-    body .inline-related select, body .djn-item select,
-    body .vTextField, body .vLargeTextField {
-        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
-    }
-    body .inline-related input:focus, body .djn-item input:focus,
-    body .inline-related textarea:focus, body .djn-item textarea:focus,
-    body .inline-related select:focus, body .djn-item select:focus {
-        border-color: #14b8a6 !important; outline: none !important;
-    }
-    body select:not([multiple]) { height: 42px !important; appearance: auto !important; }
-
-    /* =====================================================================
-       6. SUB-CARTÕES (Opções de Resposta)
-       ===================================================================== */
+    /* 4.1 SUB-CARTÕES (Opções de Resposta dentro das Perguntas) */
     .djn-group-nested {
         background-color: transparent !important;
         border: none !important;
@@ -112,16 +73,11 @@
         width: 100% !important;
         box-sizing: border-box !important;
     }
-    .djn-group-nested > h2 {
-        display: block !important; visibility: visible !important; height: auto !important; position: static !important; opacity: 1 !important;
-        color: #9ca3af !important; background: transparent !important; border: none !important;
-        padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
-    }
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 40px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #374151 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; }
 
     /* =====================================================================
-       7. BOTÕES DE AÇÃO
+       5. BOTÕES DE AÇÃO
        ===================================================================== */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important; bottom: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 6px !important; padding: 6px 16px !important; font-size: 0.8rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s;
@@ -140,14 +96,11 @@
     .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
     .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
     .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important; }
-    .btn-success:hover, input[name="_save"]:hover { background-color: #0f766e !important; }
-    .btn-info { background-color: #3b82f6 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important;}
 
     /* Select2 UI Fixes */
     .select2-container { width: 100% !important; }
     .select2-container--default .select2-selection--single { height: 42px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important;}
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
-    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; }
 
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
@@ -157,10 +110,52 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
+    // =====================================================================
+    // O EXTERMINADOR (FORÇA BRUTA VIA JAVASCRIPT)
+    // =====================================================================
+    function aniquilarProblemasDoJazzmin() {
+        // 1. Matar o título fantasma ("Perguntas", "Escolhas", "Opcao respostas", etc)
+        document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
+            let texto = el.innerText.toLowerCase();
+            if (texto.includes('pergunta') || texto.includes('escolha') || texto.includes('opcao') || texto.includes('opção')) {
+                el.style.setProperty('display', 'none', 'important');
+            }
+        });
+
+        // 2. Matar as margens negativas do Bootstrap (Fim do Scroll Horizontal!)
+        document.querySelectorAll('.row, .form-row').forEach(el => {
+            el.style.setProperty('margin-left', '0', 'important');
+            el.style.setProperty('margin-right', '0', 'important');
+            el.style.setProperty('padding', '0', 'important');
+            el.style.setProperty('display', 'flex', 'important');
+            el.style.setProperty('flex-direction', 'column', 'important');
+            el.style.setProperty('width', '100%', 'important');
+        });
+
+        // 3. Matar o fundo cinzento dos caixotes externos
+        document.querySelectorAll('fieldset.card, fieldset.card-outline, .inline-group > fieldset').forEach(el => {
+            el.style.setProperty('background', 'transparent', 'important');
+            el.style.setProperty('border', 'none', 'important');
+            el.style.setProperty('box-shadow', 'none', 'important');
+        });
+    }
+
     window.addEventListener('load', function() {
+        // Roda a limpeza imediatamente ao carregar
+        aniquilarProblemasDoJazzmin();
+
+        // Cria um observador para matar os problemas assim que o Nested Admin tentar recriá-los ao clicar em "Adicionar"
+        const observer = new MutationObserver(aniquilarProblemasDoJazzmin);
+        observer.observe(document.body, { childList: true, subtree: true });
+
+        // Limpeza do título principal
         const h1 = document.querySelector('.content-header h1');
         if (h1 && h1.innerHTML.includes('|')) { h1.innerHTML = h1.innerHTML.split('|')[0].trim(); }
+
+        // Tradução da aba
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
+
+        // Menu de conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
