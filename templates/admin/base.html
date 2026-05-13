@@ -11,13 +11,11 @@
         overflow-x: hidden !important;
     }
     .main-sidebar { background-color: #030712 !important; border: none !important; }
-
-    /* Oculta topo padrão do Django/Jazzmin que não usamos */
     nav.main-header, .breadcrumb { display: none !important; }
 
     /* Remove fundos brancos residuais */
     .card, .card-body, .tab-content, .tab-pane {
-        background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important;
+        background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important;
     }
 
     /* =====================================================================
@@ -27,12 +25,15 @@
         height: 70px !important; display: flex !important; align-items: center !important;
         border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important;
     }
-    .content-header h1 {
-        border-right: none !important; padding: 0 !important; margin: 0 !important;
+
+    /* MATA A BORDA DO TÍTULO DE UMA VEZ POR TODAS */
+    .content-header h1, .content-header .border-right, h1.border-right, .border-right {
+        border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important;
         font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
     }
 
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 25px !important;}
+    /* ABAS: Margem reduzida para colar o formulário mais para cima */
+    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 10px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
@@ -49,38 +50,34 @@
     }
 
     /* =====================================================================
-       4. O CARTÃO PRINCIPAL E INPUTS (Agora sim, 100% Width!)
+       4. O CARTÃO PRINCIPAL E INPUTS (Formulário 100% Largo)
        ===================================================================== */
     .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 10px !important;
         position: relative !important;
-        padding: 25px 25px 70px 25px !important; /* Espaço inferior para o botão remover */
+        padding: 25px 25px 60px 25px !important; /* Espaço pro botão remover */
+        margin-top: 0 !important; /* Zera espaço extra em cima */
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* O Segredo: Forçar a coluna e os divs internos a terem 100% */
     body .inline-related .form-row, body .djn-item .form-row {
         display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important;
-    }
-    body .inline-related .form-row > div, body .djn-item .form-row > div {
-        width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important;
     }
 
     body .inline-related label, body .djn-item label {
         color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; display: block !important;
     }
 
-    /* Estilo dos Inputs */
-    input[type="text"], input[type="number"], textarea, select {
+    input[type="text"], input[type="number"], textarea, select, .vTextField {
         width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 12px 15px !important; font-size: 1rem !important; box-sizing: border-box !important;
     }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* Força o Select e o Select2 (Jazzmin) a ficarem escuros */
+    /* Select Escuro */
     select { height: 45px !important; appearance: auto !important; }
     .select2-container { width: 100% !important; }
     .select2-container--default .select2-selection--single { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
@@ -109,30 +106,23 @@
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
     .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
 
-    /* Botão Adicionar "Fantasma" e Largo */
-    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; width: 100% !important; box-sizing: border-box !important;}
+    /* BOTÕES ADICIONAR COMPACTOS (Fim dos botões gigantes) */
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; width: auto !important; display: block !important;}
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 12px !important; border-radius: 8px !important; font-weight: 700 !important; font-size: 1rem !important; text-decoration: none !important; display: block !important; text-align: center !important; transition: 0.2s; width: 100% !important; box-sizing: border-box !important;
+        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 10px 20px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: inline-block !important; width: auto !important; transition: 0.2s;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
     /* =====================================================================
-       7. BARRA DE SALVAR (SUBMIT ROW ALINHADA À DIREITA)
+       7. COLUNA DIREITA (BOTÕES DE SALVAR)
        ===================================================================== */
-    /* Captura a row de submit via ID do form gerado no painel */
-    form[id$="_form"] > div > .row:last-child, .submit-row {
-        display: flex !important; flex-direction: row !important; justify-content: flex-end !important; flex-wrap: wrap !important; gap: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 30px !important; width: 100% !important; margin-left: 0 !important; margin-right: 0 !important;
+    /* Impede que os botões de Salvar na lateral direita virem blocos gigantes */
+    #change_form .col-12.col-md-3, .submit-row {
+        display: flex !important; flex-direction: column !important; align-items: flex-end !important; gap: 10px !important; padding-top: 20px !important;
     }
-
-    form[id$="_form"] > div > .row:last-child input, .submit-row input, .submit-row a {
-        width: auto !important; margin: 0 !important; display: inline-block !important; border-radius: 6px !important; padding: 10px 25px !important; font-weight: bold !important; font-size: 0.95rem !important;
+    #change_form .col-12.col-md-3 .btn, .submit-row .btn {
+        width: auto !important; min-width: 200px !important; margin: 0 !important; border-radius: 6px !important; font-weight: bold !important;
     }
-
-    input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
-    input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
-
-    input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
-    input[name="_addanother"]:hover, input[name="_continue"]:hover { background-color: #4b5563 !important; }
 
 </style>
 {% endblock %}
@@ -140,24 +130,31 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    // JS Agora APENAS apaga texto. Não mexe NUNCA no layout/grid!
-    function limparTextosInuteis() {
+    function aplicarLimpeza() {
+        // 1. Mata títulos residuais
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
+
+        // 2. Mata margens negativas para evitar barra de rolagem horizontal
+        document.querySelectorAll('.row, .form-row').forEach(el => {
+            el.style.setProperty('margin-left', '0', 'important');
+            el.style.setProperty('margin-right', '0', 'important');
+        });
     }
 
     window.addEventListener('load', function() {
-        limparTextosInuteis();
-        const observer = new MutationObserver(limparTextosInuteis);
+        aplicarLimpeza();
+        const observer = new MutationObserver(aplicarLimpeza);
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Limpa Título H1
+        // Limpa Título H1 (Remove os pipes "|")
         const h1 = document.querySelector('.content-header h1');
-        if (h1 && h1.innerHTML.includes('|')) { h1.innerHTML = h1.innerHTML.split('|')[0].trim(); }
+        if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
+
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
         // Menu de Conta
