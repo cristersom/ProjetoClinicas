@@ -16,9 +16,8 @@
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
-    /* Remove fundos de cartões principais e ZERA O ESPAÇO NO TOPO */
-    .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
-        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important; margin-top: 0 !important; overflow-x: hidden !important;
+    .card, .card-body, .info-box, .bg-white {
+        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
     }
 
     .row, .form-row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
@@ -41,7 +40,7 @@
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. EXTINÇÃO DO TÍTULO CORTADO E CAIXOTES FANTASMAS
+       3. LIMPEZA DOS INLINES E CAIXOTES
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, h2.inline-heading, .tab-pane > h2,
     .inline-related h3, .djn-item h3, .inline-related .card-header, .djn-item .card-header,
@@ -56,18 +55,17 @@
     }
 
     /* =====================================================================
-       4. O CARTÃO PRINCIPAL E INPUTS
+       4. O CARTÃO PRINCIPAL E INPUTS (Correção do Branco Cegante)
        ===================================================================== */
     .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
         position: relative !important;
-        padding: 24px 24px 60px 24px !important;
+        padding: 24px !important;
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        overflow: hidden !important;
     }
 
     body .inline-related .form-row, body .djn-item .form-row {
@@ -78,79 +76,65 @@
         color: #d1d5db !important; font-weight: 600 !important; font-size: 0.9rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; width: 100% !important; text-align: left !important;
     }
 
-    body .inline-related input, body .djn-item input,
-    body .inline-related textarea, body .djn-item textarea,
-    body .inline-related select, body .djn-item select,
-    body .vTextField, body .vLargeTextField {
-        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
+    /* Inputs escuros */
+    body input, body textarea, body select, body .vTextField, body .vLargeTextField {
+        width: 100% !important; max-width: 100% !important;
+        background-color: #374151 !important;
+        color: #ffffff !important;
+        border: 1px solid #4b5563 !important;
+        border-radius: 6px !important;
+        padding: 10px 15px !important;
+        box-sizing: border-box !important;
+        font-size: 0.95rem !important;
     }
-    body .inline-related input:focus, body .djn-item input:focus,
-    body .inline-related textarea:focus, body .djn-item textarea:focus,
-    body .inline-related select:focus, body .djn-item select:focus {
-        border-color: #14b8a6 !important; outline: none !important;
+    body input:focus, body textarea:focus, body select:focus {
+        border-color: #14b8a6 !important; outline: none !important; background-color: #374151 !important; color: #ffffff !important;
     }
-    body select:not([multiple]) { height: 42px !important; appearance: auto !important; }
+
+    /* Força o select a ser escuro e não gigantesco */
+    body select, body select:not([multiple]), body select.form-control {
+        height: 42px !important;
+        appearance: auto !important;
+        background-color: #374151 !important;
+        color: #ffffff !important;
+    }
+    body select option { background-color: #1f2937 !important; color: white !important; }
 
     /* =====================================================================
        5. SUB-CARTÕES (Opções de Resposta)
        ===================================================================== */
     .djn-group-nested {
-        background-color: transparent !important; border: none !important; border-left: 4px solid #14b8a6 !important; padding: 10px 0 10px 20px !important; margin-top: 15px !important; width: 100% !important; box-sizing: border-box !important;
-    }
-    .djn-group-nested > h2 {
-        display: block !important; visibility: visible !important; height: auto !important; position: static !important; opacity: 1 !important; color: #9ca3af !important; background: transparent !important; border: none !important; padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
-    }
-    .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 40px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #374151 !important; border-radius: 0 !important; box-shadow: none !important; }
-    .djn-group-nested .djn-item:last-child { border-bottom: none !important; }
-
-    /* =====================================================================
-       6. BOTÕES ADICIONAR E REMOVER
-       ===================================================================== */
-    .inline-deletelink, .djn-remove-handler, .delete {
-        position: absolute !important; bottom: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 6px !important; padding: 6px 16px !important; font-size: 0.8rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s;
-    }
-    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #ef4444 !important; color: white !important; }
-    .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
-    .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
-
-    /* BOTOES ADICIONAR (Agora pequenos e alinhados à esquerda) */
-    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; text-align: left !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 8px 20px !important; border-radius: 6px !important; font-weight: 700 !important; text-decoration: none !important; display: inline-block !important; width: auto !important; border: none !important; transition: 0.2s; box-sizing: border-box !important; font-size: 0.9rem !important;
-    }
-    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
-
-    /* =====================================================================
-       7. BARRA DE SALVAR (Submit Row) - ALINHADA À DIREITA
-       ===================================================================== */
-    .submit-row {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: flex-end !important; /* Manda tudo para a direita */
-        align-items: center !important;
-        gap: 10px !important;
-        background: transparent !important;
-        border: none !important;
-        padding: 20px 0 !important;
-        margin: 20px 0 0 0 !important;
+        background-color: #111827 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        padding: 20px !important;
+        margin-top: 15px !important;
         width: 100% !important;
+        box-sizing: border-box !important;
     }
-    /* Força os botões de Salvar a terem o tamanho exato do texto, não 100% */
-    .submit-row input, .submit-row a, .submit-row button {
-        width: auto !important;
-        margin: 0 !important;
-        display: inline-block !important;
-        border-radius: 6px !important;
-        padding: 10px 20px !important;
-        font-weight: bold !important;
+    .djn-group-nested .djn-item {
+        background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; box-shadow: none !important; border-bottom: 1px solid #374151 !important; border-radius: 0 !important; padding-bottom: 20px !important;
     }
-    .submit-row input[type="submit"].default, .submit-row input[name="_save"] {
-        background-color: #14b8a6 !important; color: white !important; border: none !important;
+    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
+
+    /* =====================================================================
+       6. BOTÕES: ADICIONAR E REMOVER ELEGANTES
+       ===================================================================== */
+
+    /* Remover: Canto superior direito, discreto */
+    .inline-deletelink, .djn-remove-handler, .delete {
+        position: absolute !important; top: 15px !important; right: 15px !important; background-color: transparent !important; color: #9ca3af !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 4px 12px !important; font-size: 0.75rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s; display: inline-block !important;
     }
-    .submit-row input[type="submit"]:hover { background-color: #0d9488 !important; }
-    .submit-row input[name="_addanother"], .submit-row input[name="_continue"] {
-        background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important;
+    .inline-deletelink:hover, .djn-remove-handler:hover, .delete:hover { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important;}
+    .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
+    .delete label::after { content: "Remover"; font-size: 0.75rem !important;}
+
+    /* Adicionar: Ghost button, alinhado à esquerda, sutil */
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; text-align: left !important;}
+    .add-row a, .djn-add-item a, .djn-add-handler {
+        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 20px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: inline-block !important; width: auto !important; transition: 0.2s;
     }
+    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
     /* Tela Login */
     body.login-page { background-color: #111827 !important; }
@@ -161,34 +145,48 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function aniquilarProblemasDoJazzmin() {
+    function aplicarPlasticaFinal() {
+        // 1. Mata títulos residuais
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
-            let texto = el.innerText.toLowerCase();
-            if (texto.includes('pergunta') || texto.includes('escolha') || texto.includes('opcao') || texto.includes('opção') || texto.includes('erguntas')) {
+            let t = el.innerText.toLowerCase();
+            if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
 
+        // 2. Mata margens negativas e scroll horizontal
         document.querySelectorAll('.row, .form-row').forEach(el => {
             el.style.setProperty('margin-left', '0', 'important');
             el.style.setProperty('margin-right', '0', 'important');
-            el.style.setProperty('padding', '0', 'important');
-            el.style.setProperty('display', 'flex', 'important');
-            el.style.setProperty('flex-direction', 'column', 'important');
             el.style.setProperty('width', '100%', 'important');
         });
 
-        document.querySelectorAll('fieldset.card, fieldset.card-outline, .inline-group > fieldset').forEach(el => {
-            el.style.setProperty('background', 'transparent', 'important');
-            el.style.setProperty('border', 'none', 'important');
-            el.style.setProperty('box-shadow', 'none', 'important');
-            el.style.setProperty('margin-top', '0', 'important');
-        });
+        // 3. BARRA DE SALVAR: Força o alinhamento à direita e remove o empilhamento
+        const submitRow = document.querySelector('.submit-row') || document.querySelector('#content-main > form > div:last-child');
+        if (submitRow && submitRow.tagName === 'DIV') {
+            submitRow.style.setProperty('display', 'flex', 'important');
+            submitRow.style.setProperty('flex-direction', 'row', 'important');
+            submitRow.style.setProperty('justify-content', 'flex-end', 'important');
+            submitRow.style.setProperty('flex-wrap', 'wrap', 'important');
+            submitRow.style.setProperty('gap', '10px', 'important');
+            submitRow.style.setProperty('padding', '20px 0', 'important');
+            submitRow.style.setProperty('margin-top', '20px', 'important');
+            submitRow.style.setProperty('border-top', '1px solid #374151', 'important');
+            submitRow.style.setProperty('background', 'transparent', 'important');
+
+            // Corrige os botões de salvar tirando o ".btn-block" que os deixa gigantes
+            submitRow.querySelectorAll('input, button, a').forEach(btn => {
+                btn.classList.remove('btn-block');
+                btn.style.setProperty('width', 'auto', 'important');
+                btn.style.setProperty('margin', '0', 'important');
+                btn.style.setProperty('display', 'inline-block', 'important');
+            });
+        }
     }
 
     window.addEventListener('load', function() {
-        aniquilarProblemasDoJazzmin();
-        const observer = new MutationObserver(aniquilarProblemasDoJazzmin);
+        aplicarPlasticaFinal();
+        const observer = new MutationObserver(aplicarPlasticaFinal);
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
