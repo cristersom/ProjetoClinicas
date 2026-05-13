@@ -19,40 +19,50 @@
     /* =====================================================================
        2. CABEÇALHO E ABAS
        ===================================================================== */
-    .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
+    .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 15px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
 
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
+    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 15px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. PADRÃO DOS CARTÕES (PRINCIPAL E INLINES FICAM IGUAIS)
+       3. FIM DO BOX-CEPTION (LIMPEZA DE CAIXOTES FANTASMAS)
        ===================================================================== */
-    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; }
-    .inline-group > fieldset, .djn-group > fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; }
+    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
 
-    fieldset.module, .inline-related, .djn-item {
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        position: relative !important;
-        padding: 25px !important;
-        margin-bottom: 20px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+    /* Esta linha mata o fundo duplo descoberto no print (djn-fieldset) */
+    .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group {
+        background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important;
     }
 
+    /* =====================================================================
+       4. O CARTÃO PADRÃO (Aba Principal e Itens das Listas)
+       ===================================================================== */
+    /* Cartão Principal */
+    #content-main > form > div > fieldset.module {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important;
+    }
+
+    /* Cartões Inlines (Perguntas, Cenas) */
+    .inline-related, .djn-item {
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important;
+        padding: 20px !important; /* Espaço uniforme e compacto */
+        margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important;
+    }
+
+    /* Campos e Labels */
     body .form-row { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
     body .form-row > div { width: 100% !important; max-width: 100% !important; }
-    body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; }
+    body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 70% !important;} /* 70% de largura evita conflito visual com o botão remover */
 
-    /* Inputs */
+    /* Inputs Estilizados */
     input[type="text"], input[type="number"], textarea, select, .vTextField {
-        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 12px 15px !important; font-size: 1rem !important; box-sizing: border-box !important;
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important;
     }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
+    /* Select2 UI Fixes */
     select { height: 45px !important; appearance: auto !important; }
     .select2-container { width: 100% !important; }
     .select2-container--default .select2-selection--single { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
@@ -60,36 +70,46 @@
     .select2-container--default .select2-selection--single .select2-selection__arrow { height: 43px !important; }
 
     /* =====================================================================
-       4. SUB-CARTÕES (Opções de Resposta)
+       5. SUB-CARTÕES (Opções de Resposta Compactas)
        ===================================================================== */
-    .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 15px !important; width: 100% !important; box-sizing: border-box !important; }
-    .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 25px 0 10px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
-    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; }
+    .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 10px !important; width: 100% !important; box-sizing: border-box !important; }
+    .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
+    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
 
     /* =====================================================================
-       5. SOLUÇÃO DEFINITIVA DO "REMOVERREMOVER"
+       6. CORREÇÃO DEFINITIVA DO BOTÃO "REMOVER"
        ===================================================================== */
-    /* Aniquila completamente a caixinha e a label nativa do Django */
-    span.delete, div.delete { display: none !important; }
+    /* Botões nativos do Django (Para Cenas/Escolhas) */
+    span.delete, div.delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
+    span.delete input, div.delete input { display: none !important; } /* Esconde só a caixa de seleção */
 
-    /* Estiliza APENAS o link do plugin Nested Admin e o coloca no TOPO DIREITO */
+    /* Transforma a label nativa em botão */
+    span.delete label, div.delete label {
+        background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important;
+    }
+    span.delete label::after, div.delete label::after { content: "Remover" !important; font-size: 0.75rem !important; }
+    span.delete label:hover, div.delete label:hover { background-color: #ef4444 !important; color: white !important; }
+
+    /* Botões do Nested Admin (Para Questionários) */
     a.inline-deletelink, a.djn-remove-handler {
-        position: absolute !important; top: 10px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 4px 10px !important; font-size: 0.75rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s; display: inline-block !important;
+        position: absolute !important; top: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0.75rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s; display: inline-block !important;
     }
     a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
     /* =====================================================================
-       6. BOTÕES ADICIONAR E PAINEL DE SALVAR
+       7. BOTÕES ADICIONAR E PAINEL DE SALVAR
        ===================================================================== */
     .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s;
+        background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
+    /* Painel Direita (Salvar) */
     #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; }
     #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
+    input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 </style>
 {% endblock %}
@@ -98,12 +118,15 @@
 {{ block.super }}
 <script>
     function aplicarLimpeza() {
+        // Apaga os títulos chatos do form sem quebrar a estrutura
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
+
+        // Troca "Texto:" para "Opção:" magicamente
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
         });
@@ -116,8 +139,16 @@
 
         const h1 = document.querySelector('.content-header h1');
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
-
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
+
+        const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
+        if (sidebar && !document.querySelector('#menu-conta-custom')) {
+            sidebar.insertAdjacentHTML('beforeend', `
+                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
+                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
+                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
+            `);
+        }
     });
 </script>
 {% endblock %}
