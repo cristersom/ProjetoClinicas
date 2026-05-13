@@ -6,78 +6,105 @@
     /* =====================================================================
        1. BASE E MODO ESCURO GERAL
        ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important; }
+    body, html, .wrapper, .content-wrapper, .main-footer, #content-main, .tab-content, .tab-pane {
+        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important;
+        max-width: 100vw !important; overflow-x: hidden !important; box-sizing: border-box !important;
+    }
     .main-sidebar { background-color: #030712 !important; padding-top: 0 !important; border: none !important; }
 
     nav.main-header, header.main-header, .main-header { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important;}
     a.brand-link, .brand-link { display: none !important; height: 0 !important; padding: 0 !important; margin: 0 !important; visibility: hidden !important; }
     body.sidebar-mini .wrapper .content-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
 
+    /* Remove fundos de cartões principais e ZERA O ESPAÇO NO TOPO */
     .card, .card-body, .info-box, .bg-white, .tab-content, .tab-pane {
-        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important;
+        background-color: transparent !important; border-color: transparent !important; color: #f3f4f6 !important; box-shadow: none !important; padding: 0 !important; margin-top: 0 !important; overflow-x: hidden !important;
     }
 
+    .row, .form-row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+
     /* =====================================================================
-       2. TOPO LIMPO
+       2. TOPO LIMPO E ABAS
        ===================================================================== */
     .content-header { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; background-color: #111827 !important; }
     aside.main-sidebar .user-panel { height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 15px !important; margin: 0 0 25px 0 !important; border-top: none !important; }
 
     h1, .content-header h1, h1.border-right, .border-right {
-        border-right: none !important; padding-right: 0 !important; margin-right: 0 !important;
-        font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
+        border-right: none !important; padding-right: 0 !important; margin-right: 0 !important; font-size: 1.8rem !important; font-weight: 800 !important; color: #ffffff !important;
     }
     .pr-3, .mr-3 { padding-right: 0 !important; margin-right: 0 !important; }
     .breadcrumb, .breadcrumb-item { display: none !important; }
 
-    /* =====================================================================
-       3. ABAS E INPUTS GERAIS
-       ===================================================================== */
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1.05rem; border: none !important; background: transparent !important; border-bottom: 3px solid transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link:hover { color: #d1d5db !important; border-bottom: 3px solid #6b7280 !important; }
     .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    /* Força os inputs a serem bonitos e largos */
-    input, textarea, select, .vTextField, .vLargeTextField {
-        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
+    /* =====================================================================
+       3. EXTINÇÃO DO TÍTULO CORTADO E CAIXOTES FANTASMAS
+       ===================================================================== */
+    .inline-group > h2, .djn-group > h2, h2.inline-heading, .tab-pane > h2,
+    .inline-related h3, .djn-item h3, .inline-related .card-header, .djn-item .card-header,
+    legend, .inline_label {
+        display: none !important; visibility: hidden !important; opacity: 0 !important; height: 0 !important; margin: 0 !important; padding: 0 !important; position: absolute !important; overflow: hidden !important;
     }
-    input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    select:not([multiple]) { height: 42px !important; appearance: auto !important; }
+
+    .inline-group > fieldset, .djn-group > fieldset,
+    .inline-group > fieldset > .card-body, .djn-group > fieldset > .card-body,
+    .card-outline, .inline-group, .djn-group {
+        background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important;
+    }
 
     /* =====================================================================
-       4. O CARTÃO PRINCIPAL (Pergunta / Escolha)
+       4. O CARTÃO PRINCIPAL E INPUTS
        ===================================================================== */
     .inline-related, .djn-item {
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
         position: relative !important;
-        padding: 24px 24px 60px 24px !important; /* Espaço para botão remover no fundo */
+        padding: 24px 24px 60px 24px !important;
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        overflow: hidden !important;
+    }
+
+    body .inline-related .form-row, body .djn-item .form-row {
+        display: flex !important; flex-direction: column !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; width: 100% !important; box-sizing: border-box !important;
     }
 
     body .inline-related label, body .djn-item label {
         color: #d1d5db !important; font-weight: 600 !important; font-size: 0.9rem !important; margin: 0 0 8px 0 !important; padding: 0 !important; width: 100% !important; text-align: left !important;
     }
 
-    /* 4.1 SUB-CARTÕES (Opções de Resposta dentro das Perguntas) */
+    body .inline-related input, body .djn-item input,
+    body .inline-related textarea, body .djn-item textarea,
+    body .inline-related select, body .djn-item select,
+    body .vTextField, body .vLargeTextField {
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important; font-size: 0.95rem !important;
+    }
+    body .inline-related input:focus, body .djn-item input:focus,
+    body .inline-related textarea:focus, body .djn-item textarea:focus,
+    body .inline-related select:focus, body .djn-item select:focus {
+        border-color: #14b8a6 !important; outline: none !important;
+    }
+    body select:not([multiple]) { height: 42px !important; appearance: auto !important; }
+
+    /* =====================================================================
+       5. SUB-CARTÕES (Opções de Resposta)
+       ===================================================================== */
     .djn-group-nested {
-        background-color: transparent !important;
-        border: none !important;
-        border-left: 4px solid #14b8a6 !important;
-        padding: 10px 0 10px 20px !important;
-        margin-top: 20px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+        background-color: transparent !important; border: none !important; border-left: 4px solid #14b8a6 !important; padding: 10px 0 10px 20px !important; margin-top: 15px !important; width: 100% !important; box-sizing: border-box !important;
+    }
+    .djn-group-nested > h2 {
+        display: block !important; visibility: visible !important; height: auto !important; position: static !important; opacity: 1 !important; color: #9ca3af !important; background: transparent !important; border: none !important; padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; font-size: 0.85rem !important; text-transform: uppercase; border-bottom: 1px solid #374151 !important;
     }
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 40px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #374151 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; }
 
     /* =====================================================================
-       5. BOTÕES DE AÇÃO
+       6. BOTÕES ADICIONAR E REMOVER
        ===================================================================== */
     .inline-deletelink, .djn-remove-handler, .delete {
         position: absolute !important; bottom: 15px !important; right: 15px !important; background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 6px !important; padding: 6px 16px !important; font-size: 0.8rem !important; font-weight: bold !important; text-transform: uppercase !important; text-decoration: none !important; z-index: 10 !important; transition: 0.2s;
@@ -86,22 +113,46 @@
     .delete label { font-size: 0 !important; margin-left: 5px !important; cursor: pointer;}
     .delete label::after { content: "Remover"; font-size: 0.8rem !important;}
 
-    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; width: 100% !important; box-sizing: border-box !important;}
+    /* BOTOES ADICIONAR (Agora pequenos e alinhados à esquerda) */
+    .add-row, .djn-add-item { margin-top: 15px !important; padding: 0 !important; background: transparent !important; border: none !important; text-align: left !important; }
     .add-row a, .djn-add-item a, .djn-add-handler {
-        background-color: #14b8a6 !important; color: #ffffff !important; padding: 12px !important; border-radius: 6px !important; font-weight: 700 !important; text-decoration: none !important; display: block !important; text-align: center !important; border: none !important; transition: 0.2s; width: 100% !important; box-sizing: border-box !important;
+        background-color: #14b8a6 !important; color: #ffffff !important; padding: 8px 20px !important; border-radius: 6px !important; font-weight: 700 !important; text-decoration: none !important; display: inline-block !important; width: auto !important; border: none !important; transition: 0.2s; box-sizing: border-box !important; font-size: 0.9rem !important;
     }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #0d9488 !important; }
 
-    .object-tools { display: flex !important; gap: 10px !important; margin-bottom: 20px !important; flex-wrap: wrap; }
-    .object-tools a, .btn-light, .btn-default, .btn-outline-secondary { background-color: #374151 !important; color: #ffffff !important; border: 1px solid #6b7280 !important; font-weight: 600 !important; padding: 8px 16px !important; border-radius: 6px !important; transition: 0.2s; }
-    .object-tools a:hover, .btn-light:hover, .btn-default:hover, .btn-outline-secondary:hover { background-color: #4b5563 !important; color: white !important; }
-    .btn-success, input[name="_save"], .object-tools a.btn-success { background-color: #0d9488 !important; color: white !important; border: none !important; font-weight: bold !important; border-radius: 6px !important; }
+    /* =====================================================================
+       7. BARRA DE SALVAR (Submit Row) - ALINHADA À DIREITA
+       ===================================================================== */
+    .submit-row {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: flex-end !important; /* Manda tudo para a direita */
+        align-items: center !important;
+        gap: 10px !important;
+        background: transparent !important;
+        border: none !important;
+        padding: 20px 0 !important;
+        margin: 20px 0 0 0 !important;
+        width: 100% !important;
+    }
+    /* Força os botões de Salvar a terem o tamanho exato do texto, não 100% */
+    .submit-row input, .submit-row a, .submit-row button {
+        width: auto !important;
+        margin: 0 !important;
+        display: inline-block !important;
+        border-radius: 6px !important;
+        padding: 10px 20px !important;
+        font-weight: bold !important;
+    }
+    .submit-row input[type="submit"].default, .submit-row input[name="_save"] {
+        background-color: #14b8a6 !important; color: white !important; border: none !important;
+    }
+    .submit-row input[type="submit"]:hover { background-color: #0d9488 !important; }
+    .submit-row input[name="_addanother"], .submit-row input[name="_continue"] {
+        background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important;
+    }
 
-    /* Select2 UI Fixes */
-    .select2-container { width: 100% !important; }
-    .select2-container--default .select2-selection--single { height: 42px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important;}
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
-
+    /* Tela Login */
     body.login-page { background-color: #111827 !important; }
     .login-box, .register-box, .login-card-body { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px; }
 </style>
@@ -110,19 +161,14 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    // =====================================================================
-    // O EXTERMINADOR (FORÇA BRUTA VIA JAVASCRIPT)
-    // =====================================================================
     function aniquilarProblemasDoJazzmin() {
-        // 1. Matar o título fantasma ("Perguntas", "Escolhas", "Opcao respostas", etc)
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let texto = el.innerText.toLowerCase();
-            if (texto.includes('pergunta') || texto.includes('escolha') || texto.includes('opcao') || texto.includes('opção')) {
+            if (texto.includes('pergunta') || texto.includes('escolha') || texto.includes('opcao') || texto.includes('opção') || texto.includes('erguntas')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
 
-        // 2. Matar as margens negativas do Bootstrap (Fim do Scroll Horizontal!)
         document.querySelectorAll('.row, .form-row').forEach(el => {
             el.style.setProperty('margin-left', '0', 'important');
             el.style.setProperty('margin-right', '0', 'important');
@@ -132,30 +178,23 @@
             el.style.setProperty('width', '100%', 'important');
         });
 
-        // 3. Matar o fundo cinzento dos caixotes externos
         document.querySelectorAll('fieldset.card, fieldset.card-outline, .inline-group > fieldset').forEach(el => {
             el.style.setProperty('background', 'transparent', 'important');
             el.style.setProperty('border', 'none', 'important');
             el.style.setProperty('box-shadow', 'none', 'important');
+            el.style.setProperty('margin-top', '0', 'important');
         });
     }
 
     window.addEventListener('load', function() {
-        // Roda a limpeza imediatamente ao carregar
         aniquilarProblemasDoJazzmin();
-
-        // Cria um observador para matar os problemas assim que o Nested Admin tentar recriá-los ao clicar em "Adicionar"
         const observer = new MutationObserver(aniquilarProblemasDoJazzmin);
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Limpeza do título principal
         const h1 = document.querySelector('.content-header h1');
         if (h1 && h1.innerHTML.includes('|')) { h1.innerHTML = h1.innerHTML.split('|')[0].trim(); }
-
-        // Tradução da aba
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
-        // Menu de conta
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
@@ -170,16 +209,4 @@
 
 {% block messages %}
     {{ block.super }}
-    {% if request.clinica_realtime and not request.clinica_realtime.assinatura_ativa %}
-    <div style="background-color: #1f2937; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 20px; margin: 0 15px 25px 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap;">
-        <div style="display: flex; align-items: center; padding-right: 15px;">
-            <i class="fas fa-exclamation-triangle fa-2x" style="color: #f59e0b; margin-right: 15px;"></i>
-            <div>
-                <h4 style="margin: 0; font-weight: bold; font-size: 1.1rem; color: #ffffff;">Pagamento Pendente</h4>
-                <p style="margin: 5px 0 0 0; font-size: 0.95rem; color: #d1d5db;">Não identificamos seu pagamento.</p>
-            </div>
-        </div>
-        <a href="{% url 'narrativa:planos' %}" style="background-color: #f59e0b; color: white; font-weight: 800; padding: 12px 25px; border-radius: 6px; text-decoration: none; text-align: center;">VER PLANOS</a>
-    </div>
-    {% endif %}
 {% endblock %}
