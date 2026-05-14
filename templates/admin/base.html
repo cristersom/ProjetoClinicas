@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E FIM DO SCROLL HORIZONTAL
+       1. BASE E FIM DO SCROLL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
@@ -14,7 +14,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. CABEÇALHO, ABAS E BOTÕES DO TOPO
+       2. CABEÇALHO, ABAS E BOTÕES DO TOPO (+ ADICIONAR, IMPORTAR)
        ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
@@ -75,7 +75,7 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. LISTAGENS: AÇÕES E PESQUISA ALINHADAS (NOVA ABORDAGEM DOMADA)
+       8. PESQUISA E AÇÕES - A TRAVA NUCLEAR (MAX-CONTENT & FLEX: 0 0 AUTO)
        ===================================================================== */
     #changelist { position: relative !important; display: block !important; padding-top: 1px !important; }
 
@@ -85,7 +85,7 @@
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
         padding: 10px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
         height: 64px !important; width: 100% !important; box-sizing: border-box !important;
-        padding-right: 400px !important; /* Cria um escudo para a pesquisa não sobrepor o texto */
+        padding-right: 400px !important;
     }
     .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
     .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
@@ -95,31 +95,35 @@
     .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
     .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
 
-    /* BARRA DE PESQUISA (DOMANDO O BOOTSTRAP) */
+    /* BARRA DE PESQUISA - MODO BLINDADO */
     #changelist-search {
         position: absolute !important;
-        top: 10px !important;
+        top: 11px !important;
         right: 15px !important;
         margin: 0 !important;
         padding: 0 !important;
         z-index: 100 !important;
+        height: 42px !important;
     }
 
-    #changelist-search form { margin: 0 !important; padding: 0 !important; }
+    #changelist-search form {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 42px !important;
+    }
 
-    /* AQUI ESTÁ O SEGREDO: Flex-wrap nowrap diretamente na classe maldita do Bootstrap */
+    /* Trava 1: width: max-content força a div a ter exatamente o tamanho dos itens lado a lado */
     #changelist-search .input-group {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        justify-content: center !important;
-        width: auto !important;
+        width: max-content !important;
         margin: 0 !important;
         height: 42px !important;
     }
 
-    /* O campo onde você digita */
+    /* Trava 2: flex: 0 0 auto impede que o input seja esmagado */
     #changelist-search input[type="text"] {
         width: 250px !important;
         background-color: #374151 !important;
@@ -130,16 +134,18 @@
         height: 42px !important;
         margin: 0 !important;
         box-sizing: border-box !important;
+        flex: 0 0 auto !important;
     }
 
-    /* A div do Bootstrap que segura o botão */
-    #changelist-search .input-group-append {
-        display: flex !important;
-        margin-left: 8px !important; /* Espaçinho entre o input e o botão */
+    /* Trava 3: display block direto no append para anular propriedades ocultas do flex do Bootstrap */
+    #changelist-search .input-group-append,
+    #changelist-search .input-group-btn {
+        display: block !important;
+        margin-left: 10px !important;
         height: 42px !important;
+        flex: 0 0 auto !important;
     }
 
-    /* O Botão Pesquisar final */
     #changelist-search input[type="submit"], #changelist-search button {
         background-color: #14b8a6 !important;
         color: white !important;
@@ -151,9 +157,9 @@
         cursor: pointer !important;
         margin: 0 !important;
         transition: 0.2s;
-        white-space: nowrap !important; /* Proíbe o texto de quebrar */
-        display: flex !important;
-        align-items: center !important;
+        white-space: nowrap !important;
+        display: inline-block !important;
+        box-sizing: border-box !important;
     }
     #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
 
