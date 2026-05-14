@@ -36,22 +36,19 @@
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important;}
 
-    /* Todos os inputs escuros na edição */
+    /* Inputs sempre escuros */
     input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
     input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
 
-    /* Select2 (Os dropdowns complexos) escuros */
+    /* Select2 Escuro */
     .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 45px !important; display: flex !important; align-items: center !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
     .select2-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; }
     .select2-results__option { background-color: #1f2937 !important; color: #ffffff !important; }
     .select2-results__option[aria-selected="true"], .select2-results__option--highlighted { background-color: #14b8a6 !important; color: white !important; }
 
-    /* =====================================================================
-       4. BOTÕES DE EDIÇÃO / INLINES
-       ===================================================================== */
     .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 10px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
@@ -73,20 +70,31 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       5. A BARRA INFERIOR (LISTAGEM PERFEITA - SEM BOX, TUDO NA LINHA)
+       4. TABELAS MODERNAS E BOTÃO EXCLUIR
        ===================================================================== */
-    /* Aniquila o layout nativo antigo (do topo) */
-    #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
+    #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
+    #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
+    #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
+    #changelist table tbody tr:hover { background-color: #374151 !important; }
+    #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
+    #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
+    #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
 
-    /* A nossa nova super barra no fundo da página */
-    .my-bottom-bar {
+    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important;}
+    .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
+
+    /* =====================================================================
+       5. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
+       ===================================================================== */
+    .my-super-bottom-bar {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Tudo encostado à direita */
+        justify-content: flex-end !important; /* Tudo alinhado à direita */
         align-items: center !important;
         gap: 15px !important;
-        background: transparent !important; /* SEM BOX CINZA GIGANTE */
+        background: transparent !important; /* Invisível */
         border: none !important;
         padding: 0 !important;
         margin-top: 15px !important;
@@ -94,76 +102,26 @@
         width: 100% !important;
     }
 
-    /* Agrupamentos internos para não quebrar a linha */
     .my-group { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
 
-    /* Esconde rótulos desnecessários ("Ação:") */
-    .my-group label { display: none !important; }
-
-    /* Estilização dos Inputs (Pesquisa) e Selects (Ações) */
-    .custom-input, .custom-select {
-        height: 42px !important;
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0 15px !important;
-        box-sizing: border-box !important;
-    }
-    .custom-input { width: 250px !important; }
+    .custom-input { width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; }
     .custom-input::placeholder { color: #9ca3af !important; }
+    .custom-input:focus { border-color: #14b8a6 !important; outline: none !important; }
 
     .custom-select {
-        min-width: 220px !important;
-        appearance: none !important;
-        cursor: pointer !important;
-        padding-right: 40px !important;
+        min-width: 220px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; box-sizing: border-box !important; appearance: none !important; cursor: pointer !important;
         background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
         background-repeat: no-repeat !important; background-position: right 10px center !important;
     }
-    .custom-input:focus, .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
+    .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* Estilização dos Botões */
     .custom-btn {
-        height: 42px !important;
-        padding: 0 20px !important;
-        border-radius: 6px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 8px !important;
-        transition: 0.2s !important;
-        white-space: nowrap !important;
-        border: none !important;
-        text-decoration: none !important;
+        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; border: none !important; text-decoration: none !important;
     }
-
-    /* Botões Verdes (Pesquisar, Adicionar, Importar) */
     .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
-    .custom-btn.primary:hover { background-color: #0d9488 !important; }
-
-    /* Botões Cinzas (Ir) */
+    .custom-btn.primary:hover { background-color: #0d9488 !important; color: white !important; }
     .custom-btn.secondary { background-color: #4b5563 !important; color: white !important; }
-    .custom-btn.secondary:hover { background-color: #6b7280 !important; }
-
-
-    /* =====================================================================
-       6. TABELA E PAGINAÇÃO
-       ===================================================================== */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
-    #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
-    #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
-    #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
-    #changelist table tbody tr:hover { background-color: #374151 !important; }
-
-    #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
-    #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
-    #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
-
-    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important;}
-    .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
+    .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
 </style>
 {% endblock %}
 
@@ -173,135 +131,151 @@
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
 
-        const table = document.querySelector('#changelist table');
+        const mainContent = document.getElementById('content-main');
         const formTabela = document.getElementById('changelist-form');
+        const table = document.querySelector('#changelist table');
 
-        if (!table && !formTabela) return;
+        if (!formTabela && !table) return;
 
-        // Contentor Transparente Alinhado à Direita
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
-        bottomBar.className = 'my-bottom-bar';
+        bottomBar.className = 'my-super-bottom-bar';
 
-        // -----------------------------------------------------
-        // 1. PESQUISA (Se existir na página)
-        // -----------------------------------------------------
-        const oldSearch = document.getElementById('changelist-search') || document.getElementById('toolbar');
-        if (oldSearch) {
-            const formSearchOrig = oldSearch.querySelector('form');
-            if (formSearchOrig) {
+        // =========================================================
+        // 1. PESQUISA (A caça furtiva ao input name="q" do Django)
+        // =========================================================
+        const searchInputOrig = document.querySelector('input[name="q"]:not(.custom-input)');
+        if (searchInputOrig) {
+            const searchFormOrig = searchInputOrig.closest('form');
+            if (searchFormOrig) {
                 const searchGroup = document.createElement('form');
                 searchGroup.className = 'my-group';
-                searchGroup.action = formSearchOrig.action;
-                searchGroup.method = formSearchOrig.method;
+                searchGroup.action = searchFormOrig.action;
+                searchGroup.method = searchFormOrig.method;
 
-                // O Input de Texto
-                const inputOrig = formSearchOrig.querySelector('input[type="text"]');
-                if (inputOrig) {
-                    const inputClone = inputOrig.cloneNode(true);
-                    inputClone.className = 'custom-input';
-                    inputClone.placeholder = 'Pesquisar...';
+                const inputClone = searchInputOrig.cloneNode(true);
+                inputClone.className = 'custom-input';
+                inputClone.placeholder = 'Pesquisar...';
 
-                    // Preserva a palavra pesquisada se a página recarregou
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if(urlParams.has(inputClone.name)) inputClone.value = urlParams.get(inputClone.name);
+                // Mantém o texto se a página tiver recarregado com filtro
+                const urlParams = new URLSearchParams(window.location.search);
+                if(urlParams.has(inputClone.name)) inputClone.value = urlParams.get(inputClone.name);
 
-                    searchGroup.appendChild(inputClone);
-                }
+                const btnSearch = document.createElement('button');
+                btnSearch.type = 'submit';
+                btnSearch.className = 'custom-btn primary';
+                btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
 
-                // O Botão Pesquisar
-                const btnOrig = formSearchOrig.querySelector('input[type="submit"], button');
-                if (btnOrig) {
-                    const btnSearch = document.createElement('button');
-                    btnSearch.type = 'submit';
-                    btnSearch.className = 'custom-btn primary';
-                    btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-                    searchGroup.appendChild(btnSearch);
-                }
+                searchGroup.appendChild(inputClone);
+                searchGroup.appendChild(btnSearch);
 
-                // Garante que os inputs escondidos do Django vão junto
-                formSearchOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
+                // Copia os hiddens do Django
+                searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
                 bottomBar.appendChild(searchGroup);
+
+                // Esconde a bagunça velha do Jazzmin
+                searchFormOrig.style.setProperty('display', 'none', 'important');
+                if(searchFormOrig.parentElement) searchFormOrig.parentElement.style.setProperty('display', 'none', 'important');
             }
-            // Mata a pesquisa original
-            oldSearch.style.setProperty('display', 'none', 'important');
         }
 
-        // -----------------------------------------------------
-        // 2. AÇÕES EM LOTE (O Dropdown)
-        // -----------------------------------------------------
-        const oldActions = document.querySelector('.actions');
-        if (oldActions && formTabela) {
+        // =========================================================
+        // 2. AÇÕES EM LOTE (A caça ao select name="action")
+        // =========================================================
+        const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
+        if (actionSelectOrig && formTabela) {
             const actionGroup = document.createElement('div');
             actionGroup.className = 'my-group';
 
-            const selOrig = oldActions.querySelector('select');
-            if (selOrig) {
-                const selClone = selOrig.cloneNode(true);
-                selClone.className = 'custom-select';
-                selClone.removeAttribute('data-select2-id'); // Tira o plugin Select2 teimoso
-                selClone.classList.remove('select2-hidden-accessible');
-                actionGroup.appendChild(selClone);
+            const selClone = actionSelectOrig.cloneNode(true);
+            selClone.className = 'custom-select';
+            selClone.removeAttribute('data-select2-id'); // Arranca o Select2
+            selClone.classList.remove('select2-hidden-accessible');
 
-                // Botão "Ir" associado à tabela
-                const btnIr = document.createElement('button');
-                btnIr.className = 'custom-btn secondary';
-                btnIr.innerText = 'Ir';
-                btnIr.onclick = (e) => {
-                    e.preventDefault();
-                    let hiddenAction = formTabela.querySelector('input[name="action"]');
-                    if (!hiddenAction) {
-                        hiddenAction = document.createElement('input');
-                        hiddenAction.type = 'hidden';
-                        hiddenAction.name = 'action';
-                        formTabela.appendChild(hiddenAction);
-                    }
-                    hiddenAction.value = selClone.value; // Pega o valor selecionado
-                    formTabela.submit(); // Envia os itens selecionados (checkboxes) para o Django processar
-                };
-                actionGroup.appendChild(btnIr);
-            }
+            const btnIr = document.createElement('button');
+            btnIr.className = 'custom-btn secondary';
+            btnIr.innerText = 'Ir';
+
+            // Lógica para submeter o form da tabela com o dropdown escolhido
+            btnIr.onclick = (e) => {
+                e.preventDefault();
+                let hiddenAction = formTabela.querySelector('input[name="action"]');
+                if (!hiddenAction) {
+                    hiddenAction = document.createElement('input');
+                    hiddenAction.type = 'hidden';
+                    hiddenAction.name = 'action';
+                    formTabela.appendChild(hiddenAction);
+                }
+                hiddenAction.value = selClone.value;
+                formTabela.submit();
+            };
+
+            actionGroup.appendChild(selClone);
+            actionGroup.appendChild(btnIr);
             bottomBar.appendChild(actionGroup);
-            oldActions.style.setProperty('display', 'none', 'important');
+
+            // Esconde a velha barra de ações
+            const actionsContainer = actionSelectOrig.closest('.actions');
+            if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
 
-        // -----------------------------------------------------
-        // 3. BOTÕES ADICIONAR / EXPORTAR (Descem do cabeçalho)
-        // -----------------------------------------------------
-        const oldTools = document.querySelectorAll('.object-tools a, .object-tools button');
-        if (oldTools.length > 0) {
+        // =========================================================
+        // 3. BOTÕES DO TOPO (Adicionar, Importar, Exportar)
+        // =========================================================
+        // Procuramos botões de topo onde quer que o Jazzmin os esconda
+        const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
+
+        if (topButtons.length > 0) {
             const toolsGroup = document.createElement('div');
             toolsGroup.className = 'my-group';
 
-            oldTools.forEach(tool => {
-                const toolClone = tool.cloneNode(true);
-                toolClone.className = 'custom-btn primary';
+            const processedHrefs = new Set(); // Previne clonar o mesmo botão 2 vezes
 
-                // Adiciona o ícone de + se for botão de adicionar
-                if(!toolClone.innerHTML.includes('fa-')) {
-                    toolClone.innerHTML = `<i class="fas fa-plus"></i> ${toolClone.innerText.trim()}`;
+            topButtons.forEach(btn => {
+                if(processedHrefs.has(btn.href) || btn.closest('#changelist table')) return;
+                processedHrefs.add(btn.href);
+
+                const btnClone = btn.cloneNode(true);
+                btnClone.className = 'custom-btn primary';
+
+                // Injecção automática de ícones
+                if (!btnClone.innerHTML.includes('fa-')) {
+                    if (btnClone.innerText.toLowerCase().includes('adicionar')) {
+                        btnClone.innerHTML = `<i class="fas fa-plus"></i> ${btnClone.innerText.trim()}`;
+                    } else if (btnClone.innerText.toLowerCase().includes('importar')) {
+                        btnClone.innerHTML = `<i class="fas fa-file-import"></i> ${btnClone.innerText.trim()}`;
+                    } else if (btnClone.innerText.toLowerCase().includes('exportar')) {
+                        btnClone.innerHTML = `<i class="fas fa-file-export"></i> ${btnClone.innerText.trim()}`;
+                    } else {
+                        btnClone.innerHTML = `<i class="fas fa-cog"></i> ${btnClone.innerText.trim()}`;
+                    }
                 }
-                toolsGroup.appendChild(toolClone);
+                toolsGroup.appendChild(btnClone);
+
+                // Esconde os botões originais e os seus invólucros do topo
+                btn.style.setProperty('display', 'none', 'important');
+                if (btn.parentElement && btn.parentElement.classList.contains('object-tools')) {
+                    btn.parentElement.style.setProperty('display', 'none', 'important');
+                }
+                if (btn.closest('.col-12.col-md-auto.d-flex')) {
+                     btn.closest('.col-12.col-md-auto.d-flex').style.setProperty('display', 'none', 'important');
+                }
             });
-            bottomBar.appendChild(toolsGroup);
-            document.querySelectorAll('.object-tools').forEach(t => t.style.setProperty('display', 'none', 'important'));
+
+            if(toolsGroup.children.length > 0) bottomBar.appendChild(toolsGroup);
         }
 
-        // -----------------------------------------------------
-        // INSERE A BARRA NOVA DEBAIXO DA TABELA E DA PAGINAÇÃO
-        // -----------------------------------------------------
-        const paginator = document.querySelector('.paginator');
-        if (paginator) {
-            paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling);
+        // =========================================================
+        // INSERE A BARRA NO FUNDO DA PÁGINA (Abaixo da Tabela)
+        // =========================================================
+        if (formTabela) {
+            formTabela.appendChild(bottomBar);
         } else if (table) {
             table.parentNode.insertBefore(bottomBar, table.nextSibling);
-        } else if (formTabela) {
-            formTabela.appendChild(bottomBar);
         }
     }
 
-    // Funcionalidades de limpeza para páginas de edição (Textos)
-    function aplicarLimpezaGeral() {
+    function aplicarLimpezaUX() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -315,11 +289,11 @@
 
     window.addEventListener('load', function() {
         construirBarraInferior();
-        aplicarLimpezaGeral();
+        aplicarLimpezaUX();
 
         const observer = new MutationObserver(() => {
             construirBarraInferior();
-            aplicarLimpezaGeral();
+            aplicarLimpezaUX();
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
