@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MANTIDOS INTACTOS)
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -62,105 +62,61 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. A REVOLUÇÃO: A NOSSA SUPER BARRA PERSONALIZADA E BLINDADA
+       4. A REVOLUÇÃO: BARRA DE FERRAMENTAS NO FUNDO (BOTTOM TOOLBAR)
        ===================================================================== */
-    /* ESCONDE COMPLETAMENTE OS ELEMENTOS PADRÃO DO DJANGO PARA NÃO ATRAPALHAREM */
+    /* Esconde as barras velhas e bugadas do topo */
     #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
 
-    /* A NOSSA NOVA CAIXA (Tudo alinhado à direita, inquebrável) */
-    .custom-super-toolbar {
+    /* A Nossa Nova Barra no Fundo */
+    .custom-bottom-toolbar {
         display: flex !important;
+        flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Força tudo para a direita */
+        justify-content: flex-end !important; /* Alinha tudo à direita */
         align-items: center !important;
-        gap: 15px !important; /* Espaço entre os blocos */
+        gap: 15px !important;
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
         padding: 15px 20px !important;
-        margin-bottom: 20px !important;
+        margin-top: 20px !important;
+        margin-bottom: 40px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
-    /* Agrupadores Internos (Pesquisa de um lado, Ações no outro, etc) */
-    .custom-group {
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important; /* Espaço entre Input e Botão */
-        margin: 0 !important;
-    }
+    /* 1. Grupo Pesquisa */
+    .custom-search-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
+    .custom-search-group .input-group, .custom-search-group .input-group-append { display: contents !important; }
+    .custom-input { width: 250px !important; height: 42px !important; background-color: #111827 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; }
 
-    /* Input de Pesquisa */
-    .custom-input {
-        width: 250px !important;
-        height: 42px !important;
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0 15px !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Dropdown de Ações (Design Premium, sem Select2) */
+    /* 2. Grupo Ações */
+    .custom-actions-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
+    .custom-actions-group label { display: none !important; } /* Esconde o texto "Ações:" para poupar espaço */
     .custom-select {
-        min-width: 200px !important;
-        height: 42px !important;
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0 40px 0 15px !important;
-        box-sizing: border-box !important;
-        appearance: none !important;
-        cursor: pointer !important;
+        min-width: 200px !important; height: 42px !important; background-color: #111827 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; box-sizing: border-box !important; appearance: none !important; cursor: pointer !important;
         background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
-        background-repeat: no-repeat !important;
-        background-position: right 10px center !important;
+        background-repeat: no-repeat !important; background-position: right 10px center !important;
     }
+    .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* Botões Principais (Verdes: Pesquisar e Adicionar) */
-    .custom-btn-primary {
-        background-color: #14b8a6 !important;
-        color: white !important;
-        border: none !important;
-        height: 42px !important;
-        padding: 0 20px !important;
-        border-radius: 6px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        text-decoration: none !important;
-        transition: 0.2s !important;
-        white-space: nowrap !important;
-        box-sizing: border-box !important;
+    /* 3. Estilos Comuns de Botões na Barra */
+    .custom-btn-primary, .custom-btn-secondary {
+        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important;
     }
-    .custom-btn-primary:hover { background-color: #0d9488 !important; }
+    /* Verde: Pesquisar e Adicionar */
+    .custom-btn-primary { background-color: #14b8a6 !important; color: white !important; }
+    .custom-btn-primary:hover { background-color: #0d9488 !important; color: white !important; }
 
-    /* Botões Secundários (Cinza: Botão Ir) */
-    .custom-btn-secondary {
-        background-color: #374151 !important;
-        color: white !important;
-        border: 1px solid #4b5563 !important;
-        height: 42px !important;
-        padding: 0 20px !important;
-        border-radius: 6px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        transition: 0.2s !important;
-        white-space: nowrap !important;
-        box-sizing: border-box !important;
-    }
-    .custom-btn-secondary:hover { background-color: #4b5563 !important; }
+    /* Cinza: Botão Ir */
+    .custom-btn-secondary { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
+    .custom-btn-secondary:hover { background-color: #4b5563 !important; color: white !important; }
 
 
     /* =====================================================================
        5. TABELAS MODERNAS E BOTÃO EXCLUIR
        ===================================================================== */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 20px !important;}
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
     #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
@@ -170,7 +126,7 @@
     #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
     #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
 
-    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-bottom: 30px !important;}
+    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-top: 20px !important;}
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 </style>
 {% endblock %}
@@ -178,28 +134,29 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    // ESTA FUNÇÃO CONSTRÓI A BARRA MÁGICA LENDO OS ELEMENTOS DO DJANGO
-    function construirBarraSuprema() {
-        if (document.getElementById('custom-super-toolbar')) return;
+    function construirBarraNoFundo() {
+        if (document.getElementById('custom-bottom-toolbar')) return;
 
         const changelistForm = document.getElementById('changelist-form');
+        const paginator = document.querySelector('.paginator');
+        const tabela = document.querySelector('#changelist table');
+
         if (!changelistForm) return;
 
-        // Cria o nosso contentor principal alinhado à direita
-        const toolbar = document.createElement('div');
-        toolbar.id = 'custom-super-toolbar';
-        toolbar.className = 'custom-super-toolbar';
+        // Cria a Barra Mestra Inferior
+        const bottomToolbar = document.createElement('div');
+        bottomToolbar.id = 'custom-bottom-toolbar';
+        bottomToolbar.className = 'custom-bottom-toolbar';
 
         // -----------------------------------------------------
-        // 1. BLOCO PESQUISA (Esquerda dentro do grupo)
+        // 1. PESQUISA (Recolhe e monta na nossa barra)
         // -----------------------------------------------------
         const oldSearch = document.getElementById('changelist-search') || document.getElementById('toolbar');
         if (oldSearch) {
             const formSearch = oldSearch.querySelector('form');
             if (formSearch) {
                 const searchWrap = document.createElement('form');
-                searchWrap.className = 'custom-group';
-                searchWrap.id = formSearch.id || 'custom-search-form';
+                searchWrap.className = 'custom-search-group';
                 searchWrap.action = formSearch.action;
                 searchWrap.method = formSearch.method;
 
@@ -209,38 +166,35 @@
                     inputNew.className = 'custom-input';
                     inputNew.placeholder = 'Pesquisar...';
 
-                    // Mantém o texto que estava lá se o utilizador já tiver pesquisado
                     const urlParams = new URLSearchParams(window.location.search);
                     if(urlParams.has(inputNew.name)) inputNew.value = urlParams.get(inputNew.name);
 
                     const btnNew = document.createElement('button');
                     btnNew.type = 'submit';
                     btnNew.className = 'custom-btn-primary';
-                    btnNew.innerHTML = '<i class="fas fa-search" style="margin-right: 5px;"></i> Pesquisar';
+                    btnNew.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
 
                     searchWrap.appendChild(inputNew);
                     searchWrap.appendChild(btnNew);
 
-                    // Trás os campos ocultos do Django para a pesquisa funcionar
                     formSearch.querySelectorAll('input[type="hidden"]').forEach(h => searchWrap.appendChild(h.cloneNode(true)));
-                    toolbar.appendChild(searchWrap);
+                    bottomToolbar.appendChild(searchWrap);
                 }
             }
         }
 
         // -----------------------------------------------------
-        // 2. BLOCO AÇÕES (Dropdown e Botão Ir)
+        // 2. AÇÕES EM LOTE (Dropdown + Ir)
         // -----------------------------------------------------
         const oldActions = document.querySelector('.actions');
         if (oldActions) {
             const selectOrig = oldActions.querySelector('select');
             if (selectOrig) {
                 const actionWrap = document.createElement('div');
-                actionWrap.className = 'custom-group';
+                actionWrap.className = 'custom-actions-group';
 
                 const selectNew = selectOrig.cloneNode(true);
                 selectNew.className = 'custom-select';
-                // Remove as amarras do Select2
                 selectNew.removeAttribute('data-select2-id');
                 selectNew.classList.remove('select2-hidden-accessible');
 
@@ -248,7 +202,7 @@
                 btnIr.className = 'custom-btn-secondary';
                 btnIr.innerText = 'Ir';
 
-                // Faz a ligação entre o nosso select falso e o form principal do Django
+                // Lógica para submeter a ação
                 btnIr.onclick = (e) => {
                     e.preventDefault();
                     let hiddenAction = changelistForm.querySelector('input[name="action"]');
@@ -264,34 +218,44 @@
 
                 actionWrap.appendChild(selectNew);
                 actionWrap.appendChild(btnIr);
-                toolbar.appendChild(actionWrap);
+                bottomToolbar.appendChild(actionWrap);
             }
         }
 
         // -----------------------------------------------------
-        // 3. BLOCO ADICIONAR (Direita absoluta)
+        // 3. BOTÕES ADICIONAR / IMPORTAR
         // -----------------------------------------------------
-        const oldAddBtn = document.querySelector('.object-tools a.addlink') || document.querySelector('.object-tools a');
-        if (oldAddBtn) {
-            const btnAddNew = oldAddBtn.cloneNode(true);
-            btnAddNew.className = 'custom-btn-primary';
-            btnAddNew.innerHTML = `<i class="fas fa-plus" style="margin-right: 5px;"></i> ${oldAddBtn.innerText.trim()}`;
-            toolbar.appendChild(btnAddNew);
+        const objectToolsLinks = document.querySelectorAll('.object-tools a');
+        if (objectToolsLinks.length > 0) {
+            objectToolsLinks.forEach(link => {
+                const btnNew = link.cloneNode(true);
+                btnNew.className = 'custom-btn-primary';
+
+                // Se não tiver ícone, adiciona o "+"
+                if(!btnNew.innerHTML.includes('fa-')) {
+                     btnNew.innerHTML = `<i class="fas fa-plus"></i> ${btnNew.innerText}`;
+                }
+                bottomToolbar.appendChild(btnNew);
+            });
         }
 
         // -----------------------------------------------------
-        // INSERE A BARRA NA TELA
+        // INSERE A BARRA NO FUNDO DA PÁGINA
         // -----------------------------------------------------
-        changelistForm.parentNode.insertBefore(toolbar, changelistForm);
+        if (paginator) {
+            paginator.parentNode.insertBefore(bottomToolbar, paginator.nextSibling);
+        } else if (tabela) {
+            tabela.parentNode.insertBefore(bottomToolbar, tabela.nextSibling);
+        } else {
+            changelistForm.appendChild(bottomToolbar);
+        }
 
-        // Assegura que o lixo do Jazzmin desaparece do ecrã
+        // Garante que o lixo do Jazzmin desaparece do ecrã
         if(oldSearch) oldSearch.style.setProperty('display', 'none', 'important');
         if(oldActions) oldActions.style.setProperty('display', 'none', 'important');
-        const objTools = document.querySelector('.object-tools');
-        if(objTools) objTools.style.setProperty('display', 'none', 'important');
+        document.querySelectorAll('.object-tools').forEach(t => t.style.setProperty('display', 'none', 'important'));
     }
 
-    // Funcionalidade de limpeza para as páginas de Edição
     function limparPaginadeEdicao() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
@@ -305,17 +269,15 @@
     }
 
     window.addEventListener('load', function() {
-        construirBarraSuprema();
+        construirBarraNoFundo();
         limparPaginadeEdicao();
 
-        // Garante que a barra é construída mesmo que o Jazzmin recarregue via AJAX
         const observer = new MutationObserver(() => {
-            construirBarraSuprema();
+            construirBarraNoFundo();
             limparPaginadeEdicao();
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Limpeza estética do menu
         const h1 = document.querySelector('.content-header h1');
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
