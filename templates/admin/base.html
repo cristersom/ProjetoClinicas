@@ -47,11 +47,11 @@
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
     input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
 
-    select { height: 42px !important; appearance: auto !important; }
+    select { height: 45px !important; appearance: auto !important; }
     .select2-container { width: 100% !important; display: block !important;}
-    .select2-container--default .select2-selection--single { height: 42px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
+    .select2-container--default .select2-selection--single { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
-    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 40px !important; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 43px !important; }
 
     .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 10px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
@@ -75,16 +75,16 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. PESQUISA E AÇÕES - ALINHAMENTO DEFINITIVO (BLINDADO)
+       8. PESQUISA E AÇÕES - A TRAVA DEFINITIVA (FLEX-WRAP: NOWRAP)
        ===================================================================== */
     #changelist { position: relative !important; display: block !important; padding-top: 1px !important; }
 
-    /* Ações (Fundo e Dropdown) */
     .actions {
         display: flex !important; align-items: center !important; gap: 15px !important;
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
         padding: 10px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
-        height: 62px !important; width: 100% !important; box-sizing: border-box !important;
+        height: 64px !important; width: 100% !important; box-sizing: border-box !important;
+        padding-right: 400px !important;
     }
     .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
     .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
@@ -94,24 +94,30 @@
     .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
     .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
 
-    /* BARRA DE PESQUISA MÁGICA (Vaporiza o Bootstrap) */
+    /* BARRA DE PESQUISA (Agora blindada) */
     #changelist-search {
-        position: absolute !important; top: 11px !important; right: 15px !important;
+        position: absolute !important; top: 11px !important; right: 20px !important;
         margin: 0 !important; padding: 0 !important; border: none !important;
         background: transparent !important; z-index: 100 !important; height: 42px !important;
     }
 
     #changelist-search form {
-        display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; height: 100% !important; margin: 0 !important; flex-wrap: nowrap !important;
+        display: flex !important; flex-direction: row !important; align-items: center !important;
+        height: 100% !important; margin: 0 !important;
     }
 
-    /* A bala de prata: 'display: contents' evapora a div do Bootstrap que estava a quebrar a linha */
-    #changelist-search .input-group, #changelist-search .input-group-append {
-        display: contents !important;
+    /* Obriga a Input e o Botão a ficarem lado a lado SEM QUEBRAR LINHA */
+    #changelist-search .input-group {
+        display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
+        align-items: center !important; width: auto !important; margin: 0 !important;
+    }
+
+    #changelist-search .input-group-append {
+        display: flex !important; margin-left: 10px !important; margin-top: 0 !important;
     }
 
     #changelist-search input[type="text"] {
-        width: 300px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; margin: 0 !important; box-sizing: border-box !important;
+        width: 250px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; margin: 0 !important; box-sizing: border-box !important;
     }
 
     #changelist-search input[type="submit"], #changelist-search button {
