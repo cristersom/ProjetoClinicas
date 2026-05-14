@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E FIM DO SCROLL
+       1. BASE E FIM DO SCROLL HORIZONTAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
@@ -14,7 +14,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. CABEÇALHO, ABAS E BOTÕES DO TOPO (+ ADICIONAR, IMPORTAR)
+       2. CABEÇALHO, ABAS E BOTÕES DO TOPO
        ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
@@ -75,16 +75,17 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. PESQUISA E AÇÕES - A TRAVA DEFINITIVA (FLEX-WRAP: NOWRAP)
+       8. LISTAGENS: AÇÕES E PESQUISA ALINHADAS (NOVA ABORDAGEM DOMADA)
        ===================================================================== */
     #changelist { position: relative !important; display: block !important; padding-top: 1px !important; }
 
+    /* AÇÕES (A barra principal de fundo) */
     .actions {
         display: flex !important; align-items: center !important; gap: 15px !important;
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
         padding: 10px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
         height: 64px !important; width: 100% !important; box-sizing: border-box !important;
-        padding-right: 400px !important;
+        padding-right: 400px !important; /* Cria um escudo para a pesquisa não sobrepor o texto */
     }
     .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
     .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
@@ -94,34 +95,65 @@
     .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
     .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
 
-    /* BARRA DE PESQUISA (Agora blindada) */
+    /* BARRA DE PESQUISA (DOMANDO O BOOTSTRAP) */
     #changelist-search {
-        position: absolute !important; top: 11px !important; right: 20px !important;
-        margin: 0 !important; padding: 0 !important; border: none !important;
-        background: transparent !important; z-index: 100 !important; height: 42px !important;
+        position: absolute !important;
+        top: 10px !important;
+        right: 15px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 100 !important;
     }
 
-    #changelist-search form {
-        display: flex !important; flex-direction: row !important; align-items: center !important;
-        height: 100% !important; margin: 0 !important;
-    }
+    #changelist-search form { margin: 0 !important; padding: 0 !important; }
 
-    /* Obriga a Input e o Botão a ficarem lado a lado SEM QUEBRAR LINHA */
+    /* AQUI ESTÁ O SEGREDO: Flex-wrap nowrap diretamente na classe maldita do Bootstrap */
     #changelist-search .input-group {
-        display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important;
-        align-items: center !important; width: auto !important; margin: 0 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: auto !important;
+        margin: 0 !important;
+        height: 42px !important;
     }
 
-    #changelist-search .input-group-append {
-        display: flex !important; margin-left: 10px !important; margin-top: 0 !important;
-    }
-
+    /* O campo onde você digita */
     #changelist-search input[type="text"] {
-        width: 250px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; margin: 0 !important; box-sizing: border-box !important;
+        width: 250px !important;
+        background-color: #374151 !important;
+        border: 1px solid #4b5563 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 0 15px !important;
+        height: 42px !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
     }
 
+    /* A div do Bootstrap que segura o botão */
+    #changelist-search .input-group-append {
+        display: flex !important;
+        margin-left: 8px !important; /* Espaçinho entre o input e o botão */
+        height: 42px !important;
+    }
+
+    /* O Botão Pesquisar final */
     #changelist-search input[type="submit"], #changelist-search button {
-        background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer !important; width: auto !important; margin: 0 !important; transition: 0.2s; white-space: nowrap !important; box-sizing: border-box !important; display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        background-color: #14b8a6 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 0 20px !important;
+        height: 42px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        margin: 0 !important;
+        transition: 0.2s;
+        white-space: nowrap !important; /* Proíbe o texto de quebrar */
+        display: flex !important;
+        align-items: center !important;
     }
     #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
 
