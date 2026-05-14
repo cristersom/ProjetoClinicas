@@ -23,9 +23,11 @@
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    /* Botões do Topo Descolados (Adicionar, Importar, Exportar) */
+    /* Botões do Topo (GAP FORÇADO PARA DESCOLAR) */
     .object-tools { display: flex !important; justify-content: flex-end !important; gap: 15px !important; margin-bottom: 20px !important; padding: 0 !important; flex-wrap: wrap !important;}
-    .object-tools a, .object-tools li, .object-tools button { margin: 0 !important; background-color: #14b8a6 !important; color: white !important; border: none !important; padding: 10px 20px !important; border-radius: 6px !important; font-weight: bold !important; display: inline-flex !important; align-items: center !important; gap: 5px !important; text-decoration: none !important; transition: 0.2s;}
+    .object-tools a, .object-tools li, .object-tools button, .object-tools .import_link, .object-tools .export_link {
+        margin: 0 !important; background-color: #14b8a6 !important; color: white !important; border: none !important; padding: 10px 20px !important; border-radius: 6px !important; font-weight: bold !important; display: inline-flex !important; align-items: center !important; gap: 5px !important; text-decoration: none !important; transition: 0.2s;
+    }
     .object-tools a:hover, .object-tools button:hover { background-color: #0d9488 !important; }
 
     /* =====================================================================
@@ -73,24 +75,57 @@
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-    /* TABELAS MODERNAS NAS LISTAGENS */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important;}
+    /* =====================================================================
+       8. LISTAGENS: BARRA DE AÇÕES E PESQUISA (O FIX DEFINITIVO)
+       ===================================================================== */
+    /* Aniquila o Search nativo isolado */
+    #changelist-search { display: none !important; }
+
+    /* Barra Mestra (Via JS ou CSS) */
+    .actions {
+        display: flex !important; flex-wrap: wrap !important; align-items: center !important; justify-content: space-between !important; gap: 15px !important;
+        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
+    }
+
+    /* Dropdown de Ações (Fim da caixa branca do Select2) */
+    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important;}
+    .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 8px 15px !important; height: 42px !important; appearance: auto !important; display: block !important; }
+    .actions select option { background-color: #1f2937 !important; color: white !important; }
+    .actions .select2-container { display: none !important; } /* Esconde o Select2 se o Jazzmin tentar forçá-lo aqui */
+
+    /* Botões "Ir" e "Pesquisar" */
+    .actions button, .actions .button, .search-btn-custom { background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s;}
+    .actions button:hover, .actions .button:hover, .search-btn-custom:hover { background-color: #0d9488 !important; }
+    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 10px !important; }
+
+    /* Input da Pesquisa Integrada */
+    .search-input-custom { width: 100% !important; max-width: 300px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; box-sizing: border-box !important;}
+
+    /* TABELAS MODERNAS E BOTÃO EXCLUIR */
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 20px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
     #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
-    #changelist table a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
-    #changelist table a:hover { color: #60a5fa !important; text-decoration: underline !important; }
+
+    /* Links da Tabela */
+    #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
+    #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
+
+    /* Oculta os links coloridos dos relatórios se o Jazzmin tentar subscrever */
+    #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
+
+    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-bottom: 30px !important;}
+    .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 </style>
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <script>
-    let barraCriada = false;
+    let layoutListagemCriado = false;
 
     function aplicarLimpeza() {
-        // Limpa Títulos Inúteis e formata labels
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -99,66 +134,63 @@
         });
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-            if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações em Massa:';
+            if (label.innerText.trim() === 'Ação:') label.innerText = 'Selecionar Ação:';
         });
 
         // =====================================================================
-        // UNIÃO DA PESQUISA + AÇÕES NUMA SÓ BARRA ELEGANTE (O Fim do Desastre)
+        // CRIAÇÃO DA BARRA MESTRA (PESQUISA + AÇÕES)
         // =====================================================================
-        if (!barraCriada) {
+        if (!layoutListagemCriado) {
             const actionsBox = document.querySelector('.actions');
             const searchBox = document.querySelector('#changelist-search form');
-            const listForm = document.querySelector('#changelist-form');
 
-            if (listForm && (actionsBox || searchBox)) {
-                // Cria a Barra Mestra
-                const masterBar = document.createElement('div');
-                masterBar.style.cssText = 'display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 15px 20px; margin-bottom: 20px; width: 100%; box-sizing: border-box;';
-                listForm.parentNode.insertBefore(masterBar, listForm);
+            if (actionsBox) {
+                // 1. Limpa o lixo Select2 da barra de ações
+                const selectAcoes = actionsBox.querySelector('select');
+                if (selectAcoes) {
+                    selectAcoes.classList.remove('select2-hidden-accessible');
+                    selectAcoes.removeAttribute('data-select2-id');
+                    selectAcoes.style.display = 'block'; // Força o select nativo a aparecer
+                }
+                const select2Boxes = actionsBox.querySelectorAll('.select2-container');
+                select2Boxes.forEach(b => b.remove()); // Destrói as caixas brancas geradas
 
-                // Configura a Pesquisa (Adeus botão Roxo e Input Gigante)
+                // 2. Transplanta a Pesquisa para dentro das Ações
                 if (searchBox) {
-                    const searchContainer = document.createElement('div');
-                    searchContainer.style.cssText = 'display: flex; flex-grow: 1; max-width: 500px;';
-                    searchBox.style.cssText = 'display: flex; gap: 10px; width: 100%; margin: 0; align-items: center;';
+                    const searchWrapper = document.createElement('div');
+                    searchWrapper.style.cssText = 'display: flex; gap: 10px; align-items: center; margin-left: auto;';
 
-                    const input = searchBox.querySelector('input[type="text"]');
-                    if (input) {
-                        input.style.cssText = 'flex-grow: 1; width: 100%; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important;';
-                        input.placeholder = 'Pesquisar...';
-                    }
-                    const btn = searchBox.querySelector('button, input[type="submit"]');
-                    if (btn) {
-                        btn.style.cssText = 'background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer; width: auto !important;';
-                        if (btn.tagName === 'INPUT') btn.value = 'Pesquisar';
-                        else btn.innerText = 'Pesquisar';
-                    }
-                    searchContainer.appendChild(searchBox);
-                    masterBar.appendChild(searchContainer);
+                    const oldInput = searchBox.querySelector('input[type="text"]');
+                    if (oldInput) {
+                        const newInput = document.createElement('input');
+                        newInput.type = 'text';
+                        newInput.name = oldInput.name;
+                        newInput.value = oldInput.value;
+                        newInput.placeholder = 'Pesquisar...';
+                        newInput.className = 'search-input-custom';
 
-                    // Apaga o lixo antigo
-                    const oldSearchParent = document.querySelector('#changelist-search');
-                    if (oldSearchParent) oldSearchParent.style.display = 'none';
+                        // Captura a query da url para manter o texto da pesquisa
+                        const urlParams = new URLSearchParams(window.location.search);
+                        if(urlParams.has(oldInput.name)) newInput.value = urlParams.get(oldInput.name);
+
+                        searchWrapper.appendChild(newInput);
+                    }
+
+                    const searchBtn = document.createElement('button');
+                    searchBtn.type = 'submit';
+                    searchBtn.className = 'search-btn-custom';
+                    searchBtn.innerText = 'Pesquisar';
+                    searchBtn.onclick = function(e) {
+                        e.preventDefault();
+                        searchBox.querySelector('input[type="text"]').value = searchWrapper.querySelector('input[type="text"]').value;
+                        searchBox.submit();
+                    };
+
+                    searchWrapper.appendChild(searchBtn);
+                    actionsBox.appendChild(searchWrapper);
                 }
 
-                // Configura as Ações (Remover Selecionados)
-                if (actionsBox) {
-                    const actionsContainer = document.createElement('div');
-                    actionsContainer.style.cssText = 'display: flex; align-items: center;';
-                    actionsBox.style.cssText = 'display: flex; gap: 10px; margin: 0; padding: 0; border: none; background: transparent; width: auto; align-items: center;';
-
-                    const select = actionsBox.querySelector('select');
-                    if (select) {
-                        select.style.cssText = 'min-width: 250px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important;';
-                    }
-                    const btn = actionsBox.querySelector('button');
-                    if (btn) {
-                        btn.style.cssText = 'background-color: #3b82f6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer;';
-                    }
-                    actionsContainer.appendChild(actionsBox);
-                    masterBar.appendChild(actionsContainer);
-                }
-                barraCriada = true;
+                layoutListagemCriado = true;
             }
         }
     }

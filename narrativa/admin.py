@@ -115,7 +115,7 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        return format_html('<a class="btn btn-sm" style="background-color:#ef4444; color:white; border:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
     botao_excluir.short_description = 'Ação'
 
 
@@ -166,14 +166,14 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
         return format_html(
-            '<a style="background-color:#14b8a6; color:white; border:none; display:inline-flex; align-items:center; gap:5px; padding:6px 12px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>',
+            '<a style="background-color:#14b8a6 !important; color:white !important; border:none; display:inline-flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>',
             url_percurso
         )
     links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a class="btn btn-sm" style="background-color:#ef4444; color:white; border:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
@@ -263,8 +263,8 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
             '<div style="display:flex; gap:10px;">'
-            '<a style="background-color:#3b82f6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:6px 12px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
-            '<a style="background-color:#14b8a6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:6px 12px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
+            '<a style="background-color:#3b82f6 !important; color:white !important; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
+            '<a style="background-color:#8b5cf6 !important; color:white !important; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
             '</div>',
             url_detalhe, url_resumo
         )
