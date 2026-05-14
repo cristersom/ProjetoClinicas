@@ -31,7 +31,7 @@
     .object-tools a:hover, .object-tools button:hover { background-color: #0d9488 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS
+       3. LIMPEZA DOS FORMULÁRIOS (Padrão SaaS)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -48,6 +48,7 @@
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
     input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
 
+    /* Select e Select2 */
     select { height: 45px !important; appearance: auto !important; }
     .select2-container { width: 100% !important; display: block !important;}
     .select2-container--default .select2-selection--single { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
@@ -76,30 +77,43 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. LISTAGENS: BARRA DE AÇÕES E PESQUISA (O FIX DEFINITIVO)
+       8. PESQUISA (NATIVA E ELEGANTE)
        ===================================================================== */
-    /* Aniquila o Search nativo isolado */
-    #changelist-search { display: none !important; }
+    #toolbar, #changelist-search { margin-bottom: 15px !important; padding: 0 !important; border: none !important; background: transparent !important; width: 100% !important; }
+    #toolbar form, #changelist-search form { display: flex !important; gap: 10px !important; align-items: center !important; width: 100% !important;}
 
-    /* Barra Mestra (Via JS ou CSS) */
-    .actions {
-        display: flex !important; flex-wrap: wrap !important; align-items: center !important; justify-content: space-between !important; gap: 15px !important;
-        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
+    #toolbar input[type="text"], #changelist-search input[type="text"] {
+        flex-grow: 1 !important; max-width: 400px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 40px !important;
     }
 
-    /* Dropdown de Ações (Fim da caixa branca do Select2) */
-    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important;}
-    .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 8px 15px !important; height: 42px !important; appearance: auto !important; display: block !important; }
-    .actions select option { background-color: #1f2937 !important; color: white !important; }
-    .actions .select2-container { display: none !important; } /* Esconde o Select2 se o Jazzmin tentar forçá-lo aqui */
+    #toolbar input[type="submit"], #changelist-search input[type="submit"], #changelist-search button {
+        background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 40px !important; font-weight: bold !important; cursor: pointer !important; width: auto !important; margin: 0 !important; transition: 0.2s;
+    }
+    #toolbar input[type="submit"]:hover, #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
 
-    /* Botões "Ir" e "Pesquisar" */
-    .actions button, .actions .button, .search-btn-custom { background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s;}
-    .actions button:hover, .actions .button:hover, .search-btn-custom:hover { background-color: #0d9488 !important; }
-    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 10px !important; }
+    /* =====================================================================
+       9. DROPDOWN DE AÇÕES (O FIM DA CAIXA GIGANTE)
+       ===================================================================== */
+    .actions {
+        display: flex !important; align-items: center !important; gap: 15px !important;
+        background: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; color: #d1d5db !important;
+    }
+    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
 
-    /* Input da Pesquisa Integrada */
-    .search-input-custom { width: 100% !important; max-width: 300px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; box-sizing: border-box !important;}
+    /* Input Select Nativo, Escuro e Minimalista */
+    .actions select {
+        width: auto !important; min-width: 250px !important; background-color: #1f2937 !important; color: white !important; border: 1px solid #374151 !important; border-radius: 6px !important; padding: 0 15px !important; height: 40px !important; appearance: auto !important;
+    }
+    .actions select option { background-color: #111827 !important; color: white !important; }
+    .actions .select2-container { display: none !important; } /* Previne o Select2 branco do Jazzmin */
+
+    /* Botão "Ir" Discreto */
+    .actions button, .actions .button {
+        background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 40px !important; cursor: pointer; transition: 0.2s; margin: 0 !important;
+    }
+    .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
+
+    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
 
     /* TABELAS MODERNAS E BOTÃO EXCLUIR */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 20px !important;}
@@ -108,12 +122,9 @@
     #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
 
-    /* Links da Tabela */
     #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
     #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
-
-    /* Oculta os links coloridos dos relatórios se o Jazzmin tentar subscrever */
-    #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
+    #changelist table td a[title="Relatório de Percurso"] { color: white !important; } /* Mantém botão nativo protegido */
 
     .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-bottom: 30px !important;}
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
@@ -123,81 +134,32 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    let layoutListagemCriado = false;
-
-    function aplicarLimpeza() {
+    // Agora o Javascript apenas renomeia os textos, sem estragar o layout!
+    function aplicarTraducoesETextos() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
+
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-            if (label.innerText.trim() === 'Ação:') label.innerText = 'Selecionar Ação:';
+            if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações em Lote:';
         });
 
-        // =====================================================================
-        // CRIAÇÃO DA BARRA MESTRA (PESQUISA + AÇÕES)
-        // =====================================================================
-        if (!layoutListagemCriado) {
-            const actionsBox = document.querySelector('.actions');
-            const searchBox = document.querySelector('#changelist-search form');
-
-            if (actionsBox) {
-                // 1. Limpa o lixo Select2 da barra de ações
-                const selectAcoes = actionsBox.querySelector('select');
-                if (selectAcoes) {
-                    selectAcoes.classList.remove('select2-hidden-accessible');
-                    selectAcoes.removeAttribute('data-select2-id');
-                    selectAcoes.style.display = 'block'; // Força o select nativo a aparecer
-                }
-                const select2Boxes = actionsBox.querySelectorAll('.select2-container');
-                select2Boxes.forEach(b => b.remove()); // Destrói as caixas brancas geradas
-
-                // 2. Transplanta a Pesquisa para dentro das Ações
-                if (searchBox) {
-                    const searchWrapper = document.createElement('div');
-                    searchWrapper.style.cssText = 'display: flex; gap: 10px; align-items: center; margin-left: auto;';
-
-                    const oldInput = searchBox.querySelector('input[type="text"]');
-                    if (oldInput) {
-                        const newInput = document.createElement('input');
-                        newInput.type = 'text';
-                        newInput.name = oldInput.name;
-                        newInput.value = oldInput.value;
-                        newInput.placeholder = 'Pesquisar...';
-                        newInput.className = 'search-input-custom';
-
-                        // Captura a query da url para manter o texto da pesquisa
-                        const urlParams = new URLSearchParams(window.location.search);
-                        if(urlParams.has(oldInput.name)) newInput.value = urlParams.get(oldInput.name);
-
-                        searchWrapper.appendChild(newInput);
-                    }
-
-                    const searchBtn = document.createElement('button');
-                    searchBtn.type = 'submit';
-                    searchBtn.className = 'search-btn-custom';
-                    searchBtn.innerText = 'Pesquisar';
-                    searchBtn.onclick = function(e) {
-                        e.preventDefault();
-                        searchBox.querySelector('input[type="text"]').value = searchWrapper.querySelector('input[type="text"]').value;
-                        searchBox.submit();
-                    };
-
-                    searchWrapper.appendChild(searchBtn);
-                    actionsBox.appendChild(searchWrapper);
-                }
-
-                layoutListagemCriado = true;
-            }
+        // Força a remoção do Select2 caso ele teime em aparecer no dropdown de Ações
+        const selectAcoes = document.querySelector('.actions select');
+        if(selectAcoes) {
+            selectAcoes.classList.remove('select2-hidden-accessible');
+            selectAcoes.style.display = 'block';
         }
+        document.querySelectorAll('.actions .select2-container').forEach(e => e.remove());
     }
 
     window.addEventListener('load', function() {
-        aplicarLimpeza();
-        const observer = new MutationObserver(aplicarLimpeza);
+        aplicarTraducoesETextos();
+        const observer = new MutationObserver(aplicarTraducoesETextos);
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
