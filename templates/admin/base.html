@@ -75,56 +75,39 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. PESQUISA E AÇÕES - ALINHAMENTO MILIMÉTRICO (POSITION ABSOLUTE + TRANSLATE)
+       8. NOVO LAYOUT: PESQUISA E AÇÕES EMPILHADAS (O FIM DOS PROBLEMAS)
        ===================================================================== */
-    #changelist { display: block !important; padding-top: 1px !important; }
+    #changelist { display: block !important; width: 100% !important; }
 
-    /* AÇÕES (Agora é o elemento "Pai" relativo) */
-    .actions {
-        position: relative !important; /* CRUCIAL: Mantém a pesquisa ancorada dentro daqui */
-        display: flex !important; align-items: center !important; gap: 15px !important;
-        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
-        padding: 10px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
-        height: 64px !important; width: 100% !important; box-sizing: border-box !important;
-        padding-right: 400px !important; /* Espaço vazio para não bater na pesquisa */
-    }
-    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
-    .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
-    .actions select option { background-color: #111827 !important; color: white !important; }
-    .actions .select2-container { display: none !important; }
-    .actions button, .actions .button { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s; margin: 0 !important; box-sizing: border-box !important; display: inline-flex !important; align-items: center !important;}
-    .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
-    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
-
-    /* BARRA DE PESQUISA (Agora usa Top 50% para centragem matemática perfeita) */
+    /* BARRA 1: PESQUISA */
     #changelist-search {
-        position: absolute !important;
-        top: 50% !important;
-        transform: translateY(-50%) !important; /* Centra perfeitamente na vertical */
-        right: 15px !important;
-        width: max-content !important;
-        height: 42px !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-        background: transparent !important;
-        z-index: 100 !important;
+        display: block !important;
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        padding: 15px 20px !important;
+        margin-bottom: 15px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    #changelist-search form,
-    #changelist-search .input-group {
+    #changelist-search form {
         display: flex !important;
         flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important; /* Alinha o input e o botão nativamente */
-        justify-content: flex-end !important;
-        height: 42px !important;
+        align-items: center !important;
+        width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
+    /* "Evapora" as divs intermediárias do Django */
+    #changelist-search form > div, #changelist-search .input-group, #changelist-search .input-group-append {
+        display: contents !important;
+    }
+
+    /* O campo de texto ganha destaque e ocupa o espaço disponível */
     #changelist-search input[type="text"] {
-        width: 250px !important;
+        flex-grow: 1 !important;
         background-color: #374151 !important;
         border: 1px solid #4b5563 !important;
         color: white !important;
@@ -132,16 +115,7 @@
         padding: 0 15px !important;
         height: 42px !important;
         margin: 0 !important;
-        box-sizing: border-box !important;
-        display: block !important;
-    }
-
-    #changelist-search .input-group-append,
-    #changelist-search .input-group-btn {
-        display: flex !important;
-        align-items: center !important;
-        margin-left: 10px !important;
-        height: 42px !important;
+        max-width: none !important;
     }
 
     #changelist-search input[type="submit"], #changelist-search button {
@@ -149,19 +123,37 @@
         color: white !important;
         border: none !important;
         border-radius: 6px !important;
-        padding: 0 20px !important;
+        padding: 0 25px !important;
         height: 42px !important;
         font-weight: bold !important;
         cursor: pointer !important;
-        margin: 0 !important;
+        margin-left: 15px !important;
         transition: 0.2s;
-        white-space: nowrap !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-sizing: border-box !important;
     }
     #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
+
+    /* BARRA 2: AÇÕES EM LOTE */
+    .actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important;
+        background-color: #1f2937 !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        padding: 15px 20px !important;
+        margin-bottom: 20px !important;
+        color: #d1d5db !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
+    .actions select { width: auto !important; min-width: 300px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
+    .actions select option { background-color: #111827 !important; color: white !important; }
+    .actions .select2-container { display: none !important; }
+
+    .actions button, .actions .button { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s; margin: 0 !important;}
+    .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
+    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: auto !important; } /* Empurra o texto pro fundo */
 
 
     /* =====================================================================
