@@ -14,7 +14,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. CABEÇALHO, ABAS E BOTÕES DO TOPO
+       2. CABEÇALHO E ABAS
        ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MANTIDOS INTACTOS)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -36,7 +36,7 @@
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important;}
 
-    input[type="text"], input[type="number"], textarea, select, .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
+    input[type="text"]:not(.custom-input), input[type="number"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
     input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
@@ -50,7 +50,6 @@
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
     span.delete label::after, div.delete label::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
-    a.inline-deletelink, a.djn-remove-handler { font-size: 0.75rem !important; }
 
     .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
     .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s; white-space: nowrap !important; }
@@ -63,19 +62,18 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. A SUPER BARRA DE FERRAMENTAS (A SOLUÇÃO DEFINITIVA)
+       4. A REVOLUÇÃO: A NOSSA SUPER BARRA PERSONALIZADA E BLINDADA
        ===================================================================== */
-    /* Esconde as posições antigas dos elementos */
-    #toolbar, #changelist-search:not(.injetado), .actions:not(.injetado), .object-tools:not(.injetado) { display: none !important; }
+    /* ESCONDE COMPLETAMENTE OS ELEMENTOS PADRÃO DO DJANGO PARA NÃO ATRAPALHAREM */
+    #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
 
-    /* A Barra Principal */
-    .super-toolbar {
+    /* A NOSSA NOVA CAIXA (Tudo alinhado à direita, inquebrável) */
+    .custom-super-toolbar {
         display: flex !important;
-        flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Tudo alinhado à direita */
+        justify-content: flex-end !important; /* Força tudo para a direita */
         align-items: center !important;
-        gap: 15px !important; /* Espaçamento perfeito entre todos os elementos */
+        gap: 15px !important; /* Espaço entre os blocos */
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
@@ -85,40 +83,79 @@
         box-sizing: border-box !important;
     }
 
-    /* 1. e 2. PESQUISA (Input + Botão) */
-    .super-toolbar .search-form-clean { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
-    .super-toolbar .search-form-clean .input-group { display: contents !important; } /* Evapora quebras do Bootstrap */
-    .super-toolbar .search-form-clean input[type="text"] {
-        width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; margin: 0 !important; box-sizing: border-box !important;
+    /* Agrupadores Internos (Pesquisa de um lado, Ações no outro, etc) */
+    .custom-group {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important; /* Espaço entre Input e Botão */
+        margin: 0 !important;
     }
-    .super-toolbar .search-form-clean input[type="submit"], .super-toolbar .search-form-clean button {
-        background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer !important; transition: 0.2s !important; margin: 0 !important; white-space: nowrap !important;
-    }
-    .super-toolbar .search-form-clean input[type="submit"]:hover, .super-toolbar .search-form-clean button:hover { background-color: #0d9488 !important; }
 
-    /* 3. e 4. AÇÕES (Dropdown + Botão Ir) */
-    .super-toolbar .actions-clean { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
-    .super-toolbar .actions-clean label { display: flex !important; align-items: center !important; margin: 0 !important; }
-    .super-toolbar .actions-clean select {
-        appearance: none !important; /* Tira o design feio do navegador */
-        min-width: 220px !important; height: 42px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; margin: 0 !important; box-sizing: border-box !important;
-        /* Setinha moderna SVG embutida */
+    /* Input de Pesquisa */
+    .custom-input {
+        width: 250px !important;
+        height: 42px !important;
+        background-color: #374151 !important;
+        border: 1px solid #4b5563 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 0 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Dropdown de Ações (Design Premium, sem Select2) */
+    .custom-select {
+        min-width: 200px !important;
+        height: 42px !important;
+        background-color: #374151 !important;
+        border: 1px solid #4b5563 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 0 40px 0 15px !important;
+        box-sizing: border-box !important;
+        appearance: none !important;
+        cursor: pointer !important;
         background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
-        background-repeat: no-repeat !important; background-position: right 10px center !important; cursor: pointer !important;
+        background-repeat: no-repeat !important;
+        background-position: right 10px center !important;
     }
-    .super-toolbar .actions-clean select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    .super-toolbar .actions-clean button {
-        background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer !important; transition: 0.2s !important; margin: 0 !important; box-sizing: border-box !important; white-space: nowrap !important;
-    }
-    .super-toolbar .actions-clean button:hover { background-color: #4b5563 !important; }
-    .super-toolbar .actions-clean span.action-counter { display: none !important; } /* Escondido para máxima limpeza */
 
-    /* 5. ADICIONAR (Ferramentas) */
-    .super-toolbar .tools-clean { display: flex !important; align-items: center !important; margin: 0 !important; gap: 10px !important;}
-    .super-toolbar .tools-clean a {
-        background-color: #14b8a6 !important; color: white !important; border: none !important; padding: 0 20px !important; height: 42px !important; border-radius: 6px !important; font-weight: bold !important; display: inline-flex !important; align-items: center !important; gap: 8px !important; text-decoration: none !important; transition: 0.2s !important; box-sizing: border-box !important; margin: 0 !important; white-space: nowrap !important;
+    /* Botões Principais (Verdes: Pesquisar e Adicionar) */
+    .custom-btn-primary {
+        background-color: #14b8a6 !important;
+        color: white !important;
+        border: none !important;
+        height: 42px !important;
+        padding: 0 20px !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        text-decoration: none !important;
+        transition: 0.2s !important;
+        white-space: nowrap !important;
+        box-sizing: border-box !important;
     }
-    .super-toolbar .tools-clean a:hover { background-color: #0d9488 !important; }
+    .custom-btn-primary:hover { background-color: #0d9488 !important; }
+
+    /* Botões Secundários (Cinza: Botão Ir) */
+    .custom-btn-secondary {
+        background-color: #374151 !important;
+        color: white !important;
+        border: 1px solid #4b5563 !important;
+        height: 42px !important;
+        padding: 0 20px !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        transition: 0.2s !important;
+        white-space: nowrap !important;
+        box-sizing: border-box !important;
+    }
+    .custom-btn-secondary:hover { background-color: #4b5563 !important; }
+
 
     /* =====================================================================
        5. TABELAS MODERNAS E BOTÃO EXCLUIR
@@ -141,89 +178,121 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function construirSuperToolbar() {
-        const changelist = document.querySelector('#changelist');
-        const formTabela = document.querySelector('#changelist-form');
-        if (!changelist || !formTabela) return;
+    // ESTA FUNÇÃO CONSTRÓI A BARRA MÁGICA LENDO OS ELEMENTOS DO DJANGO
+    function construirBarraSuprema() {
+        if (document.getElementById('custom-super-toolbar')) return;
 
-        // Se a Super Barra já existe, não faz nada
-        if (document.querySelector('.super-toolbar')) return;
+        const changelistForm = document.getElementById('changelist-form');
+        if (!changelistForm) return;
 
-        // Cria a Super Barra e coloca no topo
-        const superToolbar = document.createElement('div');
-        superToolbar.className = 'super-toolbar';
-        changelist.parentNode.insertBefore(superToolbar, changelist);
+        // Cria o nosso contentor principal alinhado à direita
+        const toolbar = document.createElement('div');
+        toolbar.id = 'custom-super-toolbar';
+        toolbar.className = 'custom-super-toolbar';
 
-        // Captura os elementos antigos
-        const oldSearch = document.querySelector('#changelist-search') || document.querySelector('#toolbar');
-        const oldActions = document.querySelector('.actions');
-        const oldTools = document.querySelector('.object-tools');
-
-        // ==========================================
-        // 1 & 2. PESQUISA
-        // ==========================================
+        // -----------------------------------------------------
+        // 1. BLOCO PESQUISA (Esquerda dentro do grupo)
+        // -----------------------------------------------------
+        const oldSearch = document.getElementById('changelist-search') || document.getElementById('toolbar');
         if (oldSearch) {
-            const form = oldSearch.querySelector('form');
-            if (form) {
-                form.className = 'search-form-clean';
-                // Mata os invólucros que forçam quebra de linha
-                Array.from(form.children).forEach(c => {
-                    if (c.tagName === 'DIV') c.style.display = 'contents';
-                });
+            const formSearch = oldSearch.querySelector('form');
+            if (formSearch) {
+                const searchWrap = document.createElement('form');
+                searchWrap.className = 'custom-group';
+                searchWrap.id = formSearch.id || 'custom-search-form';
+                searchWrap.action = formSearch.action;
+                searchWrap.method = formSearch.method;
 
-                const btn = form.querySelector('input[type="submit"], button');
-                if (btn && btn.tagName === 'INPUT') btn.value = 'Pesquisar';
-                else if (btn) btn.innerText = 'Pesquisar';
+                const inputOrig = formSearch.querySelector('input[type="text"]');
+                if (inputOrig) {
+                    const inputNew = inputOrig.cloneNode(true);
+                    inputNew.className = 'custom-input';
+                    inputNew.placeholder = 'Pesquisar...';
 
-                oldSearch.className = 'injetado';
-                superToolbar.appendChild(oldSearch);
+                    // Mantém o texto que estava lá se o utilizador já tiver pesquisado
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if(urlParams.has(inputNew.name)) inputNew.value = urlParams.get(inputNew.name);
+
+                    const btnNew = document.createElement('button');
+                    btnNew.type = 'submit';
+                    btnNew.className = 'custom-btn-primary';
+                    btnNew.innerHTML = '<i class="fas fa-search" style="margin-right: 5px;"></i> Pesquisar';
+
+                    searchWrap.appendChild(inputNew);
+                    searchWrap.appendChild(btnNew);
+
+                    // Trás os campos ocultos do Django para a pesquisa funcionar
+                    formSearch.querySelectorAll('input[type="hidden"]').forEach(h => searchWrap.appendChild(h.cloneNode(true)));
+                    toolbar.appendChild(searchWrap);
+                }
             }
         }
 
-        // ==========================================
-        // 3 & 4. DROPDOWN AÇÕES
-        // ==========================================
+        // -----------------------------------------------------
+        // 2. BLOCO AÇÕES (Dropdown e Botão Ir)
+        // -----------------------------------------------------
+        const oldActions = document.querySelector('.actions');
         if (oldActions) {
-            oldActions.className = 'actions-clean injetado';
+            const selectOrig = oldActions.querySelector('select');
+            if (selectOrig) {
+                const actionWrap = document.createElement('div');
+                actionWrap.className = 'custom-group';
 
-            // Magia HTML5: Como as ações vão para FORA do form principal, precisamos
-            // linkar os botões de volta ao form usando form="changelist-form"
-            formTabela.id = 'changelist-form';
-            const select = oldActions.querySelector('select');
-            const btnIr = oldActions.querySelector('button');
+                const selectNew = selectOrig.cloneNode(true);
+                selectNew.className = 'custom-select';
+                // Remove as amarras do Select2
+                selectNew.removeAttribute('data-select2-id');
+                selectNew.classList.remove('select2-hidden-accessible');
 
-            if (select) {
-                select.setAttribute('form', 'changelist-form');
-                select.classList.remove('select2-hidden-accessible'); // Mata Select2
-                select.style.display = 'block';
+                const btnIr = document.createElement('button');
+                btnIr.className = 'custom-btn-secondary';
+                btnIr.innerText = 'Ir';
+
+                // Faz a ligação entre o nosso select falso e o form principal do Django
+                btnIr.onclick = (e) => {
+                    e.preventDefault();
+                    let hiddenAction = changelistForm.querySelector('input[name="action"]');
+                    if (!hiddenAction) {
+                        hiddenAction = document.createElement('input');
+                        hiddenAction.type = 'hidden';
+                        hiddenAction.name = 'action';
+                        changelistForm.appendChild(hiddenAction);
+                    }
+                    hiddenAction.value = selectNew.value;
+                    changelistForm.submit();
+                };
+
+                actionWrap.appendChild(selectNew);
+                actionWrap.appendChild(btnIr);
+                toolbar.appendChild(actionWrap);
             }
-            if (btnIr) {
-                btnIr.setAttribute('form', 'changelist-form');
-            }
-
-            oldActions.querySelectorAll('.select2-container').forEach(e => e.remove());
-
-            // Apaga o texto "Ação:" para não ocupar espaço
-            const label = oldActions.querySelector('label');
-            if (label) {
-                Array.from(label.childNodes).forEach(node => {
-                    if (node.nodeType === 3) node.textContent = '';
-                });
-            }
-
-            superToolbar.appendChild(oldActions);
         }
 
-        // ==========================================
-        // 5. BOTÃO ADICIONAR
-        // ==========================================
-        if (oldTools) {
-            oldTools.className = 'tools-clean injetado';
-            superToolbar.appendChild(oldTools);
+        // -----------------------------------------------------
+        // 3. BLOCO ADICIONAR (Direita absoluta)
+        // -----------------------------------------------------
+        const oldAddBtn = document.querySelector('.object-tools a.addlink') || document.querySelector('.object-tools a');
+        if (oldAddBtn) {
+            const btnAddNew = oldAddBtn.cloneNode(true);
+            btnAddNew.className = 'custom-btn-primary';
+            btnAddNew.innerHTML = `<i class="fas fa-plus" style="margin-right: 5px;"></i> ${oldAddBtn.innerText.trim()}`;
+            toolbar.appendChild(btnAddNew);
         }
+
+        // -----------------------------------------------------
+        // INSERE A BARRA NA TELA
+        // -----------------------------------------------------
+        changelistForm.parentNode.insertBefore(toolbar, changelistForm);
+
+        // Assegura que o lixo do Jazzmin desaparece do ecrã
+        if(oldSearch) oldSearch.style.setProperty('display', 'none', 'important');
+        if(oldActions) oldActions.style.setProperty('display', 'none', 'important');
+        const objTools = document.querySelector('.object-tools');
+        if(objTools) objTools.style.setProperty('display', 'none', 'important');
     }
 
-    function aplicarLimpezaTelasEdicao() {
+    // Funcionalidade de limpeza para as páginas de Edição
+    function limparPaginadeEdicao() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -236,15 +305,17 @@
     }
 
     window.addEventListener('load', function() {
-        construirSuperToolbar();
-        aplicarLimpezaTelasEdicao();
+        construirBarraSuprema();
+        limparPaginadeEdicao();
 
+        // Garante que a barra é construída mesmo que o Jazzmin recarregue via AJAX
         const observer = new MutationObserver(() => {
-            construirSuperToolbar();
-            aplicarLimpezaTelasEdicao();
+            construirBarraSuprema();
+            limparPaginadeEdicao();
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
+        // Limpeza estética do menu
         const h1 = document.querySelector('.content-header h1');
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
