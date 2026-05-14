@@ -75,17 +75,16 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       8. PESQUISA E AÇÕES - A TRAVA NUCLEAR (MAX-CONTENT & FLEX: 0 0 AUTO)
+       8. AÇÕES E PESQUISA - MODO NUCLEAR (POSITION ABSOLUTE)
        ===================================================================== */
     #changelist { position: relative !important; display: block !important; padding-top: 1px !important; }
 
-    /* AÇÕES (A barra principal de fundo) */
     .actions {
         display: flex !important; align-items: center !important; gap: 15px !important;
         background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
         padding: 10px 20px !important; margin-bottom: 20px !important; color: #d1d5db !important;
         height: 64px !important; width: 100% !important; box-sizing: border-box !important;
-        padding-right: 400px !important;
+        padding-right: 380px !important; /* Cria espaço seguro à direita para a pesquisa não bater no texto */
     }
     .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
     .actions select { width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
@@ -95,71 +94,73 @@
     .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
     .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: 15px !important; }
 
-    /* BARRA DE PESQUISA - MODO BLINDADO */
+    /* BARRA DE PESQUISA IMUNE A QUEBRAS */
     #changelist-search {
         position: absolute !important;
         top: 11px !important;
         right: 15px !important;
+        width: 350px !important; /* Define uma largura fixa imutável */
+        height: 42px !important;
         margin: 0 !important;
         padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
         z-index: 100 !important;
-        height: 42px !important;
     }
 
-    #changelist-search form {
+    /* Removemos as regras flex e passamos para coordenadas absolutas */
+    #changelist-search form,
+    #changelist-search .input-group {
+        position: relative !important;
+        width: 100% !important;
+        height: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 42px !important;
+        display: block !important;
     }
 
-    /* Trava 1: width: max-content força a div a ter exatamente o tamanho dos itens lado a lado */
-    #changelist-search .input-group {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        width: max-content !important;
-        margin: 0 !important;
-        height: 42px !important;
-    }
-
-    /* Trava 2: flex: 0 0 auto impede que o input seja esmagado */
     #changelist-search input[type="text"] {
-        width: 250px !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 240px !important; /* Deixa exatamente 110px de sobra para o botão */
+        height: 42px !important;
         background-color: #374151 !important;
         border: 1px solid #4b5563 !important;
         color: white !important;
         border-radius: 6px !important;
         padding: 0 15px !important;
-        height: 42px !important;
         margin: 0 !important;
         box-sizing: border-box !important;
-        flex: 0 0 auto !important;
     }
 
-    /* Trava 3: display block direto no append para anular propriedades ocultas do flex do Bootstrap */
+    /* Prega o botão e o seu invólucro do lado direito da nossa caixa */
     #changelist-search .input-group-append,
-    #changelist-search .input-group-btn {
-        display: block !important;
-        margin-left: 10px !important;
+    #changelist-search input[type="submit"],
+    #changelist-search button {
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        width: 100px !important;
         height: 42px !important;
-        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
     }
 
-    #changelist-search input[type="submit"], #changelist-search button {
+    #changelist-search input[type="submit"],
+    #changelist-search button {
         background-color: #14b8a6 !important;
         color: white !important;
         border: none !important;
         border-radius: 6px !important;
-        padding: 0 20px !important;
-        height: 42px !important;
         font-weight: bold !important;
         cursor: pointer !important;
-        margin: 0 !important;
         transition: 0.2s;
-        white-space: nowrap !important;
-        display: inline-block !important;
         box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
 
