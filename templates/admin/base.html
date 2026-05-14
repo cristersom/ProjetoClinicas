@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MODO ESCURO ABSOLUTO)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -36,36 +36,21 @@
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important;}
 
-    /* =====================================================================
-       4. PADRONIZAÇÃO ABSOLUTA DE CORES DE INPUTS (NUNCA MAIS BRANCO)
-       ===================================================================== */
-    body input[type="text"], body input[type="number"], body input[type="email"], body input[type="password"], body textarea, body select {
-        width: 100% !important; max-width: 100% !important;
-        background-color: #374151 !important;
-        color: #ffffff !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 6px !important;
-        padding: 10px 15px !important;
-        font-size: 1rem !important;
-        box-sizing: border-box !important;
-    }
+    /* Todos os inputs escuros na edição */
+    input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
     input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
 
-    /* Doma o plugin Select2 para ficar escuro */
-    select { height: 45px !important; appearance: auto !important; }
-    .select2-container { width: 100% !important; display: block !important;}
-    .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { height: 45px !important; display: flex !important; align-items: center !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important;}
+    /* Select2 (Os dropdowns complexos) escuros */
+    .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 45px !important; display: flex !important; align-items: center !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
-    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 43px !important; }
     .select2-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; }
     .select2-results__option { background-color: #1f2937 !important; color: #ffffff !important; }
     .select2-results__option[aria-selected="true"], .select2-results__option--highlighted { background-color: #14b8a6 !important; color: white !important; }
-    .select2-search--dropdown .select2-search__field { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 4px !important;}
 
     /* =====================================================================
-       5. BOTÕES DE AÇÃO E SALVAR (MANTIDOS)
+       4. BOTÕES DE EDIÇÃO / INLINES
        ===================================================================== */
     .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 10px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
@@ -88,9 +73,86 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       6. TABELAS MODERNAS NAS LISTAGENS
+       5. A BARRA INFERIOR (LISTAGEM PERFEITA - SEM BOX, TUDO NA LINHA)
        ===================================================================== */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; }
+    /* Aniquila o layout nativo antigo (do topo) */
+    #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
+
+    /* A nossa nova super barra no fundo da página */
+    .my-bottom-bar {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-end !important; /* Tudo encostado à direita */
+        align-items: center !important;
+        gap: 15px !important;
+        background: transparent !important; /* SEM BOX CINZA GIGANTE */
+        border: none !important;
+        padding: 0 !important;
+        margin-top: 15px !important;
+        margin-bottom: 30px !important;
+        width: 100% !important;
+    }
+
+    /* Agrupamentos internos para não quebrar a linha */
+    .my-group { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
+
+    /* Esconde rótulos desnecessários ("Ação:") */
+    .my-group label { display: none !important; }
+
+    /* Estilização dos Inputs (Pesquisa) e Selects (Ações) */
+    .custom-input, .custom-select {
+        height: 42px !important;
+        background-color: #374151 !important;
+        border: 1px solid #4b5563 !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 0 15px !important;
+        box-sizing: border-box !important;
+    }
+    .custom-input { width: 250px !important; }
+    .custom-input::placeholder { color: #9ca3af !important; }
+
+    .custom-select {
+        min-width: 220px !important;
+        appearance: none !important;
+        cursor: pointer !important;
+        padding-right: 40px !important;
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
+        background-repeat: no-repeat !important; background-position: right 10px center !important;
+    }
+    .custom-input:focus, .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
+
+    /* Estilização dos Botões */
+    .custom-btn {
+        height: 42px !important;
+        padding: 0 20px !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        cursor: pointer !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        transition: 0.2s !important;
+        white-space: nowrap !important;
+        border: none !important;
+        text-decoration: none !important;
+    }
+
+    /* Botões Verdes (Pesquisar, Adicionar, Importar) */
+    .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
+    .custom-btn.primary:hover { background-color: #0d9488 !important; }
+
+    /* Botões Cinzas (Ir) */
+    .custom-btn.secondary { background-color: #4b5563 !important; color: white !important; }
+    .custom-btn.secondary:hover { background-color: #6b7280 !important; }
+
+
+    /* =====================================================================
+       6. TABELA E PAGINAÇÃO
+       ===================================================================== */
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
     #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
@@ -100,193 +162,141 @@
     #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
     #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
 
-    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important; margin-top: 10px !important;}
+    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important;}
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
-
-    /* =====================================================================
-       7. O FIM DA BAGUNÇA - BARRA DE FERRAMENTAS INFERIOR
-       ===================================================================== */
-    /* ESCONDE AS BARRAS ORIGINAIS DO JAZZMIN (Pesquisa, Ações e Adicionar do topo) */
-    #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
-
-    /* A NOSSA BARRA INFERIOR */
-    .super-bottom-bar {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Tudo alinhado à direita */
-        align-items: center !important;
-        gap: 15px !important; /* Espaçamento entre blocos */
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        padding: 15px 20px !important;
-        margin-top: 20px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Sub-grupos para alinhamento interno */
-    .custom-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
-
-    /* Inputs e Selects limpos */
-    .super-bottom-bar input[type="text"], .super-bottom-bar select {
-        width: 250px !important;
-        height: 42px !important;
-        background-color: #374151 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0 15px !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
-    }
-    .super-bottom-bar select {
-        appearance: none !important; /* Remove seta feia nativa */
-        cursor: pointer !important;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
-        background-repeat: no-repeat !important; background-position: right 10px center !important;
-    }
-
-    /* Botões Padrão da Barra */
-    .custom-btn-primary, .custom-btn-secondary {
-        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important; margin: 0 !important;
-    }
-
-    /* Verde: Pesquisar e Adicionar */
-    .custom-btn-primary { background-color: #14b8a6 !important; color: white !important; }
-    .custom-btn-primary:hover { background-color: #0d9488 !important; color: white !important; }
-
-    /* Cinza: Botão Ir */
-    .custom-btn-secondary { background-color: #4b5563 !important; color: white !important; }
-    .custom-btn-secondary:hover { background-color: #6b7280 !important; color: white !important; }
 </style>
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function construirBarraNoFundo() {
-        // Evita duplicação se o Django recarregar via AJAX
-        if (document.getElementById('super-bottom-bar')) return;
+    function construirBarraInferior() {
+        if (document.getElementById('my-super-bottom-bar')) return;
 
-        const mainContent = document.getElementById('content-main');
+        const table = document.querySelector('#changelist table');
         const formTabela = document.getElementById('changelist-form');
 
-        // Se não existir a área principal, não fazemos nada (estamos noutra tela)
-        if (!mainContent) return;
+        if (!table && !formTabela) return;
 
-        // Garante que o form tem um ID para podermos linkar as ações
-        if (formTabela && !formTabela.id) formTabela.id = 'changelist-form';
+        // Contentor Transparente Alinhado à Direita
+        const bottomBar = document.createElement('div');
+        bottomBar.id = 'my-super-bottom-bar';
+        bottomBar.className = 'my-bottom-bar';
 
-        const bar = document.createElement('div');
-        bar.id = 'super-bottom-bar';
-        bar.className = 'super-bottom-bar';
-
-        // ==========================================
-        // 1. PESQUISA
-        // ==========================================
+        // -----------------------------------------------------
+        // 1. PESQUISA (Se existir na página)
+        // -----------------------------------------------------
         const oldSearch = document.getElementById('changelist-search') || document.getElementById('toolbar');
         if (oldSearch) {
-            const formSearch = oldSearch.querySelector('form');
-            if (formSearch) {
-                const sForm = document.createElement('form');
-                sForm.action = formSearch.action;
-                sForm.method = formSearch.method;
-                sForm.className = 'custom-group';
+            const formSearchOrig = oldSearch.querySelector('form');
+            if (formSearchOrig) {
+                const searchGroup = document.createElement('form');
+                searchGroup.className = 'my-group';
+                searchGroup.action = formSearchOrig.action;
+                searchGroup.method = formSearchOrig.method;
 
-                const input = formSearch.querySelector('input[type="text"]');
-                if (input) {
-                    const clone = input.cloneNode(true);
-                    clone.placeholder = 'Pesquisar...';
+                // O Input de Texto
+                const inputOrig = formSearchOrig.querySelector('input[type="text"]');
+                if (inputOrig) {
+                    const inputClone = inputOrig.cloneNode(true);
+                    inputClone.className = 'custom-input';
+                    inputClone.placeholder = 'Pesquisar...';
 
-                    // Mantém o texto pesquisado se houver
+                    // Preserva a palavra pesquisada se a página recarregou
                     const urlParams = new URLSearchParams(window.location.search);
-                    if(urlParams.has(clone.name)) clone.value = urlParams.get(clone.name);
+                    if(urlParams.has(inputClone.name)) inputClone.value = urlParams.get(inputClone.name);
 
-                    sForm.appendChild(clone);
+                    searchGroup.appendChild(inputClone);
                 }
 
-                const btn = formSearch.querySelector('input[type="submit"], button');
-                if (btn) {
-                    const bClone = document.createElement('button');
-                    bClone.type = 'submit';
-                    bClone.className = 'custom-btn-primary';
-                    bClone.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-                    sForm.appendChild(bClone);
+                // O Botão Pesquisar
+                const btnOrig = formSearchOrig.querySelector('input[type="submit"], button');
+                if (btnOrig) {
+                    const btnSearch = document.createElement('button');
+                    btnSearch.type = 'submit';
+                    btnSearch.className = 'custom-btn primary';
+                    btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
+                    searchGroup.appendChild(btnSearch);
                 }
 
-                // Inputs escondidos vitais para o Django (filtros de datas, etc)
-                formSearch.querySelectorAll('input[type="hidden"]').forEach(h => sForm.appendChild(h.cloneNode(true)));
-                bar.appendChild(sForm);
+                // Garante que os inputs escondidos do Django vão junto
+                formSearchOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
+                bottomBar.appendChild(searchGroup);
             }
+            // Mata a pesquisa original
+            oldSearch.style.setProperty('display', 'none', 'important');
         }
 
-        // ==========================================
-        // 2. AÇÕES EM LOTE (Dropdown + Ir)
-        // ==========================================
-        const actions = document.querySelector('.actions');
-        if (actions && formTabela) {
-            const aWrap = document.createElement('div');
-            aWrap.className = 'custom-group';
+        // -----------------------------------------------------
+        // 2. AÇÕES EM LOTE (O Dropdown)
+        // -----------------------------------------------------
+        const oldActions = document.querySelector('.actions');
+        if (oldActions && formTabela) {
+            const actionGroup = document.createElement('div');
+            actionGroup.className = 'my-group';
 
-            const sel = actions.querySelector('select');
-            if (sel) {
-                const sClone = sel.cloneNode(true);
-                sClone.removeAttribute('data-select2-id'); // Arranca o plugin que estraga o layout
-                sClone.classList.remove('select2-hidden-accessible');
-                sClone.setAttribute('form', formTabela.id); // Conecta o dropdown ao form da tabela
-                aWrap.appendChild(sClone);
+            const selOrig = oldActions.querySelector('select');
+            if (selOrig) {
+                const selClone = selOrig.cloneNode(true);
+                selClone.className = 'custom-select';
+                selClone.removeAttribute('data-select2-id'); // Tira o plugin Select2 teimoso
+                selClone.classList.remove('select2-hidden-accessible');
+                actionGroup.appendChild(selClone);
 
-                const btn = actions.querySelector('button');
-                if (btn) {
-                    const bClone = document.createElement('button');
-                    bClone.className = 'custom-btn-secondary';
-                    bClone.innerText = 'Ir';
-
-                    // Conecta o botão "Ir" ao form para submeter a ação
-                    bClone.onclick = (e) => {
-                        e.preventDefault();
-                        let hidden = formTabela.querySelector('input[name="action"]');
-                        if (!hidden) {
-                            hidden = document.createElement('input');
-                            hidden.type = 'hidden';
-                            hidden.name = 'action';
-                            formTabela.appendChild(hidden);
-                        }
-                        hidden.value = sClone.value;
-                        formTabela.submit();
-                    };
-                    aWrap.appendChild(bClone);
-                }
-                bar.appendChild(aWrap);
+                // Botão "Ir" associado à tabela
+                const btnIr = document.createElement('button');
+                btnIr.className = 'custom-btn secondary';
+                btnIr.innerText = 'Ir';
+                btnIr.onclick = (e) => {
+                    e.preventDefault();
+                    let hiddenAction = formTabela.querySelector('input[name="action"]');
+                    if (!hiddenAction) {
+                        hiddenAction = document.createElement('input');
+                        hiddenAction.type = 'hidden';
+                        hiddenAction.name = 'action';
+                        formTabela.appendChild(hiddenAction);
+                    }
+                    hiddenAction.value = selClone.value; // Pega o valor selecionado
+                    formTabela.submit(); // Envia os itens selecionados (checkboxes) para o Django processar
+                };
+                actionGroup.appendChild(btnIr);
             }
+            bottomBar.appendChild(actionGroup);
+            oldActions.style.setProperty('display', 'none', 'important');
         }
 
-        // ==========================================
-        // 3. BOTÃO ADICIONAR
-        // ==========================================
-        const tools = document.querySelector('.object-tools');
-        if (tools) {
-            const tWrap = document.createElement('div');
-            tWrap.className = 'custom-group';
+        // -----------------------------------------------------
+        // 3. BOTÕES ADICIONAR / EXPORTAR (Descem do cabeçalho)
+        // -----------------------------------------------------
+        const oldTools = document.querySelectorAll('.object-tools a, .object-tools button');
+        if (oldTools.length > 0) {
+            const toolsGroup = document.createElement('div');
+            toolsGroup.className = 'my-group';
 
-            tools.querySelectorAll('a, button').forEach(t => {
-                const c = t.cloneNode(true);
-                c.className = 'custom-btn-primary';
-                if (!c.innerHTML.includes('fa-')) {
-                    c.innerHTML = `<i class="fas fa-plus"></i> ${c.innerText.trim()}`;
+            oldTools.forEach(tool => {
+                const toolClone = tool.cloneNode(true);
+                toolClone.className = 'custom-btn primary';
+
+                // Adiciona o ícone de + se for botão de adicionar
+                if(!toolClone.innerHTML.includes('fa-')) {
+                    toolClone.innerHTML = `<i class="fas fa-plus"></i> ${toolClone.innerText.trim()}`;
                 }
-                tWrap.appendChild(c);
+                toolsGroup.appendChild(toolClone);
             });
-            bar.appendChild(tWrap);
+            bottomBar.appendChild(toolsGroup);
+            document.querySelectorAll('.object-tools').forEach(t => t.style.setProperty('display', 'none', 'important'));
         }
 
-        // ==========================================
-        // INSERE A BARRA NO FUNDO DA PÁGINA
-        // ==========================================
-        if (bar.children.length > 0) {
-            mainContent.appendChild(bar);
+        // -----------------------------------------------------
+        // INSERE A BARRA NOVA DEBAIXO DA TABELA E DA PAGINAÇÃO
+        // -----------------------------------------------------
+        const paginator = document.querySelector('.paginator');
+        if (paginator) {
+            paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling);
+        } else if (table) {
+            table.parentNode.insertBefore(bottomBar, table.nextSibling);
+        } else if (formTabela) {
+            formTabela.appendChild(bottomBar);
         }
     }
 
@@ -304,22 +314,19 @@
     }
 
     window.addEventListener('load', function() {
-        construirBarraNoFundo();
+        construirBarraInferior();
         aplicarLimpezaGeral();
 
-        // Mantém a vigia caso o Django tente reconstruir a tela sozinho
         const observer = new MutationObserver(() => {
-            construirBarraNoFundo();
+            construirBarraInferior();
             aplicarLimpezaGeral();
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Tira as barras de "|" do cabeçalho
         const h1 = document.querySelector('.content-header h1');
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
-        // Conta no Sidebar
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
