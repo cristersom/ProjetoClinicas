@@ -87,6 +87,9 @@
     /* =====================================================================
        5. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
        ===================================================================== */
+    /* MATA TUDO O QUE FOR BARRA DE FERRAMENTAS/FILTRO NO TOPO */
+    #toolbar, #changelist-search, #changelist-filter, .actions, .object-tools { display: none !important; }
+
     .my-super-bottom-bar {
         display: flex !important;
         flex-direction: row !important;
@@ -116,7 +119,7 @@
     .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
     .custom-btn {
-        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; border: none !important; text-decoration: none !important;
+        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; border: none !important; text-decoration: none !important; margin: 0 !important;
     }
     .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
     .custom-btn.primary:hover { background-color: #0d9488 !important; color: white !important; }
@@ -132,52 +135,64 @@
         if (document.getElementById('my-super-bottom-bar')) return;
 
         const mainContent = document.getElementById('content-main');
+        const changelist = document.getElementById('changelist');
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
 
-        if (!formTabela && !table) return;
+        if (!mainContent) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
         // =========================================================
-        // 1. PESQUISA (A caça furtiva ao input name="q" do Django)
+        // 1. PESQUISA E FILTROS DO JAZZMIN (Caça a tudo o que é filtro)
         // =========================================================
-        const searchInputOrig = document.querySelector('input[name="q"]:not(.custom-input)');
-        if (searchInputOrig) {
-            const searchFormOrig = searchInputOrig.closest('form');
-            if (searchFormOrig) {
-                const searchGroup = document.createElement('form');
-                searchGroup.className = 'my-group';
-                searchGroup.action = searchFormOrig.action;
-                searchGroup.method = searchFormOrig.method;
+        // Procura formulários no topo (Pesquisa, Filtros como "Narrativas" em Cenas, etc)
+        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form, #content-main > form:not(#changelist-form)');
 
-                const inputClone = searchInputOrig.cloneNode(true);
-                inputClone.className = 'custom-input';
-                inputClone.placeholder = 'Pesquisar...';
+        filterForms.forEach(formOrig => {
+            const searchGroup = document.createElement('form');
+            searchGroup.className = 'my-group';
+            searchGroup.action = formOrig.action;
+            searchGroup.method = formOrig.method || 'GET';
 
-                // Mantém o texto se a página tiver recarregado com filtro
-                const urlParams = new URLSearchParams(window.location.search);
-                if(urlParams.has(inputClone.name)) inputClone.value = urlParams.get(inputClone.name);
+            let hasVisibleFields = false;
 
+            // Puxa todos os inputs e dropdowns de filtros
+            formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
+                hasVisibleFields = true;
+                const clone = field.cloneNode(true);
+                clone.value = field.value; // Mantém a seleção
+
+                if (clone.tagName === 'SELECT') {
+                    clone.className = 'custom-select';
+                    clone.removeAttribute('data-select2-id');
+                    clone.classList.remove('select2-hidden-accessible');
+                } else {
+                    clone.className = 'custom-input';
+                    if(!clone.placeholder) clone.placeholder = 'Pesquisar...';
+                }
+                searchGroup.appendChild(clone);
+            });
+
+            if (hasVisibleFields) {
+                // Cria o botão de Pesquisar padronizado
                 const btnSearch = document.createElement('button');
                 btnSearch.type = 'submit';
                 btnSearch.className = 'custom-btn primary';
                 btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-
-                searchGroup.appendChild(inputClone);
                 searchGroup.appendChild(btnSearch);
 
-                // Copia os hiddens do Django
-                searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
+                // Inputs vitais ocultos
+                formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
                 bottomBar.appendChild(searchGroup);
-
-                // Esconde a bagunça velha do Jazzmin
-                searchFormOrig.style.setProperty('display', 'none', 'important');
-                if(searchFormOrig.parentElement) searchFormOrig.parentElement.style.setProperty('display', 'none', 'important');
             }
-        }
+
+            // Esconde os contentores originais
+            formOrig.style.setProperty('display', 'none', 'important');
+            if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
+        });
 
         // =========================================================
         // 2. AÇÕES EM LOTE (A caça ao select name="action")
@@ -189,14 +204,13 @@
 
             const selClone = actionSelectOrig.cloneNode(true);
             selClone.className = 'custom-select';
-            selClone.removeAttribute('data-select2-id'); // Arranca o Select2
+            selClone.removeAttribute('data-select2-id');
             selClone.classList.remove('select2-hidden-accessible');
 
             const btnIr = document.createElement('button');
             btnIr.className = 'custom-btn secondary';
             btnIr.innerText = 'Ir';
 
-            // Lógica para submeter o form da tabela com o dropdown escolhido
             btnIr.onclick = (e) => {
                 e.preventDefault();
                 let hiddenAction = formTabela.querySelector('input[name="action"]');
@@ -214,7 +228,6 @@
             actionGroup.appendChild(btnIr);
             bottomBar.appendChild(actionGroup);
 
-            // Esconde a velha barra de ações
             const actionsContainer = actionSelectOrig.closest('.actions');
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
@@ -222,14 +235,12 @@
         // =========================================================
         // 3. BOTÕES DO TOPO (Adicionar, Importar, Exportar)
         // =========================================================
-        // Procuramos botões de topo onde quer que o Jazzmin os esconda
         const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
 
         if (topButtons.length > 0) {
             const toolsGroup = document.createElement('div');
             toolsGroup.className = 'my-group';
-
-            const processedHrefs = new Set(); // Previne clonar o mesmo botão 2 vezes
+            const processedHrefs = new Set();
 
             topButtons.forEach(btn => {
                 if(processedHrefs.has(btn.href) || btn.closest('#changelist table')) return;
@@ -238,7 +249,6 @@
                 const btnClone = btn.cloneNode(true);
                 btnClone.className = 'custom-btn primary';
 
-                // Injecção automática de ícones
                 if (!btnClone.innerHTML.includes('fa-')) {
                     if (btnClone.innerText.toLowerCase().includes('adicionar')) {
                         btnClone.innerHTML = `<i class="fas fa-plus"></i> ${btnClone.innerText.trim()}`;
@@ -252,13 +262,10 @@
                 }
                 toolsGroup.appendChild(btnClone);
 
-                // Esconde os botões originais e os seus invólucros do topo
+                // Oculta originais
                 btn.style.setProperty('display', 'none', 'important');
                 if (btn.parentElement && btn.parentElement.classList.contains('object-tools')) {
                     btn.parentElement.style.setProperty('display', 'none', 'important');
-                }
-                if (btn.closest('.col-12.col-md-auto.d-flex')) {
-                     btn.closest('.col-12.col-md-auto.d-flex').style.setProperty('display', 'none', 'important');
                 }
             });
 
@@ -266,12 +273,19 @@
         }
 
         // =========================================================
-        // INSERE A BARRA NO FUNDO DA PÁGINA (Abaixo da Tabela)
+        // INSERE A BARRA NO FUNDO (Mesmo com 0 resultados)
         // =========================================================
-        if (formTabela) {
-            formTabela.appendChild(bottomBar);
-        } else if (table) {
-            table.parentNode.insertBefore(bottomBar, table.nextSibling);
+        if (bottomBar.children.length > 0) {
+            const paginator = document.querySelector('.paginator');
+            if (paginator) {
+                paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling);
+            } else if (table) {
+                table.parentNode.insertBefore(bottomBar, table.nextSibling);
+            } else if (changelist) {
+                changelist.appendChild(bottomBar); // Para quando a tabela não existe (0 itens)
+            } else {
+                mainContent.appendChild(bottomBar);
+            }
         }
     }
 
