@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MANTIDOS INTACTOS)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -51,10 +51,6 @@
     span.delete label::after, div.delete label::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
-    .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s; white-space: nowrap !important; }
-    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
-
     #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; }
     #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
@@ -62,56 +58,58 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. A REVOLUÇÃO: BARRA DE FERRAMENTAS NO FUNDO (BOTTOM TOOLBAR)
+       4. A NOVA BARRA DE FERRAMENTAS INFERIOR (TRANSPARENTE E ELEGANTE)
        ===================================================================== */
-    /* Esconde as barras velhas e bugadas do topo */
+    /* Esconde os elementos do topo antes do script atuar */
     #toolbar, #changelist-search, .actions, .object-tools { display: none !important; }
 
-    /* A Nossa Nova Barra no Fundo */
+    /* O Contentor Transparente */
     .custom-bottom-toolbar {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Alinha tudo à direita */
+        justify-content: flex-end !important; /* Tudo encostado à direita */
         align-items: center !important;
         gap: 15px !important;
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        padding: 15px 20px !important;
+        background: transparent !important; /* ADEUS CAIXA GIGANTE */
+        border: none !important;
+        padding: 0 !important;
         margin-top: 20px !important;
         margin-bottom: 40px !important;
         width: 100% !important;
-        box-sizing: border-box !important;
     }
 
-    /* 1. Grupo Pesquisa */
+    /* O Grupo da Pesquisa */
     .custom-search-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
     .custom-search-group .input-group, .custom-search-group .input-group-append { display: contents !important; }
-    .custom-input { width: 250px !important; height: 42px !important; background-color: #111827 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; }
+    .custom-input {
+        width: 250px !important; height: 42px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; transition: 0.2s;
+    }
+    .custom-input:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* 2. Grupo Ações */
+    /* O Grupo das Ações */
     .custom-actions-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
-    .custom-actions-group label { display: none !important; } /* Esconde o texto "Ações:" para poupar espaço */
+    .custom-actions-group label { display: none !important; } /* Esconde o texto "Ação:" */
     .custom-select {
-        min-width: 200px !important; height: 42px !important; background-color: #111827 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; box-sizing: border-box !important; appearance: none !important; cursor: pointer !important;
+        min-width: 200px !important; height: 42px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; color: white !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; box-sizing: border-box !important; appearance: none !important; cursor: pointer !important; transition: 0.2s;
+        /* Setinha moderna SVG */
         background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
         background-repeat: no-repeat !important; background-position: right 10px center !important;
     }
     .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* 3. Estilos Comuns de Botões na Barra */
+    /* Botões Padrão na Barra */
     .custom-btn-primary, .custom-btn-secondary {
         height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important;
     }
-    /* Verde: Pesquisar e Adicionar */
+
+    /* Botões Principais (Pesquisar, Adicionar) */
     .custom-btn-primary { background-color: #14b8a6 !important; color: white !important; }
     .custom-btn-primary:hover { background-color: #0d9488 !important; color: white !important; }
 
-    /* Cinza: Botão Ir */
+    /* Botão Secundário (Ir) */
     .custom-btn-secondary { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
     .custom-btn-secondary:hover { background-color: #4b5563 !important; color: white !important; }
-
 
     /* =====================================================================
        5. TABELAS MODERNAS E BOTÃO EXCLUIR
@@ -126,7 +124,7 @@
     #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
     #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
 
-    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-top: 20px !important;}
+    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important; margin-top: 10px !important;}
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 </style>
 {% endblock %}
@@ -138,48 +136,46 @@
         if (document.getElementById('custom-bottom-toolbar')) return;
 
         const changelistForm = document.getElementById('changelist-form');
-        const paginator = document.querySelector('.paginator');
         const tabela = document.querySelector('#changelist table');
+        const paginator = document.querySelector('.paginator');
 
-        if (!changelistForm) return;
+        if (!changelistForm && !tabela) return;
 
-        // Cria a Barra Mestra Inferior
+        // Contentor Transparente (Direita)
         const bottomToolbar = document.createElement('div');
         bottomToolbar.id = 'custom-bottom-toolbar';
         bottomToolbar.className = 'custom-bottom-toolbar';
 
         // -----------------------------------------------------
-        // 1. PESQUISA (Recolhe e monta na nossa barra)
+        // 1. PESQUISA
         // -----------------------------------------------------
         const oldSearch = document.getElementById('changelist-search') || document.getElementById('toolbar');
         if (oldSearch) {
             const formSearch = oldSearch.querySelector('form');
             if (formSearch) {
-                const searchWrap = document.createElement('form');
-                searchWrap.className = 'custom-search-group';
-                searchWrap.action = formSearch.action;
-                searchWrap.method = formSearch.method;
+                formSearch.className = 'custom-search-group';
 
                 const inputOrig = formSearch.querySelector('input[type="text"]');
+                const btnOrig = formSearch.querySelector('input[type="submit"], button');
+
                 if (inputOrig) {
-                    const inputNew = inputOrig.cloneNode(true);
-                    inputNew.className = 'custom-input';
-                    inputNew.placeholder = 'Pesquisar...';
-
-                    const urlParams = new URLSearchParams(window.location.search);
-                    if(urlParams.has(inputNew.name)) inputNew.value = urlParams.get(inputNew.name);
-
-                    const btnNew = document.createElement('button');
-                    btnNew.type = 'submit';
-                    btnNew.className = 'custom-btn-primary';
-                    btnNew.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-
-                    searchWrap.appendChild(inputNew);
-                    searchWrap.appendChild(btnNew);
-
-                    formSearch.querySelectorAll('input[type="hidden"]').forEach(h => searchWrap.appendChild(h.cloneNode(true)));
-                    bottomToolbar.appendChild(searchWrap);
+                    inputOrig.className = 'custom-input';
+                    inputOrig.placeholder = 'Pesquisar...';
                 }
+
+                if (btnOrig) {
+                    btnOrig.className = 'custom-btn-primary';
+                    if (btnOrig.tagName === 'INPUT') btnOrig.value = 'Pesquisar';
+                    else btnOrig.innerText = 'Pesquisar';
+                }
+
+                // Remove propriedades de quebra de linha dos blocos Bootstrap
+                Array.from(formSearch.children).forEach(c => {
+                    if (c.tagName === 'DIV') c.style.display = 'contents';
+                });
+
+                bottomToolbar.appendChild(formSearch);
+                oldSearch.style.display = 'none';
             }
         }
 
@@ -188,74 +184,73 @@
         // -----------------------------------------------------
         const oldActions = document.querySelector('.actions');
         if (oldActions) {
+            const actionWrap = document.createElement('div');
+            actionWrap.className = 'custom-actions-group';
+
             const selectOrig = oldActions.querySelector('select');
+            const btnIr = oldActions.querySelector('button');
+
             if (selectOrig) {
-                const actionWrap = document.createElement('div');
-                actionWrap.className = 'custom-actions-group';
+                selectOrig.className = 'custom-select';
+                selectOrig.removeAttribute('data-select2-id'); // Tira o Select2 do Jazzmin
+                selectOrig.classList.remove('select2-hidden-accessible');
+                actionWrap.appendChild(selectOrig);
+            }
 
-                const selectNew = selectOrig.cloneNode(true);
-                selectNew.className = 'custom-select';
-                selectNew.removeAttribute('data-select2-id');
-                selectNew.classList.remove('select2-hidden-accessible');
-
-                const btnIr = document.createElement('button');
+            if (btnIr) {
                 btnIr.className = 'custom-btn-secondary';
                 btnIr.innerText = 'Ir';
 
-                // Lógica para submeter a ação
+                // Conecta o nosso botão ao form da tabela
                 btnIr.onclick = (e) => {
                     e.preventDefault();
-                    let hiddenAction = changelistForm.querySelector('input[name="action"]');
-                    if (!hiddenAction) {
-                        hiddenAction = document.createElement('input');
-                        hiddenAction.type = 'hidden';
-                        hiddenAction.name = 'action';
-                        changelistForm.appendChild(hiddenAction);
+                    if(changelistForm) {
+                        let hiddenAction = changelistForm.querySelector('input[name="action"]');
+                        if (!hiddenAction) {
+                            hiddenAction = document.createElement('input');
+                            hiddenAction.type = 'hidden';
+                            hiddenAction.name = 'action';
+                            changelistForm.appendChild(hiddenAction);
+                        }
+                        hiddenAction.value = selectOrig.value;
+                        changelistForm.submit();
                     }
-                    hiddenAction.value = selectNew.value;
-                    changelistForm.submit();
                 };
-
-                actionWrap.appendChild(selectNew);
                 actionWrap.appendChild(btnIr);
-                bottomToolbar.appendChild(actionWrap);
             }
+
+            bottomToolbar.appendChild(actionWrap);
+            oldActions.style.display = 'none';
         }
 
         // -----------------------------------------------------
-        // 3. BOTÕES ADICIONAR / IMPORTAR
+        // 3. BOTÕES ADICIONAR (Descem do topo)
         // -----------------------------------------------------
         const objectToolsLinks = document.querySelectorAll('.object-tools a');
         if (objectToolsLinks.length > 0) {
             objectToolsLinks.forEach(link => {
-                const btnNew = link.cloneNode(true);
-                btnNew.className = 'custom-btn-primary';
-
-                // Se não tiver ícone, adiciona o "+"
-                if(!btnNew.innerHTML.includes('fa-')) {
-                     btnNew.innerHTML = `<i class="fas fa-plus"></i> ${btnNew.innerText}`;
+                link.className = 'custom-btn-primary';
+                if(!link.innerHTML.includes('fa-')) {
+                     link.innerHTML = `<i class="fas fa-plus"></i> ${link.innerText.trim()}`;
                 }
-                bottomToolbar.appendChild(btnNew);
+                bottomToolbar.appendChild(link);
             });
+            document.querySelector('.object-tools').style.display = 'none';
         }
 
         // -----------------------------------------------------
-        // INSERE A BARRA NO FUNDO DA PÁGINA
+        // INSERE A BARRA NO DOM (Depois da Tabela ou Paginador)
         // -----------------------------------------------------
         if (paginator) {
             paginator.parentNode.insertBefore(bottomToolbar, paginator.nextSibling);
         } else if (tabela) {
             tabela.parentNode.insertBefore(bottomToolbar, tabela.nextSibling);
-        } else {
+        } else if (changelistForm) {
             changelistForm.appendChild(bottomToolbar);
         }
-
-        // Garante que o lixo do Jazzmin desaparece do ecrã
-        if(oldSearch) oldSearch.style.setProperty('display', 'none', 'important');
-        if(oldActions) oldActions.style.setProperty('display', 'none', 'important');
-        document.querySelectorAll('.object-tools').forEach(t => t.style.setProperty('display', 'none', 'important'));
     }
 
+    // Funcionalidade de limpeza para as páginas de Edição
     function limparPaginadeEdicao() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
