@@ -14,7 +14,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. CABEÇALHO, ABAS E BOTÕES DO TOPO (+ ADICIONAR, IMPORTAR)
+       2. CABEÇALHO, ABAS E BOTÕES DO TOPO
        ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
@@ -30,7 +30,7 @@
     .object-tools a:hover, .object-tools button:hover { background-color: #0d9488 !important; }
 
     /* =====================================================================
-       3. FORMULÁRIOS E INLINES (MANTIDOS INTACTOS)
+       3. LIMPEZA DOS FORMULÁRIOS
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -76,9 +76,8 @@
 
 
     /* =====================================================================
-       4. O UNIFICADOR DE BARRA (LISTAGENS)
+       4. BARRA DE AÇÕES (ESQUERDA) E PESQUISA (DIREITA)
        ===================================================================== */
-    /* Barra que vai engolir a pesquisa e as ações */
     .actions.unificada {
         display: flex !important;
         flex-direction: row !important;
@@ -91,7 +90,6 @@
         margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        flex-wrap: nowrap !important;
     }
 
     /* O lado das Ações (Esquerda) */
@@ -105,17 +103,11 @@
     .actions-left button:hover { background-color: #4b5563 !important; }
     .actions-left span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important;}
 
-    /* O lado da Pesquisa (Direita) */
-    .search-wrapper-injetado form, .search-wrapper-injetado .input-group {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        align-items: center !important;
-        margin: 0 !important;
-        height: 42px !important;
-    }
-    .search-wrapper-injetado .input-group-append { display: contents !important; }
-    .search-wrapper-injetado input[type="text"] {
+    /* Esconde as barras velhas do Django */
+    #toolbar, #changelist-search:not(.search-wrapper-injetado) { display: none !important; }
+
+    /* CSS da nossa Pesquisa Limpa */
+    .search-input-clean {
         width: 250px !important;
         background-color: #374151 !important;
         border: 1px solid #4b5563 !important;
@@ -123,9 +115,10 @@
         border-radius: 6px !important;
         padding: 0 15px !important;
         height: 42px !important;
+        box-sizing: border-box !important;
         margin: 0 !important;
     }
-    .search-wrapper-injetado input[type="submit"], .search-wrapper-injetado button {
+    .search-btn-clean {
         background-color: #14b8a6 !important;
         color: white !important;
         border: none !important;
@@ -134,13 +127,14 @@
         height: 42px !important;
         font-weight: bold !important;
         cursor: pointer !important;
-        margin-left: 10px !important;
         white-space: nowrap !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+        transition: 0.2s;
     }
-    .search-wrapper-injetado input[type="submit"]:hover, .search-wrapper-injetado button:hover { background-color: #0d9488 !important; }
-
-    /* Esconde as barras velhas do Django caso sobrem */
-    #toolbar, #changelist-search:not(.search-wrapper-injetado) { display: none !important; }
+    .search-btn-clean:hover {
+        background-color: #0d9488 !important;
+    }
 
 
     /* =====================================================================
@@ -164,8 +158,8 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function aplicarLimpezaEDom() {
-        // 1. Limpa Títulos Inúteis
+    function aplicarLayoutBlindado() {
+        // 1. Limpa Títulos e ajusta Labels
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -177,14 +171,14 @@
             if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações em Lote:';
         });
 
-        // 2. A CIRURGIA DE DOM (Junta Ações e Pesquisa à força)
+        // 2. A CIRURGIA DE DOM: Junta as Ações (Esquerda) e Pesquisa (Direita) na mesma barra
         const actionsBar = document.querySelector('.actions');
         const searchBox = document.querySelector('#toolbar') || document.querySelector('#changelist-search');
 
-        if (actionsBar && searchBox && !actionsBar.classList.contains('unificada')) {
+        if (actionsBar && !actionsBar.classList.contains('unificada')) {
             actionsBar.classList.add('unificada');
 
-            // Empacota o conteúdo original das ações na esquerda
+            // Empacota tudo o que já existe nas ações (o Select e o botão Ir) para a esquerda
             const leftDiv = document.createElement('div');
             leftDiv.className = 'actions-left';
             while (actionsBar.firstChild) {
@@ -192,11 +186,7 @@
             }
             actionsBar.appendChild(leftDiv);
 
-            // Transplanta a pesquisa para a direita, dentro da barra de ações
-            searchBox.className = 'search-wrapper-injetado';
-            actionsBar.appendChild(searchBox);
-
-            // Corrige o Select (Mata o Select2 branco do Jazzmin)
+            // Corrige o Select (Mata o Select2 branco)
             const selectAcoes = leftDiv.querySelector('select');
             if(selectAcoes) {
                 selectAcoes.classList.remove('select2-hidden-accessible');
@@ -204,12 +194,49 @@
                 selectAcoes.style.cssText = 'width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important;';
             }
             leftDiv.querySelectorAll('.select2-container').forEach(e => e.remove());
+
+            // 3. O SEGREDO: Extrai APENAS o Input e o Botão da Pesquisa e coloca num Flex Row protegido
+            if (searchBox) {
+                const searchForm = searchBox.querySelector('form');
+                if (searchForm) {
+                    const visibleInput = searchForm.querySelector('input[type="text"]');
+                    const submitBtn = searchForm.querySelector('input[type="submit"], button');
+
+                    if (visibleInput && submitBtn) {
+                        visibleInput.className = 'search-input-clean';
+                        submitBtn.className = 'search-btn-clean';
+                        if (submitBtn.tagName === 'INPUT') submitBtn.value = 'Pesquisar';
+                        else submitBtn.innerText = 'Pesquisar';
+
+                        // Cria uma linha inquebrável (nowrap)
+                        const cleanRow = document.createElement('div');
+                        cleanRow.style.cssText = 'display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 10px !important;';
+
+                        cleanRow.appendChild(visibleInput);
+                        cleanRow.appendChild(submitBtn);
+
+                        // Volta a colocar a linha inquebrável dentro do form
+                        searchForm.appendChild(cleanRow);
+
+                        // Esconde TODAS as divs lixo geradas pelo Bootstrap dentro do form
+                        Array.from(searchForm.children).forEach(child => {
+                            if (child !== cleanRow && child.tagName !== 'INPUT') {
+                                child.style.display = 'none';
+                            }
+                        });
+                    }
+
+                    searchBox.className = 'search-wrapper-injetado';
+                    searchBox.style.cssText = 'display: block !important; margin: 0 !important; padding: 0 !important;';
+                    actionsBar.appendChild(searchBox); // Injeta a pesquisa na direita da barra principal
+                }
+            }
         }
     }
 
     window.addEventListener('load', function() {
-        aplicarLimpezaEDom();
-        const observer = new MutationObserver(aplicarLimpezaEDom);
+        aplicarLayoutBlindado();
+        const observer = new MutationObserver(aplicarLayoutBlindado);
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
