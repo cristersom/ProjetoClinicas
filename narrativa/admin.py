@@ -99,6 +99,7 @@ class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
 class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'narrativa', 'botao_excluir')
     list_filter = ('narrativa',)
+    search_fields = ('titulo', 'narrativa__titulo') # PESQUISA ATIVADA
     inlines = [EscolhaInline]
 
     def get_queryset(self, request):
@@ -123,7 +124,7 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
-    search_fields = ('titulo',)
+    search_fields = ('titulo',) # PESQUISA JÁ ESTAVA ATIVADA
 
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
@@ -237,6 +238,7 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 @admin.register(Questionario)
 class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios')
+    search_fields = ('titulo', 'cena_associada__titulo', 'cena_destino__titulo') # PESQUISA ATIVADA
     inlines = [PerguntaInline]
 
     def get_queryset(self, request):
@@ -376,6 +378,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     resource_class = RespostaResource
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
+    search_fields = ('session_key', 'texto_resposta') # PESQUISA ATIVADA
 
     def has_export_permission(self, request): return True
 
@@ -386,9 +389,11 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
             return qs.filter(pergunta__questionario__cena_associada__narrativa__clinica=request.user.clinica)
         return qs.none()
 
+
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('session_key', 'narrativa_perfil', 'data_criacao')
+    search_fields = ('session_key', 'narrativa_perfil__titulo') # PESQUISA ATIVADA
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
