@@ -14,7 +14,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. CABEÇALHO E ABAS
+       2. CABEÇALHO, ABAS E BOTÕES DO TOPO
        ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA E ESTILIZAÇÃO DOS FORMULÁRIOS
+       3. LIMPEZA DOS FORMULÁRIOS
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -63,136 +63,67 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. O NOVO UX DAS LISTAGENS: TABELA NO TOPO, FERRAMENTAS NO FUNDO
+       4. A SUPER BARRA DE FERRAMENTAS (A SOLUÇÃO DEFINITIVA)
        ===================================================================== */
-    /* Container Principal - Transforma num Flex Column mágico */
-    #content-main { display: flex !important; flex-direction: column !important; }
+    /* Esconde as posições antigas dos elementos */
+    #toolbar, #changelist-search:not(.injetado), .actions:not(.injetado), .object-tools:not(.injetado) { display: none !important; }
 
-    /* A LISTAGEM (Tabela): Vai para o topo (Ordem 1) */
-    #changelist { order: 1 !important; display: flex !important; flex-direction: column !important; width: 100% !important; }
-    #changelist-form { order: 1 !important; display: flex !important; flex-direction: column !important; }
-    #changelist table { order: 1 !important; margin-bottom: 20px !important; }
-    .paginator { order: 2 !important; margin-bottom: 20px !important; }
-
-    /* AÇÕES EM LOTE (Dropdown): Vai para baixo da tabela (Ordem 3) */
-    .actions {
-        order: 3 !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 15px !important;
-        background: transparent !important; /* Adeus caixa feia gigante */
-        border: none !important;
-        padding: 0 !important;
-        margin-top: 10px !important;
-        margin-bottom: 20px !important;
-    }
-    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; color: #d1d5db !important;}
-
-    /* O DROPDOWN BONITO (Chega de Select2 quebrado) */
-    .actions select {
-        appearance: none !important; /* Remove o estilo padrão feio do Windows/Mac */
-        min-width: 250px !important;
-        background-color: #1f2937 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        padding: 0 40px 0 15px !important;
-        border-radius: 6px !important;
-        height: 45px !important;
-        font-size: 0.95rem !important;
-        /* Seta SVG personalizada para ficar lindo no modo dark */
-        background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
-        background-repeat: no-repeat !important;
-        background-position: right 10px center !important;
-        cursor: pointer !important;
-    }
-    .actions select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    .actions .select2-container { display: none !important; } /* Blindagem extra contra o Jazzmin */
-
-    /* Botão Ir */
-    .actions button {
-        background-color: #374151 !important;
-        color: white !important;
-        border: 1px solid #4b5563 !important;
-        border-radius: 6px !important;
-        padding: 0 20px !important;
-        height: 45px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        transition: 0.2s !important;
-    }
-    .actions button:hover { background-color: #4b5563 !important; }
-    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important;}
-
-    /* A PESQUISA RESSUSCITADA: Fica debaixo das Ações (Ordem 4) */
-    #toolbar, #changelist-search {
-        order: 4 !important;
-        display: block !important; /* Garante que aparece */
-        margin-top: 0 !important;
-        margin-bottom: 30px !important;
-    }
-    #changelist-search form {
+    /* A Barra Principal */
+    .super-toolbar {
         display: flex !important;
         flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-end !important; /* Tudo alinhado à direita */
         align-items: center !important;
-        gap: 10px !important;
-    }
-    /* Desmonta as caixas do Bootstrap para não haver quebras */
-    #changelist-search .input-group, #changelist-search .input-group-append { display: contents !important; }
-
-    #changelist-search input[type="text"] {
-        flex-grow: 0 !important;
-        width: 350px !important;
+        gap: 15px !important; /* Espaçamento perfeito entre todos os elementos */
         background-color: #1f2937 !important;
-        border: 1px solid #4b5563 !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0 15px !important;
-        height: 45px !important;
-    }
-    #changelist-search input[type="submit"], #changelist-search button {
-        background-color: #14b8a6 !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 6px !important;
-        padding: 0 25px !important;
-        height: 45px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        transition: 0.2s !important;
-    }
-    #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
-
-    /* BOTÕES DO TOPO (Adicionar): Vão para o Fim de Tudo (Ordem 10) */
-    .object-tools {
-        order: 10 !important;
-        display: flex !important;
-        justify-content: flex-start !important; /* Encosta à esquerda agora */
-        gap: 15px !important;
-        margin-top: 20px !important;
-        margin-bottom: 40px !important;
-        padding: 0 !important;
-    }
-    .object-tools a, .object-tools button {
-        margin: 0 !important;
-        background-color: #14b8a6 !important;
-        color: white !important;
-        border: none !important;
-        padding: 12px 25px !important;
-        border-radius: 6px !important;
-        font-weight: bold !important;
-        font-size: 1rem !important; /* Botão ligeiramente maior pois é o Call to Action */
-        display: inline-flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        text-decoration: none !important;
-        transition: 0.2s !important;
+        border: 1px solid #374151 !important;
+        border-radius: 8px !important;
+        padding: 15px 20px !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
+    /* 1. e 2. PESQUISA (Input + Botão) */
+    .super-toolbar .search-form-clean { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
+    .super-toolbar .search-form-clean .input-group { display: contents !important; } /* Evapora quebras do Bootstrap */
+    .super-toolbar .search-form-clean input[type="text"] {
+        width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; margin: 0 !important; box-sizing: border-box !important;
+    }
+    .super-toolbar .search-form-clean input[type="submit"], .super-toolbar .search-form-clean button {
+        background-color: #14b8a6 !important; color: white !important; border: none !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer !important; transition: 0.2s !important; margin: 0 !important; white-space: nowrap !important;
+    }
+    .super-toolbar .search-form-clean input[type="submit"]:hover, .super-toolbar .search-form-clean button:hover { background-color: #0d9488 !important; }
+
+    /* 3. e 4. AÇÕES (Dropdown + Botão Ir) */
+    .super-toolbar .actions-clean { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
+    .super-toolbar .actions-clean label { display: flex !important; align-items: center !important; margin: 0 !important; }
+    .super-toolbar .actions-clean select {
+        appearance: none !important; /* Tira o design feio do navegador */
+        min-width: 220px !important; height: 42px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; margin: 0 !important; box-sizing: border-box !important;
+        /* Setinha moderna SVG embutida */
+        background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
+        background-repeat: no-repeat !important; background-position: right 10px center !important; cursor: pointer !important;
+    }
+    .super-toolbar .actions-clean select:focus { border-color: #14b8a6 !important; outline: none !important; }
+    .super-toolbar .actions-clean button {
+        background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; height: 42px !important; font-weight: bold !important; cursor: pointer !important; transition: 0.2s !important; margin: 0 !important; box-sizing: border-box !important; white-space: nowrap !important;
+    }
+    .super-toolbar .actions-clean button:hover { background-color: #4b5563 !important; }
+    .super-toolbar .actions-clean span.action-counter { display: none !important; } /* Escondido para máxima limpeza */
+
+    /* 5. ADICIONAR (Ferramentas) */
+    .super-toolbar .tools-clean { display: flex !important; align-items: center !important; margin: 0 !important; gap: 10px !important;}
+    .super-toolbar .tools-clean a {
+        background-color: #14b8a6 !important; color: white !important; border: none !important; padding: 0 20px !important; height: 42px !important; border-radius: 6px !important; font-weight: bold !important; display: inline-flex !important; align-items: center !important; gap: 8px !important; text-decoration: none !important; transition: 0.2s !important; box-sizing: border-box !important; margin: 0 !important; white-space: nowrap !important;
+    }
+    .super-toolbar .tools-clean a:hover { background-color: #0d9488 !important; }
 
     /* =====================================================================
-       5. ESTILIZAÇÃO DA TABELA (MANTIDA)
+       5. TABELAS MODERNAS E BOTÃO EXCLUIR
        ===================================================================== */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important;}
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 20px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
     #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
@@ -202,7 +133,7 @@
     #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
     #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
 
-    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important;}
+    .paginator { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; color: #d1d5db !important; text-align: center !important; margin-bottom: 30px !important;}
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 </style>
 {% endblock %}
@@ -210,8 +141,89 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function aplicarLimpezaUX() {
-        // Títulos inúteis
+    function construirSuperToolbar() {
+        const changelist = document.querySelector('#changelist');
+        const formTabela = document.querySelector('#changelist-form');
+        if (!changelist || !formTabela) return;
+
+        // Se a Super Barra já existe, não faz nada
+        if (document.querySelector('.super-toolbar')) return;
+
+        // Cria a Super Barra e coloca no topo
+        const superToolbar = document.createElement('div');
+        superToolbar.className = 'super-toolbar';
+        changelist.parentNode.insertBefore(superToolbar, changelist);
+
+        // Captura os elementos antigos
+        const oldSearch = document.querySelector('#changelist-search') || document.querySelector('#toolbar');
+        const oldActions = document.querySelector('.actions');
+        const oldTools = document.querySelector('.object-tools');
+
+        // ==========================================
+        // 1 & 2. PESQUISA
+        // ==========================================
+        if (oldSearch) {
+            const form = oldSearch.querySelector('form');
+            if (form) {
+                form.className = 'search-form-clean';
+                // Mata os invólucros que forçam quebra de linha
+                Array.from(form.children).forEach(c => {
+                    if (c.tagName === 'DIV') c.style.display = 'contents';
+                });
+
+                const btn = form.querySelector('input[type="submit"], button');
+                if (btn && btn.tagName === 'INPUT') btn.value = 'Pesquisar';
+                else if (btn) btn.innerText = 'Pesquisar';
+
+                oldSearch.className = 'injetado';
+                superToolbar.appendChild(oldSearch);
+            }
+        }
+
+        // ==========================================
+        // 3 & 4. DROPDOWN AÇÕES
+        // ==========================================
+        if (oldActions) {
+            oldActions.className = 'actions-clean injetado';
+
+            // Magia HTML5: Como as ações vão para FORA do form principal, precisamos
+            // linkar os botões de volta ao form usando form="changelist-form"
+            formTabela.id = 'changelist-form';
+            const select = oldActions.querySelector('select');
+            const btnIr = oldActions.querySelector('button');
+
+            if (select) {
+                select.setAttribute('form', 'changelist-form');
+                select.classList.remove('select2-hidden-accessible'); // Mata Select2
+                select.style.display = 'block';
+            }
+            if (btnIr) {
+                btnIr.setAttribute('form', 'changelist-form');
+            }
+
+            oldActions.querySelectorAll('.select2-container').forEach(e => e.remove());
+
+            // Apaga o texto "Ação:" para não ocupar espaço
+            const label = oldActions.querySelector('label');
+            if (label) {
+                Array.from(label.childNodes).forEach(node => {
+                    if (node.nodeType === 3) node.textContent = '';
+                });
+            }
+
+            superToolbar.appendChild(oldActions);
+        }
+
+        // ==========================================
+        // 5. BOTÃO ADICIONAR
+        // ==========================================
+        if (oldTools) {
+            oldTools.className = 'tools-clean injetado';
+            superToolbar.appendChild(oldTools);
+        }
+    }
+
+    function aplicarLimpezaTelasEdicao() {
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -220,29 +232,23 @@
         });
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-            if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações em Lote:';
         });
-
-        // Tira o veneno do Select2 para garantir o Dropdown Bonito
-        const selectAcoes = document.querySelector('.actions select');
-        if(selectAcoes) {
-            selectAcoes.classList.remove('select2-hidden-accessible');
-            selectAcoes.removeAttribute('data-select2-id');
-            selectAcoes.style.display = 'block';
-        }
-        document.querySelectorAll('.actions .select2-container').forEach(e => e.remove());
     }
 
     window.addEventListener('load', function() {
-        aplicarLimpezaUX();
-        const observer = new MutationObserver(aplicarLimpezaUX);
+        construirSuperToolbar();
+        aplicarLimpezaTelasEdicao();
+
+        const observer = new MutationObserver(() => {
+            construirSuperToolbar();
+            aplicarLimpezaTelasEdicao();
+        });
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
-        // Menu lateral
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
