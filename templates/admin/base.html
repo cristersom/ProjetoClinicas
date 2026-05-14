@@ -30,7 +30,7 @@
     .object-tools a:hover, .object-tools button:hover { background-color: #0d9488 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS
+       3. FORMULÁRIOS E INLINES (MANTIDOS INTACTOS)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -74,40 +74,49 @@
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-    /* =====================================================================
-       8. NOVO LAYOUT: PESQUISA E AÇÕES EMPILHADAS (O FIM DOS PROBLEMAS)
-       ===================================================================== */
-    #changelist { display: block !important; width: 100% !important; }
 
-    /* BARRA 1: PESQUISA */
-    #changelist-search {
-        display: block !important;
+    /* =====================================================================
+       4. O UNIFICADOR DE BARRA (LISTAGENS)
+       ===================================================================== */
+    /* Barra que vai engolir a pesquisa e as ações */
+    .actions.unificada {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
         background-color: #1f2937 !important;
         border: 1px solid #374151 !important;
         border-radius: 8px !important;
-        padding: 15px 20px !important;
-        margin-bottom: 15px !important;
+        padding: 10px 20px !important;
+        margin-bottom: 20px !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        flex-wrap: nowrap !important;
     }
 
-    #changelist-search form {
+    /* O lado das Ações (Esquerda) */
+    .actions-left {
+        display: flex !important;
+        align-items: center !important;
+        gap: 15px !important;
+    }
+    .actions-left label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; color: #d1d5db !important;}
+    .actions-left button { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s;}
+    .actions-left button:hover { background-color: #4b5563 !important; }
+    .actions-left span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important;}
+
+    /* O lado da Pesquisa (Direita) */
+    .search-wrapper-injetado form, .search-wrapper-injetado .input-group {
         display: flex !important;
         flex-direction: row !important;
+        flex-wrap: nowrap !important;
         align-items: center !important;
-        width: 100% !important;
         margin: 0 !important;
-        padding: 0 !important;
+        height: 42px !important;
     }
-
-    /* "Evapora" as divs intermediárias do Django */
-    #changelist-search form > div, #changelist-search .input-group, #changelist-search .input-group-append {
-        display: contents !important;
-    }
-
-    /* O campo de texto ganha destaque e ocupa o espaço disponível */
-    #changelist-search input[type="text"] {
-        flex-grow: 1 !important;
+    .search-wrapper-injetado .input-group-append { display: contents !important; }
+    .search-wrapper-injetado input[type="text"] {
+        width: 250px !important;
         background-color: #374151 !important;
         border: 1px solid #4b5563 !important;
         color: white !important;
@@ -115,49 +124,27 @@
         padding: 0 15px !important;
         height: 42px !important;
         margin: 0 !important;
-        max-width: none !important;
     }
-
-    #changelist-search input[type="submit"], #changelist-search button {
+    .search-wrapper-injetado input[type="submit"], .search-wrapper-injetado button {
         background-color: #14b8a6 !important;
         color: white !important;
         border: none !important;
         border-radius: 6px !important;
-        padding: 0 25px !important;
+        padding: 0 20px !important;
         height: 42px !important;
         font-weight: bold !important;
         cursor: pointer !important;
-        margin-left: 15px !important;
-        transition: 0.2s;
+        margin-left: 10px !important;
+        white-space: nowrap !important;
     }
-    #changelist-search input[type="submit"]:hover, #changelist-search button:hover { background-color: #0d9488 !important; }
+    .search-wrapper-injetado input[type="submit"]:hover, .search-wrapper-injetado button:hover { background-color: #0d9488 !important; }
 
-    /* BARRA 2: AÇÕES EM LOTE */
-    .actions {
-        display: flex !important;
-        align-items: center !important;
-        gap: 15px !important;
-        background-color: #1f2937 !important;
-        border: 1px solid #374151 !important;
-        border-radius: 8px !important;
-        padding: 15px 20px !important;
-        margin-bottom: 20px !important;
-        color: #d1d5db !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    .actions label { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; font-size: 0.95rem !important; width: auto !important; flex-direction: row !important; white-space: nowrap !important;}
-    .actions select { width: auto !important; min-width: 300px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important; display: block !important; box-sizing: border-box !important;}
-    .actions select option { background-color: #111827 !important; color: white !important; }
-    .actions .select2-container { display: none !important; }
-
-    .actions button, .actions .button { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 20px !important; font-weight: bold !important; height: 42px !important; cursor: pointer; transition: 0.2s; margin: 0 !important;}
-    .actions button:hover, .actions .button:hover { background-color: #4b5563 !important; }
-    .actions span.action-counter { color: #9ca3af !important; font-size: 0.9rem !important; margin-left: auto !important; } /* Empurra o texto pro fundo */
+    /* Esconde as barras velhas do Django caso sobrem */
+    #toolbar, #changelist-search:not(.search-wrapper-injetado) { display: none !important; }
 
 
     /* =====================================================================
-       9. TABELAS MODERNAS E BOTÃO EXCLUIR
+       5. TABELAS MODERNAS E BOTÃO EXCLUIR
        ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 20px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
@@ -177,30 +164,52 @@
 {% block extrahead %}
 {{ block.super }}
 <script>
-    function aplicarTextos() {
+    function aplicarLimpezaEDom() {
+        // 1. Limpa Títulos Inúteis
         document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
-
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-            if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações:';
+            if (label.innerText.trim() === 'Ação:') label.innerText = 'Ações em Lote:';
         });
 
-        const selectAcoes = document.querySelector('.actions select');
-        if(selectAcoes) {
-            selectAcoes.classList.remove('select2-hidden-accessible');
-            selectAcoes.style.display = 'block';
+        // 2. A CIRURGIA DE DOM (Junta Ações e Pesquisa à força)
+        const actionsBar = document.querySelector('.actions');
+        const searchBox = document.querySelector('#toolbar') || document.querySelector('#changelist-search');
+
+        if (actionsBar && searchBox && !actionsBar.classList.contains('unificada')) {
+            actionsBar.classList.add('unificada');
+
+            // Empacota o conteúdo original das ações na esquerda
+            const leftDiv = document.createElement('div');
+            leftDiv.className = 'actions-left';
+            while (actionsBar.firstChild) {
+                leftDiv.appendChild(actionsBar.firstChild);
+            }
+            actionsBar.appendChild(leftDiv);
+
+            // Transplanta a pesquisa para a direita, dentro da barra de ações
+            searchBox.className = 'search-wrapper-injetado';
+            actionsBar.appendChild(searchBox);
+
+            // Corrige o Select (Mata o Select2 branco do Jazzmin)
+            const selectAcoes = leftDiv.querySelector('select');
+            if(selectAcoes) {
+                selectAcoes.classList.remove('select2-hidden-accessible');
+                selectAcoes.style.display = 'block';
+                selectAcoes.style.cssText = 'width: auto !important; min-width: 250px !important; background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 0 15px !important; height: 42px !important; appearance: auto !important;';
+            }
+            leftDiv.querySelectorAll('.select2-container').forEach(e => e.remove());
         }
-        document.querySelectorAll('.actions .select2-container').forEach(e => e.remove());
     }
 
     window.addEventListener('load', function() {
-        aplicarTextos();
-        const observer = new MutationObserver(aplicarTextos);
+        aplicarLimpezaEDom();
+        const observer = new MutationObserver(aplicarLimpezaEDom);
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
