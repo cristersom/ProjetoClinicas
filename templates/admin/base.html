@@ -30,7 +30,6 @@
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // 1. PESQUISA
         const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
         filterForms.forEach(formOrig => {
             const searchGroup = document.createElement('form');
@@ -71,7 +70,6 @@
             if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
         });
 
-        // 2. AÇÕES EM LOTE
         const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
@@ -106,7 +104,6 @@
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
 
-        // 3. BOTÕES DO TOPO
         const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
 
         if (topButtons.length > 0) {
@@ -209,16 +206,36 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. RESPONSIVIDADE DO CABEÇALHO (MANTÉM NO CELULAR, ESCONDE NO DESKTOP)
+       2. RESPONSIVIDADE DO CABEÇALHO (O SEGREDO DO MENU NO CELULAR)
        ===================================================================== */
     @media (min-width: 769px) {
         nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
     }
 
     @media (max-width: 768px) {
-        nav.main-header { background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; display: flex !important; }
-        nav.main-header .nav-link { color: #f3f4f6 !important; }
-        .brand-link { background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important; }
+        /* Garante que a barra do Jazzmin com o ícone do menu hambúrguer é exibida */
+        nav.main-header {
+            display: flex !important;
+            visibility: visible !important;
+            height: auto !important;
+            min-height: 55px !important;
+            background-color: #1f2937 !important;
+            border-bottom: 1px solid #374151 !important;
+            opacity: 1 !important;
+        }
+        nav.main-header * { visibility: visible !important; }
+        nav.main-header .nav-link { color: #f3f4f6 !important; font-size: 1.2rem !important; }
+
+        .brand-link {
+            display: flex !important;
+            visibility: visible !important;
+            height: auto !important;
+            background-color: #111827 !important;
+            color: white !important;
+            border-bottom: 1px solid #374151 !important;
+            align-items: center !important;
+        }
+        .brand-link .brand-text { display: block !important; visibility: visible !important; }
         .breadcrumb { display: none !important; }
 
         /* Ajustes dos Alertas no telemóvel */
