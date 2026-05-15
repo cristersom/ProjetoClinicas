@@ -125,10 +125,9 @@
                     <span class="billing-value">{{ kpi_narrativas }} / {{ request.user.clinica.plano_atual.limite_narrativas|default:"0" }}</span>
                 </div>
 
-                <a href="{% url 'narrativa:planos' %}" class="btn-action" style="margin-top: 15px;">
+                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-action" style="margin-top: 15px;">
                     Gerenciar Assinatura
                 </a>
-
             </div>
 
             <div class="side-card">

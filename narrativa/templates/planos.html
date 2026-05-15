@@ -1,84 +1,55 @@
-{% extends 'base.html' %}
-{% load static %}
+{% extends 'base.html' %} {% block content %}
+<main class="min-h-screen bg-gray-900 text-white pb-20" style="padding-top: 120px;">
 
-{% block titulo %}Planos - Narrativas Clínicas{% endblock %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Escolha o plano ideal</h1>
+        <p class="text-xl text-gray-400">Evolua o acompanhamento dos seus pacientes com as nossas jornadas.</p>
+    </div>
 
-{% block content %}
-<div class="min-h-screen bg-gray-900 py-16 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-
-        <div class="text-center mb-16">
-            <h1 class="text-4xl font-extrabold text-white mb-4">Escolha o plano ideal</h1>
-            <p class="text-xl text-gray-400">Evolua o acompanhamento dos seus pacientes com as nossas jornadas.</p>
-        </div>
-
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {% for plano in planos %}
-            <div class="bg-gray-800 border border-gray-700 rounded-2xl p-8 flex flex-col justify-between hover:border-teal-500 transition-colors shadow-xl">
-                <div>
+                <div class="bg-gray-800 rounded-2xl border border-gray-700 p-8 flex flex-col">
                     <h3 class="text-2xl font-bold text-white mb-2">{{ plano.nome }}</h3>
                     <p class="text-gray-400 text-sm mb-6">Ideal para acompanhamento de pacientes</p>
 
                     <div class="mb-6">
-                        <span class="text-4xl font-extrabold text-white">R$ {{ plano.preco }}</span><span class="text-gray-400">/mês</span>
+                        <span class="text-4xl font-extrabold text-white">R$ {{ plano.preco }}</span>
+                        <span class="text-gray-400">/mês</span>
                     </div>
 
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Crie até <strong class="text-white">{{ plano.limite_narrativas }} Jornadas</strong></span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Até <strong class="text-white">{{ plano.limite_pacientes }} Pacientes</strong></span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Questionários ilimitados</span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-teal-500 mr-2 text-xl"></ion-icon><span>Relatórios e Dashboards</span></li>
+                    <ul class="space-y-4 mb-8 flex-1">
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-teal-500 mr-3"></i> Crie até <strong class="ml-1 text-white">{{ plano.limite_narrativas|default:"Ilimitadas" }} Jornadas</strong>
+                        </li>
+                        <li class="flex items-center text-gray-300">
+                            <i class="fas fa-check-circle text-teal-500 mr-3"></i> Até <strong class="ml-1 text-white">{{ plano.limite_pacientes|default:"Ilimitados" }} Pacientes</strong>
+                        </li>
+                        <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-teal-500 mr-3"></i> Questionários ilimitados</li>
+                        <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-teal-500 mr-3"></i> Relatórios e Dashboards</li>
                     </ul>
-                </div>
 
-                <div>
-                    {% if request.user.is_authenticated and request.user.clinica %}
-                        {% if assinatura_ativa %}
-                            {% if plano == plano_atual %}
-                                <button disabled class="w-full bg-gray-700 text-gray-400 font-bold py-3 px-2 rounded-lg flex items-center justify-center cursor-not-allowed text-sm whitespace-nowrap">
-                                    <ion-icon name="checkmark-outline" class="mr-2"></ion-icon> Seu Plano Atual
-                                </button>
-                            {% else %}
-                                <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
-                                    Atualizar para {{ plano.nome }}
-                                </a>
-                            {% endif %}
-                        {% else %}
-                            <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition shadow-lg text-sm whitespace-nowrap">
-                                Renovar {{ plano.nome }}
-                            </a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-2 rounded-lg flex items-center justify-center transition text-sm whitespace-nowrap">
-                            Assinar {{ plano.nome }}
-                        </a>
-                    {% endif %}
+                    <a href="{% url 'narrativa:checkout' plano.id %}" class="w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition duration-200">
+                        Renovar {{ plano.nome }}
+                    </a>
                 </div>
-            </div>
             {% endfor %}
 
-            <div class="bg-gray-800 border border-gray-700 rounded-2xl p-8 flex flex-col justify-between hover:border-indigo-500 transition-colors shadow-xl">
-                <div>
-                    <h3 class="text-2xl font-bold text-white mb-2">Empresarial</h3>
-                    <p class="text-gray-400 text-sm mb-6">Ideal para redes ou clínicas com demandas exclusivas.</p>
-                    <div class="mb-6"><span class="text-3xl font-extrabold text-white">Sob Medida</span></div>
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-indigo-500 mr-2 text-xl"></ion-icon><span class="font-bold text-white">Jornadas Ilimitadas</span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-indigo-500 mr-2 text-xl"></ion-icon><span class="font-bold text-white">Pacientes Ilimitados</span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-indigo-500 mr-2 text-xl"></ion-icon><span class="text-white">Suporte prioritário 24h</span></li>
-                        <li class="flex items-center text-gray-300"><ion-icon name="checkmark-circle" class="text-indigo-500 mr-2 text-xl"></ion-icon><span class="text-white">Integração de sistemas</span></li>
-                    </ul>
-                </div>
-
-                <div>
-                    <div class="w-full flex flex-col items-center justify-center py-3 px-4 rounded-lg bg-indigo-600 border border-indigo-500 shadow-lg">
-                        <span class="text-[10px] text-indigo-200 font-bold uppercase tracking-wider mb-1">Falar com Consultor</span>
-                        <span class="text-sm font-bold text-white text-center w-full" style="word-break: break-word;">atendimento@narrativasclinicas.com.br</span>
-                    </div>
-                </div>
+            <div class="bg-gray-800 rounded-2xl border border-gray-700 p-8 flex flex-col">
+                <h3 class="text-2xl font-bold text-white mb-2">Empresarial</h3>
+                <p class="text-gray-400 text-sm mb-6">Ideal para redes ou clínicas com demandas exclusivas.</p>
+                <div class="mb-6"><span class="text-3xl font-extrabold text-white">Sob Medida</span></div>
+                <ul class="space-y-4 mb-8 flex-1">
+                    <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-indigo-500 mr-3"></i> Jornadas Ilimitadas</li>
+                    <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-indigo-500 mr-3"></i> Pacientes Ilimitados</li>
+                    <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-indigo-500 mr-3"></i> Suporte prioritário 24h</li>
+                    <li class="flex items-center text-gray-300"><i class="fas fa-check-circle text-indigo-500 mr-3"></i> Integração de sistemas</li>
+                </ul>
+                <a href="mailto:atendimento@narrativasclinicas.com.br" class="w-full text-center bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 rounded-lg transition duration-200 text-sm">
+                    FALAR COM CONSULTOR<br>atendimento@narrativasclinicas.com.br
+                </a>
             </div>
-
         </div>
     </div>
-</div>
+</main>
 {% endblock %}

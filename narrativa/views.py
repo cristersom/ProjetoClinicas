@@ -123,6 +123,7 @@ class PlanosView(ListView):
     model = Plano
     template_name = 'planos.html'
     context_object_name = 'planos'
+    ordering = ['preco']  # ORDENAÇÃO DO MAIS BARATO AO MAIS CARO
 
     def get(self, request, *args, **kwargs):
         if request.GET.get('gerenciar') == '1' and request.user.is_authenticated:
@@ -313,7 +314,6 @@ def stripe_webhook(request):
             novo_plano = Plano.objects.filter(stripe_price_id=price_id).first()
             if novo_plano:
                 clinica.plano_atual = novo_plano
-                # O Stripe envia 'active' quando a assinatura está regular
                 clinica.assinatura_ativa = (subscription.get('status') == 'active')
                 clinica.save()
 
@@ -459,11 +459,12 @@ class PacienteDetalhesView(DetailView):
         response = super().get(request, *args, **kwargs)
         narrativa = self.get_object()
 
-        # Incrementa visualizações
-        narrativa.visualizacoes += 1
-        narrativa.save()
+        visitou_key = f'visitou_narrativa_{narrativa.id}'
+        if not request.session.get(visitou_key):
+            narrativa.visualizacoes += 1
+            narrativa.save()
+            request.session[visitou_key] = True
 
-        # UPGRADE: Segurança de Sessão. Garante que o cookie de sessão é criado antes de avançar.
         if not request.session.session_key:
             request.session.create()
 
@@ -474,12 +475,10 @@ class PacienteDetalhesView(DetailView):
         return response
 
     def post(self, request, *args, **kwargs):
-        # Resolve o Erro HTTP 405 (Method Not Allowed)
         return redirect('narrativa:iniciar_jornada_paciente', narrativa_id=self.get_object().id)
 
 
 def exibir_cena_paciente(request, cena_id):
-    # UPGRADE: Otimização Extrema de Banco de Dados. Carrega todas as dependências da cena num único hit.
     cena = get_object_or_404(
         Cena.objects.prefetch_related('questionarios__perguntas', 'escolhas', 'escolhas__cena_destino'),
         id=cena_id
@@ -488,16 +487,15 @@ def exibir_cena_paciente(request, cena_id):
     if not request.session.session_key:
         request.session.create()
 
-    LogVisitaCena.objects.create(
+    LogVisitaCena.objects.get_or_create(
         session_key=request.session.session_key,
         cena_visitada=cena,
-        narrativa_associada=cena.narrativa
+        defaults={'narrativa_associada': cena.narrativa}
     )
 
     questionarios_status = []
     pendentes = 0
 
-    # Valida se os questionários associados a esta cena já foram respondidos
     for quest in cena.questionarios.all():
         respondido = Resposta.objects.filter(
             session_key=request.session.session_key,
@@ -513,7 +511,6 @@ def exibir_cena_paciente(request, cena_id):
         if not respondido:
             pendentes += 1
 
-    # Permite prosseguir se não houver questionários pendentes
     context = {
         'cena': cena,
         'questionarios_status': questionarios_status,
@@ -535,14 +532,12 @@ def responder_questionario(request, cena_id, questionario_id):
         for pergunta in questionario.perguntas.all():
             valores = request.POST.getlist(f"pergunta_{pergunta.id}")
             for valor in valores:
-                if valor.strip():  # Salva apenas se o utilizador digitou/selecionou algo
+                if valor.strip():
                     Resposta.objects.create(
                         pergunta=pergunta,
                         session_key=request.session.session_key,
                         texto_resposta=valor
                     )
-
-        # Retorna sempre para a cena onde estava (onde o questionário está ancorado)
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena.id)
 
     return render(request, 'questionario.html', {'cena': cena, 'questionario': questionario})
@@ -590,7 +585,6 @@ def iniciar_jornada_paciente(request, narrativa_id):
         defaults={'narrativa_perfil': narrativa}
     )
 
-    # LÓGICA INTELIGENTE: Pega a cena inicial OU a primeira cena vinculada à jornada
     cena_alvo = narrativa.cena_inicial
 
     if not cena_alvo and narrativa.cenas.exists():
@@ -599,7 +593,6 @@ def iniciar_jornada_paciente(request, narrativa_id):
     if cena_alvo:
         return redirect('narrativa:exibir_cena_paciente', cena_id=cena_alvo.id)
 
-    # Se a narrativa estiver literalmente vazia
     messages.warning(request, "Esta jornada ainda não tem cenas configuradas.")
     return redirect('narrativa:portal_paciente', clinica_id=narrativa.clinica.id if narrativa.clinica else 0)
 
