@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MODO ESCURO ABSOLUTO)
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO E FIM DO SCROLL HORIZONTAL
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -35,6 +35,17 @@
     body .form-row, body .form-group { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important;}
+
+    /* MATA O SCROLL HORIZONTAL FEIO NOS NESTED ADMINS */
+    .djn-items, .djn-item, .djn-group, .inline-group, .inline-related, .djn-fieldset {
+        overflow-x: hidden !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    /* Oculta visualmente a barra caso o navegador insista */
+    .djn-items::-webkit-scrollbar, .djn-item::-webkit-scrollbar, .djn-group::-webkit-scrollbar {
+        display: none !important;
+    }
 
     /* Inputs sempre escuros */
     input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
@@ -86,15 +97,15 @@
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 
     /* =====================================================================
-       5. A BARRA INFERIOR DEFINITIVA (SÓ NAS LISTAGENS)
+       5. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
        ===================================================================== */
-    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
+    #toolbar, #changelist-search, #changelist-filter, .actions, .object-tools { display: none !important; }
 
     .my-super-bottom-bar {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important;
+        justify-content: flex-end !important; /* Tudo alinhado à direita */
         align-items: center !important;
         gap: 15px !important;
         background: transparent !important;
@@ -120,7 +131,7 @@
     .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
     .custom-btn {
-        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important; margin: 0 !important;
+        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; border: none !important; text-decoration: none !important; margin: 0 !important;
     }
 
     .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
@@ -142,16 +153,14 @@
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
 
-        // PROTEÇÃO ABSOLUTA: Só roda se for listagem. Se não houver changelist ou tabela, aborta.
         if (!changelist && !formTabela && !table) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // 1. PESQUISA (Apenas da listagem)
+        // 1. PESQUISA
         const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
-
         filterForms.forEach(formOrig => {
             const searchGroup = document.createElement('form');
             searchGroup.className = 'my-group';
