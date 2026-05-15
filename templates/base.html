@@ -37,7 +37,7 @@
                     <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-white font-medium uppercase text-sm tracking-wide">Planos</a>
 
                     {% if request.user.is_authenticated %}
-                        {% if request.user.is_superuser %}
+                        {% if request.user.is_staff %}
                             <a href="{% url 'admin:index' %}" class="text-gray-400 hover:text-white font-medium uppercase text-sm"><i class="fas fa-cog mr-1"></i> Admin</a>
                         {% endif %}
                         <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-white font-medium uppercase text-sm">Meu Painel</a>
@@ -61,7 +61,7 @@
                 <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md font-medium text-base border-b border-gray-700">Planos</a>
 
                 {% if request.user.is_authenticated %}
-                    {% if request.user.is_superuser %}
+                    {% if request.user.is_staff %}
                         <a href="{% url 'admin:index' %}" class="text-gray-400 hover:text-white block px-3 py-3 rounded-md font-medium text-base border-b border-gray-700">Admin</a>
                     {% endif %}
                     <a href="{% url 'narrativa:narrativas' %}" class="text-teal-400 font-bold block px-3 py-3 rounded-md text-base border-b border-gray-700">Meu Painel</a>
