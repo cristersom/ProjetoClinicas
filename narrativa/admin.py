@@ -99,7 +99,7 @@ class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
 class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'narrativa', 'botao_excluir')
     list_filter = ('narrativa',)
-    search_fields = ('titulo', 'narrativa__titulo') # PESQUISA ATIVADA
+    search_fields = ('titulo', 'narrativa__titulo')
     inlines = [EscolhaInline]
 
     def get_queryset(self, request):
@@ -124,7 +124,7 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
-    search_fields = ('titulo',) # PESQUISA JÁ ESTAVA ATIVADA
+    search_fields = ('titulo',)
 
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
@@ -237,8 +237,8 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
 @admin.register(Questionario)
 class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
-    list_display = ('titulo', 'cena_associada', 'links_relatorios')
-    search_fields = ('titulo', 'cena_associada__titulo', 'cena_destino__titulo') # PESQUISA ATIVADA
+    list_display = ('titulo', 'cena_associada', 'links_relatorios', 'botao_excluir')
+    search_fields = ('titulo', 'cena_associada__titulo', 'cena_destino__titulo')
     inlines = [PerguntaInline]
 
     def get_queryset(self, request):
@@ -271,6 +271,11 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             url_detalhe, url_resumo
         )
     links_relatorios.short_description = 'Relatórios'
+
+    def botao_excluir(self, obj):
+        url = reverse('admin:narrativa_questionario_delete', args=[obj.pk])
+        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+    botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
@@ -378,7 +383,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
     resource_class = RespostaResource
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
-    search_fields = ('session_key', 'texto_resposta') # PESQUISA ATIVADA
+    search_fields = ('session_key', 'texto_resposta')
 
     def has_export_permission(self, request): return True
 
@@ -393,7 +398,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
 @admin.register(SessaoPaciente)
 class SessaoPacienteAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     list_display = ('session_key', 'narrativa_perfil', 'data_criacao')
-    search_fields = ('session_key', 'narrativa_perfil__titulo') # PESQUISA ATIVADA
+    search_fields = ('session_key', 'narrativa_perfil__titulo')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
