@@ -142,7 +142,7 @@
                         <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</p>
                     </div>
                 </div>
-                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar Agora</a>
+                <a href="{% url 'narrativa:planos' %}" class="btn-alert-action">Reativar Agora</a>
             </div>
 
         {% else %}
@@ -157,7 +157,7 @@
                                     <p class="alert-text">Precisa de criar mais conteúdos? Faça upgrade do seu plano agora.</p>
                                 </div>
                             </div>
-                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Fazer Upgrade</a>
+                            <a href="{% url 'narrativa:planos' %}" class="btn-alert-action">Fazer Upgrade</a>
                         </div>
                     {% endif %}
                 {% endif %}
