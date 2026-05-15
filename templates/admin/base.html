@@ -3,8 +3,13 @@
 
 {% block content %}
 <style>
+    /* Força o Fundo Escuro e Mata o "Administração" que voltou */
+    body, html, .content-wrapper, .main-footer { background-color: #111827 !important; }
+    .brand-link .brand-text { display: none !important; visibility: hidden !important; }
+    .content-header { display: none !important; } /* Esconde o cabeçalho duplicado do Jazzmin */
+
     /* Reset básico para o Dashboard */
-    .dashboard-container { padding: 0 20px 20px 20px; color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .dashboard-container { padding: 20px; color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     .dash-header { margin-bottom: 30px; }
     .dash-header h1 { font-size: 1.8rem; font-weight: 800; color: white; margin: 0; }
     .dash-header p { color: #9ca3af; margin-top: 5px; font-size: 1rem; }
@@ -142,7 +147,7 @@
 
             <div class="side-card" style="background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%); border: none;">
                 <h3 style="border: none; margin-bottom: 5px; color: white;"><i class="fas fa-globe"></i> Portal do Paciente</h3>
-                <p style="font-size: 0.85rem; color: #ccfbf1; margin-bottom: 15px; line-height: 1.4;">Copie o link público do seu catálogo para enviar diretamente aos seus pacientes via WhatsApp.</p>
+                <p style="font-size: 0.85rem; color: #ccfbf1; margin-bottom: 15px; line-height: 1.4;">Copie o link público do seu catálogo para enviar aos pacientes.</p>
                 <button onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:portal_paciente' request.user.clinica.id %}'); alert('Link copiado com sucesso!');" style="background: white; color: #0f766e; border: none; padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; transition: 0.2s;">
                     <i class="fas fa-copy" style="margin-right: 5px;"></i> Copiar Link do Portal
                 </button>
@@ -165,19 +170,12 @@
                         data: {{ chart_dias_data|safe|default:"[]" }},
                         borderColor: '#14b8a6',
                         backgroundColor: 'rgba(20, 184, 166, 0.15)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#14b8a6',
-                        pointBorderColor: '#ffffff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4
+                        borderWidth: 3, fill: true, tension: 0.4,
+                        pointBackgroundColor: '#14b8a6', pointBorderColor: '#ffffff', pointBorderWidth: 2, pointRadius: 4
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
                     scales: {
                         y: { beginAtZero: true, grid: { color: '#374151', borderDash: [5, 5] }, ticks: { color: '#9ca3af', stepSize: 1, padding: 10 } },
                         x: { grid: { display: false }, ticks: { color: '#9ca3af', padding: 10 } }
