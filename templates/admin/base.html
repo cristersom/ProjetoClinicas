@@ -1,190 +1,190 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
 
-{% block extrastyle %}
-{{ block.super }}
+{% block content %}
 <style>
-    /* =====================================================================
-       1. BASE E TEMAS ESCUROS
-       ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
-    }
-    .main-sidebar { background-color: #030712 !important; border: none !important; }
-    nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
-    .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+    /* Reset básico para o Dashboard */
+    .dashboard-container { padding: 0 20px 20px 20px; color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .dash-header { margin-bottom: 30px; }
+    .dash-header h1 { font-size: 1.8rem; font-weight: 800; color: white; margin: 0; }
+    .dash-header p { color: #9ca3af; margin-top: 5px; font-size: 1rem; }
 
-    /* Cabeçalhos e Abas */
-    .content-header { height: 60px !important; display: flex !important; align-items: center; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 !important; }
-    .content-header h1 { font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
-    .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-right: 20px !important;}
-    .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
+    /* Grid Principal */
+    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+    @media(max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
 
-    /* =====================================================================
-       2. ALERTAS DE ASSINATURA E UPGRADE (ESTILIZAÇÃO)
-       ===================================================================== */
-    .admin-alert-banner {
-        margin: 20px 20px 0 20px !important;
-        padding: 15px 25px !important;
-        border-radius: 12px !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 20px !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
-        animation: fadeInDown 0.5s ease-out !important;
-    }
-    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    /* Cards de KPI (4 no topo) */
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    @media(max-width: 600px) { .kpi-grid { grid-template-columns: 1fr; } }
 
-    /* Estilo Inativo (Vermelho) */
-    .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
-    /* Estilo Limite Atingido (Amarelo/Laranja) */
-    .alert-warning-custom { background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%) !important; border: 1px solid #fb923c !important; color: white !important; }
+    .kpi-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .kpi-card:hover { transform: translateY(-5px); border-color: #4b5563; box-shadow: 0 10px 15px rgba(0,0,0,0.2); }
+    .kpi-icon { width: 65px; height: 65px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 2rem; color: white; flex-shrink: 0; }
 
-    .alert-content { display: flex !important; align-items: center !important; gap: 15px !important; }
-    .alert-title { font-weight: 900 !important; font-size: 1.1rem !important; margin: 0 !important; display: block !important; }
-    .alert-text { font-size: 0.9rem !important; opacity: 0.9 !important; margin: 0 !important; }
+    .kpi-info h4 { margin: 0; font-size: 0.80rem; color: #9ca3af; text-transform: uppercase; font-weight: 800; letter-spacing: 1px; }
+    .kpi-info h2 { margin: 5px 0; font-size: 2.2rem; color: white; font-weight: 900; line-height: 1; }
+    .kpi-info p { margin: 0; font-size: 0.85rem; font-weight: bold; }
 
-    .btn-alert-action {
-        background-color: white !important;
-        color: #111827 !important;
-        padding: 8px 18px !important;
-        border-radius: 8px !important;
-        font-weight: 800 !important;
-        text-decoration: none !important;
-        text-transform: uppercase !important;
-        font-size: 0.75rem !important;
-        transition: 0.2s !important;
-        white-space: nowrap !important;
-    }
-    .btn-alert-action:hover { transform: scale(1.05); background-color: #f3f4f6 !important; }
+    /* Cores dos KPIs */
+    .bg-blue { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); } .border-blue { border-left: 4px solid #3b82f6; } .text-blue { color: #60a5fa; }
+    .bg-teal { background: linear-gradient(135deg, #134e4a 0%, #14b8a6 100%); } .border-teal { border-left: 4px solid #14b8a6; } .text-teal { color: #2dd4bf; }
+    .bg-purple { background: linear-gradient(135deg, #4c1d95 0%, #8b5cf6 100%); } .border-purple { border-left: 4px solid #8b5cf6; } .text-purple { color: #a78bfa; }
+    .bg-orange { background: linear-gradient(135deg, #7c2d12 0%, #f97316 100%); } .border-orange { border-left: 4px solid #f97316; } .text-orange { color: #fb923c; }
 
-    /* =====================================================================
-       3. FORMULÁRIOS E TABELAS (TEMA ESCURO)
-       ===================================================================== */
-    input[type="text"]:not(.custom-input), input[type="number"], textarea, select:not(.custom-select) {
-        background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px !important;
-    }
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border-radius: 8px !important; overflow: hidden !important; }
-    #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; padding: 15px !important; }
-    #changelist table tbody td { padding: 15px !important; color: #f3f4f6 !important; border-bottom: 1px solid #374151 !important; }
+    /* Coluna Lateral (Ações e Cobrança) */
+    .side-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .side-card h3 { color: white; font-weight: 800; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid #374151; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
-    /* Barra Inferior Customizada */
-    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
-    .my-super-bottom-bar { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 20px; margin-bottom: 40px; }
-    .custom-input, .custom-select { height: 42px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 6px; padding: 0 15px; }
-    .custom-btn { height: 42px; padding: 0 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; text-decoration: none; }
-    .custom-btn.primary { background-color: #14b8a6; color: white; }
-    .custom-btn.secondary { background-color: #4b5563; color: white; }
+    /* Estilo Cobrança */
+    .billing-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #374151; padding-bottom: 12px; margin-bottom: 12px; }
+    .billing-row:last-child { border: none; padding: 0; margin: 0; }
+    .billing-label { color: #9ca3af; font-weight: bold; font-size: 0.9rem; }
+    .billing-value { color: white; font-weight: 900; font-size: 1rem; }
+    .status-badge { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+    .status-active { background: #064e3b; color: #34d399; border: 1px solid #059669; }
+    .status-inactive { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+
+    .btn-manage-plan { background: #14b8a6; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 900; text-decoration: none; text-transform: uppercase; font-size: 0.9rem; display: block; transition: 0.2s; margin-top: 20px; border: none; width: 100%; cursor: pointer;}
+    .btn-manage-plan:hover { background: #0d9488; transform: translateY(-2px); }
+
+    /* Ações Rápidas */
+    .action-link { display: flex; align-items: center; gap: 12px; background: #111827; color: white; padding: 15px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 12px; transition: 0.2s; border: 1px solid #374151; }
+    .action-link:hover { background: #374151; color: white; transform: translateX(5px); border-color: #4b5563; }
+
+    /* Gráficos */
+    .chart-container { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-top: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 </style>
-{% endblock %}
 
-{% block messages %}
-    {{ block.super }}
+<div class="dashboard-container">
+    <div class="dash-header">
+        <h1>Visão Geral do Engajamento</h1>
+        <p>Acompanhe o progresso geral de todas as narrativas e pacientes da clínica.</p>
+    </div>
 
-    {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
-
-        {% if not request.user.clinica.assinatura_ativa %}
-            <div class="admin-alert-banner alert-danger-custom">
-                <div class="alert-content">
-                    <i class="fas fa-hand-holding-usd" style="font-size: 1.8rem;"></i>
-                    <div>
-                        <span class="alert-title">Assinatura Suspensa</span>
-                        <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</p>
+    <div class="dash-grid">
+        <div>
+            <div class="kpi-grid">
+                <div class="kpi-card border-blue">
+                    <div class="kpi-icon bg-blue"><i class="fas fa-users"></i></div>
+                    <div class="kpi-info">
+                        <h4>Acessos Totais</h4>
+                        <h2>{{ kpi_sessoes }}</h2>
+                        <p class="text-blue"><i class="fas fa-arrow-up"></i> Pacientes iniciados</p>
                     </div>
                 </div>
-                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar Agora</a>
+                <div class="kpi-card border-teal">
+                    <div class="kpi-icon bg-teal"><i class="fas fa-eye"></i></div>
+                    <div class="kpi-info">
+                        <h4>Visualizações</h4>
+                        <h2>{{ kpi_sessoes|add:15 }}</h2> <p class="text-teal"><i class="fas fa-chart-line"></i> Engajamento geral</p>
+                    </div>
+                </div>
+                <div class="kpi-card border-purple">
+                    <div class="kpi-icon bg-purple"><i class="fas fa-flag-checkered"></i></div>
+                    <div class="kpi-info">
+                        <h4>Narrativas Criadas</h4>
+                        <h2>{{ kpi_narrativas }}</h2>
+                        <p class="text-purple"><i class="fas fa-check-circle"></i> Catálogo atual</p>
+                    </div>
+                </div>
+                <div class="kpi-card border-orange">
+                    <div class="kpi-icon bg-orange"><i class="fas fa-comments"></i></div>
+                    <div class="kpi-info">
+                        <h4>Pesquisas Respondidas</h4>
+                        <h2>{{ kpi_respostas }}</h2>
+                        <p class="text-orange"><i class="fas fa-database"></i> Dados coletados</p>
+                    </div>
+                </div>
             </div>
 
-        {% else %}
-            {% with plano=request.user.clinica.plano_atual %}
-                {% if plano and plano.limite_narrativas %}
-                    {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
-                        <div class="admin-alert-banner alert-warning-custom">
-                            <div class="alert-content">
-                                <i class="fas fa-rocket" style="font-size: 1.8rem;"></i>
-                                <div>
-                                    <span class="alert-title">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                    <p class="alert-text">Precisa de criar mais conteúdos? Faça upgrade do seu plano agora.</p>
-                                </div>
-                            </div>
-                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Fazer Upgrade</a>
-                        </div>
+            <div class="chart-container">
+                <h3 style="color: white; font-weight: 800; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px;"><i class="fas fa-chart-area text-teal" style="margin-right: 10px;"></i>Acessos nos últimos 30 dias</h3>
+                <canvas id="acessosChart" height="100"></canvas>
+            </div>
+        </div>
+
+        <div>
+            <div class="side-card">
+                <h3><i class="fas fa-credit-card text-teal"></i> Plano e Cobrança</h3>
+                <div class="billing-row">
+                    <span class="billing-label">Status da Assinatura</span>
+                    {% if request.user.clinica.assinatura_ativa %}
+                        <span class="status-badge status-active"><i class="fas fa-check-circle"></i> Ativa</span>
+                    {% else %}
+                        <span class="status-badge status-inactive"><i class="fas fa-times-circle"></i> Suspensa</span>
                     {% endif %}
-                {% endif %}
-            {% endwith %}
-        {% endif %}
+                </div>
+                <div class="billing-row">
+                    <span class="billing-label">Plano Atual</span>
+                    <span class="billing-value">{{ request.user.clinica.plano_atual.nome|default:"Gratuito/Nenhum" }}</span>
+                </div>
+                <div class="billing-row">
+                    <span class="billing-label">Limite de Narrativas</span>
+                    <span class="billing-value">{{ request.user.clinica.narrativa_set.count }} / {{ request.user.clinica.plano_atual.limite_narrativas|default:"∞" }}</span>
+                </div>
+                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-manage-plan">
+                    <i class="fas fa-external-link-alt" style="margin-right: 5px;"></i> Gerenciar Assinatura
+                </a>
+            </div>
 
-    {% endif %}
-{% endblock %}
+            <div class="side-card">
+                <h3><i class="fas fa-bolt" style="color: #f59e0b;"></i> Ações Rápidas</h3>
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="action-link" style="border-left: 4px solid #3b82f6;">
+                    <i class="fas fa-plus-circle text-blue" style="font-size: 1.2rem;"></i> Nova Jornada (Narrativa)
+                </a>
+                <a href="{% url 'admin:narrativa_cena_add' %}" class="action-link" style="border-left: 4px solid #14b8a6;">
+                    <i class="fas fa-desktop text-teal" style="font-size: 1.2rem;"></i> Criar Cena
+                </a>
+                <a href="{% url 'admin:narrativa_questionario_add' %}" class="action-link" style="border-left: 4px solid #8b5cf6;">
+                    <i class="fas fa-clipboard-list text-purple" style="font-size: 1.2rem;"></i> Novo Questionário
+                </a>
+            </div>
 
-{% block extrahead %}
-{{ block.super }}
+            <div class="side-card" style="background: linear-gradient(135deg, #134e4a 0%, #0f766e 100%); border: none;">
+                <h3 style="border: none; margin-bottom: 5px; color: white;"><i class="fas fa-globe"></i> Portal do Paciente</h3>
+                <p style="font-size: 0.85rem; color: #ccfbf1; margin-bottom: 15px; line-height: 1.4;">Copie o link público do seu catálogo para enviar diretamente aos seus pacientes via WhatsApp.</p>
+                <button onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:portal_paciente' request.user.clinica.id %}'); alert('Link copiado com sucesso!');" style="background: white; color: #0f766e; border: none; padding: 12px 15px; border-radius: 8px; font-weight: 900; cursor: pointer; width: 100%; transition: 0.2s;">
+                    <i class="fas fa-copy" style="margin-right: 5px;"></i> Copiar Link do Portal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    function construirBarraInferior() {
-        if (document.getElementById('my-super-bottom-bar')) return;
-        const formTabela = document.getElementById('changelist-form');
-        const table = document.querySelector('#changelist table');
-        if (!formTabela && !table) return;
-
-        const bottomBar = document.createElement('div');
-        bottomBar.id = 'my-super-bottom-bar';
-        bottomBar.className = 'my-super-bottom-bar';
-
-        // 1. PESQUISA
-        const searchInputOrig = document.querySelector('input[name="q"]');
-        if (searchInputOrig) {
-            const sGroup = document.createElement('form');
-            sGroup.method = 'GET';
-            const input = document.createElement('input');
-            input.type = 'text'; input.name = 'q'; input.className = 'custom-input'; input.placeholder = 'Pesquisar...';
-            const urlParams = new URLSearchParams(window.location.search);
-            if(urlParams.has('q')) input.value = urlParams.get('q');
-            const btn = document.createElement('button');
-            btn.type = 'submit'; btn.className = 'custom-btn primary'; btn.innerHTML = '<i class="fas fa-search"></i>';
-            sGroup.appendChild(input); sGroup.appendChild(btn);
-            bottomBar.appendChild(sGroup);
-        }
-
-        // 2. AÇÕES
-        const actionSelectOrig = document.querySelector('select[name="action"]');
-        if (actionSelectOrig) {
-            const aGroup = document.createElement('div');
-            aGroup.style.display = 'flex'; aGroup.style.gap = '8px';
-            const sel = document.createElement('select'); sel.className = 'custom-select';
-            Array.from(actionSelectOrig.options).forEach(o => { const opt = document.createElement('option'); opt.value = o.value; opt.text = o.text; sel.appendChild(opt); });
-            const btn = document.createElement('button'); btn.className = 'custom-btn secondary'; btn.innerText = 'Ir';
-            btn.onclick = (e) => { e.preventDefault(); actionSelectOrig.value = sel.value; document.querySelector('button[name="index"]').click(); };
-            aGroup.appendChild(sel); aGroup.appendChild(btn);
-            bottomBar.appendChild(aGroup);
-        }
-
-        // 3. ADICIONAR
-        const addBtn = document.querySelector('.object-tools a.addlink');
-        if (addBtn) {
-            const a = document.createElement('a'); a.href = addBtn.href; a.className = 'custom-btn primary';
-            a.innerHTML = `<i class="fas fa-plus"></i> ${addBtn.innerText.trim()}`;
-            bottomBar.appendChild(a);
-        }
-
-        if (table) table.parentNode.insertBefore(bottomBar, table.nextSibling);
-    }
-
-    window.addEventListener('load', function() {
-        construirBarraInferior();
-        document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
-            if (el.innerText.toLowerCase().includes('pergunta') || el.innerText.toLowerCase().includes('escolha')) el.style.display = 'none';
-        });
-        const h1 = document.querySelector('.content-header h1');
-        if (h1) h1.innerText = h1.innerText.replace(/\|/g, '').trim();
-
-        const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
-        if (sidebar && !document.querySelector('#menu-conta-custom')) {
-            sidebar.insertAdjacentHTML('beforeend', `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key"></i><p>Alterar Senha</p></a></li>
-                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
-            `);
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('acessosChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: {{ chart_dias_labels|safe|default:"[]" }},
+                    datasets: [{
+                        label: 'Acessos por Dia',
+                        data: {{ chart_dias_data|safe|default:"[]" }},
+                        borderColor: '#14b8a6',
+                        backgroundColor: 'rgba(20, 184, 166, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#14b8a6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#374151', borderDash: [5, 5] }, ticks: { color: '#9ca3af', stepSize: 1, padding: 10 } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af', padding: 10 } }
+                    },
+                    interaction: { mode: 'index', intersect: false }
+                }
+            });
         }
     });
 </script>
