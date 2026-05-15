@@ -206,7 +206,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. RESPONSIVIDADE DO CABEÇALHO E MELHORIA DE INPUTS NO MOBILE
+       2. RESPONSIVIDADE DO CABEÇALHO
        ===================================================================== */
     @media (min-width: 769px) {
         nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
@@ -232,15 +232,15 @@
         .alert-content { flex-direction: column !important; gap: 10px !important; }
         .btn-alert-action { width: 100% !important; margin-top: 10px !important; }
 
-        /* Aproveitando melhor a tela para os inputs no telemóvel */
-        #content-main > form > div > fieldset.module { padding: 15px 10px !important; }
-        .inline-related, .djn-item { padding: 45px 10px 15px 10px !important; }
-        .djn-group-nested { padding-left: 10px !important; border-left-width: 2px !important; }
-        .submit-row { margin-top: 30px !important; }
+        /* APROVEITANDO O ESPAÇO NO CELULAR (Mata as margens grandes) */
+        #content-main { padding: 10px !important; }
+        #content-main > form > div > fieldset.module { padding: 15px 10px !important; margin: 0 0 20px 0 !important; }
+        .inline-related, .djn-item { padding: 45px 10px 15px 10px !important; margin-left: 0 !important; margin-right: 0 !important; }
+        .djn-group-nested { padding-left: 0 !important; border-left: none !important; margin-left: 0 !important; }
     }
 
     /* =====================================================================
-       3. ALERTAS DE ASSINATURA E UPGRADE
+       3. ALERTAS DE ASSINATURA E CABEÇALHOS
        ===================================================================== */
     .admin-alert-banner { margin: 20px 20px 20px 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
@@ -251,25 +251,26 @@
     .btn-alert-action { background-color: white !important; color: #111827 !important; padding: 8px 18px !important; border-radius: 8px !important; font-weight: 800 !important; text-decoration: none !important; text-transform: uppercase !important; font-size: 0.75rem !important; transition: 0.2s !important; white-space: nowrap !important; }
     .btn-alert-action:hover { transform: scale(1.05); background-color: #f3f4f6 !important; }
 
-    /* =====================================================================
-       4. CABEÇALHO INTERNO E ABAS
-       ===================================================================== */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
+
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       5. FORMULÁRIOS DE EDIÇÃO E REPOSICIONAMENTO DE BOTÕES
+       4. FIM DO "NEGÓCIO MARROM" E CABEÇALHOS DO DJANGO
        ===================================================================== */
-    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
+    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original {
+        display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important;
+    }
+
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
 
     #content-main > form > div > fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
 
-    /* Espaço extra no topo da caixa (50px) para o botão REMOVER não cobrir o input */
-    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 50px 20px 20px 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
+    /* Espaço de 45px no topo para alojar o botão REMOVER */
+    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 45px 20px 20px 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
 
     body .form-row, body .form-group { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
@@ -278,10 +279,11 @@
     .djn-items, .djn-item, .djn-group, .inline-group, .inline-related, .djn-fieldset { overflow-x: hidden !important; max-width: 100% !important; box-sizing: border-box !important; }
     .djn-items::-webkit-scrollbar, .djn-item::-webkit-scrollbar, .djn-group::-webkit-scrollbar { display: none !important; }
 
-    input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
+    /* Inputs sempre usando largura total */
+    input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 12px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
-    input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
+    input[type="checkbox"] { accent-color: #14b8a6 !important; width: 22px !important; height: 22px !important; cursor: pointer; }
 
     .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 45px !important; display: flex !important; align-items: center !important; }
     .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
@@ -293,20 +295,27 @@
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
 
-    /* Reposicionando o REMOVER para o topo do bloco e não em cima do input */
+    /* =====================================================================
+       5. BOTÕES DE EXCLUIR E ADICIONAR (SEM SOBREPOSIÇÕES!)
+       ===================================================================== */
     span.delete input, div.delete input { display: none !important; }
+
+    /* Botão remover absoluto no topo, graças ao padding-top do form */
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 10px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
     span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
-    /* Transformando os botões "Adicionar outro(a)" em blocos completos para não flutuarem em cima do "Salvar" */
-    .add-row, .djn-add-item { margin-top: 15px !important; margin-bottom: 30px !important; padding: 0 !important; display: block !important; position: relative !important; clear: both !important;}
-    .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 12px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: block !important; width: 100% !important; text-align: center !important; transition: 0.2s; white-space: nowrap !important; box-sizing: border-box !important; }
+    /* Botões "Adicionar Outro": forçados a não flutuar e ocupar 100% */
+    .add-row, .djn-add-item { display: block !important; width: 100% !important; position: static !important; clear: both !important; margin: 25px 0 !important; padding: 0 !important; }
+    .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; margin: 0 !important; background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 12px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.95rem !important; text-decoration: none !important; transition: 0.2s; white-space: nowrap !important; }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
-    #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; position: relative !important; z-index: 10 !important;}
-    #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
+    /* Botões Finais de Salvar (agrupados e limpos) */
+    .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; box-shadow: none !important; margin-top: 30px !important; clear: both !important; }
+    #change_form .col-md-3 .card { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; position: relative !important; z-index: 10 !important;}
+    #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin: 0 !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; padding: 12px !important; font-size: 1rem !important; }
+
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
