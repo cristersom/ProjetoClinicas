@@ -1,104 +1,82 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}Narrativas Clínicas{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-    {% block head %}{% endblock %}
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <title>Narrativas Clínicas</title>
 
-    {% block navbar %}
-    {% if 'jornada' not in request.path and 'cena' not in request.path and 'portal' not in request.path and 'perfil' not in request.path %}
-    <nav class="fixed w-full z-40 bg-gray-900/95 backdrop-blur-md border-b border-gray-800">
+    <meta name="description" content="Narrativas clínicas e pesquisas de satisfação, tudo em um só lugar. Evolua o acompanhamento dos seus pacientes.">
+    <meta property="og:title" content="Narrativas Clínicas">
+    <meta property="og:description" content="Evolua o acompanhamento dos seus pacientes com as nossas jornadas e pesquisas de satisfação. Crie onde quiser, aplique quando quiser.">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-image.jpg' %}">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+
+    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    {% block extrahead %}{% endblock %}
+</head>
+<body class="bg-gray-900 text-white font-sans antialiased flex flex-col min-h-screen">
+
+    <header class="bg-gray-900 border-b border-gray-800 relative z-50 fixed w-full top-0">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex-shrink-0">
-                    <a href="{% url 'narrativa:home' %}" class="flex items-center gap-2">
-                        <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
-                            <ion-icon name="medkit" class="text-2xl"></ion-icon>
+            <div class="flex justify-between items-center h-16 md:h-20">
+
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{% url 'narrativa:home' %}">
+                        <div class="text-white font-bold text-xl flex items-center gap-2">
+                            <i class="fas fa-medkit text-teal-500"></i> Narrativas<span class="text-teal-400">Clínicas</span>
                         </div>
-                        <span class="text-2xl font-extrabold tracking-tight text-white">
-                            Narrativas<span class="text-teal-500">Clínicas</span>
-                        </span>
                     </a>
                 </div>
 
-                <div class="flex items-center space-x-6">
+                <nav class="hidden md:flex space-x-6 lg:space-x-8 items-center">
+                    <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-white font-medium uppercase text-sm tracking-wide">Planos</a>
+
                     {% if request.user.is_authenticated %}
-
-                        <!-- 1. Admin -->
-                        {% if request.user.is_staff or request.user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="text-indigo-400 hover:text-indigo-300 font-bold transition text-sm uppercase tracking-wide flex items-center gap-1">
-                            <ion-icon name="settings-outline" class="text-lg"></ion-icon> Admin
-                        </a>
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'admin:index' %}" class="text-gray-400 hover:text-white font-medium uppercase text-sm"><i class="fas fa-cog mr-1"></i> Admin</a>
                         {% endif %}
-
-                        <!-- 2. Meu Painel -->
-                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide">Meu Painel</a>
-
-                        <!-- 3. Planos -->
-                        <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-teal-400 font-medium transition text-sm uppercase tracking-wide hidden sm:block">Planos</a>
-
-                        <!-- 4. Sair -->
-                        <a href="{% url 'narrativa:logout' %}" class="text-gray-400 hover:text-red-400 font-medium transition text-sm uppercase tracking-wide">Sair</a>
-
+                        <a href="{% url 'narrativa:narrativas' %}" class="text-gray-300 hover:text-white font-medium uppercase text-sm">Meu Painel</a>
+                        <a href="{% url 'narrativa:logout' %}" class="text-red-400 hover:text-red-300 font-medium uppercase text-sm">Sair</a>
                     {% else %}
-                        <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium transition">Entrar</a>
-                        <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-400 text-gray-900 px-6 py-2.5 rounded-full font-bold transition shadow-lg hover:shadow-teal-500/30">Criar Conta</a>
+                        <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white font-medium uppercase text-sm">Entrar</a>
+                        <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 hover:bg-teal-600 text-white px-5 py-2 rounded-full font-bold transition shadow-lg text-sm">Criar Conta</a>
                     {% endif %}
+                </nav>
+
+                <div class="md:hidden flex items-center">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="text-gray-300 hover:text-white focus:outline-none p-2">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
-    </nav>
-    {% endif %}
-    {% endblock %}
+
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700 absolute w-full shadow-2xl">
+            <div class="px-4 pt-2 pb-4 space-y-2 flex flex-col">
+                <a href="{% url 'narrativa:planos' %}" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md font-medium text-base border-b border-gray-700">Planos</a>
+
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" class="text-gray-400 hover:text-white block px-3 py-3 rounded-md font-medium text-base border-b border-gray-700">Admin</a>
+                    {% endif %}
+                    <a href="{% url 'narrativa:narrativas' %}" class="text-teal-400 font-bold block px-3 py-3 rounded-md text-base border-b border-gray-700">Meu Painel</a>
+                    <a href="{% url 'narrativa:logout' %}" class="text-red-400 block px-3 py-3 rounded-md font-medium text-base">Sair</a>
+                {% else %}
+                    <a href="{% url 'narrativa:login' %}" class="text-gray-300 hover:text-white block px-3 py-3 rounded-md font-medium text-base border-b border-gray-700">Entrar</a>
+                    <a href="{% url 'narrativa:criarconta' %}" class="bg-teal-500 text-white block px-3 py-3 rounded-md font-bold mt-4 text-center text-lg shadow-md">Criar Conta</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
 
     <div class="flex-grow">
         {% block content %}{% endblock %}
     </div>
 
-    <!-- Rodapé Padrão do Sistema -->
-    <footer class="bg-gray-900 border-t border-gray-800 py-8 mt-auto">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-gray-500 text-sm">© {% now "Y" %} Narrativas Clínicas. Todos os direitos reservados.</p>
-            <div class="flex gap-6">
-                <a href="{% url 'narrativa:termos' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Termos de Uso</a>
-                <a href="{% url 'narrativa:politica' %}" class="text-sm text-gray-400 hover:text-teal-400 transition">Política de Privacidade</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Aviso de Cookies (LGPD) -->
-    <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-teal-600 p-4 md:p-6 shadow-2xl z-50 hidden flex-col md:flex-row items-center justify-between gap-4">
-        <div class="text-gray-300 text-sm md:text-base">
-            Utilizamos cookies para melhorar sua experiência em nossa plataforma. Ao continuar navegando, você concorda com nossa
-            <a href="{% url 'narrativa:politica' %}" class="text-teal-400 underline hover:text-teal-300">Política de Privacidade</a>.
-        </div>
-        <button id="aceitar-cookies" class="whitespace-nowrap bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 px-6 rounded-lg transition">
-            Entendi e Aceito
-        </button>
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const banner = document.getElementById('cookie-banner');
-            const btnAceitar = document.getElementById('aceitar-cookies');
-
-            if (!localStorage.getItem('cookiesAceitos')) {
-                banner.classList.remove('hidden');
-                banner.classList.add('flex');
-            }
-
-            btnAceitar.addEventListener('click', function() {
-                localStorage.setItem('cookiesAceitos', 'true');
-                banner.classList.add('hidden');
-                banner.classList.remove('flex');
-            });
-        });
-    </script>
 </body>
 </html>

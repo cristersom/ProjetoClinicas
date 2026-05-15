@@ -34,7 +34,11 @@
                     </ul>
 
                     <a href="{% url 'narrativa:checkout' plano.id %}" class="mt-auto w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-lg transition duration-200 shadow-md">
-                        Renovar {{ plano.nome }}
+                        {% if request.user.is_authenticated and plano_atual and plano_atual.id == plano.id %}
+                            Seu Plano Atual
+                        {% else %}
+                            Assinar {{ plano.nome }}
+                        {% endif %}
                     </a>
                 </div>
             {% endfor %}
