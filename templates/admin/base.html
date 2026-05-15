@@ -24,7 +24,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO E FIM DO SCROLL HORIZONTAL
+       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MODO ESCURO ABSOLUTO)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
@@ -42,7 +42,6 @@
         max-width: 100% !important;
         box-sizing: border-box !important;
     }
-    /* Oculta visualmente a barra caso o navegador insista */
     .djn-items::-webkit-scrollbar, .djn-item::-webkit-scrollbar, .djn-group::-webkit-scrollbar {
         display: none !important;
     }
@@ -99,13 +98,13 @@
     /* =====================================================================
        5. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
        ===================================================================== */
-    #toolbar, #changelist-search, #changelist-filter, .actions, .object-tools { display: none !important; }
+    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
 
     .my-super-bottom-bar {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Tudo alinhado à direita */
+        justify-content: flex-end !important;
         align-items: center !important;
         gap: 15px !important;
         background: transparent !important;
@@ -131,7 +130,7 @@
     .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
     .custom-btn {
-        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; border: none !important; text-decoration: none !important; margin: 0 !important;
+        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important; margin: 0 !important;
     }
 
     .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
@@ -159,7 +158,9 @@
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // 1. PESQUISA
+        // =========================================================
+        // 1. PESQUISA E FILTROS DO JAZZMIN
+        // =========================================================
         const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
         filterForms.forEach(formOrig => {
             const searchGroup = document.createElement('form');
@@ -200,8 +201,12 @@
             if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
         });
 
-        // 2. AÇÕES EM LOTE
+        // =========================================================
+        // 2. AÇÕES EM LOTE (COM CORREÇÃO DO BOTÃO "IR")
+        // =========================================================
         const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
+        const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
+
         if (actionSelectOrig && formTabela) {
             const actionGroup = document.createElement('div');
             actionGroup.className = 'my-group';
@@ -217,15 +222,16 @@
 
             btnIr.onclick = (e) => {
                 e.preventDefault();
-                let hiddenAction = formTabela.querySelector('input[name="action"]');
-                if (!hiddenAction) {
-                    hiddenAction = document.createElement('input');
-                    hiddenAction.type = 'hidden';
-                    hiddenAction.name = 'action';
-                    formTabela.appendChild(hiddenAction);
+
+                // Atualiza o select invisível do Django com o valor que o usuário escolheu
+                actionSelectOrig.value = selClone.value;
+
+                // Clica no botão invisível do Django para garantir que ele pega os checkboxes!
+                if (btnIrOrig) {
+                    btnIrOrig.click();
+                } else {
+                    formTabela.submit();
                 }
-                hiddenAction.value = selClone.value;
-                formTabela.submit();
             };
 
             actionGroup.appendChild(selClone);
@@ -236,7 +242,9 @@
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
 
+        // =========================================================
         // 3. BOTÕES DO TOPO (Adicionar, Importar)
+        // =========================================================
         const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
 
         if (topButtons.length > 0) {
