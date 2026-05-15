@@ -36,37 +36,50 @@
 
         <div class="mt-8 space-y-8">
 
-            {% for questionario in cena.questionarios.all %}
+            {% for quest in questionarios_status %}
                 <div class="bg-gray-800 p-6 rounded-xl text-center shadow-lg border border-gray-700 transform transition hover:-translate-y-1">
-                    <h3 class="text-lg font-bold mb-2 text-white">{{ questionario.titulo }}</h3>
-                    <p class="text-xs text-gray-400 mb-6 uppercase tracking-widest font-bold">Pesquisa Rápida</p>
-                    <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=questionario.id %}" class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-700 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
-                        <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon> Responder Agora
-                    </a>
+                    <h3 class="text-lg font-bold mb-2 text-white">{{ quest.titulo }}</h3>
+
+                    {% if quest.respondido %}
+                        <p class="text-xs text-teal-400 mb-6 uppercase tracking-widest font-bold">Concluído</p>
+                        <button disabled class="flex items-center justify-center w-full bg-teal-900/50 border border-teal-700 text-teal-300 text-base md:text-lg font-bold py-4 px-6 rounded-xl cursor-not-allowed">
+                            <ion-icon name="checkmark-circle" class="mr-2 text-2xl"></ion-icon> Respondido
+                        </button>
+                    {% else %}
+                        <p class="text-xs text-amber-400 mb-6 uppercase tracking-widest font-bold">Ação Necessária</p>
+                        <a href="{% url 'narrativa:responder_questionario' cena_id=cena.id questionario_id=quest.id %}" class="flex items-center justify-center w-full bg-amber-600 hover:bg-amber-500 text-white text-base md:text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
+                            <ion-icon name="document-text" class="mr-2 text-2xl"></ion-icon> Responder Agora
+                        </a>
+                    {% endif %}
                 </div>
             {% endfor %}
 
             {% if cena.escolhas.all %}
-                <div class="pt-4">
-                    {% if not cena.questionarios.all %}
+                <div class="pt-4 border-t border-gray-700/50 mt-8">
+
+                    {% if not pode_prosseguir %}
+                        <div class="mb-6 p-4 bg-amber-900/20 border border-amber-500/30 rounded-xl text-center">
+                            <p class="text-amber-400 font-semibold"><ion-icon name="warning-outline" class="align-middle text-xl"></ion-icon> Por favor, responda aos questionários pendentes para liberar a navegação.</p>
+                        </div>
+                    {% else %}
                         <h3 class="text-center text-gray-400 mb-6 uppercase tracking-widest text-sm font-bold">O que você faz agora?</h3>
                     {% endif %}
 
                     <div class="flex flex-col sm:flex-row flex-wrap gap-4 justify-center">
                         {% for escolha in cena.escolhas.all %}
-                            {% if escolha.cena_destino %}
+                            {% if escolha.cena_destino and pode_prosseguir %}
                                 <a href="{% url 'narrativa:exibir_cena_paciente' cena_id=escolha.cena_destino.id %}" class="flex-1 min-w-[200px] text-center bg-teal-600 hover:bg-teal-500 border border-teal-500 text-white text-lg font-bold py-4 px-6 rounded-xl transition shadow-lg">
                                     {{ escolha.texto_da_opcao }}
                                 </a>
                             {% else %}
-                                <button class="flex-1 min-w-[200px] text-center bg-gray-800 border border-gray-700 text-gray-400 text-lg font-medium py-4 px-6 rounded-xl shadow-md opacity-75 cursor-not-allowed">
-                                    {{ escolha.texto_da_opcao }} (Em construção)
+                                <button disabled class="flex-1 min-w-[200px] text-center bg-gray-800 border border-gray-700 text-gray-500 text-lg font-medium py-4 px-6 rounded-xl shadow-md cursor-not-allowed">
+                                    {{ escolha.texto_da_opcao }} {% if not pode_prosseguir %}(Bloqueado){% else %}(Em construção){% endif %}
                                 </button>
                             {% endif %}
                         {% endfor %}
                     </div>
                 </div>
-            {% elif not cena.questionarios.all %}
+            {% elif not questionarios_status %}
                 <div class="mt-8 p-6 bg-red-900/20 border border-red-500/50 rounded-xl text-center">
                     <p class="text-red-400 font-bold mb-1">Fim da Linha</p>
                     <p class="text-gray-400 text-sm">Esta cena não possui escolhas cadastradas para continuar a jornada.</p>

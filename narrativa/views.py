@@ -444,19 +444,41 @@ class PacienteDetalhesView(DetailView):
                                              defaults={'narrativa_perfil': narrativa})
         return response
 
+    def post(self, request, *args, **kwargs):
+        return redirect('narrativa:iniciar_jornada_paciente', narrativa_id=self.get_object().id)
+
 
 def exibir_cena_paciente(request, cena_id):
     cena = get_object_or_404(Cena, id=cena_id)
     if not request.session.session_key: request.session.create()
     LogVisitaCena.objects.create(session_key=request.session.session_key, cena_visitada=cena,
                                  narrativa_associada=cena.narrativa)
-    quest = cena.questionarios.first()
-    if quest:
-        respondido = Resposta.objects.filter(session_key=request.session.session_key,
-                                             pergunta__questionario=quest).exists()
+
+    questionarios_status = []
+    pendentes = 0
+
+    for quest in cena.questionarios.all():
+        respondido = Resposta.objects.filter(
+            session_key=request.session.session_key,
+            pergunta__questionario=quest
+        ).exists()
+
+        questionarios_status.append({
+            'id': quest.id,
+            'titulo': quest.titulo,
+            'respondido': respondido
+        })
+
         if not respondido:
-            return redirect('narrativa:responder_questionario', cena_id=cena.id, questionario_id=quest.id)
-    return render(request, 'cena_paciente.html', {'cena': cena})
+            pendentes += 1
+
+    context = {
+        'cena': cena,
+        'questionarios_status': questionarios_status,
+        'pode_prosseguir': (pendentes == 0)
+    }
+
+    return render(request, 'cena_paciente.html', context)
 
 
 @require_http_methods(["GET", "POST"])
