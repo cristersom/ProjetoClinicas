@@ -81,17 +81,17 @@ class TenantPermissionsMixin:
 class EscolhaInline(TenantPermissionsMixin, admin.StackedInline):
     model = Escolha
     fk_name = 'cena_origem'
-    extra = 1
+    extra = 0
 
 class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = OpcaoResposta
-    extra = 1
+    extra = 0
     fk_name = 'pergunta'
 
 class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = Pergunta
     fk_name = 'questionario'
-    extra = 1
+    extra = 0
     inlines = [OpcaoRespostaInline]
 
 
