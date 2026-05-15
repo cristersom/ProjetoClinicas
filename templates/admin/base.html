@@ -4,7 +4,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E FIM DO SCROLL
+       1. BASE E TEMAS ESCUROS
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
@@ -13,132 +13,109 @@
     nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
-    /* =====================================================================
-       2. CABEÇALHO E ABAS
-       ===================================================================== */
-    .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
-    .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
-
+    /* Cabeçalhos e Abas */
+    .content-header { height: 60px !important; display: flex !important; align-items: center; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 !important; }
+    .content-header h1 { font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
-    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
+    .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-right: 20px !important;}
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPEZA DOS FORMULÁRIOS DE EDIÇÃO (MODO ESCURO ABSOLUTO)
+       2. ALERTAS DE ASSINATURA E UPGRADE (ESTILIZAÇÃO)
        ===================================================================== */
-    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
-    .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
-
-    #content-main > form > div > fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
-    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
-
-    body .form-row, body .form-group { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
-    body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
-    body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important;}
-
-    /* MATA O SCROLL HORIZONTAL FEIO NOS NESTED ADMINS */
-    .djn-items, .djn-item, .djn-group, .inline-group, .inline-related, .djn-fieldset {
-        overflow-x: hidden !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-    .djn-items::-webkit-scrollbar, .djn-item::-webkit-scrollbar, .djn-group::-webkit-scrollbar {
-        display: none !important;
-    }
-
-    /* Inputs sempre escuros */
-    input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
-    input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
-    input[type="checkbox"] { accent-color: #14b8a6 !important; width: 18px !important; height: 18px !important; cursor: pointer; }
-
-    /* Select2 Escuro */
-    .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 45px !important; display: flex !important; align-items: center !important; }
-    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #ffffff !important; padding-left: 15px !important;}
-    .select2-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; }
-    .select2-results__option { background-color: #1f2937 !important; color: #ffffff !important; }
-    .select2-results__option[aria-selected="true"], .select2-results__option--highlighted { background-color: #14b8a6 !important; color: white !important; }
-
-    .djn-group-nested { background-color: transparent !important; border: none !important; border-left: 3px solid #14b8a6 !important; padding: 0 0 0 15px !important; margin-top: 10px !important; width: 100% !important; box-sizing: border-box !important; }
-    .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
-    .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
-
-    /* BOTÕES DE EXCLUIR DINÂMICOS E ESTÁTICOS */
-    span.delete input, div.delete input { display: none !important; }
-    span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
-    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
-    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.75rem !important; }
-    span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
-
-    .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s; white-space: nowrap !important; }
-    .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
-
-    #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; }
-    #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
-    input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
-    input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
-    input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
-
-    /* =====================================================================
-       4. TABELAS MODERNAS NAS LISTAGENS
-       ===================================================================== */
-    #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
-    #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
-    #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
-    #changelist table tbody tr:last-child td, #changelist table tbody tr:last-child th { border-bottom: none !important; }
-    #changelist table tbody tr:hover { background-color: #374151 !important; }
-    #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; text-decoration: none !important; }
-    #changelist table td a:hover { color: #60a5fa !important; text-decoration: underline !important; }
-    #changelist table td a[title="Relatório de Percurso"] { color: white !important; }
-
-    .paginator { background-color: transparent !important; border: none !important; padding: 15px 0 !important; color: #d1d5db !important; text-align: left !important;}
-    .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
-
-    /* =====================================================================
-       5. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
-       ===================================================================== */
-    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
-
-    .my-super-bottom-bar {
+    .admin-alert-banner {
+        margin: 20px 20px 0 20px !important;
+        padding: 15px 25px !important;
+        border-radius: 12px !important;
         display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        justify-content: flex-end !important;
+        justify-content: space-between !important;
         align-items: center !important;
-        gap: 15px !important;
-        background: transparent !important;
-        border: none !important;
-        padding: 0 !important;
-        margin-top: 15px !important;
-        margin-bottom: 30px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+        gap: 20px !important;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
+        animation: fadeInDown 0.5s ease-out !important;
     }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-    .my-group { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
+    /* Estilo Inativo (Vermelho) */
+    .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
+    /* Estilo Limite Atingido (Amarelo/Laranja) */
+    .alert-warning-custom { background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%) !important; border: 1px solid #fb923c !important; color: white !important; }
 
-    .custom-input { width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; }
-    .custom-input::placeholder { color: #9ca3af !important; }
-    .custom-input:focus { border-color: #14b8a6 !important; outline: none !important; }
+    .alert-content { display: flex !important; align-items: center !important; gap: 15px !important; }
+    .alert-title { font-weight: 900 !important; font-size: 1.1rem !important; margin: 0 !important; display: block !important; }
+    .alert-text { font-size: 0.9rem !important; opacity: 0.9 !important; margin: 0 !important; }
 
-    .custom-select {
-        min-width: 220px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 40px 0 15px !important; box-sizing: border-box !important; appearance: none !important; cursor: pointer !important;
-        background-image: url('data:image/svg+xml;utf8,<svg fill="%239ca3af" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>') !important;
-        background-repeat: no-repeat !important; background-position: right 10px center !important;
+    .btn-alert-action {
+        background-color: white !important;
+        color: #111827 !important;
+        padding: 8px 18px !important;
+        border-radius: 8px !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+        text-transform: uppercase !important;
+        font-size: 0.75rem !important;
+        transition: 0.2s !important;
+        white-space: nowrap !important;
     }
-    .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
+    .btn-alert-action:hover { transform: scale(1.05); background-color: #f3f4f6 !important; }
 
-    .custom-btn {
-        height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important; margin: 0 !important;
+    /* =====================================================================
+       3. FORMULÁRIOS E TABELAS (TEMA ESCURO)
+       ===================================================================== */
+    input[type="text"]:not(.custom-input), input[type="number"], textarea, select:not(.custom-select) {
+        background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px !important;
     }
+    #changelist table { width: 100% !important; background-color: #1f2937 !important; border-radius: 8px !important; overflow: hidden !important; }
+    #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; padding: 15px !important; }
+    #changelist table tbody td { padding: 15px !important; color: #f3f4f6 !important; border-bottom: 1px solid #374151 !important; }
 
-    .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
-    .custom-btn.primary:hover { background-color: #0d9488 !important; color: white !important; }
-
-    .custom-btn.secondary { background-color: #4b5563 !important; color: white !important; }
-    .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
+    /* Barra Inferior Customizada */
+    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
+    .my-super-bottom-bar { display: flex; justify-content: flex-end; align-items: center; gap: 15px; padding: 20px; margin-bottom: 40px; }
+    .custom-input, .custom-select { height: 42px; background-color: #374151; color: white; border: 1px solid #4b5563; border-radius: 6px; padding: 0 15px; }
+    .custom-btn { height: 42px; padding: 0 20px; border-radius: 6px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; border: none; text-decoration: none; }
+    .custom-btn.primary { background-color: #14b8a6; color: white; }
+    .custom-btn.secondary { background-color: #4b5563; color: white; }
 </style>
+{% endblock %}
+
+{% block messages %}
+    {{ block.super }}
+
+    {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
+
+        {% if not request.user.clinica.assinatura_ativa %}
+            <div class="admin-alert-banner alert-danger-custom">
+                <div class="alert-content">
+                    <i class="fas fa-hand-holding-usd" style="font-size: 1.8rem;"></i>
+                    <div>
+                        <span class="alert-title">Assinatura Suspensa</span>
+                        <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</p>
+                    </div>
+                </div>
+                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar Agora</a>
+            </div>
+
+        {% else %}
+            {% with plano=request.user.clinica.plano_atual %}
+                {% if plano and plano.limite_narrativas %}
+                    {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
+                        <div class="admin-alert-banner alert-warning-custom">
+                            <div class="alert-content">
+                                <i class="fas fa-rocket" style="font-size: 1.8rem;"></i>
+                                <div>
+                                    <span class="alert-title">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
+                                    <p class="alert-text">Precisa de criar mais conteúdos? Faça upgrade do seu plano agora.</p>
+                                </div>
+                            </div>
+                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Fazer Upgrade</a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
+    {% endif %}
 {% endblock %}
 
 {% block extrahead %}
@@ -146,194 +123,69 @@
 <script>
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
-
-        const mainContent = document.getElementById('content-main');
-        const changelist = document.getElementById('changelist');
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
-
-        if (!changelist && !formTabela && !table) return;
+        if (!formTabela && !table) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // =========================================================
-        // 1. PESQUISA E FILTROS DO JAZZMIN
-        // =========================================================
-        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
-        filterForms.forEach(formOrig => {
-            const searchGroup = document.createElement('form');
-            searchGroup.className = 'my-group';
-            searchGroup.action = formOrig.action;
-            searchGroup.method = formOrig.method || 'GET';
-
-            let hasVisibleFields = false;
-
-            formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
-                hasVisibleFields = true;
-                const clone = field.cloneNode(true);
-                clone.value = field.value;
-
-                if (clone.tagName === 'SELECT') {
-                    clone.className = 'custom-select';
-                    clone.removeAttribute('data-select2-id');
-                    clone.classList.remove('select2-hidden-accessible');
-                } else {
-                    clone.className = 'custom-input';
-                    if(!clone.placeholder) clone.placeholder = 'Pesquisar...';
-                }
-                searchGroup.appendChild(clone);
-            });
-
-            if (hasVisibleFields) {
-                const btnSearch = document.createElement('button');
-                btnSearch.type = 'submit';
-                btnSearch.className = 'custom-btn primary';
-                btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-                searchGroup.appendChild(btnSearch);
-
-                formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
-                bottomBar.appendChild(searchGroup);
-            }
-
-            formOrig.style.setProperty('display', 'none', 'important');
-            if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
-        });
-
-        // =========================================================
-        // 2. AÇÕES EM LOTE (COM CORREÇÃO DO BOTÃO "IR")
-        // =========================================================
-        const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
-        const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
-
-        if (actionSelectOrig && formTabela) {
-            const actionGroup = document.createElement('div');
-            actionGroup.className = 'my-group';
-
-            const selClone = actionSelectOrig.cloneNode(true);
-            selClone.className = 'custom-select';
-            selClone.removeAttribute('data-select2-id');
-            selClone.classList.remove('select2-hidden-accessible');
-
-            const btnIr = document.createElement('button');
-            btnIr.className = 'custom-btn secondary';
-            btnIr.innerText = 'Ir';
-
-            btnIr.onclick = (e) => {
-                e.preventDefault();
-
-                // Atualiza o select invisível do Django com o valor que o usuário escolheu
-                actionSelectOrig.value = selClone.value;
-
-                // Clica no botão invisível do Django para garantir que ele pega os checkboxes!
-                if (btnIrOrig) {
-                    btnIrOrig.click();
-                } else {
-                    formTabela.submit();
-                }
-            };
-
-            actionGroup.appendChild(selClone);
-            actionGroup.appendChild(btnIr);
-            bottomBar.appendChild(actionGroup);
-
-            const actionsContainer = actionSelectOrig.closest('.actions');
-            if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
+        // 1. PESQUISA
+        const searchInputOrig = document.querySelector('input[name="q"]');
+        if (searchInputOrig) {
+            const sGroup = document.createElement('form');
+            sGroup.method = 'GET';
+            const input = document.createElement('input');
+            input.type = 'text'; input.name = 'q'; input.className = 'custom-input'; input.placeholder = 'Pesquisar...';
+            const urlParams = new URLSearchParams(window.location.search);
+            if(urlParams.has('q')) input.value = urlParams.get('q');
+            const btn = document.createElement('button');
+            btn.type = 'submit'; btn.className = 'custom-btn primary'; btn.innerHTML = '<i class="fas fa-search"></i>';
+            sGroup.appendChild(input); sGroup.appendChild(btn);
+            bottomBar.appendChild(sGroup);
         }
 
-        // =========================================================
-        // 3. BOTÕES DO TOPO (Adicionar, Importar)
-        // =========================================================
-        const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
-
-        if (topButtons.length > 0) {
-            const toolsGroup = document.createElement('div');
-            toolsGroup.className = 'my-group';
-            const processedHrefs = new Set();
-
-            topButtons.forEach(btn => {
-                if(processedHrefs.has(btn.href) || btn.closest('#changelist table')) return;
-                processedHrefs.add(btn.href);
-
-                const btnClone = btn.cloneNode(true);
-                btnClone.className = 'custom-btn primary';
-
-                if (!btnClone.innerHTML.includes('fa-')) {
-                    if (btnClone.innerText.toLowerCase().includes('adicionar')) {
-                        btnClone.innerHTML = `<i class="fas fa-plus"></i> ${btnClone.innerText.trim()}`;
-                    } else if (btnClone.innerText.toLowerCase().includes('importar')) {
-                        btnClone.innerHTML = `<i class="fas fa-file-import"></i> ${btnClone.innerText.trim()}`;
-                    } else if (btnClone.innerText.toLowerCase().includes('exportar')) {
-                        btnClone.innerHTML = `<i class="fas fa-file-export"></i> ${btnClone.innerText.trim()}`;
-                    } else {
-                        btnClone.innerHTML = `<i class="fas fa-cog"></i> ${btnClone.innerText.trim()}`;
-                    }
-                }
-                toolsGroup.appendChild(btnClone);
-
-                btn.style.setProperty('display', 'none', 'important');
-                if (btn.parentElement && btn.parentElement.classList.contains('object-tools')) {
-                    btn.parentElement.style.setProperty('display', 'none', 'important');
-                }
-            });
-
-            if(toolsGroup.children.length > 0) bottomBar.appendChild(toolsGroup);
+        // 2. AÇÕES
+        const actionSelectOrig = document.querySelector('select[name="action"]');
+        if (actionSelectOrig) {
+            const aGroup = document.createElement('div');
+            aGroup.style.display = 'flex'; aGroup.style.gap = '8px';
+            const sel = document.createElement('select'); sel.className = 'custom-select';
+            Array.from(actionSelectOrig.options).forEach(o => { const opt = document.createElement('option'); opt.value = o.value; opt.text = o.text; sel.appendChild(opt); });
+            const btn = document.createElement('button'); btn.className = 'custom-btn secondary'; btn.innerText = 'Ir';
+            btn.onclick = (e) => { e.preventDefault(); actionSelectOrig.value = sel.value; document.querySelector('button[name="index"]').click(); };
+            aGroup.appendChild(sel); aGroup.appendChild(btn);
+            bottomBar.appendChild(aGroup);
         }
 
-        // INSERE A BARRA NO FUNDO DA PÁGINA
-        if (bottomBar.children.length > 0) {
-            const paginator = document.querySelector('.paginator');
-            if (paginator) {
-                paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling);
-            } else if (table) {
-                table.parentNode.insertBefore(bottomBar, table.nextSibling);
-            } else if (changelist) {
-                changelist.appendChild(bottomBar);
-            } else {
-                mainContent.appendChild(bottomBar);
-            }
+        // 3. ADICIONAR
+        const addBtn = document.querySelector('.object-tools a.addlink');
+        if (addBtn) {
+            const a = document.createElement('a'); a.href = addBtn.href; a.className = 'custom-btn primary';
+            a.innerHTML = `<i class="fas fa-plus"></i> ${addBtn.innerText.trim()}`;
+            bottomBar.appendChild(a);
         }
-    }
 
-    function aplicarLimpezaUX() {
-        document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
-            let t = el.innerText.toLowerCase();
-            if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
-                el.style.setProperty('display', 'none', 'important');
-            }
-        });
-        document.querySelectorAll('label').forEach(label => {
-            if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-        });
+        if (table) table.parentNode.insertBefore(bottomBar, table.nextSibling);
     }
 
     window.addEventListener('load', function() {
         construirBarraInferior();
-        aplicarLimpezaUX();
-
-        const observer = new MutationObserver(() => {
-            construirBarraInferior();
-            aplicarLimpezaUX();
+        document.querySelectorAll('h2, h3, legend, .inline_label').forEach(el => {
+            if (el.innerText.toLowerCase().includes('pergunta') || el.innerText.toLowerCase().includes('escolha')) el.style.display = 'none';
         });
-        observer.observe(document.body, { childList: true, subtree: true });
-
         const h1 = document.querySelector('.content-header h1');
-        if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
-        document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
+        if (h1) h1.innerText = h1.innerText.replace(/\|/g, '').trim();
 
         const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
                 <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
+                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key"></i><p>Alterar Senha</p></a></li>
                 <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
             `);
         }
     });
 </script>
-{% endblock %}
-
-{% block messages %}
-    {{ block.super }}
 {% endblock %}
