@@ -3,18 +3,14 @@
 
 {% block content %}
 <style>
-    /* GARANTIA DE TEMA ESCURO E REMOÇÃO DE CABEÇALHOS DUPLICADOS */
     body, html, .content-wrapper, .main-footer { background-color: #111827 !important; }
     .brand-link .brand-text, .content-header { display: none !important; }
 
-    /* Estilo do Dashboard */
     .dashboard-container { padding: 20px; color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
-
-    /* Grid Principal */
     .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
     @media(max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
 
-    /* Cards de KPI */
     .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
     .kpi-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
     .kpi-card:hover { transform: translateY(-5px); border-color: #4b5563; }
@@ -29,11 +25,9 @@
     .bg-purple { background: linear-gradient(135deg, #4c1d95, #8b5cf6); }
     .bg-orange { background: linear-gradient(135deg, #7c2d12, #f97316); }
 
-    /* Coluna Lateral */
     .side-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
     .side-card h3 { color: white; font-weight: 800; font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; padding-bottom: 10px; }
 
-    /* Billing / Cobrança */
     .billing-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #374151; padding-bottom: 10px; }
     .billing-label { color: #9ca3af; font-size: 0.9rem; font-weight: bold; }
     .billing-value { color: white; font-weight: 900; }
@@ -44,12 +38,22 @@
     .btn-action { background: #14b8a6; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 900; text-decoration: none; display: block; text-transform: uppercase; font-size: 0.85rem; border: none; width: 100%; cursor: pointer; transition: 0.2s; }
     .btn-action:hover { background: #0d9488; transform: scale(1.02); }
 
-    /* Ações Rápidas */
     .quick-link { display: flex; align-items: center; gap: 10px; background: #111827; color: white; padding: 12px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 10px; border: 1px solid #374151; transition: 0.2s; }
     .quick-link:hover { background: #374151; transform: translateX(5px); }
 
-    /* Esconde a lista padrão do Django que fica sobrando no fundo */
     .app-narrativa, .module { display: none !important; }
+
+    /* =====================================================================
+       AJUSTES DO DASHBOARD EXCLUSIVOS PARA CELULAR
+       ===================================================================== */
+    @media (max-width: 768px) {
+        .dashboard-container { padding: 10px; }
+        .dash-header h1 { font-size: 1.8rem !important; text-align: center; line-height: 1.2; margin-bottom: 10px; }
+        .dash-header p { text-align: center; font-size: 0.9rem; }
+        .kpi-grid { grid-template-columns: 1fr !important; }
+        .billing-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .billing-value { align-self: flex-start; }
+    }
 </style>
 
 <div class="dashboard-container">
@@ -97,11 +101,9 @@
 
             <div style="background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px;">
                 <h3 style="color: white; font-weight: 800; margin-bottom: 20px;"><i class="fas fa-chart-line text-teal"></i> Acessos nos últimos 30 dias</h3>
-
                 <div style="position: relative; height: 280px; width: 100%;">
                     <canvas id="acessosChart"></canvas>
                 </div>
-
             </div>
         </div>
 
