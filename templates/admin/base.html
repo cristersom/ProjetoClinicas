@@ -53,30 +53,11 @@
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
 
-    /* =====================================================================
-       4. BOTÕES DE EXCLUIR (CORRIGIDO: DINÂMICOS E ESTÁTICOS)
-       ===================================================================== */
+    /* BOTÕES DE EXCLUIR DINÂMICOS E ESTÁTICOS */
     span.delete input, div.delete input { display: none !important; }
-
-    /* Posicionamento no canto superior direito para TODOS os botões de remover */
-    span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler {
-        position: absolute !important;
-        top: 15px !important;
-        right: 15px !important;
-        z-index: 10 !important;
-        display: block !important;
-    }
-
-    /* Estilização base do botão vermelho (esconde o texto original com font-size: 0) */
-    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler {
-        background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;
-    }
-
-    /* A SOLUÇÃO: Injeta a palavra "REMOVER" em todos eles */
-    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after {
-        content: "Remover" !important; font-size: 0.75rem !important;
-    }
-
+    span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
+    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
+    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
     .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
@@ -90,7 +71,7 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       5. TABELAS MODERNAS NAS LISTAGENS
+       4. TABELAS MODERNAS NAS LISTAGENS
        ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
@@ -105,20 +86,18 @@
     .paginator a { color: #14b8a6 !important; padding: 5px 10px !important; text-decoration: none !important; font-weight: bold !important; }
 
     /* =====================================================================
-       6. A BARRA INFERIOR DEFINITIVA (PESQUISA + AÇÕES + BOTÕES)
+       5. A BARRA INFERIOR DEFINITIVA (SÓ NAS LISTAGENS)
        ===================================================================== */
-    /* ESCONDE AS BARRAS ORIGINAIS DO JAZZMIN */
-    #toolbar, #changelist-search, #changelist-filter, .actions, .object-tools { display: none !important; }
+    #toolbar, #changelist-search, #changelist-filter { display: none !important; }
 
-    /* A NOSSA BARRA INFERIOR */
     .my-super-bottom-bar {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        justify-content: flex-end !important; /* Tudo alinhado à direita */
+        justify-content: flex-end !important;
         align-items: center !important;
-        gap: 15px !important; /* Espaçamento entre os 3 blocos principais */
-        background: transparent !important; /* Sem fundo feio */
+        gap: 15px !important;
+        background: transparent !important;
         border: none !important;
         padding: 0 !important;
         margin-top: 15px !important;
@@ -127,10 +106,8 @@
         box-sizing: border-box !important;
     }
 
-    /* Sub-grupos para alinhamento interno de cada bloco */
     .my-group { display: flex !important; align-items: center !important; gap: 8px !important; margin: 0 !important; }
 
-    /* Input e Select (Pesquisa e Ações) */
     .custom-input { width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; box-sizing: border-box !important; }
     .custom-input::placeholder { color: #9ca3af !important; }
     .custom-input:focus { border-color: #14b8a6 !important; outline: none !important; }
@@ -142,16 +119,13 @@
     }
     .custom-select:focus { border-color: #14b8a6 !important; outline: none !important; }
 
-    /* Botões Padrão da Barra */
     .custom-btn {
         height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; font-weight: bold !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; transition: 0.2s !important; white-space: nowrap !important; box-sizing: border-box !important; text-decoration: none !important; border: none !important; margin: 0 !important;
     }
 
-    /* Verde: Pesquisar e Adicionar */
     .custom-btn.primary { background-color: #14b8a6 !important; color: white !important; }
     .custom-btn.primary:hover { background-color: #0d9488 !important; color: white !important; }
 
-    /* Cinza: Botão Ir */
     .custom-btn.secondary { background-color: #4b5563 !important; color: white !important; }
     .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
 </style>
@@ -168,16 +142,15 @@
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
 
-        if (!mainContent) return;
+        // PROTEÇÃO ABSOLUTA: Só roda se for listagem. Se não houver changelist ou tabela, aborta.
+        if (!changelist && !formTabela && !table) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // =========================================================
-        // 1. PESQUISA E FILTROS DO JAZZMIN (Caça a tudo o que é filtro)
-        // =========================================================
-        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form, #content-main > form:not(#changelist-form)');
+        // 1. PESQUISA (Apenas da listagem)
+        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
 
         filterForms.forEach(formOrig => {
             const searchGroup = document.createElement('form');
@@ -218,9 +191,7 @@
             if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
         });
 
-        // =========================================================
-        // 2. AÇÕES EM LOTE (A caça ao select name="action")
-        // =========================================================
+        // 2. AÇÕES EM LOTE
         const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
         if (actionSelectOrig && formTabela) {
             const actionGroup = document.createElement('div');
@@ -256,9 +227,7 @@
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
 
-        // =========================================================
-        // 3. BOTÕES DO TOPO (Adicionar, Importar, Exportar)
-        // =========================================================
+        // 3. BOTÕES DO TOPO (Adicionar, Importar)
         const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
 
         if (topButtons.length > 0) {
@@ -295,9 +264,7 @@
             if(toolsGroup.children.length > 0) bottomBar.appendChild(toolsGroup);
         }
 
-        // =========================================================
-        // INSERE A BARRA NO FUNDO (Mesmo com 0 resultados)
-        // =========================================================
+        // INSERE A BARRA NO FUNDO DA PÁGINA
         if (bottomBar.children.length > 0) {
             const paginator = document.querySelector('.paginator');
             if (paginator) {
