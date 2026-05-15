@@ -206,34 +206,23 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. RESPONSIVIDADE DO CABEÇALHO (O SEGREDO DO MENU NO CELULAR)
+       2. RESPONSIVIDADE DO CABEÇALHO E MELHORIA DE INPUTS NO MOBILE
        ===================================================================== */
     @media (min-width: 769px) {
         nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
     }
 
     @media (max-width: 768px) {
-        /* Garante que a barra do Jazzmin com o ícone do menu hambúrguer é exibida */
         nav.main-header {
-            display: flex !important;
-            visibility: visible !important;
-            height: auto !important;
-            min-height: 55px !important;
-            background-color: #1f2937 !important;
-            border-bottom: 1px solid #374151 !important;
-            opacity: 1 !important;
+            display: flex !important; visibility: visible !important; height: auto !important; min-height: 55px !important;
+            background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; opacity: 1 !important;
         }
         nav.main-header * { visibility: visible !important; }
         nav.main-header .nav-link { color: #f3f4f6 !important; font-size: 1.2rem !important; }
 
         .brand-link {
-            display: flex !important;
-            visibility: visible !important;
-            height: auto !important;
-            background-color: #111827 !important;
-            color: white !important;
-            border-bottom: 1px solid #374151 !important;
-            align-items: center !important;
+            display: flex !important; visibility: visible !important; height: auto !important;
+            background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important; align-items: center !important;
         }
         .brand-link .brand-text { display: block !important; visibility: visible !important; }
         .breadcrumb { display: none !important; }
@@ -242,6 +231,12 @@
         .admin-alert-banner { flex-direction: column !important; text-align: center !important; padding: 20px 15px !important; gap: 15px !important; margin: 15px !important; }
         .alert-content { flex-direction: column !important; gap: 10px !important; }
         .btn-alert-action { width: 100% !important; margin-top: 10px !important; }
+
+        /* Aproveitando melhor a tela para os inputs no telemóvel */
+        #content-main > form > div > fieldset.module { padding: 15px 10px !important; }
+        .inline-related, .djn-item { padding: 45px 10px 15px 10px !important; }
+        .djn-group-nested { padding-left: 10px !important; border-left-width: 2px !important; }
+        .submit-row { margin-top: 30px !important; }
     }
 
     /* =====================================================================
@@ -266,13 +261,15 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       5. FORMULÁRIOS DE EDIÇÃO (MODO ESCURO ABSOLUTO)
+       5. FORMULÁRIOS DE EDIÇÃO E REPOSICIONAMENTO DE BOTÕES
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important;}
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
 
     #content-main > form > div > fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
-    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
+
+    /* Espaço extra no topo da caixa (50px) para o botão REMOVER não cobrir o input */
+    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 50px 20px 20px 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
 
     body .form-row, body .form-group { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
     body .form-row > div, body .form-group > div, body .fieldBox { width: 100% !important; max-width: 100% !important; display: block !important; }
@@ -296,17 +293,19 @@
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
 
+    /* Reposicionando o REMOVER para o topo do bloco e não em cima do input */
     span.delete input, div.delete input { display: none !important; }
-    span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
+    span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 10px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
     span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
-    .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s; white-space: nowrap !important; }
+    /* Transformando os botões "Adicionar outro(a)" em blocos completos para não flutuarem em cima do "Salvar" */
+    .add-row, .djn-add-item { margin-top: 15px !important; margin-bottom: 30px !important; padding: 0 !important; display: block !important; position: relative !important; clear: both !important;}
+    .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 12px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.9rem !important; text-decoration: none !important; display: block !important; width: 100% !important; text-align: center !important; transition: 0.2s; white-space: nowrap !important; box-sizing: border-box !important; }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
-    #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; }
+    #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; position: relative !important; z-index: 10 !important;}
     #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
