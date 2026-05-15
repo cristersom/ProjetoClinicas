@@ -1,124 +1,80 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-{% block extrastyle %}
-    {{ block.super }}
-    <style>
-        .export-actions {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f8f8;
-            border-radius: 4px;
-            border: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .export-actions h3 {
-            margin: 0;
-            font-size: 14px;
-            color: #666;
-            font-weight: bold;
-        }
-        .export-btn {
-            padding: 8px 15px;
-            background: #417690;
-            color: #ffffff !important; /* CORRIGIDO: Força a cor branca */
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-        .export-btn:hover {
-            background: #205067;
-            color: #ffffff !important;
-        }
-        .export-btn.csv { background: #1f8b4c; }
-        .export-btn.csv:hover { background: #145e33; }
-
-        .export-btn.json { background: #e67e22; }
-        .export-btn.json:hover { background: #b9651b; }
-
-        .session-header {
-            background: #417690;
-            color: white;
-            padding: 10px 15px;
-            margin-top: 30px;
-            margin-bottom: 0;
-            border-radius: 4px 4px 0 0;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .session-header span.date {
-            font-weight: normal;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-    </style>
-{% endblock %}
-
-{% block title %} Detalhes do Relatório: {{ questionario.titulo }} {% endblock %}
-
 {% block content %}
-<div id="content-main">
-  <h1>Respostas Detalhadas: "{{ questionario.titulo }}"</h1>
+<style>
+    /* Padronização do Tema Escuro para Relatórios */
+    .report-wrapper { color: #f3f4f6; padding: 10px 0; }
+    .report-header h1 { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 25px; }
 
-  {% if dados_do_relatorio %}
-  <div class="export-actions">
-      <h3>Exportar Relatório Completo:</h3>
-      <a href="?export=xlsx" class="export-btn">⬇️ Planilha Excel (.xlsx)</a>
-      <a href="?export=csv" class="export-btn csv">⬇️ Planilha Simples (.csv)</a>
-      <a href="?export=json" class="export-btn json">⬇️ Dados Brutos (.json)</a>
-  </div>
-  {% endif %}
+    /* Barra de Exportação */
+    .export-bar { background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px; display: flex; align-items: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+    .export-title { font-weight: bold; color: #9ca3af; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; }
 
-  {% for session_key, respostas in dados_do_relatorio.items %}
-  <div class="module" style="margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+    .btn-export { padding: 10px 20px; border-radius: 6px; font-weight: bold; color: white !important; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: none; cursor: pointer; }
+    .btn-excel { background-color: #0284c7; } .btn-excel:hover { background-color: #0369a1; }
+    .btn-csv { background-color: #10b981; } .btn-csv:hover { background-color: #059669; }
+    .btn-json { background-color: #f59e0b; } .btn-json:hover { background-color: #d97706; }
 
-    <h2 class="session-header">
-        <span>Sessão do Paciente: <strong>{{ session_key|slice:":8" }}...</strong></span>
-        {% with first_answer=respostas|first %}
-            <span class="date">Respondido em: {{ first_answer.data_resposta|date:"d/m/Y H:i" }}</span>
-        {% endwith %}
-    </h2>
+    /* Tabelas de Respostas (Padrão Changelist) */
+    .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; overflow: hidden; margin-bottom: 30px; }
+    .custom-table thead th { background-color: #111827; color: #9ca3af; padding: 15px; font-weight: bold; text-transform: uppercase; font-size: 0.85rem; text-align: left; border-bottom: 2px solid #374151; }
+    .custom-table tbody td { padding: 15px; color: #f3f4f6; border-bottom: 1px solid #374151; vertical-align: middle; }
+    .custom-table tbody tr:last-child td { border-bottom: none; }
+    .custom-table tbody tr:hover { background-color: #374151; }
 
-    <div class="results" style="margin:0;">
-        <table id="result_list" style="width: 100%; margin: 0; border-top: none;">
-            <thead>
-              <tr>
-                <th class="sortable column-pergunta" style="width: 60%; background: #f8f8f8;">
-                  <div class="text"><a>Pergunta</a></div>
-                </th>
-                <th class="sortable column-resposta" style="width: 40%; background: #f8f8f8;">
-                  <div class="text"><a>Resposta do Paciente</a></div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-                {% for resposta in respostas %}
-                <tr class="{% cycle 'row1' 'row2' %}">
-                    <td class="field-pergunta" style="padding: 12px; font-size: 13px; color: #333;">
-                        {{ resposta.pergunta.texto_pergunta }}
-                    </td>
-                    <td class="field-resposta" style="padding: 12px; font-size: 14px;">
-                        <strong>{{ resposta.texto_resposta }}</strong>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    /* Destaque para o ID da Sessão */
+    .session-row th { background-color: #374151 !important; border-bottom: none !important; padding: 12px 15px !important; }
+    .session-info { display: flex; justify-content: space-between; align-items: center; }
+    .session-key { color: #60a5fa; font-size: 1rem; font-weight: bold; }
+    .session-date { color: #d1d5db; font-size: 0.85rem; font-weight: normal; }
+
+    .question-text { color: #9ca3af; font-size: 0.95rem; width: 40%; }
+    .answer-text { color: #ffffff; font-weight: bold; font-size: 1rem; width: 60%; }
+</style>
+
+<div class="report-wrapper">
+    <div class="report-header">
+        <h1>Respostas Detalhadas: "{{ questionario.titulo }}"</h1>
     </div>
-  </div>
-  {% endfor %}
 
-  {% if not dados_do_relatorio %}
-    <div style="padding: 40px; text-align: center; background: #fff; border: 1px dashed #ccc; border-radius: 8px; margin-top: 20px;">
-        <h2 style="color: #666; font-weight: normal;">Ainda não há respostas para este questionário.</h2>
-        <p style="color: #999; font-size: 14px;">Envie o link da jornada para seus pacientes começarem a responder.</p>
+    <div class="export-bar">
+        <span class="export-title">Exportar Relatório Completo:</span>
+        <a href="?export=xlsx" class="btn-export btn-excel"><i class="fas fa-file-excel"></i> Planilha Excel (.xlsx)</a>
+        <a href="?export=csv" class="btn-export btn-csv"><i class="fas fa-file-csv"></i> Planilha Simples (.csv)</a>
+        <a href="?export=json" class="btn-export btn-json"><i class="fas fa-file-code"></i> Dados Brutos (.json)</a>
     </div>
-  {% endif %}
 
+    {% for session_key, respostas in dados_do_relatorio.items %}
+    <table class="custom-table">
+        <thead>
+            <tr class="session-row">
+                <th colspan="2">
+                    <div class="session-info">
+                        <span class="session-key"><i class="fas fa-user-circle" style="margin-right: 8px;"></i>Sessão do Paciente: {{ session_key|slice:":12" }}...</span>
+                        <span class="session-date">Respondido em: {{ respostas.0.data_resposta|date:"d/m/Y H:i" }}</span>
+                    </div>
+                </th>
+            </tr>
+            <tr>
+                <th>Pergunta</th>
+                <th>Resposta do Paciente</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in respostas %}
+            <tr>
+                <td class="question-text">{{ r.pergunta.texto_pergunta }}</td>
+                <td class="answer-text">{{ r.texto_resposta }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% empty %}
+    <div style="background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 40px; text-align: center;">
+        <i class="fas fa-folder-open" style="font-size: 3rem; color: #4b5563; margin-bottom: 15px;"></i>
+        <p style="color: #9ca3af; font-size: 1.1rem; font-weight: bold;">Nenhuma resposta registrada para este questionário até ao momento.</p>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

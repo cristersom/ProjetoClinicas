@@ -1,214 +1,167 @@
 {% extends "admin/base_site.html" %}
-{% block title %} Resumo Comparativo: {{ questionario.titulo }} {% endblock %}
-
-{% block extrahead %}
-{{ block.super }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    /* Estilos para o container de comparação */
-    .comparison-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        justify-content: center;
-        width: 100%;
-    }
-    .profile-block { /* */
-        flex: 1;
-        min-width: 300px;
-        max-width: 45%;
-        border: 1px solid #eee;
-        padding: 15px;
-        background: #fdfdfd;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .profile-block h3 { /* */
-        color: #333;
-        font-size: 1.2rem;
-        border-bottom: 2px solid #f0f0f0;
-        padding-bottom: 5px;
-        margin-top: 0;
-    }
-    .text-response-list { /* */
-        max-height: 200px;
-        overflow-y: auto;
-        border: 1px solid #ddd;
-        padding: 10px;
-        background: #f9f9f9;
-        list-style-type: disc;
-        padding-left: 25px;
-    }
-    .filter-form fieldset { /* */
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 4px;
-    }
-    .filter-form legend { /* */
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .filter-form .checkbox-grid { /* */
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 10px;
-    }
-    .filter-form label { /* */
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-    }
-    /* Para alinhar os botões de filtro e exportação */
-    .filter-buttons {
-        display: flex;
-        flex-wrap: wrap; /* Permite quebrar a linha em telas menores */
-        gap: 10px;
-        align-items: center;
-        margin-top: 15px;
-    }
-</style>
-{% endblock %}
-
+{% load static %}
 
 {% block content %}
-<div id="content-main">
-  <div class="module filter-form">
-    <form method="GET" action="" id="profile-filter-form">
-      <fieldset>
-        <legend>Comparar Perfis de Paciente</legend>
-        <div class="checkbox-grid">
-            <label>
-                <input type="checkbox" name="narrativa_perfil_id" value="all"
-                       {% if 'all' in perfis_selecionados_ids %}checked{% endif %}
-                       id="check-all-profiles">
-                <strong>Todos os Perfis (Agregado)</strong>
-            </label>
-            {% for perfil in todos_os_perfis %}
-            <label>
-                <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}"
-                       class="profile-check"
-                       {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
-                {{ perfil.titulo }}
-            </label>
-            {% endfor %}
-        </div>
+<style>
+    .report-wrapper { color: #f3f4f6; padding: 10px 0; }
+    .report-header h1 { font-size: 1.8rem; font-weight: 800; color: #ffffff; margin-bottom: 25px; }
 
-        <div class="filter-buttons">
-            <input type="submit" value="Comparar" class="button default">
-            {# O 'request.GET.urlencode' preserva os filtros atuais no link de exportação #}
-            <a href="?{{ request.GET.urlencode }}&export=xlsx" class="button">Exportar XLSX</a>
-            <a href="?{{ request.GET.urlencode }}&export=csv" class="button">Exportar CSV</a>
-            <a href="?{{ request.GET.urlencode }}&export=json" class="button">Exportar JSON</a>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-  {% for pergunta_id, dados_pergunta in dados_comparativos.items %}
-  <div class="module">
-    <h2>Pergunta: {{ dados_pergunta.pergunta_texto }}</h2>
-    <p><strong>Tipo:</strong> {{ dados_pergunta.pergunta_tipo }}</p>
+    /* Caixa de Filtros (Igual ao do Percurso) */
+    .filter-box { background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 25px; margin-bottom: 40px; }
+    .checkbox-group { display: flex; gap: 25px; flex-wrap: wrap; margin-bottom: 25px; }
+    .checkbox-item { display: flex; align-items: center; gap: 10px; color: #d1d5db; font-weight: bold; cursor: pointer; font-size: 0.95rem; }
+    .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: #14b8a6; cursor: pointer; }
 
-    <div class="comparison-container">
+    .action-row { display: flex; align-items: center; gap: 20px; border-top: 1px solid #374151; padding-top: 20px; flex-wrap: wrap; }
+    .btn-filter { background-color: #f3f4f6; color: #111827; border: none; padding: 10px 25px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-filter:hover { background-color: #d1d5db; }
 
-        {% for dados_perfil in dados_pergunta.dados_por_perfil %}
-        <div class="profile-block">
-            <h3>{{ dados_perfil.perfil_titulo }}</h3>
-            <p><strong>Total de Respostas:</strong> {{ dados_perfil.total_respostas }}</p>
+    .export-links { display: flex; gap: 15px; flex-wrap: wrap; }
+    .export-links a { color: #60a5fa; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; }
+    .export-links a:hover { color: #93c5fd; text-decoration: underline; }
 
-            {% if dados_pergunta.pergunta_tipo_raw == "TEXTO" %}
-                <ul class="text-response-list">
-                    {% for resposta_txt in dados_perfil.respostas_texto %}
-                        {% if resposta_txt %}
-                            <li>{{ resposta_txt }}</li>
+    /* Blocos de Perguntas e Cartões */
+    .question-block { margin-bottom: 50px; }
+    .question-title { font-size: 1.4rem; font-weight: bold; color: #ffffff; margin-bottom: 5px; }
+    .question-type { font-size: 0.85rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; margin-bottom: 20px; }
+
+    .cards-grid { display: flex; flex-wrap: wrap; gap: 20px; }
+    .profile-card { background-color: #1f2937; border: 1px solid #374151; border-radius: 8px; padding: 20px; flex: 1; min-width: 320px; display: flex; flex-direction: column; }
+    .profile-header { border-bottom: 1px solid #374151; padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+    .profile-name { font-size: 1.2rem; font-weight: bold; color: #14b8a6; }
+    .profile-total { font-size: 0.85rem; font-weight: bold; color: #9ca3af; background: #111827; padding: 5px 10px; border-radius: 4px; }
+
+    /* Estilo para Respostas de Texto Livre */
+    .text-answers-box { background-color: #111827; border: 1px solid #374151; border-radius: 6px; padding: 15px; max-height: 250px; overflow-y: auto; flex-grow: 1; }
+    .text-answers-box ul { margin: 0; padding-left: 20px; color: #d1d5db; }
+    .text-answers-box li { margin-bottom: 10px; font-size: 0.95rem; line-height: 1.5; }
+    .text-answers-box li::marker { color: #14b8a6; }
+
+    /* Contêiner Branco para o Gráfico Brilhar */
+    .chart-box { background-color: #ffffff; border-radius: 6px; padding: 15px; flex-grow: 1; display: flex; justify-content: center; align-items: center; }
+</style>
+
+<div class="report-wrapper">
+    <div class="report-header">
+        <h1>Resumo Agregado: "{{ questionario.titulo }}"</h1>
+    </div>
+
+    <div class="filter-box">
+        <form method="GET" id="filter-form">
+            <div class="checkbox-group">
+                <label class="checkbox-item">
+                    <input type="checkbox" name="narrativa_perfil_id" value="all" id="check-all"> Todos os Perfis (Agregado)
+                </label>
+                {% for perfil in todos_os_perfis %}
+                <label class="checkbox-item">
+                    <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}" class="check-perfil"> {{ perfil.titulo }} (Perfil)
+                </label>
+                {% endfor %}
+            </div>
+
+            <div class="action-row">
+                <button type="submit" class="btn-filter">Filtrar Relatório</button>
+                <div class="export-links">
+                    <a href="#" onclick="exportData('xlsx')">Exportar XLSX</a>
+                    <a href="#" onclick="exportData('csv')">Exportar CSV</a>
+                    <a href="#" onclick="exportData('json')">Exportar JSON</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% for p_id, p_data in dados_comparativos.items %}
+    <div class="question-block">
+        <div class="question-title">{{ p_data.pergunta_texto }}</div>
+        <div class="question-type">Tipo: {{ p_data.pergunta_tipo }}</div>
+
+        <div class="cards-grid">
+            {% for perfil_data in p_data.dados_por_perfil %}
+            <div class="profile-card">
+                <div class="profile-header">
+                    <div class="profile-name">{{ perfil_data.perfil_titulo }}</div>
+                    <div class="profile-total">Total: {{ perfil_data.total_respostas }}</div>
+                </div>
+
+                {% if p_data.pergunta_tipo_raw == 'TEXTO' %}
+                    <div class="text-answers-box">
+                        {% if perfil_data.respostas_texto %}
+                            <ul>
+                                {% for texto in perfil_data.respostas_texto %}
+                                    <li>{{ texto }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div style="text-align: center; color: #6b7280; font-style: italic; padding-top: 20px;">Nenhuma resposta registrada.</div>
                         {% endif %}
-                    {% empty %}
-                        <li>Nenhuma resposta.</li>
-                    {% endfor %}
-                </ul>
-
-            {% elif dados_perfil.dados_grafico %}
-                {% if dados_perfil.total_respostas > 0 %}
-                    <div style="width: 100%; margin: auto;">
-                        <canvas id="grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}"></canvas>
+                    </div>
+                {% else %}
+                    <div class="chart-box">
+                        {% if perfil_data.total_respostas > 0 %}
+                            <canvas id="chart_{{ p_id }}_{{ forloop.counter }}"></canvas>
+                        {% else %}
+                            <div style="color: #9ca3af; font-style: italic;">Dados insuficientes para gráfico.</div>
+                        {% endif %}
                     </div>
 
+                    {% if perfil_data.total_respostas > 0 %}
                     <script>
-                    document.addEventListener('DOMContentLoaded', (event) => {
-                        const ctx_{{ pergunta_id }}_{{ forloop.counter }} = document.getElementById('grafico-pergunta-{{ pergunta_id }}-perfil-{{ forloop.counter }}');
+                        document.addEventListener("DOMContentLoaded", function() {
+                            const ctx = document.getElementById('chart_{{ p_id }}_{{ forloop.counter }}').getContext('2d');
+                            const type = '{{ perfil_data.dados_grafico.tipo_grafico }}';
 
-                        new Chart(ctx_{{ pergunta_id }}_{{ forloop.counter }}, {
-                            type: '{{ dados_perfil.dados_grafico.tipo_grafico }}',
-                            data: {
-                                labels: {{ dados_perfil.dados_grafico.labels|safe }},
-                                datasets: [{
-                                    label: 'Nº de Respostas',
-                                    data: {{ dados_perfil.dados_grafico.data|safe }},
-                                    backgroundColor: [
-                                        'rgba(54, 162, 235, 0.7)',
-                                        'rgba(255, 99, 132, 0.7)',
-                                        'rgba(255, 206, 86, 0.7)',
-                                        'rgba(75, 192, 192, 0.7)',
-                                        'rgba(153, 102, 255, 0.7)',
-                                        'rgba(255, 159, 64, 0.7)',
-                                        'rgba(199, 199, 199, 0.7)'
-                                    ],
-                                    borderColor: '#fff',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    legend: {
-                                        position: 'top',
-                                        display: '{{ dados_perfil.dados_grafico.tipo_grafico }}' === 'pie' ? true : false,
-                                    },
-                                    title: {
-                                        display: false,
-                                    }
+                            new Chart(ctx, {
+                                type: type,
+                                data: {
+                                    labels: {{ perfil_data.dados_grafico.labels|safe }},
+                                    datasets: [{
+                                        data: {{ perfil_data.dados_grafico.data|safe }},
+                                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f43f5e'],
+                                        borderWidth: 0
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: { legend: { position: 'bottom' } },
+                                    scales: type === 'bar' ? { y: { beginAtZero: true, ticks: { stepSize: 1 } } } : {}
                                 }
-                            }
+                            });
                         });
-                    });
                     </script>
-                {% else %}
-                    <p>Nenhuma resposta encontrada.</p>
+                    {% endif %}
                 {% endif %}
-            {% endif %}
-
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-  </div>
-  {% empty %}
-  <p>Ainda não há perguntas ou respostas para este questionário.</p>
-  {% endfor %}
-
+    {% endfor %}
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    // Lógica para os checkboxes de Perfil
-    const checkAll = document.getElementById('check-all-profiles');
-    const profileChecks = document.querySelectorAll('.profile-check');
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectedIds = urlParams.getAll('narrativa_perfil_id');
 
-    checkAll.addEventListener('change', function() {
-        if (this.checked) {
-            profileChecks.forEach(check => {
-                check.checked = false;
-            });
+        const checkAll = document.getElementById('check-all');
+        const checksPerfil = document.querySelectorAll('.check-perfil');
+
+        // Marca as caixas de acordo com o URL
+        if (selectedIds.includes('all') || selectedIds.length === 0) {
+            checkAll.checked = true;
         }
-    });
-
-    profileChecks.forEach(check => {
-        check.addEventListener('change', function() {
-            if (this.checked) {
-                checkAll.checked = false;
-            }
+        checksPerfil.forEach(cb => {
+            if (selectedIds.includes(cb.value)) cb.checked = true;
         });
-    });
-});
-</script>
 
+        // Exportação preservando os filtros atuais
+        window.exportData = function(format) {
+            const form = document.getElementById('filter-form');
+            const url = new URL(window.location.href);
+            url.search = new URLSearchParams(new FormData(form)).toString();
+            url.searchParams.set('export', format);
+            window.location.href = url.toString();
+        };
+    });
+</script>
 {% endblock %}
