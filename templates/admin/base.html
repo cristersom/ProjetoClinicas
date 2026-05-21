@@ -196,39 +196,30 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. FUNDOS BASE E PAINEL LATERAL
+       1. BASE E FIM DO SCROLL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
     }
-    .main-sidebar, .main-sidebar::before { background-color: #030712 !important; border: none !important; }
+    .main-sidebar { background-color: #030712 !important; border: none !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. TEMA ESCURO DO CABEÇALHO (NAVBAR) E LOGO (RESOLVE O BURACO BRANCO)
+       2. LIMPEZA TOTAL DE LIXO VISUAL DO JAZZMIN (A, Ícones, Scroll)
        ===================================================================== */
-    .main-header, .navbar, nav.main-header {
-        background-color: #1f2937 !important;
-        border-bottom: 1px solid #374151 !important;
-        color: white !important;
-    }
-    .main-header .nav-link, .main-header i { color: #9ca3af !important; }
-    .main-header .nav-link:hover, .main-header i:hover { color: #14b8a6 !important; }
+    /* Mata o logo 'A' do topo da barra lateral */
+    .brand-link, .brand-logo { display: none !important; visibility: hidden !important; height: 0 !important; }
 
-    .brand-link {
-        background-color: #030712 !important;
-        border-bottom: 1px solid #374151 !important;
-        color: #14b8a6 !important;
-    }
-    .brand-link .brand-text { color: #f3f4f6 !important; font-weight: bold !important; }
+    /* Mata o ícone e menu de usuário do cabeçalho */
+    .navbar-nav.ml-auto, .user-panel { display: none !important; visibility: hidden !important; width: 0 !important; height: 0 !important; }
 
-    .user-panel { border-bottom: 1px solid #374151 !important; }
-    .user-panel .info a { color: #d1d5db !important; }
-
-    .breadcrumb { display: none !important; }
+    /* Mata as barras de scroll horríveis no menu lateral */
+    .os-scrollbar, .os-scrollbar-horizontal, .os-scrollbar-vertical { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+    .main-sidebar, .sidebar, .os-viewport { scrollbar-width: none !important; -ms-overflow-style: none !important; }
+    .main-sidebar::-webkit-scrollbar, .sidebar::-webkit-scrollbar, .os-viewport::-webkit-scrollbar { display: none !important; }
 
     /* =====================================================================
-       3. ALERTAS DE ASSINATURA E CABEÇALHOS GERAIS
+       3. ALERTAS E CABEÇALHOS INTERNOS
        ===================================================================== */
     .admin-alert-banner { margin: 20px 20px 20px 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
@@ -247,7 +238,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       4. LIMPANDO O LIXO DO DJANGO (Global)
+       4. LIMPANDO O LIXO DOS FORMULÁRIOS (Global)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original {
         display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important;
@@ -328,12 +319,20 @@
     .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
 
     /* =====================================================================
-       6. A MÁGICA DO MOBILE (ESMAGANDO AS MARGENS DO BOOTSTRAP)
+       6. A MÁGICA DO MOBILE & DESKTOP NAVBAR
        ===================================================================== */
+    @media (min-width: 769px) {
+        /* No Desktop: Barra do topo completamente invisível e zerada */
+        body nav.main-header, body .main-header, body .navbar { display: none !important; visibility: hidden !important; height: 0 !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; border: none !important; }
+        [data-widget="pushmenu"] { display: none !important; }
+    }
+
     @media (max-width: 768px) {
-        /* Esconde painéis laterais quando o menu recolhe e aplica a cor Teal no Hamburger */
-        .brand-link, .user-panel { display: none !important; }
-        nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
+        /* No Mobile: Cabeçalho volta só com o Hambúrguer (verde teal) */
+        body nav.main-header { display: flex !important; visibility: visible !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; opacity: 1 !important; }
+        body nav.main-header * { visibility: visible !important; }
+        body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
+        .breadcrumb { display: none !important; }
 
         /* Consertando Cortes (Respostas e Barra Topo) */
         .content-header { height: auto !important; min-height: 60px !important; flex-direction: column !important; align-items: flex-start !important; padding: 15px 10px !important; }
