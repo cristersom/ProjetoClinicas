@@ -196,16 +196,39 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E FIM DO SCROLL (DESKTOP E MOBILE)
+       1. FUNDOS BASE E PAINEL LATERAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
     }
-    .main-sidebar { background-color: #030712 !important; border: none !important; }
+    .main-sidebar, .main-sidebar::before { background-color: #030712 !important; border: none !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. ALERTAS E CABEÇALHOS GERAIS
+       2. TEMA ESCURO DO CABEÇALHO (NAVBAR) E LOGO (RESOLVE O BURACO BRANCO)
+       ===================================================================== */
+    .main-header, .navbar, nav.main-header {
+        background-color: #1f2937 !important;
+        border-bottom: 1px solid #374151 !important;
+        color: white !important;
+    }
+    .main-header .nav-link, .main-header i { color: #9ca3af !important; }
+    .main-header .nav-link:hover, .main-header i:hover { color: #14b8a6 !important; }
+
+    .brand-link {
+        background-color: #030712 !important;
+        border-bottom: 1px solid #374151 !important;
+        color: #14b8a6 !important;
+    }
+    .brand-link .brand-text { color: #f3f4f6 !important; font-weight: bold !important; }
+
+    .user-panel { border-bottom: 1px solid #374151 !important; }
+    .user-panel .info a { color: #d1d5db !important; }
+
+    .breadcrumb { display: none !important; }
+
+    /* =====================================================================
+       3. ALERTAS DE ASSINATURA E CABEÇALHOS GERAIS
        ===================================================================== */
     .admin-alert-banner { margin: 20px 20px 20px 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
@@ -224,7 +247,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPANDO O LIXO DO DJANGO (Global)
+       4. LIMPANDO O LIXO DO DJANGO (Global)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original {
         display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important;
@@ -275,7 +298,7 @@
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
     /* =====================================================================
-       4. TABELAS MODERNAS E BARRA INFERIOR (APLICA-SE A DESKTOP E MOBILE)
+       5. TABELAS MODERNAS E BARRA INFERIOR (APLICA-SE A DESKTOP E MOBILE)
        ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
@@ -305,15 +328,12 @@
     .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
 
     /* =====================================================================
-       5. A MÁGICA DO MOBILE (ESMAGANDO AS MARGENS DO BOOTSTRAP)
+       6. A MÁGICA DO MOBILE (ESMAGANDO AS MARGENS DO BOOTSTRAP)
        ===================================================================== */
     @media (max-width: 768px) {
-        /* Menu Mobile - Forçando a cor do Hambúrguer para Verde Água (Teal) */
-        .brand-link, .user-panel, .navbar-nav.ml-auto { display: none !important; }
-        nav.main-header { display: flex !important; visibility: visible !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; opacity: 1 !important; }
-        nav.main-header * { visibility: visible !important; }
-        nav.main-header .nav-link, nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
-        .breadcrumb { display: none !important; }
+        /* Esconde painéis laterais quando o menu recolhe e aplica a cor Teal no Hamburger */
+        .brand-link, .user-panel { display: none !important; }
+        nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
 
         /* Consertando Cortes (Respostas e Barra Topo) */
         .content-header { height: auto !important; min-height: 60px !important; flex-direction: column !important; align-items: flex-start !important; padding: 15px 10px !important; }
@@ -332,7 +352,7 @@
 
         /* Espaçamento das Labels (Coladas no input, sem buraco em cima) */
         body label { margin: 15px 0 5px 0 !important; padding: 0 !important; width: 100% !important; display: block !important; font-weight: bold !important; }
-        body .form-row:first-child label { margin-top: 0 !important; } /* A primeira label não precisa de margem em cima */
+        body .form-row:first-child label { margin-top: 0 !important; }
 
         #content-main > form > div > fieldset.module { padding: 15px 10px !important; margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box !important; border: 1px solid #374151 !important; border-radius: 8px !important; }
         .inline-related, .djn-item { padding: 45px 10px 15px 10px !important; margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; }
