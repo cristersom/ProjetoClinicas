@@ -196,7 +196,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E FIM DO SCROLL (APLICA-SE A DESKTOP E MOBILE)
+       1. BASE E FIM DO SCROLL (DESKTOP E MOBILE)
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
         background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
@@ -205,7 +205,7 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. ALERTAS E CABEÇALHOS GERAIS (APLICA-SE A DESKTOP E MOBILE)
+       2. ALERTAS E CABEÇALHOS GERAIS
        ===================================================================== */
     .admin-alert-banner { margin: 20px 20px 20px 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
@@ -224,7 +224,7 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       3. LIMPANDO O LIXO DO DJANGO (APLICA-SE A DESKTOP E MOBILE)
+       3. LIMPANDO O LIXO DO DJANGO (Global)
        ===================================================================== */
     .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original {
         display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important;
@@ -243,6 +243,7 @@
     .djn-items, .djn-item, .djn-group, .inline-group, .inline-related, .djn-fieldset { overflow-x: hidden !important; max-width: 100% !important; box-sizing: border-box !important; }
     .djn-items::-webkit-scrollbar, .djn-item::-webkit-scrollbar, .djn-group::-webkit-scrollbar { display: none !important; }
 
+    /* Inputs base para desktop */
     input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField { width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
@@ -274,10 +275,6 @@
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-
-    /* =====================================================================
-       4. TABELAS MODERNAS E BARRA INFERIOR (APLICA-SE A DESKTOP E MOBILE)
-       ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
@@ -306,14 +303,14 @@
     .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
 
     /* =====================================================================
-       5. REGRAS EXCLUSIVAS PARA CELULAR (A MÁGICA DOS INPUTS E CORTES AQUI)
+       5. A MÁGICA DO MOBILE (AQUI ARRUMAMOS TUDO!)
        ===================================================================== */
     @media (min-width: 769px) {
         nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
     }
 
     @media (max-width: 768px) {
-        /* Removemos o "A" e o Ícone de Usuário da Navbar como pediu */
+        /* Menu e Topo Mobile */
         .brand-link, .user-panel, .navbar-nav.ml-auto { display: none !important; }
 
         nav.main-header {
@@ -324,36 +321,38 @@
         nav.main-header .nav-link { color: #f3f4f6 !important; font-size: 1.2rem !important; }
         .breadcrumb { display: none !important; }
 
-        .admin-alert-banner { flex-direction: column !important; text-align: center !important; padding: 20px 15px !important; gap: 15px !important; margin: 15px 5px !important; }
-        .alert-content { flex-direction: column !important; gap: 10px !important; }
-        .btn-alert-action { width: 100% !important; margin-top: 10px !important; }
-
-        /* DEVOLVENDO O ESPAÇO E REMOVENDO OS CORTES NAS LATERAIS */
-        #content-main { padding: 15px !important; width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important; }
+        /* Ajuste do content-main (Deixando espaço para os inputs respirarem) */
+        #content-main { padding: 10px !important; width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important; }
         #change_form { padding: 0 !important; margin: 0 !important; width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important; }
 
-        #content-main > form > div > fieldset.module { padding: 15px !important; margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+        /* REMOVENDO ESPAÇOS EM CIMA DAS LABELS */
+        body label { margin: 0 0 5px 0 !important; padding: 0 !important; display: block !important; width: 100% !important; font-weight: bold !important; text-align: left !important; }
 
-        .inline-related, .djn-item { padding: 45px 15px 15px 15px !important; margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box !important; border-radius: 0 !important; border-left: none !important; border-right: none !important;}
+        /* LARGURA TOTAL E REMOÇÃO DE BORDAS */
+        .form-row, .form-group, .fieldBox { margin: 0 0 15px 0 !important; padding: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+        div[class^="col-"] { padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; }
+
+        #content-main > form > div > fieldset.module { padding: 15px !important; margin: 0 0 15px 0 !important; border: 1px solid #374151 !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important; }
+        .inline-related, .djn-item { padding: 45px 15px 15px 15px !important; margin: 0 0 15px 0 !important; border: 1px solid #374151 !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important;}
 
         .djn-group-nested { padding-left: 0 !important; border-left: none !important; margin-left: 0 !important; }
 
-        /* Zerar margens negativas do Bootstrap que causam os cortes de "ategoria", "ession", etc */
-        .row, .form-row, .form-group { margin-left: 0 !important; margin-right: 0 !important; padding: 0 !important; width: 100% !important; box-sizing: border-box !important; }
-        div[class^="col-"], .fieldBox { padding-left: 0 !important; padding-right: 0 !important; width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; box-sizing: border-box !important; }
+        /* INPUTS GIGANTES, DE PONTA A PONTA (Altura 50px para clique fácil) */
+        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], textarea, select:not(.custom-select), .vTextField {
+            width: 100% !important; max-width: 100% !important; height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; box-sizing: border-box !important; display: block !important;
+        }
 
-        /* Consertando os botões de Listagem (Respostas cortadas) */
-        .object-tools { display: flex !important; flex-wrap: wrap !important; margin: 0 0 15px 0 !important; padding: 0 !important; justify-content: flex-start !important; }
-        .object-tools li { margin-left: 0 !important; margin-right: 10px !important; margin-bottom: 10px !important; display: block !important; }
+        /* Select2 Consertado para 100% */
+        .select2-container, .select2-container--default { width: 100% !important; max-width: 100% !important; display: block !important; }
+        .select2-selection { height: 50px !important; display: flex !important; align-items: center !important; width: 100% !important; }
 
-        /* Botões Adicionar Outro (Blocos inteiros para não sobreporem o Salvar) */
-        .add-row, .djn-add-item { display: block !important; width: 100% !important; position: static !important; clear: both !important; margin: 25px 0 !important; padding: 0 !important; }
-        .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; margin: 0 !important; padding: 12px 15px !important; font-size: 0.95rem !important; }
+        /* BOTÕES ADICIONAR E SALVAR (MESMA LARGURA 100% GIGANTESCA) */
+        .add-row, .djn-add-item { display: block !important; width: 100% !important; margin: 25px 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+        .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1.05rem !important; box-sizing: border-box !important; }
 
-        /* Botão Salvar */
-        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; padding: 15px 10px !important; margin-top: 15px !important; clear: both !important; box-sizing: border-box !important; width: 100% !important;}
-        #change_form .col-md-3 .card { position: relative !important; z-index: 10 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; width: 100% !important; box-sizing: border-box !important;}
-        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { padding: 12px !important; font-size: 1rem !important; width: 100% !important; box-sizing: border-box !important; margin-bottom: 10px !important;}
+        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; margin-top: 20px !important; width: 100% !important; box-sizing: border-box !important; clear: both !important; }
+        #change_form .col-md-3 .card { padding: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important; }
+        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { display: block !important; width: 100% !important; padding: 15px !important; font-size: 1.1rem !important; border-radius: 8px !important; margin: 0 !important; box-sizing: border-box !important; }
     }
 </style>
 {% endblock %}
