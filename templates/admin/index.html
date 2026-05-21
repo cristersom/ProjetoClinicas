@@ -7,7 +7,9 @@
     .brand-link .brand-text, .content-header { display: none !important; }
 
     .dashboard-container { padding: 20px; color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
-    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+    /* CORREÇÃO DO ALINHAMENTO DESKTOP: Adicionado align-items: start; */
+    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
 
     @media(max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
 
@@ -43,9 +45,6 @@
 
     .app-narrativa, .module { display: none !important; }
 
-    /* =====================================================================
-       AJUSTES DO DASHBOARD EXCLUSIVOS PARA CELULAR
-       ===================================================================== */
     @media (max-width: 768px) {
         .dashboard-container { padding: 10px; }
         .dash-header h1 { font-size: 1.8rem !important; text-align: center; line-height: 1.2; margin-bottom: 10px; }
