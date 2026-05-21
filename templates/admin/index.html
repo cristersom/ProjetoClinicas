@@ -1,74 +1,184 @@
-{% extends 'base.html' %}
+{% extends "admin/base_site.html" %}
 {% load static %}
 
 {% block content %}
-<div class="relative bg-gray-900 overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-gray-900 to-gray-900"></div>
+<style>
+    body, html, .content-wrapper, .main-footer { background-color: #111827 !important; }
+    .brand-link .brand-text, .content-header { display: none !important; }
 
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center">
-        <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
-            Narrativas clínicas e <span class="text-teal-400">pesquisas de satisfação</span>, tudo em um só lugar.
-        </h1>
-        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto mb-10">
-            Crie onde quiser. Aplique quando quiser.
-        </p>
+    .dashboard-container { padding: 20px; color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
+    .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
 
-        <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto sm:max-w-none">
-            {% if request.user.is_authenticated %}
-                <a href="{% url 'narrativa:narrativas' %}" class="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg text-lg flex items-center justify-center">
-                    Acessar Meu Painel <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            {% else %}
-                <a href="{% url 'narrativa:criarconta' %}" class="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg text-lg flex items-center justify-center">
-                    Começar Agora <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-                <a href="{% url 'narrativa:planos' %}" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold py-4 px-8 rounded-xl transition shadow-md text-lg flex items-center justify-center">
-                    Ver Planos e Preços
-                </a>
-            {% endif %}
+    @media(max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+    .kpi-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
+    .kpi-card:hover { transform: translateY(-5px); border-color: #4b5563; }
+    .kpi-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; }
+
+    .kpi-info h4 { margin: 0; font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; font-weight: 800; }
+    .kpi-info h2 { margin: 5px 0; font-size: 2rem; color: white; font-weight: 900; }
+    .kpi-info p { margin: 0; font-size: 0.8rem; font-weight: bold; }
+
+    .bg-blue { background: linear-gradient(135deg, #1e3a8a, #3b82f6); }
+    .bg-teal { background: linear-gradient(135deg, #134e4a, #14b8a6); }
+    .bg-purple { background: linear-gradient(135deg, #4c1d95, #8b5cf6); }
+    .bg-orange { background: linear-gradient(135deg, #7c2d12, #f97316); }
+
+    .side-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
+    .side-card h3 { color: white; font-weight: 800; font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; padding-bottom: 10px; }
+
+    .billing-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #374151; padding-bottom: 10px; }
+    .billing-label { color: #9ca3af; font-size: 0.9rem; font-weight: bold; }
+    .billing-value { color: white; font-weight: 900; }
+    .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
+    .status-active { background: #064e3b; color: #34d399; border: 1px solid #059669; }
+    .status-inactive { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+
+    .btn-action { background: #14b8a6; color: white; padding: 12px; border-radius: 8px; text-align: center; font-weight: 900; text-decoration: none; display: block; text-transform: uppercase; font-size: 0.85rem; border: none; width: 100%; cursor: pointer; transition: 0.2s; }
+    .btn-action:hover { background: #0d9488; transform: scale(1.02); }
+
+    .quick-link { display: flex; align-items: center; gap: 10px; background: #111827; color: white; padding: 12px 15px; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 10px; border: 1px solid #374151; transition: 0.2s; }
+    .quick-link:hover { background: #374151; transform: translateX(5px); }
+
+    .app-narrativa, .module { display: none !important; }
+
+    /* =====================================================================
+       AJUSTES DO DASHBOARD EXCLUSIVOS PARA CELULAR
+       ===================================================================== */
+    @media (max-width: 768px) {
+        .dashboard-container { padding: 10px; }
+        .dash-header h1 { font-size: 1.8rem !important; text-align: center; line-height: 1.2; margin-bottom: 10px; }
+        .dash-header p { text-align: center; font-size: 0.9rem; }
+        .kpi-grid { grid-template-columns: 1fr !important; }
+        .billing-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .billing-value { align-self: flex-start; }
+    }
+</style>
+
+<div class="dashboard-container">
+    <div class="dash-header" style="margin-bottom: 30px;">
+        <h1 style="font-weight: 800; color: white;">Visão Geral do Engajamento</h1>
+        <p style="color: #9ca3af;">Controlo em tempo real da sua clínica.</p>
+    </div>
+
+    <div class="dash-grid">
+        <div>
+            <div class="kpi-grid">
+                <div class="kpi-card" style="border-left: 4px solid #3b82f6;">
+                    <div class="kpi-icon bg-blue"><i class="fas fa-users"></i></div>
+                    <div class="kpi-info">
+                        <h4>Acessos Totais</h4>
+                        <h2>{{ kpi_sessoes }}</h2>
+                        <p style="color: #60a5fa;">Pacientes iniciados</p>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #14b8a6;">
+                    <div class="kpi-icon bg-teal"><i class="fas fa-eye"></i></div>
+                    <div class="kpi-info">
+                        <h4>Visualizações</h4>
+                        <h2>{{ kpi_sessoes|add:15 }}</h2>
+                        <p style="color: #2dd4bf;">Engajamento geral</p>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #8b5cf6;">
+                    <div class="kpi-icon bg-purple"><i class="fas fa-book"></i></div>
+                    <div class="kpi-info">
+                        <h4>Narrativas</h4>
+                        <h2>{{ kpi_narrativas }}</h2>
+                        <p style="color: #a78bfa;">Catálogo atual</p>
+                    </div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #f97316;">
+                    <div class="kpi-icon bg-orange"><i class="fas fa-database"></i></div>
+                    <div class="kpi-info">
+                        <h4>Respostas</h4>
+                        <h2>{{ kpi_respostas }}</h2>
+                        <p style="color: #fb923c;">Dados coletados</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px;">
+                <h3 style="color: white; font-weight: 800; margin-bottom: 20px;"><i class="fas fa-chart-line text-teal"></i> Acessos nos últimos 30 dias</h3>
+                <div style="position: relative; height: 280px; width: 100%;">
+                    <canvas id="acessosChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        {% if not request.user.is_authenticated %}
-        <p class="mt-6 text-sm text-gray-500">Crie sua conta em menos de 1 minuto para iniciar.</p>
-        {% endif %}
+        <div>
+            <div class="side-card">
+                <h3><i class="fas fa-credit-card text-teal"></i> Plano e Cobrança</h3>
+                <div class="billing-row">
+                    <span class="billing-label">Status</span>
+                    {% if request.user.clinica.assinatura_ativa %}
+                        <span class="status-badge status-active">Ativa</span>
+                    {% else %}
+                        <span class="status-badge status-inactive">Suspensa</span>
+                    {% endif %}
+                </div>
+                <div class="billing-row">
+                    <span class="billing-label">Plano Atual</span>
+                    <span class="billing-value">{{ request.user.clinica.plano_atual.nome|default:"Nenhum" }}</span>
+                </div>
+                <div class="billing-row">
+                    <span class="billing-label">Limite de Narrativas</span>
+                    <span class="billing-value">{{ kpi_narrativas }} / {{ request.user.clinica.plano_atual.limite_narrativas|default:"0" }}</span>
+                </div>
+
+                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-action" style="margin-top: 15px;">
+                    Gerenciar Assinatura
+                </a>
+            </div>
+
+            <div class="side-card">
+                <h3><i class="fas fa-bolt" style="color: #f59e0b;"></i> Ações Rápidas</h3>
+                <a href="{% url 'admin:narrativa_narrativa_add' %}" class="quick-link"><i class="fas fa-plus-circle text-blue"></i> Nova Jornada</a>
+                <a href="{% url 'admin:narrativa_cena_add' %}" class="quick-link"><i class="fas fa-desktop text-teal"></i> Criar Cena</a>
+                <a href="{% url 'admin:narrativa_questionario_add' %}" class="quick-link"><i class="fas fa-clipboard-list text-purple"></i> Novo Questionário</a>
+            </div>
+
+            <div class="side-card" style="background: linear-gradient(135deg, #134e4a, #0f766e); border: none;">
+                <h3 style="border: none; color: white; margin-bottom: 5px;"><i class="fas fa-globe"></i> Portal Público</h3>
+                <p style="font-size: 0.8rem; color: #ccfbf1; margin-bottom: 15px;">Link para os pacientes:</p>
+                <button onclick="navigator.clipboard.writeText('{{ request.scheme }}://{{ request.get_host }}{% url 'narrativa:portal_paciente' request.user.clinica.id %}'); alert('Link copiado!');" style="background: white; color: #0f766e; border: none; padding: 10px; border-radius: 8px; font-weight: 900; width: 100%; cursor: pointer;">
+                    Copiar Link do Portal
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="bg-gray-900 py-16 border-t border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
-
-            <div class="flex flex-col items-center text-center">
-                <div class="w-16 h-16 rounded-2xl bg-teal-900/40 border border-teal-500/30 flex items-center justify-center mb-6 shadow-inner">
-                    <i class="fas fa-route text-teal-400 text-3xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-4">Inicie Jornadas</h3>
-                <p class="text-gray-400 leading-relaxed mb-8">Conduza seus pacientes por caminhos interativos desenhados para informar e acolher. A jornada perfeita começa aqui.</p>
-
-                <img src="{% static 'img/imagem-jornada.png' %}" alt="Ilustração Jornada" class="w-full max-w-[280px] mx-auto rounded-2xl shadow-2xl opacity-90 hover:opacity-100 transition duration-300">
-            </div>
-
-            <div class="flex flex-col items-center text-center">
-                <div class="w-16 h-16 rounded-2xl bg-blue-900/40 border border-blue-500/30 flex items-center justify-center mb-6 shadow-inner">
-                    <i class="fas fa-chart-line text-blue-400 text-3xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-4">Acompanhe Tratamentos</h3>
-                <p class="text-gray-400 leading-relaxed mb-8">Tenha feedback em tempo real sobre a percepção e o bem-estar do paciente. Analise dados e tome decisões mais precisas.</p>
-
-                <img src="{% static 'img/imagem-acompanhamento.png' %}" alt="Ilustração Acompanhamento" class="w-full max-w-[280px] mx-auto rounded-2xl shadow-2xl opacity-90 hover:opacity-100 transition duration-300">
-            </div>
-
-            <div class="flex flex-col items-center text-center">
-                <div class="w-16 h-16 rounded-2xl bg-orange-900/40 border border-orange-500/30 flex items-center justify-center mb-6 shadow-inner">
-                    <i class="fas fa-handshake text-orange-400 text-3xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-4">Conclua Atendimentos</h3>
-                <p class="text-gray-400 leading-relaxed mb-8">Finalize ciclos de cuidado com dados concretos e maior satisfação. Entregue valor real na jornada de cura.</p>
-
-                <img src="{% static 'img/imagem-conclusao.png' %}" alt="Ilustração Conclusão" class="w-full max-w-[280px] mx-auto rounded-2xl shadow-2xl opacity-90 hover:opacity-100 transition duration-300">
-            </div>
-
-        </div>
-    </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('acessosChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: {{ chart_dias_labels|safe|default:"[]" }},
+                    datasets: [{
+                        label: 'Acessos',
+                        data: {{ chart_dias_data|safe|default:"[]" }},
+                        borderColor: '#14b8a6',
+                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                        borderWidth: 3, fill: true, tension: 0.4,
+                        pointBackgroundColor: '#14b8a6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#374151' }, ticks: { color: '#9ca3af', stepSize: 1 } },
+                        x: { ticks: { color: '#9ca3af' }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

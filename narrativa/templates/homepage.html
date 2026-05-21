@@ -1,144 +1,68 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block titulo %}Narrativas Clínicas - Revolucione seus Atendimentos{% endblock %}
-
 {% block content %}
-<header class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-cover bg-center bg-no-repeat border-b border-gray-800" style="background-image: url('{% static 'images/background.png' %}');">
-    <div class="absolute inset-0 bg-gray-900/80 backdrop-blur-[2px]"></div>
+<div class="relative bg-gray-900 overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-teal-900/20 via-gray-900 to-gray-900"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 drop-shadow-2xl leading-tight">
-            Narrativas clínicas e <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-teal-200">pesquisas de satisfação</span>,<br class="hidden md:block"> tudo em um só lugar.
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24 text-center">
+        <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
+            Narrativas clínicas e <span class="text-teal-400">pesquisas de satisfação</span>, tudo em um só lugar.
         </h1>
-
-        <p class="mt-6 text-xl md:text-3xl text-gray-300 max-w-3xl mx-auto font-light mb-12">
+        <p class="mt-4 max-w-2xl text-xl text-gray-300 mx-auto mb-10">
             Crie onde quiser. Aplique quando quiser.
         </p>
 
-        <!-- BOTÕES INTELIGENTES DO TOPO -->
-        <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-lg mx-auto">
-            {% if user.is_authenticated %}
-                <a href="{% url 'narrativa:narrativas' %}" class="px-8 py-4 text-lg font-extrabold rounded-xl text-white bg-teal-600 hover:bg-teal-500 shadow-[0_0_20px_rgba(13,148,136,0.4)] transition-all transform hover:-translate-y-1 flex justify-center items-center w-full">
-                    Acessar Meu Painel <ion-icon name="arrow-forward" class="ml-2 text-xl"></ion-icon>
+        <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto sm:max-w-none">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'narrativa:narrativas' %}" class="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg text-lg flex items-center justify-center">
+                    Acessar Meu Painel <i class="fas fa-arrow-right ml-2"></i>
                 </a>
             {% else %}
-                <a href="{% url 'narrativa:criarconta' %}" class="px-8 py-4 text-lg font-extrabold rounded-xl text-white bg-teal-600 hover:bg-teal-500 shadow-[0_0_20px_rgba(13,148,136,0.4)] transition-all transform hover:-translate-y-1 flex justify-center items-center w-full sm:w-auto">
-                    Começar Agora <ion-icon name="arrow-forward" class="ml-2 text-xl"></ion-icon>
+                <a href="{% url 'narrativa:criarconta' %}" class="w-full sm:w-auto bg-teal-500 hover:bg-teal-600 text-white font-bold py-4 px-8 rounded-xl transition shadow-lg text-lg flex items-center justify-center">
+                    Começar Agora <i class="fas fa-arrow-right ml-2"></i>
                 </a>
-                <a href="{% url 'narrativa:planos' %}" class="px-8 py-4 text-lg font-bold rounded-xl text-teal-400 bg-gray-800/80 hover:bg-gray-700 backdrop-blur-md border border-teal-500/30 transition-all shadow-lg flex justify-center items-center w-full sm:w-auto">
+                <a href="{% url 'narrativa:planos' %}" class="w-full sm:w-auto bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white font-bold py-4 px-8 rounded-xl transition shadow-md text-lg flex items-center justify-center">
                     Ver Planos e Preços
                 </a>
             {% endif %}
         </div>
 
-        {% if not user.is_authenticated %}
-            <p class="text-gray-400 text-sm mt-6">Crie sua conta em menos de 1 minuto para iniciar.</p>
+        {% if not request.user.is_authenticated %}
+        <p class="mt-6 text-sm text-gray-500">Crie sua conta em menos de 1 minuto para iniciar.</p>
         {% endif %}
     </div>
-</header>
+</div>
 
-<main class="bg-gray-900">
+<div class="bg-gray-900 py-16 border-t border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
 
-    <section class="py-20 lg:py-28 border-b border-gray-800 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12 lg:gap-20">
-            <div class="w-full md:w-1/2 text-center md:text-left">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-teal-900/50 text-teal-400 rounded-2xl mb-6 border border-teal-500/30">
-                    <ion-icon name="map-outline" class="text-3xl"></ion-icon>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 rounded-2xl bg-teal-900/40 border border-teal-500/30 flex items-center justify-center mb-6 shadow-inner text-teal-400">
+                    <i class="fas fa-route text-3xl"></i>
                 </div>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-6 text-white tracking-tight">Inicie Jornadas</h2>
-                <p class="text-xl text-gray-400 leading-relaxed">
-                    Conduza seus pacientes por caminhos interativos desenhados para informar e acolher. A jornada perfeita começa aqui.
-                </p>
+                <h3 class="text-2xl font-bold text-white mb-4">Inicie Jornadas</h3>
+                <p class="text-gray-400 leading-relaxed">Conduza seus pacientes por caminhos interativos desenhados para informar e acolher. A jornada perfeita começa aqui.</p>
             </div>
-            <div class="w-full md:w-1/2 relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-teal-500 to-blue-600 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                <img src="{% static 'images/jornada.png' %}" class="relative w-full rounded-[2rem] shadow-2xl opacity-90 group-hover:opacity-100 transition duration-500 object-cover border border-gray-700" alt="Inicie Jornadas">
-            </div>
-        </div>
-    </section>
 
-    <section class="py-20 lg:py-28 border-b border-gray-800 bg-gray-800/30 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col-reverse md:flex-row items-center gap-12 lg:gap-20">
-            <div class="w-full md:w-1/2 relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                <img src="{% static 'images/tratamentos.png' %}" class="relative w-full rounded-[2rem] shadow-2xl opacity-90 group-hover:opacity-100 transition duration-500 object-cover border border-gray-700" alt="Acompanhe Tratamentos">
-            </div>
-            <div class="w-full md:w-1/2 text-center md:text-left">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-blue-900/50 text-blue-400 rounded-2xl mb-6 border border-blue-500/30">
-                    <ion-icon name="pulse-outline" class="text-3xl"></ion-icon>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 rounded-2xl bg-blue-900/40 border border-blue-500/30 flex items-center justify-center mb-6 shadow-inner text-blue-400">
+                    <i class="fas fa-chart-line text-3xl"></i>
                 </div>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-6 text-white tracking-tight">Acompanhe Tratamentos</h2>
-                <p class="text-xl text-gray-400 leading-relaxed">
-                    Tenha feedback em tempo real sobre a percepção e o bem-estar do paciente. Analise dados e tome decisões mais precisas.
-                </p>
+                <h3 class="text-2xl font-bold text-white mb-4">Acompanhe Tratamentos</h3>
+                <p class="text-gray-400 leading-relaxed">Tenha feedback em tempo real sobre a percepção e o bem-estar do paciente. Analise dados e tome decisões mais precisas.</p>
             </div>
-        </div>
-    </section>
 
-    <section class="py-20 lg:py-28 overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12 lg:gap-20">
-            <div class="w-full md:w-1/2 text-center md:text-left">
-                <div class="inline-flex items-center justify-center w-14 h-14 bg-amber-900/50 text-amber-400 rounded-2xl mb-6 border border-amber-500/30">
-                    <ion-icon name="checkmark-circle-outline" class="text-3xl"></ion-icon>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 rounded-2xl bg-orange-900/40 border border-orange-500/30 flex items-center justify-center mb-6 shadow-inner text-orange-400">
+                    <i class="fas fa-handshake text-3xl"></i>
                 </div>
-                <h2 class="text-3xl md:text-5xl font-extrabold mb-6 text-white tracking-tight">Conclua Atendimentos</h2>
-                <p class="text-xl text-gray-400 leading-relaxed">
-                    Finalize ciclos de cuidado com dados concretos e maior satisfação. Entregue valor real na jornada de cura.
-                </p>
+                <h3 class="text-2xl font-bold text-white mb-4">Conclua Atendimentos</h3>
+                <p class="text-gray-400 leading-relaxed">Finalize ciclos de cuidado com dados concretos e maior satisfação. Entregue valor real na jornada de cura.</p>
             </div>
-            <div class="w-full md:w-1/2 relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-amber-500 to-orange-600 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
-                <img src="{% static 'images/atendimento.png' %}" class="relative w-full rounded-[2rem] shadow-2xl opacity-90 group-hover:opacity-100 transition duration-500 object-cover border border-gray-700" alt="Conclua Atendimentos">
-            </div>
+
         </div>
-    </section>
-
-</main>
-
-<section class="py-20 relative border-t border-gray-800">
-    <div class="absolute inset-0 bg-gradient-to-b from-gray-900 to-teal-900/20"></div>
-    <div class="max-w-4xl mx-auto px-4 relative z-10 text-center bg-gray-800/80 backdrop-blur-md p-10 md:p-16 rounded-3xl border border-teal-500/30 shadow-2xl">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-6">Pronto para transformar sua clínica?</h2>
-        <p class="text-xl text-gray-300 mb-10">Junte-se aos profissionais que já estão modernizando seus atendimentos e gerando resultados reais para os pacientes.</p>
-
-        <!-- BOTÕES INTELIGENTES DA SEÇÃO INFERIOR -->
-        {% if user.is_authenticated %}
-            <a href="{% url 'narrativa:narrativas' %}" class="inline-flex justify-center items-center px-10 py-5 text-xl font-bold rounded-xl text-white bg-teal-600 hover:bg-teal-500 shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all transform hover:-translate-y-1">
-                <ion-icon name="desktop-outline" class="mr-3 text-2xl"></ion-icon> Ir para o Painel da Clínica
-            </a>
-        {% else %}
-            <a href="{% url 'narrativa:planos' %}" class="inline-flex justify-center items-center px-10 py-5 text-xl font-bold rounded-xl text-white bg-teal-600 hover:bg-teal-500 shadow-[0_0_20px_rgba(20,184,166,0.4)] transition-all transform hover:-translate-y-1">
-                <ion-icon name="medkit-outline" class="mr-3 text-2xl"></ion-icon> Ver Planos Disponíveis
-            </a>
-        {% endif %}
     </div>
-</section>
-
-<footer class="bg-gray-950 py-12 border-t border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div class="flex items-center gap-2">
-            <div class="bg-teal-500 text-gray-900 p-1.5 rounded-lg flex items-center justify-center">
-                <ion-icon name="medkit" class="text-xl"></ion-icon>
-            </div>
-            <span class="text-xl font-extrabold tracking-tight text-white">
-                Narrativas<span class="text-teal-500">Clínicas</span>
-            </span>
-        </div>
-
-        <!-- LINKS INTELIGENTES DO RODAPÉ -->
-        <div class="flex gap-6">
-            {% if user.is_authenticated %}
-                <a href="{% url 'narrativa:narrativas' %}" class="text-gray-400 hover:text-teal-400 transition text-sm font-medium">Meu Painel</a>
-            {% else %}
-                <a href="{% url 'narrativa:login' %}" class="text-gray-400 hover:text-teal-400 transition text-sm font-medium">Acesso Clínicas</a>
-                <a href="{% url 'narrativa:criarconta' %}" class="text-gray-400 hover:text-teal-400 transition text-sm font-medium">Criar Conta</a>
-            {% endif %}
-        </div>
-
-        <p class="text-gray-600 text-sm text-center">
-            &copy; {% now "Y" %} Narrativas Clínicas.
-        </p>
-    </div>
-</footer>
+</div>
 {% endblock %}

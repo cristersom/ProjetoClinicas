@@ -3,27 +3,14 @@
 
 {% block extrahead %}
 {{ block.super }}
-
 <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-
-<meta name="description" content="Narrativas clínicas e pesquisas de satisfação, tudo em um só lugar. Evolua o acompanhamento dos seus pacientes.">
-<meta property="og:title" content="Narrativas Clínicas">
-<meta property="og:description" content="Evolua o acompanhamento dos seus pacientes com as nossas jornadas e pesquisas de satisfação. Crie onde quiser, aplique quando quiser.">
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-image.jpg' %}">
-<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Narrativas Clínicas">
-<meta property="og:locale" content="pt_BR">
-
 <script>
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
-
         const mainContent = document.getElementById('content-main');
         const changelist = document.getElementById('changelist');
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
-
         if (!changelist && !formTabela && !table) return;
 
         const bottomBar = document.createElement('div');
@@ -36,14 +23,12 @@
             searchGroup.className = 'my-group';
             searchGroup.action = formOrig.action;
             searchGroup.method = formOrig.method || 'GET';
-
             let hasVisibleFields = false;
 
             formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
                 hasVisibleFields = true;
                 const clone = field.cloneNode(true);
                 clone.value = field.value;
-
                 if (clone.tagName === 'SELECT') {
                     clone.className = 'custom-select';
                     clone.removeAttribute('data-select2-id');
@@ -61,11 +46,9 @@
                 btnSearch.className = 'custom-btn primary';
                 btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
                 searchGroup.appendChild(btnSearch);
-
                 formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
                 bottomBar.appendChild(searchGroup);
             }
-
             formOrig.style.setProperty('display', 'none', 'important');
             if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
         });
@@ -76,7 +59,6 @@
         if (actionSelectOrig && formTabela) {
             const actionGroup = document.createElement('div');
             actionGroup.className = 'my-group';
-
             const selClone = actionSelectOrig.cloneNode(true);
             selClone.className = 'custom-select';
             selClone.removeAttribute('data-select2-id');
@@ -85,27 +67,20 @@
             const btnIr = document.createElement('button');
             btnIr.className = 'custom-btn secondary';
             btnIr.innerText = 'Ir';
-
             btnIr.onclick = (e) => {
                 e.preventDefault();
                 actionSelectOrig.value = selClone.value;
-                if (btnIrOrig) {
-                    btnIrOrig.click();
-                } else {
-                    formTabela.submit();
-                }
+                if (btnIrOrig) { btnIrOrig.click(); } else { formTabela.submit(); }
             };
 
             actionGroup.appendChild(selClone);
             actionGroup.appendChild(btnIr);
             bottomBar.appendChild(actionGroup);
-
             const actionsContainer = actionSelectOrig.closest('.actions');
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
 
         const topButtons = document.querySelectorAll('.content-header a.btn, .page-actions a.btn, .object-tools a, a[href*="/add/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/import/"]:not(td a):not(.my-super-bottom-bar a), a[href*="/export/"]:not(td a):not(.my-super-bottom-bar a)');
-
         if (topButtons.length > 0) {
             const toolsGroup = document.createElement('div');
             toolsGroup.className = 'my-group';
@@ -114,43 +89,27 @@
             topButtons.forEach(btn => {
                 if(processedHrefs.has(btn.href) || btn.closest('#changelist table')) return;
                 processedHrefs.add(btn.href);
-
                 const btnClone = btn.cloneNode(true);
                 btnClone.className = 'custom-btn primary';
-
                 if (!btnClone.innerHTML.includes('fa-')) {
-                    if (btnClone.innerText.toLowerCase().includes('adicionar')) {
-                        btnClone.innerHTML = `<i class="fas fa-plus"></i> ${btnClone.innerText.trim()}`;
-                    } else if (btnClone.innerText.toLowerCase().includes('importar')) {
-                        btnClone.innerHTML = `<i class="fas fa-file-import"></i> ${btnClone.innerText.trim()}`;
-                    } else if (btnClone.innerText.toLowerCase().includes('exportar')) {
-                        btnClone.innerHTML = `<i class="fas fa-file-export"></i> ${btnClone.innerText.trim()}`;
-                    } else {
-                        btnClone.innerHTML = `<i class="fas fa-cog"></i> ${btnClone.innerText.trim()}`;
-                    }
+                    if (btnClone.innerText.toLowerCase().includes('adicionar')) { btnClone.innerHTML = `<i class="fas fa-plus"></i> ${btnClone.innerText.trim()}`; }
+                    else if (btnClone.innerText.toLowerCase().includes('importar')) { btnClone.innerHTML = `<i class="fas fa-file-import"></i> ${btnClone.innerText.trim()}`; }
+                    else if (btnClone.innerText.toLowerCase().includes('exportar')) { btnClone.innerHTML = `<i class="fas fa-file-export"></i> ${btnClone.innerText.trim()}`; }
+                    else { btnClone.innerHTML = `<i class="fas fa-cog"></i> ${btnClone.innerText.trim()}`; }
                 }
                 toolsGroup.appendChild(btnClone);
-
                 btn.style.setProperty('display', 'none', 'important');
-                if (btn.parentElement && btn.parentElement.classList.contains('object-tools')) {
-                    btn.parentElement.style.setProperty('display', 'none', 'important');
-                }
+                if (btn.parentElement && btn.parentElement.classList.contains('object-tools')) { btn.parentElement.style.setProperty('display', 'none', 'important'); }
             });
-
             if(toolsGroup.children.length > 0) bottomBar.appendChild(toolsGroup);
         }
 
         if (bottomBar.children.length > 0) {
             const paginator = document.querySelector('.paginator');
-            if (paginator) {
-                paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling);
-            } else if (table) {
-                table.parentNode.insertBefore(bottomBar, table.nextSibling);
-            } else if (changelist) {
-                changelist.appendChild(bottomBar);
-            } else {
-                mainContent.appendChild(bottomBar);
-            }
+            if (paginator) { paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling); }
+            else if (table) { table.parentNode.insertBefore(bottomBar, table.nextSibling); }
+            else if (changelist) { changelist.appendChild(bottomBar); }
+            else { mainContent.appendChild(bottomBar); }
         }
     }
 
@@ -169,11 +128,7 @@
     window.addEventListener('load', function() {
         construirBarraInferior();
         aplicarLimpezaUX();
-
-        const observer = new MutationObserver(() => {
-            construirBarraInferior();
-            aplicarLimpezaUX();
-        });
+        const observer = new MutationObserver(() => { construirBarraInferior(); aplicarLimpezaUX(); });
         observer.observe(document.body, { childList: true, subtree: true });
 
         const h1 = document.querySelector('.content-header h1');
@@ -195,19 +150,34 @@
 {% block extrastyle %}
 {{ block.super }}
 <style>
-    /* =====================================================================
-       1. BASE E FIM DO SCROLL (APLICA-SE A DESKTOP E MOBILE)
-       ===================================================================== */
-    body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
-    }
+    body, html, .wrapper, .content-wrapper, .main-footer, #content-main { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important; }
     .main-sidebar { background-color: #030712 !important; border: none !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
-    /* =====================================================================
-       2. ALERTAS E CABEÇALHOS GERAIS (APLICA-SE A DESKTOP E MOBILE)
-       ===================================================================== */
-    .admin-alert-banner { margin: 20px 20px 20px 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
+    @media (min-width: 769px) { nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; } }
+    @media (max-width: 768px) {
+        nav.main-header { display: flex !important; visibility: visible !important; height: auto !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; opacity: 1 !important; }
+        nav.main-header * { visibility: visible !important; }
+        nav.main-header .nav-link { color: #f3f4f6 !important; font-size: 1.2rem !important; }
+        .brand-link { display: flex !important; visibility: visible !important; height: auto !important; background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important; align-items: center !important; }
+        .brand-link .brand-text { display: block !important; visibility: visible !important; }
+        .breadcrumb { display: none !important; }
+        .admin-alert-banner { flex-direction: column !important; text-align: center !important; padding: 20px 15px !important; gap: 15px !important; margin: 15px 5px !important; }
+        .alert-content { flex-direction: column !important; gap: 10px !important; }
+        .btn-alert-action { width: 100% !important; margin-top: 10px !important; }
+        #content-main { padding: 0 !important; }
+        #change_form { padding: 0 !important; margin: 0 !important; width: 100% !important; overflow-x: hidden !important; }
+        #content-main > form > div > fieldset.module { padding: 15px 10px !important; margin: 0 0 15px 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+        .inline-related, .djn-item { padding: 45px 10px 15px 10px !important; margin: 0 0 10px 0 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+        .djn-group-nested { padding-left: 0 !important; border-left: none !important; margin-left: 0 !important; }
+        .add-row, .djn-add-item { display: block !important; width: 100% !important; position: static !important; clear: both !important; margin: 25px 0 !important; padding: 0 !important; }
+        .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; margin: 0 !important; padding: 12px 15px !important; font-size: 0.95rem !important; }
+        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; padding: 15px 10px !important; margin-top: 15px !important; clear: both !important; }
+        #change_form .col-md-3 .card { position: relative !important; z-index: 10 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
+        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { padding: 12px !important; font-size: 1rem !important; }
+    }
+
+    .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
     .alert-warning-custom { background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%) !important; border: 1px solid #fb923c !important; color: white !important; }
     .alert-content { display: flex !important; align-items: center !important; gap: 15px !important; }
@@ -218,24 +188,13 @@
 
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
     .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
-
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
     .nav-tabs .nav-link { color: #9ca3af !important; font-weight: bold !important; font-size: 1rem !important; border: none !important; background: transparent !important; padding-left: 0 !important; padding-right: 20px !important;}
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
-    /* =====================================================================
-       3. LIMPANDO O LIXO DO DJANGO (APLICA-SE A DESKTOP E MOBILE)
-       ===================================================================== */
-    /* Removemos o p.original (bloco marrom/castanho) aqui de forma global */
-    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original {
-        display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important;
-    }
-
+    .inline-group > h2, .djn-group > h2, .inline-related h3, .djn-item h3, legend, .inline_label, p.original { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: transparent !important; overflow: hidden !important; }
     .inline-group > fieldset, .djn-group > fieldset, fieldset.djn-fieldset, .inline-group, .djn-group { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
-
     #content-main > form > div > fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
-
-    /* Um "teto" de 45px para proteger o input do botão REMOVER (Global) */
     .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; position: relative !important; padding: 45px 20px 20px 20px !important; margin-bottom: 15px !important; width: 100% !important; box-sizing: border-box !important; }
 
     body .form-row, body .form-group { display: flex !important; flex-direction: column !important; width: 100% !important; max-width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; border: none !important; }
@@ -260,29 +219,22 @@
     .djn-group-nested .djn-item { background: transparent !important; border: none !important; padding: 0 0 20px 0 !important; margin-bottom: 10px !important; border-bottom: 1px dashed #4b5563 !important; border-radius: 0 !important; box-shadow: none !important; }
     .djn-group-nested .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important;}
 
-    /* BOTÕES DE EXCLUIR DINÂMICOS E ESTÁTICOS (Global - protegido pelo teto de 45px) */
     span.delete input, div.delete input { display: none !important; }
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 10px !important; right: 15px !important; z-index: 10 !important; display: block !important; }
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; font-weight: bold !important; text-transform: uppercase !important; cursor: pointer !important; transition: 0.2s; display: inline-block !important; margin: 0 !important; line-height: 1 !important; white-space: nowrap !important;}
     span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.75rem !important; }
     span.delete label:hover, div.delete label:hover, a.inline-deletelink:hover, a.djn-remove-handler:hover { background-color: #ef4444 !important; color: white !important; }
 
-    /* Botão Adicionar Padrão (Desktop) */
     .add-row, .djn-add-item { margin-top: 10px !important; padding: 0 !important; display: block !important; }
     .add-row a, .djn-add-item a, .djn-add-handler { background-color: transparent !important; color: #14b8a6 !important; border: 1px dashed #14b8a6 !important; padding: 8px 15px !important; border-radius: 6px !important; font-weight: 600 !important; font-size: 0.85rem !important; text-decoration: none !important; display: inline-block !important; transition: 0.2s; white-space: nowrap !important; }
     .add-row a:hover, .djn-add-item a:hover, .djn-add-handler:hover { background-color: #14b8a6 !important; color: white !important; }
 
-    /* Salvar (Desktop) */
     #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; box-shadow: none !important; }
     #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
     input[name="_save"]:hover, .btn-success:hover { background-color: #0d9488 !important; }
     input[name="_addanother"], input[name="_continue"] { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; }
 
-
-    /* =====================================================================
-       4. TABELAS MODERNAS E BARRA INFERIOR (APLICA-SE A DESKTOP E MOBILE)
-       ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important; border-spacing: 0 !important; margin-bottom: 0 !important; margin-top: 10px !important;}
     #changelist table thead th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; font-weight: bold !important; text-transform: uppercase !important; font-size: 0.85rem !important; text-align: left !important;}
     #changelist table tbody td, #changelist table tbody th { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; vertical-align: middle !important; }
@@ -309,67 +261,11 @@
     .custom-btn.primary:hover { background-color: #0d9488 !important; color: white !important; }
     .custom-btn.secondary { background-color: #4b5563 !important; color: white !important; }
     .custom-btn.secondary:hover { background-color: #6b7280 !important; color: white !important; }
-
-    /* =====================================================================
-       5. REGRAS EXCLUSIVAS PARA CELULAR (AQUI ACONTECE A MÁGICA SEM TOCAR NO DESKTOP)
-       ===================================================================== */
-    @media (min-width: 769px) {
-        nav.main-header, .breadcrumb, .brand-link { display: none !important; visibility: hidden !important; height: 0 !important; }
-    }
-
-    @media (max-width: 768px) {
-        /* Mantém o menu superior aberto no telemóvel para aceder à aba lateral */
-        nav.main-header {
-            display: flex !important; visibility: visible !important; height: auto !important; min-height: 55px !important;
-            background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; opacity: 1 !important;
-        }
-        nav.main-header * { visibility: visible !important; }
-        nav.main-header .nav-link { color: #f3f4f6 !important; font-size: 1.2rem !important; }
-
-        .brand-link {
-            display: flex !important; visibility: visible !important; height: auto !important;
-            background-color: #111827 !important; color: white !important; border-bottom: 1px solid #374151 !important; align-items: center !important;
-        }
-        .brand-link .brand-text { display: block !important; visibility: visible !important; }
-        .breadcrumb { display: none !important; }
-
-        /* Ajuste do Alerta */
-        .admin-alert-banner { flex-direction: column !important; text-align: center !important; padding: 20px 15px !important; gap: 15px !important; margin: 15px 5px !important; }
-        .alert-content { flex-direction: column !important; gap: 10px !important; }
-        .btn-alert-action { width: 100% !important; margin-top: 10px !important; }
-
-        /* AQUI ESTÁ O REMÉDIO PARA O ESPAÇO: Remove paddings gerais e laterais só no mobile */
-        #content-main { padding: 0 !important; }
-        #change_form { padding: 0 !important; margin: 0 !important; width: 100% !important; overflow-x: hidden !important; }
-
-        #content-main > form > div > fieldset.module {
-            padding: 15px 10px !important; margin: 0 0 15px 0 !important;
-            border-radius: 0 !important; border-left: none !important; border-right: none !important;
-        }
-
-        /* A caixa interna continua com teto para o botão remover, mas perde as bordas gordinhas laterais */
-        .inline-related, .djn-item {
-            padding: 45px 10px 15px 10px !important; margin: 0 0 10px 0 !important;
-            border-radius: 0 !important; border-left: none !important; border-right: none !important;
-        }
-
-        .djn-group-nested { padding-left: 0 !important; border-left: none !important; margin-left: 0 !important; }
-
-        /* Conserto dos botões ADICIONAR (empurrando-os para ocuparem 100% só no mobile) */
-        .add-row, .djn-add-item { display: block !important; width: 100% !important; position: static !important; clear: both !important; margin: 25px 0 !important; padding: 0 !important; }
-        .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; box-sizing: border-box !important; text-align: center !important; margin: 0 !important; padding: 12px 15px !important; font-size: 0.95rem !important; }
-
-        /* Ajuste do botão SALVAR (flex column) */
-        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; padding: 15px 10px !important; margin-top: 15px !important; clear: both !important; }
-        #change_form .col-md-3 .card { position: relative !important; z-index: 10 !important; border-radius: 0 !important; border-left: none !important; border-right: none !important; }
-        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { padding: 12px !important; font-size: 1rem !important; }
-    }
 </style>
 {% endblock %}
 
 {% block messages %}
     {{ block.super }}
-
     {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
         {% if not request.user.clinica.assinatura_ativa %}
             <div class="admin-alert-banner alert-danger-custom">
