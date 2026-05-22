@@ -141,7 +141,8 @@
         if (h1) { h1.innerText = h1.innerText.replace(/\|/g, '').trim(); }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
-        const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul');
+        // AJSUTE PARA PEGAR O MENU LATERAL EM QUALQUER TELA (INCLUINDO MANUAL)
+        const sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.os-content ul') || document.querySelector('nav ul.nav');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
                 <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
@@ -160,7 +161,7 @@
        1. BASE E TEMA ESCURO GERAL
        ===================================================================== */
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important;
+        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important;
     }
     .main-sidebar { background-color: #030712 !important; border: none !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
@@ -178,22 +179,24 @@
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 10px !important;
+        padding: 0 20px !important;
         margin: 0 !important;
     }
     .user-panel .image { display: none !important; }
+    /* E-mail centralizado no PC e sem cortes */
     .user-panel .info { width: 100% !important; text-align: center !important; padding: 0 !important; display: block !important; }
-    .user-panel .info a { display: block !important; width: 100% !important; text-align: center !important; font-weight: bold !important; color: #d1d5db !important; }
+    .user-panel .info a { display: block !important; width: 100% !important; text-align: center !important; font-weight: bold !important; color: #d1d5db !important; white-space: normal !important; word-wrap: break-word !important; }
 
+    /* REMOVIDA A BORDA DIREITA DO TÍTULO */
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
-    .content-header h1 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
+    .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
 
     .os-scrollbar { display: none !important; visibility: hidden !important; }
 
     /* =====================================================================
        3. ALERTAS E ESTILOS PADRÃO
        ===================================================================== */
-    .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; }
+    .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
     .alert-warning-custom { background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%) !important; border: 1px solid #fb923c !important; color: white !important; }
     .btn-alert-action { background-color: white !important; color: #111827 !important; padding: 8px 18px !important; border-radius: 8px !important; font-weight: 800 !important; text-decoration: none !important; text-transform: uppercase !important; }
@@ -207,7 +210,6 @@
        ===================================================================== */
     p.original { display: none !important; }
     fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; }
-
     .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; margin-bottom: 15px !important; }
 
     input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select {
@@ -219,9 +221,6 @@
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; display: flex !important; align-items: center !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
-    /* =====================================================================
-       5. BOTÕES INFERIORES E TABELAS
-       ===================================================================== */
     #change_form .col-md-3 .card, .submit-row { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; }
     #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; margin-bottom: 10px !important; border-radius: 6px !important; font-weight: bold !important; text-align: center !important; }
     input[name="_save"], .btn-success { background-color: #14b8a6 !important; color: white !important; border: none !important; }
@@ -237,63 +236,81 @@
     .custom-btn.primary { background-color: #14b8a6 !important; }
 
     /* =====================================================================
-       6. O NOVO CÓDIGO MOBILE (INPUTS A 100%, SEM CORTES)
+       6. A MÁGICA DO MOBILE (CORREÇÃO DE CORTES E ALINHAMENTOS REAIS)
        ===================================================================== */
     @media (min-width: 769px) {
         body nav.main-header, body .main-header, body .navbar { display: none !important; }
     }
 
     @media (max-width: 768px) {
-        /* Cabeçalho */
+        /* BLINDAGEM CONTRA CORTES (Vazamentos de tela) */
+        html, body { overflow-x: hidden !important; width: 100vw !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+
+        #content-main, .content-wrapper, .container-fluid, .content {
+            padding: 15px !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; overflow-x: hidden !important;
+        }
+
+        /* Menu de Topo (Hambúrguer) */
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
         body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
         .breadcrumb { display: none !important; }
-        .content-header { height: auto !important; padding: 15px 10px !important; margin: 0 !important; border: none !important; flex-direction: column !important; align-items: flex-start !important; }
 
-        /* Container Principal */
-        #content-main, .container-fluid { padding: 10px !important; width: 100% !important; overflow-x: hidden !important; box-sizing: border-box !important; }
+        /* O E-MAIL DO MENU NO MOBILE (Alinhado à esquerda) */
+        .user-panel { justify-content: flex-start !important; padding-left: 20px !important; }
+        .user-panel .info { text-align: left !important; }
+        .user-panel .info a { text-align: left !important; }
 
-        /* BOTÕES DE RESPOSTAS E AÇÕES DO TOPO (Empilhados e Full Width) */
-        ul.object-tools, .page-actions { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 0 0 20px 0 !important; padding: 0 !important; }
-        ul.object-tools li, .page-actions li { display: block !important; width: 100% !important; margin: 0 0 10px 0 !important; }
-        ul.object-tools a, .page-actions a { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1.1rem !important; box-sizing: border-box !important; border-radius: 8px !important; }
+        /* Cabeçalhos (Títulos como Narrativas, Cenas) */
+        .content-header { height: auto !important; padding: 0 0 15px 0 !important; margin: 0 0 15px 0 !important; border-bottom: none !important; }
+        .content-header h1 { white-space: normal !important; word-wrap: break-word !important; font-size: 1.8rem !important; margin-bottom: 10px !important;}
 
-        /* MARRETA NO BOOTSTRAP: Força colunas de formulário a 100% */
-        .form-group.row, .form-row { display: flex !important; flex-direction: column !important; margin: 0 0 15px 0 !important; width: 100% !important; box-sizing: border-box !important; }
-        .form-group.row > label, .form-row > label { margin: 0 0 5px 0 !important; text-align: left !important; width: 100% !important; max-width: 100% !important; flex: none !important; padding: 0 !important; font-weight: bold !important; }
-        .form-group.row > div, .form-row > div, div[class^="col-"], .fieldBox { width: 100% !important; max-width: 100% !important; flex: none !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important; }
+        /* Zera margens negativas destrutivas do Bootstrap */
+        .row, .form-row, .form-group, .aligned .form-row { margin-left: 0 !important; margin-right: 0 !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+        div[class^="col-"], div[class*=" col-"], .fieldBox { padding-left: 0 !important; padding-right: 0 !important; width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; box-sizing: border-box !important; }
 
-        /* Módulos e Inlines (Cenas/Questionários) */
-        #content-main > form > div > fieldset.module { padding: 15px !important; width: 100% !important; box-sizing: border-box !important; }
-        .inline-related, .djn-item { padding: 15px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
+        /* BOTÕES DE TOPO E PESQUISA (Exportar, Adicionar, etc) - UM EM BAIXO DO OUTRO */
+        ul.object-tools, .page-actions { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 15px 0 !important; padding: 0 !important; float: none !important; gap: 10px !important; }
+        ul.object-tools li, .page-actions li { display: block !important; width: 100% !important; margin: 0 !important; }
 
-        /* Ajuste do Título e Botão Remover no Inline */
-        .inline-related h3 {
-            display: flex !important; justify-content: flex-end !important; align-items: center !important;
-            margin: 0 0 15px 0 !important; padding: 0 0 10px 0 !important; border-bottom: 1px dashed #4b5563 !important;
-            color: transparent !important; /* Esconde texto "Cena 1" */ height: auto !important; visibility: visible !important;
+        /* Design idêntico aos botões da Sessão Pacientes */
+        ul.object-tools li a, .page-actions a, .btn-success {
+            display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1.1rem !important; box-sizing: border-box !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important; font-weight: bold !important;
         }
-        .inline-related h3 b { display: none !important; }
-        span.delete, div.delete { position: static !important; display: block !important; }
-        span.delete label { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; margin: 0 !important; display: inline-block !important; }
-        span.delete label::after { content: "Remover" !important; font-size: 0.8rem !important; }
 
-        /* INPUTS LARGOS GIGANTES (100% da tela) */
-        input[type="text"], input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
-            width: 100% !important; max-width: 100% !important; box-sizing: border-box !important;
-        }
-        input:not([type="checkbox"]):not([type="radio"]), select { height: 50px !important; font-size: 1rem !important; padding: 10px 15px !important; }
-        .select2-container { width: 100% !important; }
-        .select2-selection { height: 50px !important; width: 100% !important; }
+        #changelist-search form { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; }
+        #changelist-search input[type="text"], #changelist-search input[type="submit"] { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+
+        /* LABELS E FORMULÁRIOS GERAIS */
+        body label { margin: 10px 0 5px 0 !important; padding: 0 !important; width: 100% !important; display: block !important; text-align: left !important; font-weight: bold !important; }
+
+        /* Cenas e Questionários (Inlines) - Força largura máxima */
+        .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; box-sizing: border-box !important; }
+        .inline-related, .djn-item { width: 100% !important; margin: 0 0 15px 0 !important; padding: 35px 15px 15px 15px !important; box-sizing: border-box !important; border-radius: 8px !important; position: relative !important; }
+        fieldset { margin-left: 0 !important; margin-right: 0 !important; padding: 15px 10px !important; width: 100% !important; box-sizing: border-box !important; }
+
+        /* Remove o buraco gigante antes do primeiro input no inline */
+        .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 0 !important; }
+
+        /* INPUTS e SELECTS gigantes - Ponta a Ponta */
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; display: block !important; }
+        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select:not(.custom-select) { height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; }
+        .select2-container { width: 100% !important; max-width: 100% !important; display: block !important; }
+        .select2-selection { height: 50px !important; display: flex !important; align-items: center !important; width: 100% !important; }
         textarea { min-height: 120px !important; }
 
-        /* Botões de Ação Finais (Gigantes) */
-        .add-row, .djn-add-item { margin: 20px 0 !important; width: 100% !important; }
-        .add-row a, .djn-add-item a { width: 100% !important; display: block !important; text-align: center !important; padding: 15px !important; font-size: 1.1rem !important; box-sizing: border-box !important; }
+        /* Botão Remover (Padrão para Questionários e Cenas) */
+        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 10px !important; right: 10px !important; display: block !important; z-index: 10; }
+        span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; margin: 0 !important; display: inline-block !important;}
+        span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.8rem !important; }
 
-        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; padding: 15px !important; margin-top: 15px !important; }
-        #change_form .col-md-3 .card { padding: 15px !important; }
-        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 15px !important; font-size: 1.1rem !important; margin: 0 !important; box-sizing: border-box !important; }
+        /* Botões "Adicionar Outro" (Cores fortes, menos espaçamento vazio) */
+        .add-row, .djn-add-item { margin: 10px 0 20px 0 !important; width: 100% !important; padding: 0 !important; display: block !important; }
+        .add-row a, .djn-add-item a, .djn-add-handler { width: 100% !important; display: block !important; text-align: center !important; padding: 15px !important; font-size: 1.05rem !important; box-sizing: border-box !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; opacity: 1 !important; border-radius: 8px !important; }
+
+        /* Botões Finais de Salvar */
+        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; padding: 15px !important; margin-top: 15px !important; box-sizing: border-box !important; }
+        #change_form .col-md-3 .card { width: 100% !important; padding: 15px !important; box-sizing: border-box !important; }
+        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 15px !important; font-size: 1.1rem !important; box-sizing: border-box !important; margin: 0 !important; border-radius: 8px !important; }
     }
 </style>
 {% endblock %}
