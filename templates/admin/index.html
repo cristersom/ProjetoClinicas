@@ -8,12 +8,10 @@
 
     .dashboard-container { padding: 20px; color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
 
-    /* Grelha Desktop */
     .dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
     @media(max-width: 1024px) { .dash-grid { grid-template-columns: 1fr; } }
 
-    /* Forçamos o margin-top a ZERO na grelha esquerda (KPIs) */
-    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; margin-top: 0 !important; padding-top: 0 !important; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
     .kpi-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
     .kpi-card:hover { transform: translateY(-5px); border-color: #4b5563; }
     .kpi-icon { width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; color: white; }
@@ -27,8 +25,7 @@
     .bg-purple { background: linear-gradient(135deg, #4c1d95, #8b5cf6); }
     .bg-orange { background: linear-gradient(135deg, #7c2d12, #f97316); }
 
-    /* Forçamos o margin-top a ZERO na caixa da direita (Plano) */
-    .side-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-bottom: 25px; margin-top: 0 !important; }
+    .side-card { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 25px; margin-bottom: 25px; }
     .side-card h3 { color: white; font-weight: 800; font-size: 1.1rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #374151; padding-bottom: 10px; }
 
     .billing-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px dashed #374151; padding-bottom: 10px; }
