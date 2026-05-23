@@ -31,14 +31,14 @@
         });
     }
 
-    // 2. CONVERTER TABELAS EM CARTÕES NO MOBILE (A GRANDE MELHORIA DE UX)
+    // 2. CONVERTER TABELAS EM CARTÕES NO MOBILE (UX NATIVA)
     function formatarTabelasMobile() {
         if(window.innerWidth <= 768) {
             const tables = document.querySelectorAll('#changelist table');
             tables.forEach(table => {
                 const headers = Array.from(table.querySelectorAll('thead th')).map(th => {
                     let text = th.innerText.trim();
-                    return text === "" ? "Ação" : text; // Se for vazio (como a checkbox), dá um nome
+                    return text === "" ? "Ação" : text;
                 });
                 table.querySelectorAll('tbody tr').forEach(tr => {
                     Array.from(tr.querySelectorAll('td, th')).forEach((td, index) => {
@@ -51,64 +51,26 @@
         }
     }
 
-    // 3. BARRA INFERIOR (Ações)
+    // 3. BARRA INFERIOR (Ações e Pesquisa unificados)
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
 
-        const mainContent = document.getElementById('content-main');
         const changelist = document.getElementById('changelist');
-        const formTabela = document.getElementById('changelist-form');
-        const table = document.querySelector('#changelist table');
-
-        if (!changelist && !formTabela && !table) return;
+        if (!changelist) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
-        filterForms.forEach(formOrig => {
-            const searchGroup = document.createElement('form');
-            searchGroup.className = 'my-group search-group';
-            searchGroup.action = formOrig.action;
-            searchGroup.method = formOrig.method || 'GET';
-            let hasVisibleFields = false;
-
-            formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
-                hasVisibleFields = true;
-                const clone = field.cloneNode(true);
-                clone.value = field.value;
-                clone.className = 'custom-input';
-                if(!clone.placeholder) clone.placeholder = 'Pesquisar...';
-                searchGroup.appendChild(clone);
-            });
-
-            if (hasVisibleFields) {
-                const btnSearch = document.createElement('button');
-                btnSearch.type = 'submit';
-                btnSearch.className = 'custom-btn btn-pesquisar';
-                btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-                searchGroup.appendChild(btnSearch);
-                formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
-                bottomBar.appendChild(searchGroup);
-            }
-            formOrig.style.setProperty('display', 'none', 'important');
-            if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
-        });
-
+        // Mover Dropdown de Ações
         const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
-        if (actionSelectOrig && formTabela) {
-            const actionGroup = document.createElement('div');
-            actionGroup.className = 'my-group actions-group';
-
+        if (actionSelectOrig && changelist) {
             const selClone = actionSelectOrig.cloneNode(true);
-            selClone.className = 'custom-select';
-            selClone.removeAttribute('data-select2-id');
-            selClone.classList.remove('select2-hidden-accessible');
+            selClone.className = 'custom-select full-width'; // Largo total
             if(selClone.options[0] && selClone.options[0].text.includes('---')) {
-                selClone.options[0].text = 'Selecione uma ação...';
+                selClone.options[0].text = 'Ação...';
             }
 
             const btnIr = document.createElement('button');
@@ -117,27 +79,35 @@
             btnIr.onclick = (e) => {
                 e.preventDefault();
                 actionSelectOrig.value = selClone.value;
-                if (btnIrOrig) { btnIrOrig.click(); } else { formTabela.submit(); }
+                if (btnIrOrig) btnIrOrig.click();
             };
 
-            actionGroup.appendChild(selClone);
-            actionGroup.appendChild(btnIr);
-            bottomBar.appendChild(actionGroup);
+            // Botão Pesquisar (Vem do form)
+            const btnPesquisar = document.createElement('button');
+            btnPesquisar.className = 'custom-btn btn-pesquisar';
+            btnPesquisar.innerText = 'Pesquisar';
+            btnPesquisar.onclick = (e) => {
+                e.preventDefault();
+                const searchForm = document.querySelector('#changelist-search form');
+                if (searchForm) searchForm.submit();
+            };
 
-            const actionsContainer = actionSelectOrig.closest('.actions');
-            if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
+            const actionsRow = document.createElement('div');
+            actionsRow.className = 'actions-row';
+            actionsRow.appendChild(btnPesquisar); // Pesquisar na esquerda
+            actionsRow.appendChild(btnIr);        // Ir na direita
+
+            bottomBar.appendChild(selClone);      // Dropdown em cima
+            bottomBar.appendChild(actionsRow);    // Botões embaixo
         }
 
-        if (bottomBar.children.length > 0) {
-            const paginator = document.querySelector('.paginator');
-            if (paginator) { paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling); }
-            else if (table) { table.parentNode.insertBefore(bottomBar, table.nextSibling); }
-            else if (changelist) { changelist.appendChild(bottomBar); }
-            else { mainContent.appendChild(bottomBar); }
-        }
+        const paginator = document.querySelector('.paginator');
+        if (paginator) { paginator.parentNode.insertBefore(bottomBar, paginator.nextSibling); }
+        else { changelist.appendChild(bottomBar); }
     }
 
     function aplicarLimpezaUX() {
+        // Remover legendas inúteis
         document.querySelectorAll('h2, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
@@ -148,14 +118,27 @@
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
         });
 
-        // Ícones nos botões do topo
-        document.querySelectorAll('.object-tools a').forEach(btn => {
-            if (!btn.innerHTML.includes('fa-')) {
-                if (btn.innerText.toLowerCase().includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> ${btn.innerText.trim()}`; }
-                else if (btn.innerText.toLowerCase().includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> ${btn.innerText.trim()}`; }
-                else if (btn.innerText.toLowerCase().includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> ${btn.innerText.trim()}`; }
-            }
-        });
+        // Formatar botões de topo (Só Ícones no Mobile)
+        if(window.innerWidth <= 768) {
+            document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
+                let text = btn.innerText.toLowerCase();
+                btn.className = btn.className.replace('btn-success', '').replace('btn-secondary', '').replace('btn-primary', '');
+                btn.className += ' icon-only-btn'; // Classe para só ícone
+
+                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i>`; }
+                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i>`; }
+                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i>`; }
+            });
+        } else {
+             // Desktop: Mantém texto e ícones
+            document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
+                if (!btn.innerHTML.includes('fa-')) {
+                    if (btn.innerText.toLowerCase().includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> ${btn.innerText.trim()}`; }
+                    else if (btn.innerText.toLowerCase().includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> ${btn.innerText.trim()}`; }
+                    else if (btn.innerText.toLowerCase().includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> ${btn.innerText.trim()}`; }
+                }
+            });
+        }
     }
 
     window.addEventListener('load', function() {
@@ -172,27 +155,16 @@
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
-        // Título sem linhas fantasmas
+        // Título limpo
         const h1 = document.querySelector('.content-header h1');
         if (h1) {
             h1.childNodes.forEach(node => {
-                if (node.nodeType === 3) { node.nodeValue = node.nodeValue.replace(/\|/g, '').trim(); }
+                if (node.nodeType === 3) node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
             });
-        }
-        document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
-
-        // Menu Lateral
-        let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
-        if (sidebar && !document.querySelector('#menu-conta-custom')) {
-            sidebar.insertAdjacentHTML('beforeend', `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
-                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
-            `);
         }
     });
 
-    window.addEventListener('resize', formatarTabelasMobile);
+    window.addEventListener('resize', () => { formatarTabelasMobile(); aplicarLimpezaUX(); });
 </script>
 {% endblock %}
 
@@ -200,60 +172,36 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE, TEMA ESCURO E RESET
+       1. BASE E TEMA ESCURO (Prevenção Total de Estouro de Tela)
        ===================================================================== */
     *, *::before, *::after { box-sizing: border-box !important; }
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; max-width: 100vw !important; overflow-x: hidden !important;
+        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; max-width: 100% !important; overflow-x: hidden !important;
     }
     .main-sidebar { background-color: #030712 !important; border: none !important; }
+    .os-scrollbar { display: none !important; visibility: hidden !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. O ALINHAMENTO PERFEITO DO DESKTOP (E-MAIL E TÍTULO)
+       2. TÍTULOS E ALINHAMENTO DESKTOP
        ===================================================================== */
     .brand-link { display: none !important; border: none !important; }
     .navbar-nav.ml-auto { display: none !important; }
 
-    /* E-MAIL NA BARRA LATERAL - EXATOS 65px */
-    .user-panel {
-        border-top: none !important;
-        border-bottom: 1px solid #374151 !important;
-        height: 65px !important; display: flex !important; align-items: center !important; justify-content: center !important;
-        padding: 0 20px !important; margin: 0 !important;
-    }
+    .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 20px !important; margin: 0 !important; }
     .user-panel .image { display: none !important; }
     .user-panel .info { width: 100% !important; text-align: center !important; padding: 0 !important; display: block !important;}
-    .user-panel .info a { display: block !important; width: 100% !important; text-align: center !important; font-weight: bold !important; color: #d1d5db !important; }
+    .user-panel .info a { display: block !important; font-weight: bold !important; color: #d1d5db !important; }
 
-    /* TÍTULO DA PÁGINA - EXATOS 65px PARA A LINHA CORRER PERFEITA */
-    .content-header {
-        height: 65px !important; display: flex !important; align-items: center !important;
-        border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important;
-    }
-    .content-header h1 { border-right: none !important; border-left: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
+    .content-header { height: 65px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; }
+    .content-header h1, h1.border-right, .border-right { border-right: none !important; border-left: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; border: none !important;}
 
-    .os-scrollbar { display: none !important; visibility: hidden !important; }
-
-    /* =====================================================================
-       3. BOTÃO HISTÓRICO (AGORA COM LEITURA NO DESKTOP)
-       ===================================================================== */
-    .historylink {
-        background-color: #4b5563 !important; color: white !important;
-        padding: 8px 15px !important; border-radius: 8px !important; text-decoration: none !important;
-        font-weight: bold !important; font-size: 0.9rem !important; margin-left: auto !important;
-    }
+    /* Botão Histórico Desktop */
+    .historylink { background-color: #4b5563 !important; color: white !important; padding: 8px 15px !important; border-radius: 8px !important; text-decoration: none !important; font-weight: bold !important; font-size: 0.9rem !important; margin-left: auto !important; }
     .historylink:hover { background-color: #6b7280 !important; color: white !important; }
 
     /* =====================================================================
-       4. NEUTRALIZANDO A CLASSE .P-5 E O "BOX-IN-BOX"
-       ===================================================================== */
-    .p-5, .card-body.p-5 { padding: 15px !important; }
-    #change_form .tab-content > .card, #change_form .tab-pane > .card { border: 1px solid #374151 !important; background-color: #1f2937 !important; border-radius: 8px !important; }
-    .inline-related .field-narrativa { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
-
-    /* =====================================================================
-       5. ALERTAS E ABAS
+       3. ALERTAS E ABAS
        ===================================================================== */
     .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
     .alert-content { display: flex !important; align-items: center !important; gap: 15px !important; }
@@ -266,11 +214,10 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       6. FORMULÁRIOS DESKTOP & GERAIS
+       4. FORMULÁRIOS DESKTOP & BOX-IN-BOX GERAL (Reset de Aninhamento)
        ===================================================================== */
     p.original { display: none !important; }
     fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; }
-
     .inline-related, .djn-item { background-color: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 20px !important; }
     .djn-group-nested .inline-related { padding: 15px !important; margin-bottom: 10px !important; background-color: #1f2937 !important; }
 
@@ -278,182 +225,156 @@
         background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important;
     }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
-
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; display: flex !important; align-items: center !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
     /* =====================================================================
-       7. TABELAS NO DESKTOP E BOTÕES DO TOPO (DESCOLADOS DA TABELA)
+       5. TABELAS NO DESKTOP (E Botões do Topo Descolados)
        ===================================================================== */
-    ul.object-tools {
-        display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-end !important;
-        gap: 12px !important; margin: 0 0 30px 0 !important; padding: 0 !important; /* Margin bottom forte para não colar na tabela */
-    }
+    ul.object-tools { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-end !important; gap: 12px !important; margin: 0 0 30px 0 !important; padding: 0 !important; }
     ul.object-tools li { margin: 0 !important; list-style: none !important;}
-    ul.object-tools li a {
-        display: inline-block !important; padding: 12px 25px !important; font-size: 1rem !important; font-weight: bold !important;
-        border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;
-        text-decoration: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
+    ul.object-tools li a { display: inline-block !important; padding: 12px 25px !important; font-size: 1rem !important; font-weight: bold !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important; text-decoration: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important; }
 
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
     #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
     #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
     #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; }
 
-    /* =====================================================================
-       8. PADRONIZAÇÃO DAS BARRAS DE AÇÃO (PESQUISAR / IR)
-       ===================================================================== */
-    /* Barra de Pesquisa */
+    /* Pesquisa Desktop */
     #changelist-search { margin-bottom: 25px !important; display: flex; justify-content: flex-start; width: 100%; }
     #changelist-search form { display: flex !important; gap: 10px !important; align-items: center !important; }
-    .custom-input { width: 300px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
-    .btn-pesquisar { height: 45px !important; padding: 0 25px !important; border-radius: 8px !important; background-color: #6b21a8 !important; color: white !important; font-weight: bold !important; border: none !important; cursor: pointer;}
+    #changelist-search input[type="text"] { height: 42px !important; width: 300px !important; border-radius: 8px !important; }
+    #changelist-search input[type="submit"] { display: none !important; } /* Esconde o submit padrão, o JS unificou */
 
-    /* Barra de Ações Inferior (Ir) */
-    .my-super-bottom-bar {
-        display: flex !important; flex-direction: row !important; align-items: center !important;
-        gap: 15px !important; padding: 15px !important; margin-top: 25px !important;
-        background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
-    }
+    /* Barra de Ações Desktop */
+    .my-super-bottom-bar { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; padding: 15px !important; margin-top: 25px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; }
     .my-group.actions-group { display: flex !important; align-items: center !important; gap: 10px !important; }
-    .custom-select { width: 300px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
-    .btn-ir { height: 45px !important; padding: 0 35px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; background-color: #3b82f6 !important; border: none !important; cursor: pointer; text-transform: uppercase;}
-    .btn-ir:hover { background-color: #2563eb !important; }
+    .custom-select { width: 250px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; }
+    .btn-pesquisar, .btn-ir { height: 42px !important; padding: 0 25px !important; border-radius: 6px !important; font-weight: bold !important; color: white !important; cursor: pointer; border: none !important; }
+    .btn-pesquisar { background-color: #6b21a8 !important; } /* Cor do Pesquisar no PC */
+    .btn-ir { background-color: #3b82f6 !important; }       /* Cor do IR no PC */
 
     /* =====================================================================
-       9. BOTÕES DE SALVAR NO DESKTOP (JOGADOS PARA O FUNDO)
+       6. BOTÕES DE SALVAR NO DESKTOP (Jogados para o Fundo)
        ===================================================================== */
     @media (min-width: 769px) {
-        body nav.main-header, body .main-header, body .navbar { display: none !important; }
-
         #content-main > form > div.row { display: flex !important; flex-direction: column !important; margin: 0 !important; }
-        #content-main > form > div.row > [class*="col-"] { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; }
-
+        #content-main > form > div.row > [class*="col-"] { width: 100% !important; max-width: 100% !important; padding: 0 !important; }
         .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 30px !important; }
-        .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; display: inline-block !important; background-color: #14b8a6 !important; color: white !important; border: none !important; cursor: pointer;}
-        .submit-row input:hover { background-color: #0d9488 !important; }
-
-        #change_form .col-md-3 { display: none !important; } /* Esconde a barra direita lateral */
+        .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; background-color: #14b8a6 !important; color: white !important; border: none !important; cursor: pointer;}
+        #change_form .col-md-3 { display: none !important; }
     }
 
     /* =====================================================================
-       10. A SOLUÇÃO DEFINITIVA DO MOBILE (CARD VIEW & PADRONIZAÇÃO)
+       7. A SOLUÇÃO DEFINITIVA DO MOBILE (RESET DE ANINHAMENTO E CARD VIEW)
        ===================================================================== */
     @media (max-width: 768px) {
+        /* PADRÃO APP (100% de largura, sem espaços vazios laterais) */
         #content-main, .content-wrapper, .container-fluid, .content {
-            width: 100% !important; max-width: 100vw !important; padding: 15px 10px !important; margin: 0 !important; overflow-x: hidden !important; box-sizing: border-box !important;
+            width: 100% !important; max-width: 100% !important; padding: 15px 5px !important; margin: 0 !important; box-sizing: border-box !important; overflow-x: hidden !important;
         }
 
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
         body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
         .breadcrumb { display: none !important; }
+        .user-panel { justify-content: flex-start !important; padding-left: 20px !important; }
+        .user-panel .info { text-align: left !important; }
+        .user-panel .info a { text-align: left !important; }
 
-        .user-panel { justify-content: flex-start !important; padding-left: 20px !important; border-bottom: 1px solid #374151 !important;}
-        .user-panel .info { display: block !important; text-align: left !important; }
-        .user-panel .info a { display: block !important; text-align: left !important; }
+        /* Título e Botões de Relatório na Mesma Linha */
+        .content-header { height: auto !important; padding: 0 5px 10px 5px !important; margin: 0 0 15px 0 !important; border-bottom: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; display: flex !important; float: none !important; clear: both !important;}
+        .content-header h1 { margin: 0 !important; font-size: 1.5rem !important; border: none !important; border-right: none !important; display: inline-block !important;}
 
-        /* CABEÇALHOS CORRIGIDOS (Evita sobrepor botões em Sessão Pacientes) */
-        .content-header { height: auto !important; padding: 0 0 10px 0 !important; margin: 0 0 20px 0 !important; border-bottom: none !important; flex-direction: column !important; align-items: flex-start !important; position: relative !important; display: block !important; clear: both !important;}
-        .content-header h1 { margin: 0 !important; width: 100% !important; text-align: left !important; border: none !important;}
+        /* NEUTRALIZANDO A GRELHA DO BOOTSTRAP (Morte ao Box-in-Box) */
+        .row, .form-row, .form-group, .aligned .form-row { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; box-sizing: border-box !important;}
+        div[class^="col-"], div[class*=" col-"], .fieldBox, .aligned label { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; margin: 0 !important; box-sizing: border-box !important;}
 
-        /* NEUTRALIZANDO A GRELHA DO BOOTSTRAP */
-        .row, .form-row, .form-group, .aligned .form-row {
-            display: flex !important; flex-direction: column !important;
-            width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important;
+        fieldset.module { padding: 15px 5px !important; margin-bottom: 15px !important; }
+        .inline-group, .djn-group { margin-top: 20px !important; }
+
+        /* RESET DE ANINHAMENTO TOTAL (Anula cartões dentro de cartões mostrados nos prints) */
+        .inline-related, .djn-item, .djn-group-nested .inline-related {
+            width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; /* Morte ao Padding */
+            border: none !important; background-color: transparent !important; box-shadow: none !important; position: relative !important;
         }
-        .row > div, .form-row > div, .form-group > div, div[class^="col-"], div[class*=" col-"], .fieldBox, .aligned label {
-            width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important;
-            padding: 0 !important; margin: 0 !important;
-        }
+        /* Morte às legendas das perguntas e escolhas */
+        .inline-related .card, .djn-item .card, .djn-group-nested .inline-related .card { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+        .inline-related fieldset, .djn-item fieldset { border: none !important; background-color: transparent !important; padding: 10px 0 !important; margin: 0 !important; }
+
+        /* Espaço para o botão Remover n sobrepor */
+        .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 35px !important; }
 
         /* -----------------------------------------------------------
-           NOVA VISUALIZAÇÃO EM CARTÕES (CARD VIEW PARA TABELAS MOBILE)
+           NOVA VISUALIZAÇÃO EM CARTÕES (CARD VIEW) - Títulos Corrigidos
            ----------------------------------------------------------- */
-        #changelist table { border: none !important; background: transparent !important; display: block !important;}
-        #changelist table thead { display: none !important; } /* Esconde o cabeçalho clássico */
+        #changelist table { display: block !important; width: 100% !important; border: none !important; }
+        #changelist table thead { display: none !important; }
         #changelist table tbody { display: block !important; width: 100% !important; }
-        #changelist table tbody tr {
-            display: flex !important; flex-direction: column !important; width: 100% !important;
-            margin-bottom: 20px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important;
-            border-radius: 12px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-        }
-        #changelist table tbody td, #changelist table tbody th {
-            display: flex !important; flex-direction: column !important; align-items: flex-start !important;
-            padding: 10px 0 !important; border-bottom: 1px dashed #374151 !important; width: 100% !important; text-align: left !important;
-        }
-        #changelist table tbody td:last-child, #changelist table tbody th:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
-        /* A Mágica do Data-Label */
+        #changelist table tbody tr { display: flex !important; flex-direction: column !important; width: 100% !important; margin-bottom: 20px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 15px !important; }
+        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; align-items: flex-start !important; padding: 10px 0 !important; border-bottom: 1px dashed #374151 !important; width: 100% !important; text-align: left !important;}
+        #changelist table tbody td:last-child, #changelist table tbody th:last-child { border-bottom: none !important; }
+
+        /* Título dos Cartões (data-label): Fundo removido e cor cinza clara */
         #changelist table tbody td::before, #changelist table tbody th::before {
-            content: attr(data-label) !important; font-weight: 900 !important; color: #9ca3af !important;
-            font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important;
+            content: attr(data-label) !important; font-weight: 800 !important; color: #9ca3af !important; /* Cinza elegante */
+            font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 3px !important; display: block !important; border: none !important; background: transparent !important; padding: 0 !important;
         }
 
         /* -----------------------------------------------------------
-           PADRONIZAÇÃO PESQUISAR E IR E DROPDOWN (MESMA LARGURA)
+           BOTÕES DO TOPO (Só Ícones no Mobile - Tela Respostas, etc)
            ----------------------------------------------------------- */
-        /* Pesquisa */
-        #changelist-search { margin-bottom: 25px !important; display: block !important; width: 100% !important;}
-        #changelist-search form { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important;}
-        #changelist-search form > div { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; margin: 0 !important;}
-        .custom-input { width: 100% !important; max-width: 100% !important; height: 50px !important; border-radius: 8px !important; }
-        .btn-pesquisar { width: 100% !important; height: 50px !important; border-radius: 8px !important; align-self: center !important; font-size: 1.1rem !important;}
+        ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 8px !important; margin: 0 !important; padding: 0 !important; float: right !important; clear: none !important; position: static !important;}
+        ul.object-tools li, .page-actions li { width: auto !important; margin: 0 !important; display: inline-block !important;}
 
-        /* Ir e Dropdown */
-        .my-super-bottom-bar { display: flex !important; flex-direction: column !important; padding: 15px !important; background: transparent !important; border: none !important; width: 100% !important;}
-        .my-group.actions-group { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important;}
-        .custom-select { width: 100% !important; height: 50px !important; border-radius: 8px !important;}
-        .btn-ir { width: 100% !important; height: 50px !important; border-radius: 8px !important; font-size: 1.1rem !important;}
-
-        /* BOTÕES DE TOPO (Adicionar, Importar, Exportar) - EMPILHADOS COM RESPIRO */
-        ul.object-tools, .page-actions {
-            display: flex !important; flex-direction: column !important; width: 100% !important;
-            margin: 0 0 25px 0 !important; padding: 0 !important; float: none !important; gap: 15px !important;
-            position: relative !important; clear: both !important;
+        /* O estilo do Ícone Único */
+        .icon-only-btn {
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            width: 42px !important; height: 42px !important; /* Tamanho do Adicionar diminuído */
+            font-size: 1.2rem !important; border-radius: 8px !important;
+            background-color: #14b8a6 !important; color: white !important; border: none !important;
         }
-        ul.object-tools li, .page-actions li { width: 100% !important; margin: 0 !important; display: block !important; }
-        ul.object-tools li a, .page-actions a {
-            display: block !important; width: 100% !important; text-align: center !important;
-            padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important;
-            border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;
-        }
+        .icon-only-btn:hover { background-color: #0d9488 !important; }
 
-        body label { margin: 0 0 5px 0 !important; padding: 0 !important; width: 100% !important; display: block !important; text-align: left !important; font-weight: bold !important; }
+        /* -----------------------------------------------------------
+           PADRONIZAÇÃO BARRA INFERIOR (Ações Dropdown LARGO e Botões Gémeos)
+           ----------------------------------------------------------- */
+        #changelist-search { display: none !important; } /* Unificado na barra de ações */
+        .my-super-bottom-bar { display: flex !important; flex-direction: column !important; padding: 15px !important; background: transparent !important; border: none !important; width: 100% !important; gap: 10px !important;}
 
-        /* Cenas e Questionários (Inlines) */
-        .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
+        /* O Dropdown LARGO que pediu */
+        .custom-select.full-width { width: 100% !important; max-width: 100% !important; height: 50px !important; border-radius: 8px !important; background-color: #374151 !important; margin: 0 !important;}
 
-        .inline-related, .djn-item {
-            width: 100% !important; margin: 0 0 15px 0 !important;
-            padding: 55px 15px 15px 15px !important;
-            border-radius: 8px !important; border: 1px solid #374151 !important; position: relative !important; background-color: #1f2937 !important;
-        }
-        fieldset.module { margin-left: 0 !important; margin-right: 0 !important; padding: 15px !important; width: 100% !important; border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #1f2937 !important;}
+        /* Pesquisar e Ir na Mesma Linha (Gémeos) */
+        .actions-row { display: flex !important; flex-direction: row !important; width: 100% !important; gap: 10px !important; justify-content: space-between !important;}
+        .custom-btn.btn-pesquisar, .custom-btn.btn-ir { width: 48% !important; height: 50px !important; border-radius: 8px !important; font-size: 1.1rem !important; border: none !important; margin: 0 !important; text-transform: uppercase !important;}
+        .btn-pesquisar { background-color: #6b21a8 !important; } /* Roxo Pesquisar */
+        .btn-ir { background-color: #3b82f6 !important; }        /* Azul Ir */
 
-        /* INPUTS e SELECTS gigantes (100% da tela) */
-        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
-            width: 100% !important; max-width: 100% !important; height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; display: block !important;
+        /* INPUTS e LABELS Mobile */
+        body label { margin: 0 0 5px 0 !important; padding: 0 5px !important; text-align: left !important; font-weight: bold !important; display: block !important; }
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
+            width: 100% !important; max-width: 100% !important; height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; display: block !important; border-radius: 8px !important;
         }
         .select2-container { width: 100% !important; max-width: 100% !important; }
-        .select2-selection { height: 50px !important; display: flex !important; align-items: center !important; width: 100% !important; }
+        .select2-selection { height: 50px !important; border-radius: 8px !important; }
         textarea { height: auto !important; min-height: 120px !important; }
 
-        /* Botão Remover (Ancorado no teto vazio) */
-        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 12px !important; right: 12px !important; display: block !important; z-index: 10; margin: 0 !important; }
-        span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: transparent !important; color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0 !important; margin: 0 !important; display: inline-block !important;}
-        span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "Remover" !important; font-size: 0.85rem !important; }
+        /* Botão Remover (Ancorado) */
+        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 12px !important; right: 12px !important; display: block !important; margin: 0 !important; }
+        span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { color: #ef4444 !important; border: 1px solid #ef4444 !important; border-radius: 4px !important; padding: 6px 12px !important; font-size: 0.85rem !important; margin: 0 !important;}
+        span.delete label::after { content: "Remover" !important; font-size: 0.85rem !important; }
 
-        /* Botões "Adicionar Outra Opção" (Legíveis, Grandes e Espaçados) */
+        /* Botão "Adicionar Outra Opção" (Fortes e Grandes) */
         .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; padding: 0 !important; display: block !important; }
         .add-row a, .djn-add-item a, .djn-add-handler {
-            width: 100% !important; display: block !important; text-align: center !important; padding: 15px !important;
-            font-size: 1.1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important; margin-bottom: 15px !important;
+            width: 100% !important; display: block !important; text-align: center !important; padding: 18px 15px !important;
+            font-size: 1.1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important;
         }
 
         /* Botões Finais de Salvar */
         .submit-row { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; padding: 15px 0 !important; margin-top: 15px !important; background: transparent !important; border: none !important;}
         #change_form .col-md-3 { display: none !important; }
-        .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;}
+        .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important;}
     }
 </style>
 {% endblock %}
@@ -462,7 +383,7 @@
     {{ block.super }}
     {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
         {% if not request.user.clinica.assinatura_ativa %}
-            <div class="admin-alert-banner alert-danger-custom">
+            <div class="admin-alert-banner">
                 <div class="alert-content">
                     <i class="fas fa-hand-holding-usd" style="font-size: 1.8rem;"></i>
                     <div>
@@ -480,11 +401,11 @@
                             <div class="alert-content">
                                 <i class="fas fa-rocket" style="font-size: 1.8rem;"></i>
                                 <div>
-                                    <span class="alert-title">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                    <p class="alert-text">Precisa de criar mais conteúdos? Faça upgrade do seu plano agora.</p>
+                                    <span class="alert-title">Limite de Narrativas ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
+                                    <p class="alert-text">Faça upgrade do seu plano agora para criar mais conteúdos.</p>
                                 </div>
                             </div>
-                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Fazer Upgrade</a>
+                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Upgrade</a>
                         </div>
                     {% endif %}
                 {% endif %}
