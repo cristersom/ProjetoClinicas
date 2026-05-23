@@ -16,7 +16,7 @@
 <meta property="og:locale" content="pt_BR">
 
 <script>
-    // TROCAR OS "---------" POR TEXTO ÚTIL EM TEMPO REAL
+    // 1. ELIMINAR OS "---------"
     function ajustarDropdowns() {
         document.querySelectorAll('option').forEach(opt => {
             if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') {
@@ -31,7 +31,27 @@
         });
     }
 
-    // CONSTROI APENAS A BARRA DE AÇÕES (SEM DUPLICAR BOTÕES DE ADICIONAR)
+    // 2. CONVERTER TABELAS EM CARTÕES NO MOBILE (A GRANDE MELHORIA DE UX)
+    function formatarTabelasMobile() {
+        if(window.innerWidth <= 768) {
+            const tables = document.querySelectorAll('#changelist table');
+            tables.forEach(table => {
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => {
+                    let text = th.innerText.trim();
+                    return text === "" ? "Ação" : text; // Se for vazio (como a checkbox), dá um nome
+                });
+                table.querySelectorAll('tbody tr').forEach(tr => {
+                    Array.from(tr.querySelectorAll('td, th')).forEach((td, index) => {
+                        let headerText = headers[index] || '';
+                        if (td.querySelector('.action-checkbox')) headerText = 'Selecionar';
+                        td.setAttribute('data-label', headerText);
+                    });
+                });
+            });
+        }
+    }
+
+    // 3. BARRA INFERIOR (Ações)
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
 
@@ -46,8 +66,37 @@
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // Mover as Ações (Dropdown) para a barra bonita
-        const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
+        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
+        filterForms.forEach(formOrig => {
+            const searchGroup = document.createElement('form');
+            searchGroup.className = 'my-group search-group';
+            searchGroup.action = formOrig.action;
+            searchGroup.method = formOrig.method || 'GET';
+            let hasVisibleFields = false;
+
+            formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
+                hasVisibleFields = true;
+                const clone = field.cloneNode(true);
+                clone.value = field.value;
+                clone.className = 'custom-input';
+                if(!clone.placeholder) clone.placeholder = 'Pesquisar...';
+                searchGroup.appendChild(clone);
+            });
+
+            if (hasVisibleFields) {
+                const btnSearch = document.createElement('button');
+                btnSearch.type = 'submit';
+                btnSearch.className = 'custom-btn btn-pesquisar';
+                btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
+                searchGroup.appendChild(btnSearch);
+                formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
+                bottomBar.appendChild(searchGroup);
+            }
+            formOrig.style.setProperty('display', 'none', 'important');
+            if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
+        });
+
+        const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
         if (actionSelectOrig && formTabela) {
@@ -99,7 +148,7 @@
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
         });
 
-        // Formatar botões de topo nativos
+        // Ícones nos botões do topo
         document.querySelectorAll('.object-tools a').forEach(btn => {
             if (!btn.innerHTML.includes('fa-')) {
                 if (btn.innerText.toLowerCase().includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> ${btn.innerText.trim()}`; }
@@ -113,14 +162,17 @@
         construirBarraInferior();
         aplicarLimpezaUX();
         ajustarDropdowns();
+        formatarTabelasMobile();
 
         const observer = new MutationObserver(() => {
             construirBarraInferior();
             aplicarLimpezaUX();
             ajustarDropdowns();
+            formatarTabelasMobile();
         });
         observer.observe(document.body, { childList: true, subtree: true });
 
+        // Título sem linhas fantasmas
         const h1 = document.querySelector('.content-header h1');
         if (h1) {
             h1.childNodes.forEach(node => {
@@ -129,6 +181,7 @@
         }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
+        // Menu Lateral
         let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
@@ -138,6 +191,8 @@
             `);
         }
     });
+
+    window.addEventListener('resize', formatarTabelasMobile);
 </script>
 {% endblock %}
 
@@ -145,7 +200,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E RESET GERAL
+       1. BASE, TEMA ESCURO E RESET
        ===================================================================== */
     *, *::before, *::after { box-sizing: border-box !important; }
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
@@ -155,41 +210,55 @@
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
 
     /* =====================================================================
-       2. LIMPANDO O JAZZMIN E ALINHAMENTO DO DESKTOP
+       2. O ALINHAMENTO PERFEITO DO DESKTOP (E-MAIL E TÍTULO)
        ===================================================================== */
     .brand-link { display: none !important; border: none !important; }
     .navbar-nav.ml-auto { display: none !important; }
 
+    /* E-MAIL NA BARRA LATERAL - EXATOS 65px */
     .user-panel {
-        border-top: none !important; border-bottom: 1px solid #374151 !important;
-        height: 60px !important; display: flex !important; align-items: center !important; justify-content: center !important;
+        border-top: none !important;
+        border-bottom: 1px solid #374151 !important;
+        height: 65px !important; display: flex !important; align-items: center !important; justify-content: center !important;
         padding: 0 20px !important; margin: 0 !important;
     }
     .user-panel .image { display: none !important; }
-    .user-panel .info { width: 100% !important; text-align: center !important; padding: 0 !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; }
+    .user-panel .info { width: 100% !important; text-align: center !important; padding: 0 !important; display: block !important;}
     .user-panel .info a { display: block !important; width: 100% !important; text-align: center !important; font-weight: bold !important; color: #d1d5db !important; }
 
-    .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
-    .content-header h1 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
-    .content-header h1::after, .content-header h1::before { display: none !important; }
+    /* TÍTULO DA PÁGINA - EXATOS 65px PARA A LINHA CORRER PERFEITA */
+    .content-header {
+        height: 65px !important; display: flex !important; align-items: center !important;
+        border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important;
+    }
+    .content-header h1 { border-right: none !important; border-left: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
 
     .os-scrollbar { display: none !important; visibility: hidden !important; }
 
     /* =====================================================================
-       3. A MÁGICA: NEUTRALIZANDO A CLASSE .P-5 E ESCONDENDO DUPLICATOS
+       3. BOTÃO HISTÓRICO (AGORA COM LEITURA NO DESKTOP)
+       ===================================================================== */
+    .historylink {
+        background-color: #4b5563 !important; color: white !important;
+        padding: 8px 15px !important; border-radius: 8px !important; text-decoration: none !important;
+        font-weight: bold !important; font-size: 0.9rem !important; margin-left: auto !important;
+    }
+    .historylink:hover { background-color: #6b7280 !important; color: white !important; }
+
+    /* =====================================================================
+       4. NEUTRALIZANDO A CLASSE .P-5 E O "BOX-IN-BOX"
        ===================================================================== */
     .p-5, .card-body.p-5 { padding: 15px !important; }
     #change_form .tab-content > .card, #change_form .tab-pane > .card { border: 1px solid #374151 !important; background-color: #1f2937 !important; border-radius: 8px !important; }
-
-    /* ESCONDE O CAMPO 'NARRATIVA' DENTRO DOS INLINES PARA NÃO DUPLICAR EM CENAS/QUESTIONARIOS */
     .inline-related .field-narrativa { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 
     /* =====================================================================
-       4. ALERTAS
+       5. ALERTAS E ABAS
        ===================================================================== */
-    .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
-    .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
-    .alert-warning-custom { background: linear-gradient(135deg, #7c2d12 0%, #ea580c 100%) !important; border: 1px solid #fb923c !important; color: white !important; }
+    .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
+    .alert-content { display: flex !important; align-items: center !important; gap: 15px !important; }
+    .alert-title { font-weight: 900 !important; font-size: 1.1rem !important; margin: 0 !important; display: block !important; }
+    .alert-text { font-size: 0.9rem !important; opacity: 0.9 !important; margin: 0 !important; }
     .btn-alert-action { background-color: white !important; color: #111827 !important; padding: 8px 18px !important; border-radius: 8px !important; font-weight: 800 !important; text-decoration: none !important; text-transform: uppercase !important; }
 
     .nav-tabs { border-bottom: 1px solid #4b5563 !important; margin-bottom: 20px !important;}
@@ -197,70 +266,63 @@
     .nav-tabs .nav-link.active { color: #14b8a6 !important; border-bottom: 3px solid #14b8a6 !important; }
 
     /* =====================================================================
-       5. FORMULÁRIOS DESKTOP & GERAIS
+       6. FORMULÁRIOS DESKTOP & GERAIS
        ===================================================================== */
     p.original { display: none !important; }
     fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; }
 
-    .inline-related, .djn-item { background-color: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; margin-bottom: 15px !important; }
-    .djn-group-nested .inline-related { padding: 15px !important; margin-bottom: 10px !important; }
+    .inline-related, .djn-item { background-color: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 20px !important; }
+    .djn-group-nested .inline-related { padding: 15px !important; margin-bottom: 10px !important; background-color: #1f2937 !important; }
 
     input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select {
         background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important;
     }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    input[type="file"] { background-color: transparent !important; border: none !important; padding: 5px 0 !important; color: #9ca3af !important; }
 
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; display: flex !important; align-items: center !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
     /* =====================================================================
-       6. TABELAS MODERNAS (Com Scroll Automático)
+       7. TABELAS NO DESKTOP E BOTÕES DO TOPO (DESCOLADOS DA TABELA)
        ===================================================================== */
+    ul.object-tools {
+        display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-end !important;
+        gap: 12px !important; margin: 0 0 30px 0 !important; padding: 0 !important; /* Margin bottom forte para não colar na tabela */
+    }
+    ul.object-tools li { margin: 0 !important; list-style: none !important;}
+    ul.object-tools li a {
+        display: inline-block !important; padding: 12px 25px !important; font-size: 1rem !important; font-weight: bold !important;
+        border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;
+        text-decoration: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    }
+
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
     #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
     #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
     #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; }
 
-    /* Scroll Horizontal para não esmagar no Mobile */
-    #changelist-form .results, .results { overflow-x: auto !important; width: 100% !important; display: block !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 10px !important;}
-
     /* =====================================================================
-       7. BOTÕES DE TOPO E PESQUISA (EMPILHADOS "UM EM BAIXO DO OUTRO")
+       8. PADRONIZAÇÃO DAS BARRAS DE AÇÃO (PESQUISAR / IR)
        ===================================================================== */
-    /* Pesquisa sempre à direita no Desktop */
-    #changelist-search { margin-bottom: 20px !important; display: flex; justify-content: flex-end; }
-    #changelist-search form { display: flex !important; gap: 10px !important; align-items: center !important;}
-    #changelist-search input[type="text"] { height: 42px !important; border-radius: 6px !important; padding: 0 15px !important; }
-    #changelist-search input[type="submit"] { height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; background-color: #6b21a8 !important; color: white !important; font-weight: bold !important; border: none !important; cursor: pointer; }
+    /* Barra de Pesquisa */
+    #changelist-search { margin-bottom: 25px !important; display: flex; justify-content: flex-start; width: 100%; }
+    #changelist-search form { display: flex !important; gap: 10px !important; align-items: center !important; }
+    .custom-input { width: 300px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
+    .btn-pesquisar { height: 45px !important; padding: 0 25px !important; border-radius: 8px !important; background-color: #6b21a8 !important; color: white !important; font-weight: bold !important; border: none !important; cursor: pointer;}
 
-    /* Botões Adicionar/Importar/Exportar (Sempre empilhados à direita no Desktop) */
-    ul.object-tools {
-        display: flex !important; flex-direction: column !important; align-items: flex-end !important;
-        gap: 12px !important; margin: 0 0 30px 0 !important; padding: 0 !important; float: right !important;
-    }
-    ul.object-tools li { display: block !important; margin: 0 !important; }
-    ul.object-tools li a {
-        display: inline-block !important; text-align: center !important; padding: 12px 25px !important;
-        font-size: 1rem !important; font-weight: bold !important; border-radius: 8px !important;
-        background-color: #14b8a6 !important; color: white !important; border: none !important;
-        white-space: nowrap !important; line-height: 1 !important; height: auto !important;
-    }
-    ul.object-tools li a:hover { background-color: #0d9488 !important; }
-
-    /* Barra inferior (Ações "Selecione uma ação..." e IR) */
+    /* Barra de Ações Inferior (Ir) */
     .my-super-bottom-bar {
         display: flex !important; flex-direction: row !important; align-items: center !important;
-        gap: 15px !important; padding: 15px !important; margin-top: 20px !important;
+        gap: 15px !important; padding: 15px !important; margin-top: 25px !important;
         background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
     }
-    .my-group.actions-group { display: flex !important; align-items: center !important; gap: 10px !important; width: auto !important;}
-    .my-group.actions-group .custom-select { width: 250px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; }
-    .my-group.actions-group .btn-ir { height: 45px !important; padding: 0 25px !important; border-radius: 6px !important; font-weight: bold !important; color: white !important; background-color: #3b82f6 !important; border: none !important; cursor: pointer;}
-    .my-group.actions-group .btn-ir:hover { background-color: #2563eb !important; }
+    .my-group.actions-group { display: flex !important; align-items: center !important; gap: 10px !important; }
+    .custom-select { width: 300px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
+    .btn-ir { height: 45px !important; padding: 0 35px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; background-color: #3b82f6 !important; border: none !important; cursor: pointer; text-transform: uppercase;}
+    .btn-ir:hover { background-color: #2563eb !important; }
 
     /* =====================================================================
-       8. JOGANDO OS BOTÕES DE SALVAR PARA O FUNDO NO DESKTOP
+       9. BOTÕES DE SALVAR NO DESKTOP (JOGADOS PARA O FUNDO)
        ===================================================================== */
     @media (min-width: 769px) {
         body nav.main-header, body .main-header, body .navbar { display: none !important; }
@@ -268,15 +330,15 @@
         #content-main > form > div.row { display: flex !important; flex-direction: column !important; margin: 0 !important; }
         #content-main > form > div.row > [class*="col-"] { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; }
 
-        .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 20px !important; }
+        .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 30px !important; }
         .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; display: inline-block !important; background-color: #14b8a6 !important; color: white !important; border: none !important; cursor: pointer;}
         .submit-row input:hover { background-color: #0d9488 !important; }
 
-        #change_form .col-md-3 { display: none !important; } /* Esconde a barra lateral direita vazia no PC */
+        #change_form .col-md-3 { display: none !important; } /* Esconde a barra direita lateral */
     }
 
     /* =====================================================================
-       9. A SOLUÇÃO DEFINITIVA DO MOBILE (TUDO PADRONIZADO)
+       10. A SOLUÇÃO DEFINITIVA DO MOBILE (CARD VIEW & PADRONIZAÇÃO)
        ===================================================================== */
     @media (max-width: 768px) {
         #content-main, .content-wrapper, .container-fluid, .content {
@@ -291,8 +353,9 @@
         .user-panel .info { display: block !important; text-align: left !important; }
         .user-panel .info a { display: block !important; text-align: left !important; }
 
-        .content-header { height: auto !important; padding: 0 0 10px 0 !important; margin: 0 0 15px 0 !important; border-bottom: none !important; flex-direction: column !important; align-items: flex-start !important; }
-        .content-header h1 { margin: 0 !important; width: 100% !important; text-align: left !important; border: none !important; border-right: none !important;}
+        /* CABEÇALHOS CORRIGIDOS (Evita sobrepor botões em Sessão Pacientes) */
+        .content-header { height: auto !important; padding: 0 0 10px 0 !important; margin: 0 0 20px 0 !important; border-bottom: none !important; flex-direction: column !important; align-items: flex-start !important; position: relative !important; display: block !important; clear: both !important;}
+        .content-header h1 { margin: 0 !important; width: 100% !important; text-align: left !important; border: none !important;}
 
         /* NEUTRALIZANDO A GRELHA DO BOOTSTRAP */
         .row, .form-row, .form-group, .aligned .form-row {
@@ -304,23 +367,60 @@
             padding: 0 !important; margin: 0 !important;
         }
 
-        /* BOTÕES DE TOPO E PESQUISA - EMPILHADOS E LARGOS */
-        ul.object-tools { align-items: stretch !important; margin: 0 0 20px 0 !important; float: none !important; }
-        ul.object-tools li a { width: 100% !important; padding: 18px 15px !important; font-size: 1.1rem !important; border-radius: 8px !important; }
+        /* -----------------------------------------------------------
+           NOVA VISUALIZAÇÃO EM CARTÕES (CARD VIEW PARA TABELAS MOBILE)
+           ----------------------------------------------------------- */
+        #changelist table { border: none !important; background: transparent !important; display: block !important;}
+        #changelist table thead { display: none !important; } /* Esconde o cabeçalho clássico */
+        #changelist table tbody { display: block !important; width: 100% !important; }
+        #changelist table tbody tr {
+            display: flex !important; flex-direction: column !important; width: 100% !important;
+            margin-bottom: 20px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important;
+            border-radius: 12px !important; padding: 15px !important; box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
+        }
+        #changelist table tbody td, #changelist table tbody th {
+            display: flex !important; flex-direction: column !important; align-items: flex-start !important;
+            padding: 10px 0 !important; border-bottom: 1px dashed #374151 !important; width: 100% !important; text-align: left !important;
+        }
+        #changelist table tbody td:last-child, #changelist table tbody th:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
+        /* A Mágica do Data-Label */
+        #changelist table tbody td::before, #changelist table tbody th::before {
+            content: attr(data-label) !important; font-weight: 900 !important; color: #9ca3af !important;
+            font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important;
+        }
 
-        #changelist-search { justify-content: stretch !important; margin-bottom: 20px !important; }
-        #changelist-search form { flex-direction: column !important; width: 100% !important; }
-        #changelist-search input[type="text"] { width: 100% !important; height: 50px !important; }
-        #changelist-search input[type="submit"] { width: 100% !important; height: 50px !important; }
+        /* -----------------------------------------------------------
+           PADRONIZAÇÃO PESQUISAR E IR E DROPDOWN (MESMA LARGURA)
+           ----------------------------------------------------------- */
+        /* Pesquisa */
+        #changelist-search { margin-bottom: 25px !important; display: block !important; width: 100% !important;}
+        #changelist-search form { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important;}
+        #changelist-search form > div { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; margin: 0 !important;}
+        .custom-input { width: 100% !important; max-width: 100% !important; height: 50px !important; border-radius: 8px !important; }
+        .btn-pesquisar { width: 100% !important; height: 50px !important; border-radius: 8px !important; align-self: center !important; font-size: 1.1rem !important;}
 
-        .my-super-bottom-bar { flex-direction: column !important; padding: 15px !important; background: transparent !important; border: none !important; }
-        .my-group.actions-group { flex-direction: column !important; width: 100% !important; }
-        .my-group.actions-group .custom-select { width: 100% !important; height: 50px !important; }
-        .my-group.actions-group .btn-ir { width: 100% !important; height: 50px !important; }
+        /* Ir e Dropdown */
+        .my-super-bottom-bar { display: flex !important; flex-direction: column !important; padding: 15px !important; background: transparent !important; border: none !important; width: 100% !important;}
+        .my-group.actions-group { display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important;}
+        .custom-select { width: 100% !important; height: 50px !important; border-radius: 8px !important;}
+        .btn-ir { width: 100% !important; height: 50px !important; border-radius: 8px !important; font-size: 1.1rem !important;}
+
+        /* BOTÕES DE TOPO (Adicionar, Importar, Exportar) - EMPILHADOS COM RESPIRO */
+        ul.object-tools, .page-actions {
+            display: flex !important; flex-direction: column !important; width: 100% !important;
+            margin: 0 0 25px 0 !important; padding: 0 !important; float: none !important; gap: 15px !important;
+            position: relative !important; clear: both !important;
+        }
+        ul.object-tools li, .page-actions li { width: 100% !important; margin: 0 !important; display: block !important; }
+        ul.object-tools li a, .page-actions a {
+            display: block !important; width: 100% !important; text-align: center !important;
+            padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important;
+            border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;
+        }
 
         body label { margin: 0 0 5px 0 !important; padding: 0 !important; width: 100% !important; display: block !important; text-align: left !important; font-weight: bold !important; }
 
-        /* Cenas e Questionários (Inlines) - Fim do esmagamento */
+        /* Cenas e Questionários (Inlines) */
         .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
 
         .inline-related, .djn-item {
@@ -346,11 +446,11 @@
         /* Botões "Adicionar Outra Opção" (Legíveis, Grandes e Espaçados) */
         .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; padding: 0 !important; display: block !important; }
         .add-row a, .djn-add-item a, .djn-add-handler {
-            width: 100% !important; display: block !important; text-align: center !important; padding: 18px 15px !important;
+            width: 100% !important; display: block !important; text-align: center !important; padding: 15px !important;
             font-size: 1.1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important; margin-bottom: 15px !important;
         }
 
-        /* Botões Finais de Salvar (Sessão Pacientes, Narrativas, Senha) */
+        /* Botões Finais de Salvar */
         .submit-row { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; padding: 15px 0 !important; margin-top: 15px !important; background: transparent !important; border: none !important;}
         #change_form .col-md-3 { display: none !important; }
         .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;}
