@@ -5,18 +5,12 @@
 {{ block.super }}
 
 <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-<meta name="description" content="Narrativas clínicas e pesquisas de satisfação, tudo em um só lugar. Evolua o acompanhamento dos seus pacientes.">
-<meta property="og:title" content="Narrativas Clínicas">
-<meta property="og:description" content="Evolua o acompanhamento dos seus pacientes com as nossas jornadas e pesquisas de satisfação. Crie onde quiser, aplique quando quiser.">
-<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-image.jpg' %}">
-<meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Narrativas Clínicas">
-<meta property="og:locale" content="pt_BR">
+<meta name="description" content="Narrativas clínicas e pesquisas de satisfação, tudo em um só lugar.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <script>
-    // 1. ELIMINAR OS "---------"
     function ajustarDropdowns() {
         document.querySelectorAll('option').forEach(opt => {
             if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') {
@@ -31,7 +25,6 @@
         });
     }
 
-    // 2. CONVERTER TABELAS EM CARTÕES NO MOBILE
     function formatarTabelasMobile() {
         if(window.innerWidth <= 768) {
             const tables = document.querySelectorAll('#changelist table');
@@ -51,7 +44,6 @@
         }
     }
 
-    // 3. BARRA INFERIOR (Ações e Pesquisa unificados)
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
 
@@ -62,7 +54,7 @@
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        // Lógica de Pesquisa (Apenas se existir o input de busca real)
+        // 1. BARRA DE PESQUISA (Se existir)
         const searchInputOrig = document.querySelector('#changelist-search input[name="q"]');
         const searchFormOrig = document.querySelector('#changelist-search form');
 
@@ -78,49 +70,38 @@
 
             const btnSearch = document.createElement('button');
             btnSearch.type = 'submit';
-            btnSearch.className = 'custom-btn primary btn-pesquisar';
-            btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
+            btnSearch.className = 'custom-btn btn-pesquisar';
+            btnSearch.innerHTML = '<i class="fas fa-search"></i> <span class="hide-mobile">Pesquisar</span>';
 
             searchGroup.appendChild(cloneInput);
             searchGroup.appendChild(btnSearch);
-
             searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
-            bottomBar.appendChild(searchGroup);
 
+            bottomBar.appendChild(searchGroup);
             document.querySelector('#changelist-search').style.setProperty('display', 'none', 'important');
         }
 
-        // Lógica de Ações (Ir)
+        // 2. AÇÃO DE LIXEIRA DIRETA (Substitui o Dropdown "Ir")
         const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
-        if (actionSelectOrig) {
-            const actionGroup = document.createElement('div');
-            actionGroup.className = 'my-group actions-group';
-
-            const selClone = actionSelectOrig.cloneNode(true);
-            selClone.className = 'custom-select';
-            selClone.removeAttribute('data-select2-id');
-            selClone.classList.remove('select2-hidden-accessible');
-            if(selClone.options[0] && selClone.options[0].text.includes('---')) {
-                selClone.options[0].text = 'Ação...';
-            }
-
-            const btnIr = document.createElement('button');
-            btnIr.className = 'custom-btn btn-ir';
-            btnIr.innerText = 'Ir';
-            btnIr.onclick = (e) => {
+        if (actionSelectOrig && btnIrOrig) {
+            const btnExcluir = document.createElement('button');
+            btnExcluir.className = 'custom-btn btn-danger btn-excluir-massa';
+            btnExcluir.innerHTML = '<i class="fas fa-trash"></i> Excluir Selecionados';
+            btnExcluir.onclick = (e) => {
                 e.preventDefault();
-                actionSelectOrig.value = selClone.value;
-                if (btnIrOrig) btnIrOrig.click();
+                actionSelectOrig.value = 'delete_selected'; // Força a ação de deletar
+                btnIrOrig.click();
             };
 
-            actionGroup.appendChild(selClone);
-            actionGroup.appendChild(btnIr);
-            bottomBar.appendChild(actionGroup);
+            const actionContainer = document.createElement('div');
+            actionContainer.className = 'my-group actions-group';
+            actionContainer.appendChild(btnExcluir);
+            bottomBar.appendChild(actionContainer);
 
-            const actionsContainer = actionSelectOrig.closest('.actions');
-            if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
+            const origContainer = actionSelectOrig.closest('.actions');
+            if (origContainer) origContainer.style.setProperty('display', 'none', 'important');
         }
 
         const paginator = document.querySelector('.paginator');
@@ -129,29 +110,42 @@
     }
 
     function aplicarLimpezaUX() {
+        // Remove legendas inúteis
         document.querySelectorAll('h2, legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('erguntas') || t.includes('principal')) {
                 el.style.setProperty('display', 'none', 'important');
             }
         });
-        document.querySelectorAll('label').forEach(label => {
-            if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
-        });
 
-        // Formatar botões de topo: Ícones no Mobile, Texto+Ícone no PC
+        // Transforma botões do topo em ÍCONES QUADRADOS (PC e Mobile)
         document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
             let text = btn.innerText.toLowerCase();
-
-            // Adicionar Ícones se não existirem
-            if (!btn.innerHTML.includes('fa-')) {
-                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> <span>${btn.innerText.trim()}</span>`; }
-                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> <span>${btn.innerText.trim()}</span>`; }
-                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> <span>${btn.innerText.trim()}</span>`; }
+            if (!btn.classList.contains('icon-formatted')) {
+                btn.className = 'icon-only-btn icon-formatted';
+                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i>`; btn.title = "Adicionar"; }
+                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i>`; btn.title = "Importar"; }
+                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i>`; btn.title = "Exportar"; }
+                else { btn.innerHTML = `<i class="fas fa-cog"></i>`; }
             }
-
-            // Ocultar span de texto no mobile via CSS depois
+            // Move o botão para o cabeçalho no mobile
+            const header = document.querySelector('.content-header');
+            if(header && window.innerWidth <= 768 && !header.contains(btn)) {
+                header.appendChild(btn);
+            }
         });
+
+        // Botões de Relatório no Mobile (Lado a Lado e só ícones)
+        if(window.innerWidth <= 768) {
+            document.querySelectorAll('td a').forEach(link => {
+                let text = link.innerText.toLowerCase();
+                if(text.includes('relatório') || text.includes('resumo') || text.includes('detalhes')) {
+                    link.classList.add('mobile-icon-link');
+                    if(text.includes('relatório') || text.includes('resumo')) link.innerHTML = '<i class="fas fa-chart-pie"></i>';
+                    if(text.includes('detalhes')) link.innerHTML = '<i class="fas fa-list"></i>';
+                }
+            });
+        }
     }
 
     window.addEventListener('load', function() {
@@ -175,6 +169,16 @@
                 if (node.nodeType === 3) node.nodeValue = node.nodeValue.replace(/\|/g, '').trim();
             });
         }
+
+        // Adiciona menu de conta na lateral
+        let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
+        if (sidebar && !document.querySelector('#menu-conta-custom')) {
+            sidebar.insertAdjacentHTML('beforeend', `
+                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
+                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
+                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
+            `);
+        }
     });
 
     window.addEventListener('resize', () => { formatarTabelasMobile(); aplicarLimpezaUX(); });
@@ -185,7 +189,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E TEMA ESCURO (Prevenção Total de Estouro de Tela)
+       1. BASE E RESET GERAL
        ===================================================================== */
     *, *::before, *::after { box-sizing: border-box !important; }
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
@@ -198,178 +202,177 @@
     /* =====================================================================
        2. TÍTULOS E ALINHAMENTO DESKTOP (Linhas Perfeitas)
        ===================================================================== */
-    .brand-link { display: none !important; border: none !important; }
-    .navbar-nav.ml-auto { display: none !important; }
+    .brand-link, .navbar-nav.ml-auto { display: none !important; border: none !important; }
 
-    .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: center !important; padding: 0 20px !important; margin: 0 !important; }
+    .user-panel {
+        border-top: none !important; border-bottom: 1px solid #374151 !important;
+        height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important;
+        padding: 0 20px !important; margin: 0 !important;
+    }
     .user-panel .image { display: none !important; }
-    .user-panel .info { width: 100% !important; text-align: center !important; padding: 0 !important; display: block !important;}
+    .user-panel .info { width: 100% !important; text-align: left !important; padding: 0 !important; display: block !important;}
     .user-panel .info a { display: block !important; font-weight: bold !important; color: #d1d5db !important; }
 
-    .content-header { height: 65px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 25px 0 !important; justify-content: space-between !important;}
-    .content-header h1, h1.border-right, .border-right { border-right: none !important; border-left: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; border: none !important;}
+    /* Cabeçalho de Conteúdo */
+    .content-header {
+        height: 65px !important; display: flex !important; align-items: center !important; justify-content: space-between !important;
+        border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important;
+    }
+    .content-header h1 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important;}
 
-    /* =====================================================================
-       3. BOTÃO HISTÓRICO NO DESKTOP E MOBILE
-       ===================================================================== */
+    /* Botão Histórico */
     .historylink {
         background-color: #4b5563 !important; color: white !important;
-        padding: 8px 15px !important; border-radius: 8px !important; text-decoration: none !important;
-        font-weight: bold !important; font-size: 0.9rem !important; margin-left: auto !important;
+        padding: 10px 20px !important; border-radius: 8px !important; text-decoration: none !important;
+        font-weight: bold !important; font-size: 0.95rem !important; margin-left: auto !important; display: inline-block !important; border: 1px solid #6b7280 !important;
     }
     .historylink:hover { background-color: #6b7280 !important; }
 
     /* =====================================================================
-       4. NEUTRALIZANDO A CLASSE .P-5 E O "BOX-IN-BOX"
+       3. FIM DO BOX-IN-BOX E PADRONIZAÇÃO DE INPUTS
        ===================================================================== */
-    .p-5, .card-body.p-5 { padding: 15px !important; }
-    #change_form .tab-content > .card, #change_form .tab-pane > .card { border: 1px solid #374151 !important; background-color: #1f2937 !important; border-radius: 8px !important; }
-    .inline-related .field-narrativa { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
+    /* Remove padding 5 parasita do Jazzmin */
+    .p-5, .card-body.p-5 { padding: 15px 0 !important; }
+    #change_form .tab-content > .card, #change_form .tab-pane > .card { border: none !important; background-color: transparent !important; }
 
-    /* =====================================================================
-       5. DATA E HORA (HOJE / AGORA)
-       ===================================================================== */
-    p.datetime { font-size: 0.8rem !important; color: #9ca3af !important; margin-top: 5px !important; font-weight: bold !important; }
-    p.datetime a { color: #14b8a6 !important; text-decoration: none !important; margin: 0 5px !important; }
+    fieldset.module { background-color: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
 
-    /* =====================================================================
-       6. FORMULÁRIOS DESKTOP & GERAIS
-       ===================================================================== */
-    p.original { display: none !important; }
-    fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; }
+    /* Inlines (Cenas/Questionários) limpos e elegantes */
+    .inline-related, .djn-item {
+        background-color: transparent !important; border: none !important; border-top: 1px dashed #374151 !important; border-radius: 0 !important;
+        padding: 20px 0 !important; margin-bottom: 0 !important; position: relative !important;
+    }
+    .djn-group-nested .inline-related { padding: 15px 0 !important; border-top: 1px dashed #4b5563 !important; margin-bottom: 0 !important; }
 
-    .inline-related, .djn-item { background-color: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 20px !important; position: relative !important;}
-    .djn-group-nested .inline-related { padding: 15px !important; margin-bottom: 10px !important; background-color: #1f2937 !important; }
+    /* Inputs alinhados e padronizados */
+    .form-row, .form-group { display: flex !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; margin: 0 0 15px 0 !important;}
+    .form-row > div, .form-group > div, .fieldBox { width: 100% !important; max-width: 100% !important; padding: 0 !important;}
+
+    body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; padding: 0 !important; display: block !important; width: 100% !important; text-align: left !important;}
 
     input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select {
-        background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; padding: 10px 15px !important; box-sizing: border-box !important;
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; padding: 10px 15px !important; box-sizing: border-box !important; height: 45px !important; font-size: 1rem !important;
     }
+    textarea { height: auto !important; min-height: 100px !important; }
     input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
-    .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; display: flex !important; align-items: center !important;}
+
+    .select2-container { width: 100% !important; max-width: 100% !important; }
+    .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; height: 45px !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
-    /* ÍCONE DE LIXO (Remover) */
+    /* Datas (Hoje / Agora) */
+    p.datetime { font-size: 0.8rem !important; color: #9ca3af !important; margin-top: 5px !important; }
+    p.datetime a { color: #14b8a6 !important; text-decoration: none !important; margin-right: 10px !important; font-weight: bold !important;}
+
+    /* ÍCONE DE LIXO (Substitui botões "Remover") */
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler {
-        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10 !important; display: block !important; margin: 0 !important;
+        position: absolute !important; top: 15px !important; right: 0 !important; z-index: 10 !important; margin: 0 !important;
     }
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler {
-        background-color: #ef4444 !important; color: white !important; width: 35px !important; height: 35px !important; border-radius: 8px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important;
+        background-color: transparent !important; color: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 8px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: 1px solid #ef4444 !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important;
     }
     span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after {
-        content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1rem !important;
+        content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1.1rem !important;
     }
-    span.delete label:hover, a.inline-deletelink:hover { background-color: #dc2626 !important; }
+    span.delete label:hover, a.inline-deletelink:hover { background-color: #ef4444 !important; color: white !important;}
 
     /* =====================================================================
-       7. TABELAS NO DESKTOP E BOTÕES DO TOPO
+       4. BOTÕES DE TOPO E INFERIOR (Pesquisa e Ações)
        ===================================================================== */
-    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; padding: 0 !important; }
-    ul.object-tools li { margin: 0 !important; list-style: none !important;}
-    ul.object-tools li a, .page-actions a {
-        display: flex !important; align-items: center !important; gap: 8px !important; padding: 10px 20px !important; font-size: 0.95rem !important; font-weight: bold !important;
-        border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important; text-decoration: none !important; box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-    }
+    ul.object-tools, .page-actions { display: none !important; } /* Esconde a ul original para os botões irem pro content-header */
 
+    .icon-only-btn {
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
+        width: 45px !important; height: 45px !important; border-radius: 8px !important;
+        background-color: #14b8a6 !important; color: white !important; font-size: 1.2rem !important; border: none !important; text-decoration: none !important; margin-left: 10px !important;
+    }
+    .icon-only-btn:hover { background-color: #0d9488 !important; color: white !important;}
+
+    /* Barra Inferior (Pesquisa e Lixeira) */
+    .my-super-bottom-bar { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; gap: 15px !important; padding: 15px 0 !important; margin-bottom: 30px !important; background: transparent !important; flex-wrap: wrap !important;}
+
+    .my-group { display: flex !important; align-items: center !important; gap: 10px !important; flex: 1 !important;}
+    .my-group.search-group { justify-content: flex-start !important; }
+    .my-group.actions-group { justify-content: flex-end !important; flex: none !important; }
+
+    .custom-input { width: 100% !important; max-width: 350px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
+    .btn-pesquisar, .btn-danger { height: 45px !important; padding: 0 20px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; cursor: pointer; border: none !important; white-space: nowrap !important; display: inline-flex !important; align-items: center !important; gap: 8px !important;}
+    .btn-pesquisar { background-color: #6b21a8 !important; }
+    .btn-danger { background-color: #ef4444 !important; }
+
+    /* Tabelas Desktop */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
     #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
     #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
-    #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; }
-
-    /* Barras de Pesquisa e Ações (Desktop) */
-    .my-super-bottom-bar { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 15px !important; margin-bottom: 30px !important; background: transparent !important; }
-    .my-group { display: flex !important; align-items: center !important; justify-content: flex-end !important; gap: 10px !important; width: 100% !important;}
-    .custom-input, .custom-select { width: 300px !important; height: 42px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
-    .custom-btn { height: 42px !important; padding: 0 25px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; cursor: pointer; border: none !important; }
-    .btn-pesquisar { background-color: #6b21a8 !important; }
-    .btn-ir { background-color: #3b82f6 !important; text-transform: uppercase !important;}
 
     /* =====================================================================
-       8. JOGANDO OS BOTÕES DE SALVAR PARA O FUNDO NO DESKTOP
+       5. BOTÕES DE SALVAR (Desktop)
        ===================================================================== */
     @media (min-width: 769px) {
         body nav.main-header { display: none !important; }
         #content-main > form > div.row { display: flex !important; flex-direction: column !important; margin: 0 !important; }
         #content-main > form > div.row > [class*="col-"] { width: 100% !important; max-width: 100% !important; padding: 0 !important; }
-        .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 30px !important; }
+
+        .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: transparent !important; padding: 20px 0 !important; margin-top: 20px !important; border: none !important;}
         .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; background-color: #14b8a6 !important; color: white !important; border: none !important; cursor: pointer;}
         #change_form .col-md-3 { display: none !important; }
     }
 
     /* =====================================================================
-       9. A SOLUÇÃO DEFINITIVA DO MOBILE (CARD VIEW & ALINHAMENTOS)
+       6. O NOVO PADRÃO MOBILE (Tudo alinhado, limpo e em blocos)
        ===================================================================== */
     @media (max-width: 768px) {
-        #content-main, .content-wrapper, .container-fluid, .content {
-            width: 100% !important; max-width: 100vw !important; padding: 15px 10px !important; margin: 0 !important; overflow-x: hidden !important; box-sizing: border-box !important;
-        }
+        html, body { width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; margin: 0 !important; padding: 0 !important; }
+        #content-main, .content-wrapper, .container-fluid, .content { width: 100% !important; padding: 15px 10px !important; margin: 0 !important; box-sizing: border-box !important; }
 
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
-        body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; }
-        .breadcrumb { display: none !important; }
 
-        .user-panel { justify-content: flex-start !important; padding-left: 20px !important; border-bottom: 1px solid #374151 !important; height: 60px !important;}
+        /* Título e Botões de Adicionar alinhados perfeitamente */
+        .content-header { height: auto !important; padding: 0 !important; margin: 0 0 20px 0 !important; border: none !important; flex-direction: row !important; justify-content: space-between !important; flex-wrap: nowrap !important; gap: 10px !important;}
+        .content-header h1 { font-size: 1.5rem !important; flex: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; }
 
-        /* Título e Botões na mesma linha */
-        .content-header { height: auto !important; padding: 0 5px 10px 5px !important; margin: 0 0 15px 0 !important; border-bottom: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; flex-wrap: wrap !important;}
-        .content-header h1 { margin: 0 !important; font-size: 1.5rem !important; border: none !important; flex: 1 !important;}
+        /* Barra de Pesquisa e Excluir empilhados a 100% */
+        .my-super-bottom-bar { flex-direction: column !important; padding: 0 !important; margin-bottom: 20px !important; gap: 15px !important;}
+        .my-group { flex-direction: column !important; width: 100% !important; align-items: stretch !important; gap: 10px !important;}
+        .my-group.search-group { flex-direction: column !important; }
+        .custom-input { max-width: 100% !important; }
+        .btn-pesquisar, .btn-danger { width: 100% !important; justify-content: center !important;}
 
-        /* Apenas Ícones nos Botões de Topo Mobile */
-        ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; gap: 10px !important; margin: 0 !important; width: auto !important;}
-        ul.object-tools li a, .page-actions a {
-            width: 42px !important; height: 42px !important; padding: 0 !important;
-            display: flex !important; align-items: center !important; justify-content: center !important;
-            border-radius: 8px !important; font-size: 1.2rem !important;
-        }
-        ul.object-tools li a span, .page-actions a span { display: none !important; } /* Esconde o texto */
-
-        /* NEUTRALIZANDO A GRELHA */
-        .row, .form-row, .form-group, .aligned .form-row { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; }
-        div[class^="col-"], div[class*=" col-"], .fieldBox, .aligned label { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; margin: 0 !important;}
-
-        fieldset.module { padding: 15px 10px !important; margin-bottom: 15px !important; border: 1px solid #374151 !important;}
-
-        /* CARD VIEW PARA TABELAS */
-        #changelist table { display: block !important; width: 100% !important; border: none !important; }
+        /* CARD VIEW MOBILE (Sem fundos escuros, textos alinhados) */
+        #changelist table { display: block !important; width: 100% !important; border: none !important; background: transparent !important;}
         #changelist table thead { display: none !important; }
         #changelist table tbody { display: block !important; width: 100% !important; }
         #changelist table tbody tr { display: flex !important; flex-direction: column !important; width: 100% !important; margin-bottom: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 15px !important; }
-        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 !important; border-bottom: 1px dashed #374151 !important; width: 100% !important; text-align: left !important;}
-        #changelist table tbody td:last-child { border-bottom: none !important; }
-        #changelist table tbody td::before, #changelist table tbody th::before { content: attr(data-label) !important; font-weight: 800 !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 3px !important; display: block !important;}
+        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 !important; border-bottom: 1px solid #374151 !important; width: 100% !important; align-items: flex-start !important; }
+        #changelist table tbody td:last-child { border-bottom: none !important; padding-bottom: 0 !important;}
 
-        /* PESQUISAR E IR - ESTRUTURA */
-        .my-super-bottom-bar { padding: 0 5px !important; margin-bottom: 20px !important;}
-        .my-group { flex-direction: column !important; align-items: flex-end !important; width: 100% !important; margin-bottom: 15px !important; gap: 10px !important;}
-        .custom-input, .custom-select { width: 100% !important; max-width: 100% !important; height: 50px !important; border-radius: 8px !important; }
-        .custom-btn { width: auto !important; height: 45px !important; padding: 0 30px !important; font-size: 1rem !important;}
-
-        /* LABELS E INPUTS */
-        body label { margin: 0 0 5px 0 !important; padding: 0 !important; width: 100% !important; font-weight: bold !important; }
-        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
-            width: 100% !important; max-width: 100% !important; height: 50px !important; border-radius: 8px !important;
-        }
-        .select2-container { width: 100% !important; max-width: 100% !important; }
-        .select2-selection { height: 50px !important; border-radius: 8px !important; display: flex !important; align-items: center !important;}
-
-        /* Cenas e Questionários - Ajustes Mágicos */
-        .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
-        .inline-related, .djn-item { width: 100% !important; margin: 0 0 15px 0 !important; padding: 15px !important; border-radius: 8px !important; border: 1px solid #374151 !important; position: relative !important; background-color: #1f2937 !important; }
-
-        /* Botão Remover (Trash Icon) nos inlines - Sempre no topo direito */
-        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { top: 12px !important; right: 12px !important; }
-
-        /* Botão "Adicionar Outra Opção" */
-        .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; display: block !important; }
-        .add-row a, .djn-add-item a, .djn-add-handler {
-            width: 100% !important; display: block !important; text-align: center !important; padding: 15px !important;
-            font-size: 1.1rem !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.05) !important;
+        /* Título do Card limpo e elegante */
+        #changelist table tbody td::before, #changelist table tbody th::before {
+            content: attr(data-label) !important; font-weight: bold !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important; background: transparent !important; padding: 0 !important; border: none !important;
         }
 
-        /* Botões Finais de Salvar */
-        .submit-row { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; padding: 0 !important; margin-top: 15px !important; background: transparent !important; border: none !important;}
+        /* Ícones de Relatório / Resumo em Linha no Mobile */
+        td.field-relatorios, td[data-label="Relatórios"] { flex-direction: row !important; gap: 10px !important; align-items: center !important; }
+        .mobile-icon-link { display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 40px !important; height: 40px !important; background: #4b5563 !important; border-radius: 8px !important; color: white !important; font-size: 1.1rem !important;}
+
+        /* Inlines (Cenas/Perguntas) Morte ao Box-in-Box */
+        .inline-related, .djn-item { padding: 25px 0 15px 0 !important; border: none !important; border-top: 2px solid #374151 !important; border-radius: 0 !important; background: transparent !important; margin-bottom: 10px !important;}
+
+        /* Botão Remover ancorado ao topo direito */
+        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { top: 15px !important; right: 0 !important; }
+
+        /* Espaçamento em cima do primeiro input para o ícone de lixo não pisar */
+        .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 25px !important; }
+
+        /* Botão Adicionar Outro */
+        .add-row, .djn-add-item { margin: 20px 0 !important; width: 100% !important; }
+        .add-row a, .djn-add-item a { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1rem !important; border: 2px dashed #4b5563 !important; color: #9ca3af !important; border-radius: 8px !important; font-weight: bold !important;}
+
+        /* Botões de Salvar no Mobile (Empilhados e Largos) */
+        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; padding: 15px 0 !important; margin-top: 15px !important; background: transparent !important;}
+        .submit-row input, .submit-row a { width: 100% !important; padding: 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important; }
         #change_form .col-md-3 { display: none !important; }
-        .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important;}
     }
 </style>
 {% endblock %}
@@ -383,28 +386,11 @@
                     <i class="fas fa-hand-holding-usd" style="font-size: 1.8rem;"></i>
                     <div>
                         <span class="alert-title">Assinatura Suspensa</span>
-                        <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</p>
+                        <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou.</p>
                     </div>
                 </div>
-                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar Agora</a>
+                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar</a>
             </div>
-        {% else %}
-            {% with plano=request.user.clinica.plano_atual %}
-                {% if plano and plano.limite_narrativas %}
-                    {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
-                        <div class="admin-alert-banner alert-warning-custom">
-                            <div class="alert-content">
-                                <i class="fas fa-rocket" style="font-size: 1.8rem;"></i>
-                                <div>
-                                    <span class="alert-title">Limite de Narrativas ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                    <p class="alert-text">Faça upgrade do seu plano agora para criar mais conteúdos.</p>
-                                </div>
-                            </div>
-                            <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Upgrade</a>
-                        </div>
-                    {% endif %}
-                {% endif %}
-            {% endwith %}
         {% endif %}
     {% endif %}
 {% endblock %}
