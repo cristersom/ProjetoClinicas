@@ -16,10 +16,10 @@
 <meta property="og:locale" content="pt_BR">
 
 <script>
-    // TROCAR OS "---------" POR TEXTO ÚTIL
+    // TROCAR OS "---------" POR TEXTO ÚTIL EM TEMPO REAL
     function ajustarDropdowns() {
         document.querySelectorAll('option').forEach(opt => {
-            if(opt.textContent.trim() === '---------') {
+            if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') {
                 opt.textContent = 'Selecione uma opção...';
             }
         });
@@ -31,54 +31,22 @@
         });
     }
 
+    // CONSTROI APENAS A BARRA DE AÇÕES (SEM DUPLICAR BOTÕES DE ADICIONAR)
     function construirBarraInferior() {
         if (document.getElementById('my-super-bottom-bar')) return;
+
         const mainContent = document.getElementById('content-main');
         const changelist = document.getElementById('changelist');
         const formTabela = document.getElementById('changelist-form');
         const table = document.querySelector('#changelist table');
+
         if (!changelist && !formTabela && !table) return;
 
         const bottomBar = document.createElement('div');
         bottomBar.id = 'my-super-bottom-bar';
         bottomBar.className = 'my-super-bottom-bar';
 
-        const filterForms = document.querySelectorAll('#changelist-search form, #changelist-filter form');
-        filterForms.forEach(formOrig => {
-            const searchGroup = document.createElement('form');
-            searchGroup.className = 'my-group search-group';
-            searchGroup.action = formOrig.action;
-            searchGroup.method = formOrig.method || 'GET';
-            let hasVisibleFields = false;
-
-            formOrig.querySelectorAll('input:not([type="hidden"]):not([type="submit"]):not([type="button"]), select').forEach(field => {
-                hasVisibleFields = true;
-                const clone = field.cloneNode(true);
-                clone.value = field.value;
-                if (clone.tagName === 'SELECT') {
-                    clone.className = 'custom-select';
-                    clone.removeAttribute('data-select2-id');
-                    clone.classList.remove('select2-hidden-accessible');
-                } else {
-                    clone.className = 'custom-input';
-                    if(!clone.placeholder) clone.placeholder = 'Pesquisar...';
-                }
-                searchGroup.appendChild(clone);
-            });
-
-            if (hasVisibleFields) {
-                const btnSearch = document.createElement('button');
-                btnSearch.type = 'submit';
-                btnSearch.className = 'custom-btn primary btn-pesquisar';
-                btnSearch.innerHTML = '<i class="fas fa-search"></i> Pesquisar';
-                searchGroup.appendChild(btnSearch);
-                formOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
-                bottomBar.appendChild(searchGroup);
-            }
-            formOrig.style.setProperty('display', 'none', 'important');
-            if(formOrig.parentElement) formOrig.parentElement.style.setProperty('display', 'none', 'important');
-        });
-
+        // Mover as Ações (Dropdown) para a barra bonita
         const actionSelectOrig = document.querySelector('select[name="action"]:not(.custom-select)');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
@@ -106,6 +74,7 @@
             actionGroup.appendChild(selClone);
             actionGroup.appendChild(btnIr);
             bottomBar.appendChild(actionGroup);
+
             const actionsContainer = actionSelectOrig.closest('.actions');
             if (actionsContainer) actionsContainer.style.setProperty('display', 'none', 'important');
         }
@@ -129,6 +98,15 @@
         document.querySelectorAll('label').forEach(label => {
             if (label.innerText.trim() === 'Texto:') label.innerText = 'Opção:';
         });
+
+        // Formatar botões de topo nativos
+        document.querySelectorAll('.object-tools a').forEach(btn => {
+            if (!btn.innerHTML.includes('fa-')) {
+                if (btn.innerText.toLowerCase().includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> ${btn.innerText.trim()}`; }
+                else if (btn.innerText.toLowerCase().includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> ${btn.innerText.trim()}`; }
+                else if (btn.innerText.toLowerCase().includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> ${btn.innerText.trim()}`; }
+            }
+        });
     }
 
     window.addEventListener('load', function() {
@@ -151,7 +129,6 @@
         }
         document.querySelectorAll('.nav-link').forEach(function(el) { if (el.textContent.trim() === 'General') { el.textContent = 'Principal'; } });
 
-        // GARANTIA: O Menu Lateral entra em todas as páginas (incluindo Manual)
         let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
@@ -168,7 +145,7 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E RESET GERAL (PARA EVITAR CORTES NO MANUAL E DASHBOARD)
+       1. BASE E RESET GERAL
        ===================================================================== */
     *, *::before, *::after { box-sizing: border-box !important; }
     body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
@@ -193,22 +170,22 @@
     .user-panel .info a { display: block !important; width: 100% !important; text-align: center !important; font-weight: bold !important; color: #d1d5db !important; }
 
     .content-header { height: 60px !important; display: flex !important; align-items: center !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; }
-    .content-header h1, .content-header .border-right, h1.border-right, .border-right { border-right: none !important; border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
+    .content-header h1 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; }
     .content-header h1::after, .content-header h1::before { display: none !important; }
 
     .os-scrollbar { display: none !important; visibility: hidden !important; }
 
     /* =====================================================================
-       3. A MÁGICA: NEUTRALIZANDO A CLASSE .P-5 E BOX-IN-BOX
+       3. A MÁGICA: NEUTRALIZANDO A CLASSE .P-5 E ESCONDENDO DUPLICATOS
        ===================================================================== */
     .p-5, .card-body.p-5 { padding: 15px !important; }
     #change_form .tab-content > .card, #change_form .tab-pane > .card { border: 1px solid #374151 !important; background-color: #1f2937 !important; border-radius: 8px !important; }
 
-    /* ESCONDE O CAMPO 'NARRATIVA' DENTRO DOS INLINES PARA NÃO DUPLICAR */
+    /* ESCONDE O CAMPO 'NARRATIVA' DENTRO DOS INLINES PARA NÃO DUPLICAR EM CENAS/QUESTIONARIOS */
     .inline-related .field-narrativa { display: none !important; visibility: hidden !important; height: 0 !important; margin: 0 !important; padding: 0 !important; }
 
     /* =====================================================================
-       4. ALERTAS E ESTILOS PADRÃO
+       4. ALERTAS
        ===================================================================== */
     .admin-alert-banner { margin: 20px !important; padding: 15px 25px !important; border-radius: 12px !important; display: flex !important; justify-content: space-between !important; align-items: center !important; gap: 20px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important; }
     .alert-danger-custom { background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%) !important; border: 1px solid #f87171 !important; color: white !important; }
@@ -225,7 +202,6 @@
     p.original { display: none !important; }
     fieldset.module { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px !important; margin-bottom: 20px !important; }
 
-    /* Box in Box otimizado */
     .inline-related, .djn-item { background-color: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px !important; margin-bottom: 15px !important; }
     .djn-group-nested .inline-related { padding: 15px !important; margin-bottom: 10px !important; }
 
@@ -239,29 +215,49 @@
     .select2-selection__rendered { color: #ffffff !important; }
 
     /* =====================================================================
-       6. TABELAS MODERNAS (Com Scroll no Mobile)
+       6. TABELAS MODERNAS (Com Scroll Automático)
        ===================================================================== */
     #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
     #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
     #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
     #changelist table td a { color: #14b8a6 !important; font-weight: 600 !important; }
-    #changelist-form .results { overflow-x: auto !important; width: 100% !important; display: block !important; -webkit-overflow-scrolling: touch !important; }
+
+    /* Scroll Horizontal para não esmagar no Mobile */
+    #changelist-form .results, .results { overflow-x: auto !important; width: 100% !important; display: block !important; -webkit-overflow-scrolling: touch !important; padding-bottom: 10px !important;}
 
     /* =====================================================================
-       7. BOTÕES DE ACÇÃO DO TOPO (O Padrão Definitivo Desktop e Mobile)
+       7. BOTÕES DE TOPO E PESQUISA (EMPILHADOS "UM EM BAIXO DO OUTRO")
        ===================================================================== */
-    .my-super-bottom-bar { display: flex !important; flex-direction: column !important; gap: 15px !important; margin-bottom: 30px !important; width: 100% !important; align-items: stretch !important; }
-    .my-group { display: flex !important; align-items: center !important; gap: 10px !important; margin: 0 !important; }
+    /* Pesquisa sempre à direita no Desktop */
+    #changelist-search { margin-bottom: 20px !important; display: flex; justify-content: flex-end; }
+    #changelist-search form { display: flex !important; gap: 10px !important; align-items: center !important;}
+    #changelist-search input[type="text"] { height: 42px !important; border-radius: 6px !important; padding: 0 15px !important; }
+    #changelist-search input[type="submit"] { height: 42px !important; padding: 0 20px !important; border-radius: 6px !important; background-color: #6b21a8 !important; color: white !important; font-weight: bold !important; border: none !important; cursor: pointer; }
 
-    .custom-input, .custom-select { background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; height: 45px !important; padding: 0 15px !important; flex: 1 !important;}
-    .custom-btn { height: 45px !important; padding: 0 20px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important;}
-    .custom-btn.primary { background-color: #14b8a6 !important; }
-    .custom-btn.btn-ir { background-color: #3b82f6 !important; } /* Azul forte para contraste no IR */
+    /* Botões Adicionar/Importar/Exportar (Sempre empilhados à direita no Desktop) */
+    ul.object-tools {
+        display: flex !important; flex-direction: column !important; align-items: flex-end !important;
+        gap: 12px !important; margin: 0 0 30px 0 !important; padding: 0 !important; float: right !important;
+    }
+    ul.object-tools li { display: block !important; margin: 0 !important; }
+    ul.object-tools li a {
+        display: inline-block !important; text-align: center !important; padding: 12px 25px !important;
+        font-size: 1rem !important; font-weight: bold !important; border-radius: 8px !important;
+        background-color: #14b8a6 !important; color: white !important; border: none !important;
+        white-space: nowrap !important; line-height: 1 !important; height: auto !important;
+    }
+    ul.object-tools li a:hover { background-color: #0d9488 !important; }
 
-    /* Exportar/Adicionar - Empilhados por padrão */
-    ul.object-tools, .page-actions { display: flex !important; flex-direction: column !important; align-items: flex-end !important; gap: 10px !important; margin: 0 0 30px 0 !important; padding: 0 !important; float: none !important;}
-    ul.object-tools li, .page-actions li { display: block !important; margin: 0 !important; width: 100% !important; max-width: 300px !important;}
-    ul.object-tools li a, .page-actions a { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important; }
+    /* Barra inferior (Ações "Selecione uma ação..." e IR) */
+    .my-super-bottom-bar {
+        display: flex !important; flex-direction: row !important; align-items: center !important;
+        gap: 15px !important; padding: 15px !important; margin-top: 20px !important;
+        background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;
+    }
+    .my-group.actions-group { display: flex !important; align-items: center !important; gap: 10px !important; width: auto !important;}
+    .my-group.actions-group .custom-select { width: 250px !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 6px !important; padding: 0 15px !important; }
+    .my-group.actions-group .btn-ir { height: 45px !important; padding: 0 25px !important; border-radius: 6px !important; font-weight: bold !important; color: white !important; background-color: #3b82f6 !important; border: none !important; cursor: pointer;}
+    .my-group.actions-group .btn-ir:hover { background-color: #2563eb !important; }
 
     /* =====================================================================
        8. JOGANDO OS BOTÕES DE SALVAR PARA O FUNDO NO DESKTOP
@@ -269,20 +265,18 @@
     @media (min-width: 769px) {
         body nav.main-header, body .main-header, body .navbar { display: none !important; }
 
-        #content-main > form > div.row { display: flex !important; flex-direction: column !important; }
+        #content-main > form > div.row { display: flex !important; flex-direction: column !important; margin: 0 !important; }
         #content-main > form > div.row > [class*="col-"] { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; }
 
         .submit-row { display: flex !important; flex-direction: row !important; justify-content: flex-end !important; gap: 15px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-top: 20px !important; }
-        .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; display: inline-block !important;}
-        #change_form .col-md-3 .card { display: none !important; } /* Esconde o card vazio lateral */
+        .submit-row input, .submit-row a { width: auto !important; margin: 0 !important; padding: 12px 25px !important; border-radius: 8px !important; font-size: 1rem !important; font-weight: bold !important; display: inline-block !important; background-color: #14b8a6 !important; color: white !important; border: none !important; cursor: pointer;}
+        .submit-row input:hover { background-color: #0d9488 !important; }
 
-        /* Ajuste do botão de pesquisa na lista */
-        .my-group.search-group { flex-direction: row !important; }
-        .my-group.search-group .btn-pesquisar { width: auto !important; }
+        #change_form .col-md-3 { display: none !important; } /* Esconde a barra lateral direita vazia no PC */
     }
 
     /* =====================================================================
-       9. A SOLUÇÃO DEFINITIVA DO MOBILE (TUDO PADRONIZADO E 100%)
+       9. A SOLUÇÃO DEFINITIVA DO MOBILE (TUDO PADRONIZADO)
        ===================================================================== */
     @media (max-width: 768px) {
         #content-main, .content-wrapper, .container-fluid, .content {
@@ -311,21 +305,24 @@
         }
 
         /* BOTÕES DE TOPO E PESQUISA - EMPILHADOS E LARGOS */
-        ul.object-tools li, .page-actions li { max-width: 100% !important; }
-        ul.object-tools li a, .page-actions a { padding: 15px !important; font-size: 1.1rem !important; margin-bottom: 15px !important;}
+        ul.object-tools { align-items: stretch !important; margin: 0 0 20px 0 !important; float: none !important; }
+        ul.object-tools li a { width: 100% !important; padding: 18px 15px !important; font-size: 1.1rem !important; border-radius: 8px !important; }
 
-        .my-group.search-group { flex-direction: column !important; }
-        .my-group.search-group .custom-input { width: 100% !important; max-width: 100% !important;}
-        .my-group.search-group .btn-pesquisar { align-self: flex-end !important; width: auto !important; margin-top: 5px !important;}
+        #changelist-search { justify-content: stretch !important; margin-bottom: 20px !important; }
+        #changelist-search form { flex-direction: column !important; width: 100% !important; }
+        #changelist-search input[type="text"] { width: 100% !important; height: 50px !important; }
+        #changelist-search input[type="submit"] { width: 100% !important; height: 50px !important; }
 
-        .my-group.actions-group { flex-direction: row !important; }
+        .my-super-bottom-bar { flex-direction: column !important; padding: 15px !important; background: transparent !important; border: none !important; }
+        .my-group.actions-group { flex-direction: column !important; width: 100% !important; }
+        .my-group.actions-group .custom-select { width: 100% !important; height: 50px !important; }
+        .my-group.actions-group .btn-ir { width: 100% !important; height: 50px !important; }
 
         body label { margin: 0 0 5px 0 !important; padding: 0 !important; width: 100% !important; display: block !important; text-align: left !important; font-weight: bold !important; }
 
         /* Cenas e Questionários (Inlines) - Fim do esmagamento */
         .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
 
-        /* A magia do botão Remover (55px de teto em branco) */
         .inline-related, .djn-item {
             width: 100% !important; margin: 0 0 15px 0 !important;
             padding: 55px 15px 15px 15px !important;
@@ -350,13 +347,13 @@
         .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; padding: 0 !important; display: block !important; }
         .add-row a, .djn-add-item a, .djn-add-handler {
             width: 100% !important; display: block !important; text-align: center !important; padding: 18px 15px !important;
-            font-size: 1.1rem !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important; margin-bottom: 15px !important;
+            font-size: 1.1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important; margin-bottom: 15px !important;
         }
 
         /* Botões Finais de Salvar (Sessão Pacientes, Narrativas, Senha) */
         .submit-row { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; padding: 15px 0 !important; margin-top: 15px !important; background: transparent !important; border: none !important;}
-        #change_form .col-md-3 .card { display: none !important; }
-        #change_form .col-md-3 .btn, .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 0 15px 0 !important; border-radius: 8px !important; }
+        #change_form .col-md-3 { display: none !important; }
+        .submit-row input, .submit-row a { width: 100% !important; display: block !important; padding: 18px 15px !important; font-size: 1.1rem !important; margin: 0 !important; border-radius: 8px !important; background-color: #14b8a6 !important; color: white !important; border: none !important;}
     }
 </style>
 {% endblock %}
