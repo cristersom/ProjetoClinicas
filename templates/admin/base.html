@@ -12,7 +12,6 @@
 
 <script>
     function limparTextosInuteis() {
-        // Dropdowns
         document.querySelectorAll('option').forEach(opt => {
             if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') opt.textContent = 'Selecione...';
         });
@@ -20,12 +19,9 @@
             if(el.textContent.trim() === '---------' || el.title === '---------') { el.textContent = 'Selecione...'; el.title = 'Selecione...'; }
         });
 
-        // Remove traços inúteis da tabela
         document.querySelectorAll('#changelist table tbody td').forEach(td => {
             let texto = td.innerText.trim();
-            if(texto === '-' || texto === '—' || texto === 'None') {
-                td.innerHTML = '';
-            }
+            if(texto === '-' || texto === '—' || texto === 'None') td.innerHTML = '';
         });
     }
 
@@ -35,7 +31,6 @@
             tables.forEach(table => {
                 const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
                 table.querySelectorAll('tbody tr').forEach(tr => {
-
                     let actionsDiv = tr.querySelector('.mobile-actions-container');
                     if (!actionsDiv) {
                         actionsDiv = document.createElement('div');
@@ -46,7 +41,6 @@
                     Array.from(tr.querySelectorAll('td, th')).forEach((td, index) => {
                         let headerText = headers[index] || '';
 
-                        // Lógica dos Botões (Diferenciando Ícones)
                         if (td.querySelector('a') && (headerText.toLowerCase().includes('ação') || headerText.toLowerCase().includes('relatório') || headerText === '')) {
                             let links = td.querySelectorAll('a');
                             links.forEach(l => {
@@ -54,14 +48,11 @@
                                 l.className = 'btn-table-icon';
 
                                 if(text.includes('relatório') || text.includes('resumo')) {
-                                    l.innerHTML = '<i class="fas fa-chart-line"></i>';
-                                    l.classList.add('btn-info');
+                                    l.innerHTML = '<i class="fas fa-chart-line"></i>'; l.classList.add('btn-info');
                                 } else if(text.includes('detalhes')) {
-                                    l.innerHTML = '<i class="fas fa-list"></i>';
-                                    l.classList.add('btn-primary');
+                                    l.innerHTML = '<i class="fas fa-list"></i>'; l.classList.add('btn-primary');
                                 } else if(text.includes('excluir') || text.includes('remover') || l.classList.contains('deletelink') || headerText.toLowerCase().includes('ação')) {
-                                    l.innerHTML = '<i class="fas fa-trash"></i>';
-                                    l.classList.add('btn-danger');
+                                    l.innerHTML = '<i class="fas fa-trash"></i>'; l.classList.add('btn-danger');
                                 }
                                 actionsDiv.appendChild(l);
                             });
@@ -71,10 +62,7 @@
                                 if (td.querySelector('.action-checkbox')) headerText = 'Selecionar';
                                 td.setAttribute('data-label', headerText);
                             }
-                            // Oculta completamente campos vazios no mobile
-                            if (td.innerHTML.trim() === '' && !td.querySelector('input')) {
-                                td.style.display = 'none';
-                            }
+                            if (td.innerHTML.trim() === '' && !td.querySelector('input')) td.style.display = 'none';
                         }
                     });
                 });
@@ -84,11 +72,10 @@
 
     function construirBarrasInferiores() {
         if (document.getElementById('custom-search-container')) return;
-
         const changelist = document.getElementById('changelist');
         if (!changelist) return;
 
-        // --- BARRA DE PESQUISA (Input e Lupinha na mesma linha) ---
+        // --- BARRA DE PESQUISA (Input e Lupa na mesma linha) ---
         const searchInputOrig = document.querySelector('#changelist-search input[name="q"]');
         const searchFormOrig = document.querySelector('#changelist-search form');
 
@@ -109,7 +96,7 @@
             const btnSearch = document.createElement('button');
             btnSearch.type = 'submit';
             btnSearch.className = 'custom-btn btn-pesquisar';
-            btnSearch.innerHTML = '<i class="fas fa-search"></i>'; // Só a lupinha!
+            btnSearch.innerHTML = '<i class="fas fa-search"></i>';
 
             searchGroup.appendChild(cloneInput);
             searchGroup.appendChild(btnSearch);
@@ -120,7 +107,7 @@
             document.querySelector('#changelist-search').style.setProperty('display', 'none', 'important');
         }
 
-        // --- BARRA DE AÇÕES (Lixeira/Ir) ---
+        // --- BARRA DE AÇÕES EM MASSA ---
         const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
@@ -163,6 +150,7 @@
     }
 
     function aplicarUXeBotoes() {
+        // Remover legendas que poluem a tela
         document.querySelectorAll('legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('principal')) {
@@ -170,32 +158,46 @@
             }
         });
 
-        // Botões de Topo: Sempre Ícones (PC e Mobile) para não colar e poluir
+        // Formatar botões do Topo com Texto + Ícone, mantendo GAP
         document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
             let text = btn.innerText.toLowerCase();
-            btn.className = 'icon-only-btn';
-
-            if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i>`; btn.title = "Adicionar"; }
-            else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i>`; btn.title = "Importar"; }
-            else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i>`; btn.title = "Exportar"; }
-            else { btn.innerHTML = `<i class="fas fa-cog"></i>`; }
+            if(!btn.classList.contains('custom-btn-top')) {
+                btn.className = 'custom-btn-top';
+                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> ${btn.innerText.trim()}`; }
+                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> ${btn.innerText.trim()}`; }
+                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> ${btn.innerText.trim()}`; }
+            }
         });
 
-        // Move os botões para o Header para alinharem com o título
-        const header = document.querySelector('.content-header');
-        const tools = document.querySelector('ul.object-tools') || document.querySelector('.page-actions');
-        if (header && tools && !header.contains(tools)) {
-            header.appendChild(tools);
-        }
+        // Pegar botão histórico/engrenagem e descer para a área de Salvar
+        document.querySelectorAll('.object-tools a, .historylink, a[href$="/history/"]').forEach(btn => {
+            let text = btn.innerText.toLowerCase();
+            if (text.includes('histórico') || text.includes('history') || btn.innerHTML.includes('fa-cog') || btn.classList.contains('historylink')) {
+                btn.className = 'custom-btn-bottom btn-history';
+                btn.innerHTML = '<i class="fas fa-history"></i> Histórico';
+                const submitRow = document.querySelector('.submit-row') || document.getElementById('jazzy-actions');
+                if (submitRow && !submitRow.contains(btn)) {
+                    submitRow.appendChild(btn);
+                }
+            }
+        });
 
-        // Histórico volta para o fundo
-        const historyLink = document.querySelector('.historylink');
-        const submitRow = document.querySelector('.submit-row') || document.getElementById('jazzy-actions');
-        if (historyLink && submitRow) {
-            historyLink.className = 'custom-btn-bottom history-btn';
-            historyLink.innerHTML = '<i class="fas fa-history"></i> Histórico';
-            submitRow.appendChild(historyLink);
-        }
+        // Confirm Action para Lixeiras Inlines
+        document.querySelectorAll('span.delete label, a.inline-deletelink').forEach(lbl => {
+            if(!lbl.classList.contains('js-bound')) {
+                lbl.classList.add('js-bound');
+                lbl.addEventListener('click', function(e) {
+                    if(!confirm('Tem certeza que deseja remover este item?')) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                    // Ocultar a caixa imediatamente após a confirmação para melhorar UX
+                    let inlineCard = this.closest('.inline-related') || this.closest('.djn-item');
+                    if(inlineCard) inlineCard.style.display = 'none';
+                });
+            }
+        });
     }
 
     window.addEventListener('DOMContentLoaded', function() {
@@ -212,14 +214,15 @@
             });
         }
 
-        // Menu da Conta
-        let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
-        if (sidebar && !document.querySelector('#menu-conta-custom')) {
-            sidebar.insertAdjacentHTML('beforeend', `
-                <li id="menu-conta-custom" class="nav-header" style="color: #6b7280; font-size: 0.75rem; text-transform: uppercase; padding: 10px 15px 5px; margin-top: 15px;">Conta</li>
-                <li class="nav-item"><a href="/admin/password_change/" class="nav-link"><i class="nav-icon fas fa-key" style="color: #9ca3af;"></i><p style="color: #d1d5db;">Alterar Senha</p></a></li>
-                <li class="nav-item"><a href="{% url 'narrativa:logout' %}" class="nav-link"><i class="nav-icon fas fa-sign-out-alt" style="color: #ef4444;"></i><p style="color: #ef4444; font-weight: bold;">Sair</p></a></li>
-            `);
+        // Dashboard título forçado se necessário para alinhar
+        if(window.location.pathname === '/admin/' && !document.querySelector('.content-header')) {
+            const wrapper = document.querySelector('.content-wrapper');
+            if(wrapper) {
+                const fakeHeader = document.createElement('div');
+                fakeHeader.className = 'content-header';
+                fakeHeader.innerHTML = '<h1>Dashboard</h1>';
+                wrapper.insertBefore(fakeHeader, wrapper.firstChild);
+            }
         }
     });
 
@@ -242,70 +245,77 @@
     #change_form .tab-content > .card, #change_form .tab-pane > .card { border: none !important; background-color: transparent !important; }
 
     /* =====================================================================
-       2. TÍTULOS E USUÁRIO (Adeus Ícone)
+       2. TÍTULOS E ALINHAMENTO DESKTOP (A Regra dos 65px)
        ===================================================================== */
     .brand-link, .navbar-nav.ml-auto { display: none !important; }
 
-    .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important; padding: 0 20px !important; margin: 0 !important; }
-
-    /* ESCONDER ÍCONE DO USUÁRIO */
+    /* Box do Email */
+    .user-panel {
+        border-top: none !important; border-bottom: 1px solid #374151 !important;
+        height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important;
+        padding: 0 20px !important; margin: 0 !important;
+    }
     .user-panel .image, .user-panel img, .user-panel i, .user-block .image { display: none !important; }
-
     .user-panel .info { width: 100% !important; text-align: left !important; padding: 0 !important; display: block !important;}
     .user-panel .info a { display: block !important; font-weight: bold !important; color: #d1d5db !important; }
 
-    /* Header: Alinhado e sem bordas */
-    .content-header { height: 65px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; border-right: none !important; border-left: none !important; }
-    .content-header h1, h1.border-right, .border-right, .content-header .row, .content-header .col-sm-6 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; box-shadow: none !important; }
-
-    /* =====================================================================
-       3. BOTÕES DE TOPO (COM GAP E SÓ ÍCONES)
-       ===================================================================== */
-    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; padding: 0 !important; list-style: none !important; }
-    ul.object-tools li, .page-actions li { margin: 0 !important; }
-    .icon-only-btn {
-        display: inline-flex !important; align-items: center !important; justify-content: center !important;
-        width: 45px !important; height: 45px !important; border-radius: 8px !important; flex-shrink: 0 !important;
-        background-color: #14b8a6 !important; color: white !important; font-size: 1.2rem !important; border: none !important; text-decoration: none !important; transition: 0.2s;
+    /* Box do Título (Perfeitamente alinhado com o Email) */
+    .content-header {
+        height: 65px !important; min-height: 65px !important; display: flex !important; align-items: center !important; justify-content: space-between !important;
+        border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important;
+        border-right: none !important; border-left: none !important; box-sizing: border-box !important;
     }
-    .icon-only-btn:hover { background-color: #0d9488 !important; }
-    .content-header .historylink { display: none !important; }
+    .content-header h1, h1.border-right, .border-right {
+        border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; box-shadow: none !important;
+    }
 
     /* =====================================================================
-       4. PESQUISA COM LUPA E AÇÕES (MESMA LINHA)
+       3. BOTÕES DO TOPO (Espaçados e Alinhados)
+       ===================================================================== */
+    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; margin: 0 !important; padding: 0 !important; list-style: none !important; margin-left: 15px !important;}
+    ul.object-tools li, .page-actions li { margin: 0 !important; }
+    .custom-btn-top {
+        display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important;
+        height: 42px !important; padding: 0 20px !important; border-radius: 8px !important;
+        background-color: #14b8a6 !important; color: white !important; font-size: 1rem !important; font-weight: bold !important; border: none !important; text-decoration: none !important; transition: 0.2s; white-space: nowrap !important;
+    }
+    .custom-btn-top:hover { background-color: #0d9488 !important; color: white !important;}
+
+    /* =====================================================================
+       4. PESQUISA COM LUPA E AÇÕES (MESMA LINHA E SEM BOXES)
        ===================================================================== */
     .inline-action-bar { display: block !important; width: 100% !important; margin-bottom: 20px !important; }
 
-    /* Pesquisa Flex Row */
     .my-group.search-group { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
     .my-group.search-group .custom-input { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
     .my-group.search-group .btn-pesquisar { width: 50px !important; height: 45px !important; border-radius: 8px !important; background-color: #6b21a8 !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important; font-size: 1.2rem !important;}
 
-    /* Ações */
     .my-group.actions-group { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; width: 100% !important;}
     .my-group.actions-group .custom-select { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
     .my-group.actions-group .btn-ir { width: 80px !important; height: 45px !important; border-radius: 8px !important; background-color: #3b82f6 !important; color: white !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important;}
 
     /* =====================================================================
-       5. FORMULÁRIOS, INPUTS E ÍCONES INÚTEIS
+       5. FORMULÁRIOS, INPUTS E LIXEIRAS PERFEITAS
        ===================================================================== */
-    p.original { display: none !important; }
     fieldset.module { background-color: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
-
-    /* Esconder Lápis, Olho e Lixeira nativos do Django perto dos Dropdowns */
-    .related-widget-wrapper-link.change-related, .related-widget-wrapper-link.delete-related, .related-widget-wrapper-link.view-related { display: none !important; }
+    .related-widget-wrapper-link { display: none !important; } /* Lápis e olho do Django */
     .datetimeshortcuts { display: none !important; } /* Adeus Hoje | Agora */
 
-    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; position: relative !important; }
+    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 20px !important; position: relative !important; }
     .djn-group-nested .inline-related { background-color: #111827 !important; border: 1px dashed #4b5563 !important; margin-top: 15px !important;}
     .inline-related .field-narrativa { display: none !important; }
 
-    /* Lixeira Vermelha do Canto (Remover) */
-    .inline-related h2, .inline-related h3, .djn-item h3 { padding-right: 50px !important; margin-top: 0 !important; margin-bottom: 15px !important; color: #9ca3af !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-size: 1.1rem !important;}
+    /* A MÁGICA DA LIXEIRA: Botão na Direita, Checkbox Oculta */
+    span.delete input[type="checkbox"], div.delete input[type="checkbox"] { display: none !important; }
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; display: block !important; margin: 0 !important; z-index: 10; }
-    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: #ef4444 !important; color: white !important; width: 35px !important; height: 35px !important; border-radius: 8px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important; }
-    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1.1rem !important; }
+    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler {
+        background-color: #ef4444 !important; color: white !important; width: 40px !important; height: 40px !important; border-radius: 8px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important; transition: 0.2s;
+    }
+    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1.2rem !important; }
+    span.delete label:hover, a.inline-deletelink:hover { background-color: #dc2626 !important; transform: scale(1.05); }
 
+    /* Estrutura dos Inputs alinhada à esquerda */
     .form-row, .form-group { display: flex !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; margin: 0 0 15px 0 !important;}
     .form-row > div, .form-group > div, .fieldBox { width: 100% !important; max-width: 100% !important; padding: 0 !important;}
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; display: block !important; width: 100% !important; text-align: left !important;}
@@ -319,105 +329,76 @@
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; height: 45px !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
+    /* Botão Adicionar Outro */
     .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; display: block !important; }
     .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1rem !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.05) !important; }
 
     /* =====================================================================
        6. BOTÕES DE SALVAR E HISTÓRICO NO FUNDO
        ===================================================================== */
-    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 0 !important; margin-top: 30px !important; background: transparent !important; border: none !important; padding-bottom: 30px !important;}
+    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 20px !important; margin-top: 30px !important; background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important;}
     .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn {
-        width: 100% !important; display: block !important; padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important; text-align: center !important; border-radius: 8px !important; border: none !important; color: white !important; cursor: pointer; text-decoration: none !important;
+        width: 100% !important; display: block !important; padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important; text-align: center !important; border-radius: 8px !important; border: none !important; color: white !important; cursor: pointer; text-decoration: none !important; margin: 0 !important;
     }
     input[name="_save"] { background-color: #14b8a6 !important; }
     input[name="_addanother"], .btn-info { background-color: #3b82f6 !important; }
     input[name="_continue"] { background-color: #8b5cf6 !important; }
-    .history-btn { background-color: #4b5563 !important; border: 1px solid #6b7280 !important;}
+    .btn-history { background-color: #4b5563 !important; }
     #change_form .col-md-3 { display: none !important; }
 
     /* =====================================================================
-       7. TABELAS E COMPORTAMENTO DESKTOP
+       7. TABELAS DESKTOP
        ===================================================================== */
     @media (min-width: 769px) {
         body nav.main-header { display: none !important; }
-        .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important; padding: 0 20px !important; margin: 0 !important; }
 
         #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
         #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
         #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
 
-        /* Barras de pesquisa e ir limitadas de tamanho no PC */
-        .my-group.search-group { max-width: 500px !important; margin-bottom: 30px !important;}
-        .my-group.actions-group { max-width: 500px !important; margin-top: 30px !important;}
+        .my-group.search-group, .my-group.actions-group { max-width: 500px !important; margin-bottom: 30px !important;}
 
-        .submit-row { flex-direction: row !important; justify-content: flex-end !important; background: #1f2937 !important; padding: 20px !important; border: 1px solid #374151 !important; border-radius: 8px !important;}
-        .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn { width: auto !important; }
+        .submit-row { flex-direction: row !important; justify-content: flex-end !important; }
+        .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn { width: auto !important; padding: 12px 25px !important; }
     }
 
     /* =====================================================================
-       8. MOBILE PERFEITO (Limpo, Card View, Alinhado)
+       8. MOBILE PERFEITO (Card View e Alinhamentos)
        ===================================================================== */
     @media (max-width: 768px) {
-        html, body { width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; margin: 0 !important; padding: 0 !important; }
-        #content-main, .content-wrapper, .container-fluid, .content { width: 100% !important; padding: 15px 10px !important; margin: 0 !important; box-sizing: border-box !important; }
-
+        #content-main, .content-wrapper, .container-fluid, .content { padding: 15px 10px 40px 10px !important; } /* 40px padding bottom extra p/ os botoes de salvar */
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
         body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; opacity: 1 !important;}
         .breadcrumb { display: none !important; }
+
         .user-panel { justify-content: flex-start !important; padding-left: 20px !important; height: 60px !important;}
 
-        .content-header { height: auto !important; padding: 0 5px 10px 5px !important; margin: 0 0 20px 0 !important; border-bottom: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
-        .content-header h1 { font-size: 1.5rem !important; flex: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; border: none !important; }
+        /* Título e Botões na mesma linha no Mobile */
+        .content-header { height: auto !important; padding: 0 5px !important; margin: 0 0 20px 0 !important; border: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important;}
+        .content-header h1 { font-size: 1.5rem !important; flex: 1 !important;}
+        ul.object-tools { flex-wrap: wrap !important; justify-content: flex-end !important; margin-left: auto !important;}
 
-        .row, .form-row, .form-group, .aligned .form-row { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; }
-        div[class^="col-"], div[class*=" col-"], .fieldBox, .aligned label { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; margin: 0 !important;}
-
-        /* TABELAS (CARD VIEW SEM FUNDO ESCURO NO TÍTULO) */
+        /* CARD VIEW MOBILE (Sem linhas feias, sem títulos escuros) */
         #changelist table { display: block !important; width: 100% !important; border: none !important; background: transparent !important;}
         #changelist table thead { display: none !important; }
         #changelist table tbody { display: block !important; width: 100% !important; }
         #changelist table tbody tr { display: flex !important; flex-direction: column !important; width: 100% !important; margin-bottom: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 15px !important; }
-        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 !important; border-bottom: 1px solid #374151 !important; width: 100% !important; align-items: flex-start !important; background: transparent !important; }
-        #changelist table tbody td:last-child { border-bottom: none !important; padding-bottom: 0 !important;}
+
+        /* O segredo da limpeza visual: Sem borders nas TDs */
+        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 5px 0 15px 0 !important; border-bottom: none !important; width: 100% !important; align-items: flex-start !important; background: transparent !important; }
+
         #changelist table tbody td::before, #changelist table tbody th::before {
             content: attr(data-label) !important; font-weight: bold !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important; background: transparent !important; padding: 0 !important; border: none !important;
         }
 
-        .mobile-actions-container { display: flex !important; flex-direction: row !important; gap: 10px !important; width: 100% !important; justify-content: flex-end !important; margin-top: 10px !important; padding-top: 10px !important; border-top: 1px solid #374151 !important;}
+        .mobile-actions-container { display: flex !important; flex-direction: row !important; gap: 10px !important; width: 100% !important; justify-content: flex-end !important; margin-top: 5px !important; padding-top: 15px !important; border-top: 1px solid #374151 !important;}
         .btn-table-icon { display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 45px !important; height: 45px !important; border-radius: 8px !important; color: white !important; font-size: 1.2rem !important; text-decoration: none !important;}
 
-        /* INLINES LIMPOS E LIXEIRAS NO CANTO */
-        .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
-        .inline-related, .djn-item { width: 100% !important; margin: 0 0 15px 0 !important; padding: 15px !important; border-radius: 8px !important; border: 1px solid #374151 !important; position: relative !important; background-color: #1f2937 !important; }
-        fieldset.module { margin-left: 0 !important; margin-right: 0 !important; padding: 15px !important; width: 100% !important; border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #1f2937 !important;}
-
-        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { top: 15px !important; right: 15px !important; }
-        .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 25px !important; }
-
-        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
-            width: 100% !important; max-width: 100% !important; height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; display: block !important;
-        }
-        .select2-container { width: 100% !important; max-width: 100% !important; }
-        .select2-selection { height: 50px !important; border-radius: 8px !important; display: flex !important; align-items: center !important; width: 100% !important; }
-        textarea { height: auto !important; min-height: 120px !important; }
+        .submit-row { background: transparent !important; border: none !important; padding: 0 !important; margin-top: 20px !important;}
     }
 </style>
 {% endblock %}
 
 {% block messages %}
     {{ block.super }}
-    {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
-        {% if not request.user.clinica.assinatura_ativa %}
-            <div class="admin-alert-banner alert-danger-custom">
-                <div class="alert-content">
-                    <i class="fas fa-hand-holding-usd" style="font-size: 1.8rem;"></i>
-                    <div>
-                        <span class="alert-title">Assinatura Suspensa</span>
-                        <p class="alert-text">O seu plano foi cancelado ou o pagamento falhou.</p>
-                    </div>
-                </div>
-                <a href="{% url 'narrativa:planos' %}?gerenciar=1" class="btn-alert-action">Reativar</a>
-            </div>
-        {% endif %}
-    {% endif %}
 {% endblock %}
