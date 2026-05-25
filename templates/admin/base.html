@@ -18,10 +18,15 @@
         document.querySelectorAll('.select2-selection__rendered').forEach(el => {
             if(el.textContent.trim() === '---------' || el.title === '---------') { el.textContent = 'Selecione...'; el.title = 'Selecione...'; }
         });
-
         document.querySelectorAll('#changelist table tbody td').forEach(td => {
             let texto = td.innerText.trim();
             if(texto === '-' || texto === '—' || texto === 'None') td.innerHTML = '';
+        });
+        document.querySelectorAll('.inline_label, legend').forEach(el => {
+            let t = el.innerText.toLowerCase();
+            if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('principal') || t.includes('novo escolha') || t.includes('+')) {
+                el.style.setProperty('display', 'none', 'important');
+            }
         });
     }
 
@@ -37,7 +42,6 @@
                         actionsDiv.className = 'mobile-actions-container';
                         tr.appendChild(actionsDiv);
                     }
-
                     Array.from(tr.querySelectorAll('td, th')).forEach((td, index) => {
                         let headerText = headers[index] || '';
                         if (td.querySelector('a') && (headerText.toLowerCase().includes('ação') || headerText.toLowerCase().includes('relatório') || headerText === '')) {
@@ -69,39 +73,53 @@
         const changelist = document.getElementById('changelist');
         if (!changelist) return;
 
-        // 1. PESQUISA NA MESMA LINHA
+        // 1. PESQUISA + FILTROS NA MESMA LINHA
         const searchInputOrig = document.querySelector('#changelist-search input[name="q"]');
         const searchFormOrig = document.querySelector('#changelist-search form');
+        const filtersOrig = document.querySelectorAll('#changelist-filter select');
 
-        if (searchInputOrig && searchFormOrig) {
+        if (searchInputOrig || filtersOrig.length > 0) {
             const searchContainer = document.createElement('div');
             searchContainer.id = 'custom-search-container';
             searchContainer.className = 'inline-action-bar search-bar-container';
 
             const searchGroup = document.createElement('form');
             searchGroup.className = 'my-group search-group';
-            searchGroup.action = searchFormOrig.action;
-            searchGroup.method = searchFormOrig.method || 'GET';
+            searchGroup.action = searchFormOrig ? searchFormOrig.action : window.location.pathname;
+            searchGroup.method = 'GET';
 
-            const cloneInput = searchInputOrig.cloneNode(true);
-            cloneInput.className = 'custom-input';
-            if(!cloneInput.placeholder) cloneInput.placeholder = 'Pesquisar...';
+            if(filtersOrig.length > 0) {
+                filtersOrig.forEach(sel => {
+                    const cloneSel = sel.cloneNode(true);
+                    cloneSel.className = 'custom-select';
+                    searchGroup.appendChild(cloneSel);
+                });
+                document.querySelector('#changelist-filter').style.setProperty('display', 'none', 'important');
+            }
+
+            if(searchInputOrig) {
+                const cloneInput = searchInputOrig.cloneNode(true);
+                cloneInput.className = 'custom-input';
+                if(!cloneInput.placeholder) cloneInput.placeholder = 'Pesquisar...';
+                searchGroup.appendChild(cloneInput);
+
+                if(searchFormOrig) {
+                    searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
+                    document.querySelector('#changelist-search').style.setProperty('display', 'none', 'important');
+                }
+            }
 
             const btnSearch = document.createElement('button');
             btnSearch.type = 'submit';
             btnSearch.className = 'custom-btn btn-pesquisar';
             btnSearch.innerHTML = '<i class="fas fa-search"></i>';
-
-            searchGroup.appendChild(cloneInput);
             searchGroup.appendChild(btnSearch);
-            searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
 
             searchContainer.appendChild(searchGroup);
             changelist.insertBefore(searchContainer, document.querySelector('#changelist-form'));
-            document.querySelector('#changelist-search').style.setProperty('display', 'none', 'important');
         }
 
-        // 2. AÇÕES
+        // 2. AÇÕES EM MASSA (IR)
         const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
@@ -138,52 +156,64 @@
     }
 
     function aplicarUXeBotoes() {
-        // Tira o "Novo Escolha" falso
-        document.querySelectorAll('.inline_label').forEach(el => {
-            if (el.innerText.includes('Novo Escolha') || el.innerText.includes('+')) {
-                el.style.setProperty('display', 'none', 'important');
-            }
-        });
+        const isMobile = window.innerWidth <= 768;
 
-        // Títulos inúteis
-        document.querySelectorAll('legend').forEach(el => {
-            el.style.setProperty('display', 'none', 'important');
-        });
-
-        // Formatação de Botões do Topo
+        // Formatação dos Botões de Topo
         document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
             let text = btn.innerText.toLowerCase();
 
-            if(!btn.classList.contains('custom-btn-top')) {
+            if (isMobile) {
+                btn.className = 'icon-only-btn';
+                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i>`; btn.title = "Adicionar"; }
+                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i>`; btn.title = "Importar"; }
+                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i>`; btn.title = "Exportar"; }
+            } else {
                 btn.className = 'custom-btn-top';
-                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> <span>${btn.innerText.trim()}</span>`; }
-                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> <span>${btn.innerText.trim()}</span>`; }
-                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> <span>${btn.innerText.trim()}</span>`; }
+                if (text.includes('adicionar')) { btn.innerHTML = `<i class="fas fa-plus"></i> <span>Adicionar</span>`; }
+                else if (text.includes('importar')) { btn.innerHTML = `<i class="fas fa-file-import"></i> <span>Importar</span>`; }
+                else if (text.includes('exportar')) { btn.innerHTML = `<i class="fas fa-file-export"></i> <span>Exportar</span>`; }
             }
         });
 
-        // Desce botão histórico
+        // Posicionamento correto dos Botões de Topo
+        const header = document.querySelector('.content-header');
+        const tools = document.querySelector('ul.object-tools') || document.querySelector('.page-actions');
+
+        if (tools) {
+            if (isMobile) {
+                // Tira do header e coloca em baixo no mobile
+                const contentMain = document.querySelector('#content-main');
+                if (contentMain && !contentMain.contains(tools)) {
+                    contentMain.insertBefore(tools, contentMain.firstChild);
+                }
+            } else {
+                // Fica alinhado à direita no header no PC
+                if (header && !header.contains(tools)) {
+                    header.appendChild(tools);
+                }
+            }
+        }
+
+        // Histórico padronizado e movido para o fundo
         document.querySelectorAll('.object-tools a, .historylink, a[href$="/history/"]').forEach(btn => {
             let text = btn.innerText.toLowerCase();
             if (text.includes('histórico') || text.includes('history') || btn.innerHTML.includes('fa-cog') || btn.classList.contains('historylink')) {
                 btn.className = 'custom-btn-bottom btn-history';
-                btn.innerHTML = '<i class="fas fa-history"></i> Histórico';
+                btn.innerHTML = 'Histórico'; // Sem ícone, padronizado com o botão Salvar
                 const submitRow = document.querySelector('.submit-row') || document.getElementById('jazzy-actions');
                 if (submitRow && !submitRow.contains(btn)) submitRow.appendChild(btn);
             }
         });
 
-        const header = document.querySelector('.content-header');
-        const tools = document.querySelector('ul.object-tools') || document.querySelector('.page-actions');
-        if (header && tools && !header.contains(tools)) header.appendChild(tools);
+        // Remove botões desnecessários de Salvar
+        document.querySelectorAll('input[name="_addanother"], input[name="_continue"]').forEach(b => b.style.setProperty('display', 'none', 'important'));
 
+        // Delete Alert
         document.querySelectorAll('span.delete label, a.inline-deletelink').forEach(lbl => {
             if(!lbl.classList.contains('js-bound')) {
                 lbl.classList.add('js-bound');
                 lbl.addEventListener('click', function(e) {
-                    if(!confirm('Tem certeza que deseja remover este item?')) {
-                        e.preventDefault(); e.stopPropagation(); return false;
-                    }
+                    if(!confirm('Tem certeza que deseja remover este item?')) { e.preventDefault(); e.stopPropagation(); return false; }
                     let inlineCard = this.closest('.inline-related') || this.closest('.djn-item');
                     if(inlineCard) inlineCard.style.display = 'none';
                 });
@@ -197,23 +227,24 @@
         limparTextosInuteis();
         formatarTabelasMobile();
 
+        // Morte à borda fantasma nos títulos
         const h1 = document.querySelector('.content-header h1');
         if (h1) {
             h1.childNodes.forEach(node => { if (node.nodeType === 3) node.nodeValue = node.nodeValue.replace(/\|/g, '').trim(); });
         }
 
-        // Título Dashboard no Mobile
-        if(window.location.pathname === '/admin/' && window.innerWidth <= 768) {
-            const container = document.querySelector('.container-fluid');
-            if(container && !document.querySelector('.mobile-dash-title')) {
-                const title = document.createElement('h1');
-                title.className = 'mobile-dash-title';
-                title.innerText = 'Dashboard';
-                title.style.cssText = 'color: white; font-weight: 800; font-size: 1.6rem; margin-bottom: 20px;';
-                container.insertBefore(title, container.firstChild);
+        // Dashboard título forçado no Topo
+        if(window.location.pathname === '/admin/') {
+            const contentMain = document.querySelector('#content-main');
+            if(contentMain && !document.querySelector('.content-header')) {
+                const header = document.createElement('div');
+                header.className = 'content-header';
+                header.innerHTML = '<h1>Dashboard</h1>';
+                contentMain.parentNode.insertBefore(header, contentMain);
             }
         }
 
+        // Menu Lateral
         let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
@@ -224,7 +255,7 @@
         }
     });
 
-    window.addEventListener('resize', formatarTabelasMobile);
+    window.addEventListener('resize', () => { formatarTabelasMobile(); aplicarUXeBotoes(); });
 </script>
 {% endblock %}
 
@@ -244,13 +275,13 @@
     #change_form .tab-content > .card, #change_form .tab-pane > .card { border: none !important; background-color: transparent !important; }
 
     /* =====================================================================
-       2. TÍTULOS E ALINHAMENTO DESKTOP (Linhas perfeitas de 70px)
+       2. TÍTULOS E ALINHAMENTO (A Matemática dos 70px)
        ===================================================================== */
     .brand-link, .navbar-nav.ml-auto { display: none !important; }
 
     .user-panel {
         border-top: none !important; border-bottom: 1px solid #374151 !important;
-        height: 70px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important;
+        height: 70px !important; min-height: 70px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important;
         padding: 0 20px !important; margin: 0 !important; box-sizing: border-box !important;
     }
     .user-panel .image, .user-panel img, .user-panel i, .user-block .image { display: none !important; }
@@ -267,11 +298,12 @@
     }
 
     /* =====================================================================
-       3. BOTÕES DO TOPO (Espaçados com Margin Left)
+       3. BOTÕES DE TOPO (Margin e Gap)
        ===================================================================== */
-    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; margin: 0 0 0 auto !important; padding: 0 !important; list-style: none !important; }
+    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 15px !important; margin: 0 0 0 20px !important; padding: 0 !important; list-style: none !important; flex-wrap: nowrap !important;}
     ul.object-tools li, .page-actions li { margin: 0 !important; }
 
+    /* PC: Texto + Ícone */
     .custom-btn-top {
         display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important;
         height: 42px !important; padding: 0 20px !important; border-radius: 8px !important;
@@ -284,8 +316,8 @@
        ===================================================================== */
     .inline-action-bar { display: block !important; width: 100% !important; margin-bottom: 20px !important; }
 
-    .my-group.search-group { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
-    .my-group.search-group .custom-input { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; min-width: 0 !important;}
+    .my-group.search-group { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: stretch !important; gap: 10px !important; width: 100% !important; }
+    .my-group.search-group .custom-input, .my-group.search-group .custom-select { flex: 1 !important; width: 100% !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; min-width: 0 !important;}
     .my-group.search-group .btn-pesquisar { width: 50px !important; height: 45px !important; border-radius: 8px !important; background-color: #6b21a8 !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important; font-size: 1.2rem !important;}
 
     .my-group.actions-group { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; align-items: center !important; gap: 10px !important; width: 100% !important;}
@@ -293,24 +325,27 @@
     .my-group.actions-group .btn-ir { width: 80px !important; height: 45px !important; border-radius: 8px !important; background-color: #3b82f6 !important; color: white !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important;}
 
     /* =====================================================================
-       5. FORMULÁRIOS, INPUTS E LIXEIRAS (SEM BOX-IN-BOX)
+       5. FORMULÁRIOS, LIXEIRAS (FIM DO BOX-IN-BOX)
        ===================================================================== */
     fieldset.module { background-color: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
-    .related-widget-wrapper-link { display: none !important; }
-    .datetimeshortcuts { display: none !important; }
+    .related-widget-wrapper-link, .datetimeshortcuts { display: none !important; }
 
     .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 20px !important; position: relative !important; }
-    .djn-group-nested .inline-related { background-color: #111827 !important; border: 1px dashed #4b5563 !important; margin-top: 15px !important;}
+    /* Nested Options (Sem Box e Sem Bordas Duplas) */
+    .djn-group-nested .inline-related, .djn-group-nested .djn-item { background-color: transparent !important; border: none !important; border-top: 1px dashed #4b5563 !important; border-radius: 0 !important; padding: 20px 0 0 0 !important; margin-bottom: 10px !important; box-shadow: none !important;}
     .inline-related .field-narrativa { display: none !important; }
 
     /* LIXEIRA */
     span.delete input[type="checkbox"], div.delete input[type="checkbox"] { display: none !important; }
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; display: block !important; margin: 0 !important; z-index: 10; }
+    .djn-group-nested .inline-related span.delete, .djn-group-nested .inline-related div.delete { top: 20px !important; right: 0 !important; } /* Ajuste fino na opção resposta */
+
     span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler {
         background-color: #ef4444 !important; color: white !important; width: 40px !important; height: 40px !important; border-radius: 8px !important;
         display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important; transition: 0.2s;
     }
     span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1.2rem !important; }
+    span.delete label:hover, a.inline-deletelink:hover { background-color: #dc2626 !important; transform: scale(1.05); }
 
     .form-row, .form-group { display: flex !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; margin: 0 0 15px 0 !important;}
     .form-row > div, .form-group > div, .fieldBox { width: 100% !important; max-width: 100% !important; padding: 0 !important;}
@@ -325,20 +360,18 @@
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; height: 45px !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
-    /* Botão Adicionar Outro (Destaque visual) */
+    /* Botão Adicionar Outro (Destaque visual legível) */
     .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; display: block !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.05) !important; }
+    .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1.1rem !important; border: 2px solid #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.1) !important; }
 
     /* =====================================================================
-       6. BOTÕES DE SALVAR (Todos do Mesmo Tamanho)
+       6. BOTÕES DE SALVAR E HISTÓRICO (PADRONIZADOS)
        ===================================================================== */
-    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 20px 0 50px 0 !important; margin-top: 30px !important; background: transparent !important; border: none !important;}
+    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 20px 0 !important; margin-top: 30px !important; background: transparent !important; border: none !important;}
     .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn {
         width: 100% !important; display: flex !important; align-items: center !important; justify-content: center !important; padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important; border-radius: 8px !important; border: none !important; color: white !important; cursor: pointer; text-decoration: none !important; margin: 0 !important;
     }
     input[name="_save"] { background-color: #14b8a6 !important; }
-    input[name="_addanother"], .btn-info { background-color: #3b82f6 !important; }
-    input[name="_continue"] { background-color: #8b5cf6 !important; }
     .btn-history { background-color: #4b5563 !important; }
     #change_form .col-md-3 { display: none !important; }
 
@@ -354,39 +387,37 @@
 
         .my-group.search-group, .my-group.actions-group { max-width: 500px !important; margin-bottom: 30px !important;}
 
-        /* Botões Salvar Iguais no Desktop (220px) */
+        /* Botões Salvar Iguais no Desktop (220px Exatos) */
         .submit-row { flex-direction: row !important; justify-content: flex-end !important; background: #1f2937 !important; padding: 20px !important; border: 1px solid #374151 !important; border-radius: 8px !important;}
-        .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn { width: 220px !important; padding: 12px 15px !important; }
+        .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn { width: 220px !important; padding: 15px !important; }
     }
 
     /* =====================================================================
-       8. MOBILE (Card View e Alinhamentos Absolutos)
+       8. MOBILE PERFEITO (Limpo e Separado do Título)
        ===================================================================== */
     @media (max-width: 768px) {
-        #content-main, .content-wrapper, .container-fluid, .content { padding: 15px 10px 40px 10px !important; }
+        #content-main, .content-wrapper, .container-fluid, .content { padding: 15px 10px 60px 10px !important; } /* 60px padding bottom extra p/ os botoes de salvar n colarem em baixo */
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
         body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; opacity: 1 !important;}
         .breadcrumb { display: none !important; }
 
         .user-panel { justify-content: flex-start !important; padding-left: 20px !important; height: 60px !important; border-bottom: 1px solid #374151 !important;}
 
-        /* Título e Botões na mesma linha */
-        .content-header { height: auto !important; padding: 0 5px !important; margin: 0 0 20px 0 !important; border: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; flex-wrap: nowrap !important; }
-        .content-header h1 { font-size: 1.5rem !important; flex: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; margin-right: 10px !important; border: none !important;}
+        /* Título livre de margens inúteis */
+        .content-header { height: auto !important; padding: 0 !important; margin: 0 0 10px 0 !important; border: none !important; }
+        .content-header h1 { font-size: 1.6rem !important; white-space: normal !important; margin: 0 !important; border: none !important;}
 
-        /* Botões do Topo Apenas Ícones */
-        ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; flex-wrap: nowrap !important; justify-content: flex-end !important; gap: 10px !important; margin: 0 !important;}
-        .custom-btn-top span { display: none !important; }
-        .custom-btn-top { width: 42px !important; height: 42px !important; padding: 0 !important; }
+        /* Botões de Topo Mobile: Apenas Ícones fora do header, na linha de baixo */
+        ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; flex-wrap: wrap !important; justify-content: flex-end !important; gap: 10px !important; margin: 0 0 20px 0 !important;}
+        .icon-only-btn { width: 45px !important; height: 45px !important; padding: 0 !important; }
 
         /* CARD VIEW MOBILE */
         #changelist table { display: block !important; width: 100% !important; border: none !important; background: transparent !important;}
         #changelist table thead { display: none !important; }
         #changelist table tbody { display: block !important; width: 100% !important; }
         #changelist table tbody tr { display: flex !important; flex-direction: column !important; width: 100% !important; margin-bottom: 15px !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 15px !important; }
-
-        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 15px 0 !important; border-bottom: none !important; width: 100% !important; align-items: flex-start !important; background: transparent !important; }
-
+        #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 !important; border-bottom: 1px solid #374151 !important; width: 100% !important; align-items: flex-start !important; background: transparent !important; }
+        #changelist table tbody td:last-child { border-bottom: none !important; padding-bottom: 0 !important;}
         #changelist table tbody td::before, #changelist table tbody th::before {
             content: attr(data-label) !important; font-weight: bold !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important; background: transparent !important; padding: 0 !important; border: none !important;
         }
@@ -394,12 +425,14 @@
         .mobile-actions-container { display: flex !important; flex-direction: row !important; gap: 10px !important; width: 100% !important; justify-content: flex-end !important; margin-top: 5px !important; padding-top: 15px !important; border-top: 1px solid #374151 !important;}
         .btn-table-icon { display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 45px !important; height: 45px !important; border-radius: 8px !important; color: white !important; font-size: 1.2rem !important; text-decoration: none !important;}
 
-        /* INLINES LIMPOS E LIXEIRAS */
+        /* INLINES LIMPOS E LIXEIRAS NO CANTO DA DIREITA (SÓ ÍCONE, SEM TEXTO) */
         .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
         .inline-related, .djn-item { width: 100% !important; margin: 0 0 15px 0 !important; padding: 15px !important; border-radius: 8px !important; border: 1px solid #374151 !important; position: relative !important; background-color: #1f2937 !important; }
         fieldset.module { margin-left: 0 !important; margin-right: 0 !important; padding: 15px !important; width: 100% !important; border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #1f2937 !important;}
 
         span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { top: 15px !important; right: 15px !important; }
+        .djn-group-nested .inline-related span.delete, .djn-group-nested .inline-related div.delete { top: 15px !important; right: 0 !important; }
+
         .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 35px !important; }
 
         input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
@@ -410,7 +443,7 @@
         textarea { height: auto !important; min-height: 120px !important; }
 
         /* Botões de Salvar no Mobile (Com Padding no Fundo) */
-        .submit-row { display: flex !important; flex-direction: column !important; gap: 15px !important; width: 100% !important; padding: 15px 0 50px 0 !important; margin-top: 15px !important; background: transparent !important;}
+        .submit-row { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; padding: 15px 0 50px 0 !important; margin-top: 15px !important; background: transparent !important;}
         .submit-row input, .submit-row a, .custom-btn-bottom { height: 50px !important; font-size: 1.1rem !important; }
         #change_form .col-md-3 { display: none !important; }
     }
