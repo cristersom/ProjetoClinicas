@@ -11,33 +11,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <script>
-    // 1. ELIMINAR OS "---------" e TRAÇOS VAZIOS
     function limparTextosInuteis() {
+        // Dropdowns
         document.querySelectorAll('option').forEach(opt => {
-            if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') {
-                opt.textContent = 'Selecione...';
-            }
+            if(opt.textContent.trim() === '---------' || opt.textContent.trim() === '---') opt.textContent = 'Selecione...';
         });
         document.querySelectorAll('.select2-selection__rendered').forEach(el => {
-            if(el.textContent.trim() === '---------' || el.title === '---------') {
-                el.textContent = 'Selecione...';
-                el.title = 'Selecione...';
-            }
+            if(el.textContent.trim() === '---------' || el.title === '---------') { el.textContent = 'Selecione...'; el.title = 'Selecione...'; }
         });
+
+        // Remove traços inúteis da tabela
         document.querySelectorAll('#changelist table tbody td').forEach(td => {
-            if(td.innerText.trim() === '-' || td.innerText.trim() === '—') {
+            let texto = td.innerText.trim();
+            if(texto === '-' || texto === '—' || texto === 'None') {
                 td.innerHTML = '';
             }
         });
     }
 
-    // 2. CONVERTER TABELAS EM CARTÕES NO MOBILE
     function formatarTabelasMobile() {
         if(window.innerWidth <= 768) {
             const tables = document.querySelectorAll('#changelist table');
             tables.forEach(table => {
                 const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
                 table.querySelectorAll('tbody tr').forEach(tr => {
+
                     let actionsDiv = tr.querySelector('.mobile-actions-container');
                     if (!actionsDiv) {
                         actionsDiv = document.createElement('div');
@@ -48,15 +46,19 @@
                     Array.from(tr.querySelectorAll('td, th')).forEach((td, index) => {
                         let headerText = headers[index] || '';
 
+                        // Lógica dos Botões (Diferenciando Ícones)
                         if (td.querySelector('a') && (headerText.toLowerCase().includes('ação') || headerText.toLowerCase().includes('relatório') || headerText === '')) {
                             let links = td.querySelectorAll('a');
                             links.forEach(l => {
                                 let text = l.innerText.toLowerCase();
                                 l.className = 'btn-table-icon';
 
-                                if(text.includes('relatório') || text.includes('resumo') || text.includes('detalhes')) {
-                                    l.innerHTML = '<i class="fas fa-chart-pie"></i>';
+                                if(text.includes('relatório') || text.includes('resumo')) {
+                                    l.innerHTML = '<i class="fas fa-chart-line"></i>';
                                     l.classList.add('btn-info');
+                                } else if(text.includes('detalhes')) {
+                                    l.innerHTML = '<i class="fas fa-list"></i>';
+                                    l.classList.add('btn-primary');
                                 } else if(text.includes('excluir') || text.includes('remover') || l.classList.contains('deletelink') || headerText.toLowerCase().includes('ação')) {
                                     l.innerHTML = '<i class="fas fa-trash"></i>';
                                     l.classList.add('btn-danger');
@@ -69,6 +71,10 @@
                                 if (td.querySelector('.action-checkbox')) headerText = 'Selecionar';
                                 td.setAttribute('data-label', headerText);
                             }
+                            // Oculta completamente campos vazios no mobile
+                            if (td.innerHTML.trim() === '' && !td.querySelector('input')) {
+                                td.style.display = 'none';
+                            }
                         }
                     });
                 });
@@ -76,24 +82,23 @@
         }
     }
 
-    // 3. BARRAS INFERIORES: PESQUISA E AÇÕES (LINHAS ÚNICAS, LADO A LADO)
     function construirBarrasInferiores() {
         if (document.getElementById('custom-search-container')) return;
 
         const changelist = document.getElementById('changelist');
         if (!changelist) return;
 
-        // --- BLOCO PESQUISA ---
+        // --- BARRA DE PESQUISA (Input e Lupinha na mesma linha) ---
         const searchInputOrig = document.querySelector('#changelist-search input[name="q"]');
         const searchFormOrig = document.querySelector('#changelist-search form');
 
         if (searchInputOrig && searchFormOrig) {
             const searchContainer = document.createElement('div');
             searchContainer.id = 'custom-search-container';
-            searchContainer.className = 'inline-action-bar';
+            searchContainer.className = 'inline-action-bar search-bar-container';
 
             const searchGroup = document.createElement('form');
-            searchGroup.className = 'my-group';
+            searchGroup.className = 'my-group search-group';
             searchGroup.action = searchFormOrig.action;
             searchGroup.method = searchFormOrig.method || 'GET';
 
@@ -101,24 +106,21 @@
             cloneInput.className = 'custom-input';
             if(!cloneInput.placeholder) cloneInput.placeholder = 'Pesquisar...';
 
-            // Botão Lupa (Sem Texto)
             const btnSearch = document.createElement('button');
             btnSearch.type = 'submit';
             btnSearch.className = 'custom-btn btn-pesquisar';
-            btnSearch.innerHTML = '<i class="fas fa-search"></i>';
+            btnSearch.innerHTML = '<i class="fas fa-search"></i>'; // Só a lupinha!
 
             searchGroup.appendChild(cloneInput);
             searchGroup.appendChild(btnSearch);
             searchFormOrig.querySelectorAll('input[type="hidden"]').forEach(h => searchGroup.appendChild(h.cloneNode(true)));
 
             searchContainer.appendChild(searchGroup);
-
-            // Insere antes da tabela
             changelist.insertBefore(searchContainer, document.querySelector('#changelist-form'));
             document.querySelector('#changelist-search').style.setProperty('display', 'none', 'important');
         }
 
-        // --- BLOCO AÇÕES (Dropdown + Ir) ---
+        // --- BARRA DE AÇÕES (Lixeira/Ir) ---
         const actionSelectOrig = document.querySelector('select[name="action"]');
         const btnIrOrig = document.querySelector('.actions button[type="submit"], .actions input[type="submit"]');
 
@@ -128,19 +130,19 @@
             actionContainer.className = 'inline-action-bar';
 
             const actionGroup = document.createElement('div');
-            actionGroup.className = 'my-group';
+            actionGroup.className = 'my-group actions-group';
 
             const selClone = actionSelectOrig.cloneNode(true);
             selClone.className = 'custom-select';
             selClone.removeAttribute('data-select2-id');
             selClone.classList.remove('select2-hidden-accessible');
             if(selClone.options[0] && selClone.options[0].text.includes('---')) {
-                selClone.options[0].text = 'Ação...';
+                selClone.options[0].text = 'Ações em massa...';
             }
 
             const btnIr = document.createElement('button');
             btnIr.className = 'custom-btn btn-ir';
-            btnIr.innerHTML = 'IR';
+            btnIr.innerHTML = 'Ir';
             btnIr.onclick = (e) => {
                 e.preventDefault();
                 actionSelectOrig.value = selClone.value;
@@ -151,7 +153,6 @@
             actionGroup.appendChild(btnIr);
             actionContainer.appendChild(actionGroup);
 
-            // Insere depois da tabela
             const paginator = document.querySelector('.paginator');
             if (paginator) { paginator.parentNode.insertBefore(actionContainer, paginator); }
             else { changelist.appendChild(actionContainer); }
@@ -162,7 +163,6 @@
     }
 
     function aplicarUXeBotoes() {
-        // Remove legendas e títulos desnecessários nos inlines
         document.querySelectorAll('legend, .inline_label').forEach(el => {
             let t = el.innerText.toLowerCase();
             if (t.includes('pergunta') || t.includes('escolha') || t.includes('opcao') || t.includes('opção') || t.includes('principal')) {
@@ -170,7 +170,7 @@
             }
         });
 
-        // Transforma botões de Topo em APENAS ÍCONES (Adicionar, Importar, Exportar)
+        // Botões de Topo: Sempre Ícones (PC e Mobile) para não colar e poluir
         document.querySelectorAll('.object-tools a, .page-actions a').forEach(btn => {
             let text = btn.innerText.toLowerCase();
             btn.className = 'icon-only-btn';
@@ -181,14 +181,14 @@
             else { btn.innerHTML = `<i class="fas fa-cog"></i>`; }
         });
 
-        // Alinha os botões de topo ao Título
+        // Move os botões para o Header para alinharem com o título
         const header = document.querySelector('.content-header');
         const tools = document.querySelector('ul.object-tools') || document.querySelector('.page-actions');
         if (header && tools && !header.contains(tools)) {
             header.appendChild(tools);
         }
 
-        // --- A GRANDE SOLUÇÃO DO HISTÓRICO ---
+        // Histórico volta para o fundo
         const historyLink = document.querySelector('.historylink');
         const submitRow = document.querySelector('.submit-row') || document.getElementById('jazzy-actions');
         if (historyLink && submitRow) {
@@ -204,7 +204,7 @@
         limparTextosInuteis();
         formatarTabelasMobile();
 
-        // Morte à borda fantasma e barras no título
+        // Morte à borda fantasma nos títulos
         const h1 = document.querySelector('.content-header h1');
         if (h1) {
             h1.childNodes.forEach(node => {
@@ -212,7 +212,7 @@
             });
         }
 
-        // Menu Lateral
+        // Menu da Conta
         let sidebar = document.querySelector('ul.nav-sidebar') || document.querySelector('.main-sidebar ul') || document.querySelector('aside ul');
         if (sidebar && !document.querySelector('#menu-conta-custom')) {
             sidebar.insertAdjacentHTML('beforeend', `
@@ -223,7 +223,6 @@
         }
     });
 
-    // Reformatar se a tela girar
     window.addEventListener('resize', formatarTabelasMobile);
 </script>
 {% endblock %}
@@ -232,149 +231,148 @@
 {{ block.super }}
 <style>
     /* =====================================================================
-       1. BASE E TEMA ESCURO (Cortes Proibidos)
+       1. BASE E TEMA ESCURO
        ===================================================================== */
     *, *::before, *::after { box-sizing: border-box !important; }
-    body, html, .wrapper, .content-wrapper, .main-footer, #content-main {
-        background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; max-width: 100vw !important; overflow-x: hidden !important;
-    }
+    body, html, .wrapper, .content-wrapper, .main-footer, #content-main { background-color: #111827 !important; color: #f3f4f6 !important; border: none !important; box-shadow: none !important; max-width: 100vw !important; overflow-x: hidden !important; }
     .main-sidebar { background-color: #030712 !important; border: none !important; }
     .os-scrollbar { display: none !important; visibility: hidden !important; }
-
-    /* Morte ao P-5 e Bordas Brancas Inúteis */
     .p-5, .card-body.p-5 { padding: 0 !important; }
     .card, .card-body, .tab-content, .tab-pane { background-color: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
     #change_form .tab-content > .card, #change_form .tab-pane > .card { border: none !important; background-color: transparent !important; }
 
     /* =====================================================================
-       2. TÍTULOS E ALINHAMENTOS GERAIS
+       2. TÍTULOS E USUÁRIO (Adeus Ícone)
        ===================================================================== */
     .brand-link, .navbar-nav.ml-auto { display: none !important; }
 
-    .content-header {
-        height: auto !important; min-height: 65px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important;
-        border-bottom: 1px solid #374151 !important; padding: 15px 20px !important; margin: 0 0 20px 0 !important; gap: 15px !important;
-    }
-    .content-header h1 {
-        border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.5rem !important; font-weight: 800 !important; color: #ffffff !important; flex: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;
-    }
+    .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important; padding: 0 20px !important; margin: 0 !important; }
 
-    /* Os Botões Quadrados no Topo (Importar, Exportar, Adicionar) */
-    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; gap: 10px !important; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+    /* ESCONDER ÍCONE DO USUÁRIO */
+    .user-panel .image, .user-panel img, .user-panel i, .user-block .image { display: none !important; }
+
+    .user-panel .info { width: 100% !important; text-align: left !important; padding: 0 !important; display: block !important;}
+    .user-panel .info a { display: block !important; font-weight: bold !important; color: #d1d5db !important; }
+
+    /* Header: Alinhado e sem bordas */
+    .content-header { height: 65px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; border-bottom: 1px solid #374151 !important; padding: 0 20px !important; margin: 0 0 20px 0 !important; border-right: none !important; border-left: none !important; }
+    .content-header h1, h1.border-right, .border-right, .content-header .row, .content-header .col-sm-6 { border: none !important; padding: 0 !important; margin: 0 !important; font-size: 1.6rem !important; font-weight: 800 !important; color: #ffffff !important; box-shadow: none !important; }
+
+    /* =====================================================================
+       3. BOTÕES DE TOPO (COM GAP E SÓ ÍCONES)
+       ===================================================================== */
+    ul.object-tools, .page-actions { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; margin: 0 !important; padding: 0 !important; list-style: none !important; }
     ul.object-tools li, .page-actions li { margin: 0 !important; }
     .icon-only-btn {
-        display: flex !important; align-items: center !important; justify-content: center !important;
+        display: inline-flex !important; align-items: center !important; justify-content: center !important;
         width: 45px !important; height: 45px !important; border-radius: 8px !important; flex-shrink: 0 !important;
-        background-color: #14b8a6 !important; color: white !important; font-size: 1.2rem !important; border: none !important; text-decoration: none !important; cursor: pointer; transition: 0.2s;
+        background-color: #14b8a6 !important; color: white !important; font-size: 1.2rem !important; border: none !important; text-decoration: none !important; transition: 0.2s;
     }
     .icon-only-btn:hover { background-color: #0d9488 !important; }
-
-    /* Remove Botão Histórico do Topo (Ele desce via JS) */
     .content-header .historylink { display: none !important; }
 
     /* =====================================================================
-       3. BARRAS INLINE (Pesquisa / Ações Sem Box Feio)
+       4. PESQUISA COM LUPA E AÇÕES (MESMA LINHA)
        ===================================================================== */
     .inline-action-bar { display: block !important; width: 100% !important; margin-bottom: 20px !important; }
-    .my-group { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
 
-    .custom-input, .custom-select { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
-    .custom-btn { width: 50px !important; height: 45px !important; border-radius: 8px !important; font-weight: bold !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important;}
+    /* Pesquisa Flex Row */
+    .my-group.search-group { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; width: 100% !important; }
+    .my-group.search-group .custom-input { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
+    .my-group.search-group .btn-pesquisar { width: 50px !important; height: 45px !important; border-radius: 8px !important; background-color: #6b21a8 !important; color: white !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important; font-size: 1.2rem !important;}
 
-    .btn-pesquisar { background-color: #6b21a8 !important; }
-    .btn-ir { background-color: #3b82f6 !important; }
+    /* Ações */
+    .my-group.actions-group { display: flex !important; flex-direction: row !important; align-items: center !important; gap: 10px !important; width: 100% !important;}
+    .my-group.actions-group .custom-select { flex: 1 !important; height: 45px !important; background-color: #374151 !important; border: 1px solid #4b5563 !important; color: white !important; border-radius: 8px !important; padding: 0 15px !important; }
+    .my-group.actions-group .btn-ir { width: 80px !important; height: 45px !important; border-radius: 8px !important; background-color: #3b82f6 !important; color: white !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; flex-shrink: 0 !important;}
 
     /* =====================================================================
-       4. FORMULÁRIOS INLINES (Questionários e Cenas Limpos)
+       5. FORMULÁRIOS, INPUTS E ÍCONES INÚTEIS
        ===================================================================== */
     p.original { display: none !important; }
     fieldset.module { background-color: transparent !important; border: none !important; padding: 0 !important; margin-bottom: 20px !important; }
 
-    /* Caixas Sólidas sem Box-in-Box Confuso */
-    .inline-related, .djn-item {
-        background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important;
-        padding: 20px !important; margin-bottom: 20px !important; position: relative !important;
-    }
+    /* Esconder Lápis, Olho e Lixeira nativos do Django perto dos Dropdowns */
+    .related-widget-wrapper-link.change-related, .related-widget-wrapper-link.delete-related, .related-widget-wrapper-link.view-related { display: none !important; }
+    .datetimeshortcuts { display: none !important; } /* Adeus Hoje | Agora */
+
+    .inline-related, .djn-item { background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; position: relative !important; }
     .djn-group-nested .inline-related { background-color: #111827 !important; border: 1px dashed #4b5563 !important; margin-top: 15px !important;}
     .inline-related .field-narrativa { display: none !important; }
 
-    /* Lixeiras Posicionadas Rigorosamente no Canto */
+    /* Lixeira Vermelha do Canto (Remover) */
     .inline-related h2, .inline-related h3, .djn-item h3 { padding-right: 50px !important; margin-top: 0 !important; margin-bottom: 15px !important; color: #9ca3af !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-size: 1.1rem !important;}
-
     span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { position: absolute !important; top: 15px !important; right: 15px !important; display: block !important; margin: 0 !important; z-index: 10; }
-    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler {
-        background-color: #ef4444 !important; color: white !important; width: 35px !important; height: 35px !important; border-radius: 8px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important;
-    }
-    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1rem !important; }
+    span.delete label, div.delete label, a.inline-deletelink, a.djn-remove-handler { background-color: #ef4444 !important; color: white !important; width: 35px !important; height: 35px !important; border-radius: 8px !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 0 !important; border: none !important; cursor: pointer !important; padding: 0 !important; margin: 0 !important; }
+    span.delete label::after, div.delete label::after, a.inline-deletelink::after, a.djn-remove-handler::after { content: "\f2ed" !important; font-family: "Font Awesome 5 Free" !important; font-weight: 900 !important; font-size: 1.1rem !important; }
 
-    /* Inputs Padrão 100% Largura */
     .form-row, .form-group { display: flex !important; flex-direction: column !important; align-items: flex-start !important; width: 100% !important; margin: 0 0 15px 0 !important;}
     .form-row > div, .form-group > div, .fieldBox { width: 100% !important; max-width: 100% !important; padding: 0 !important;}
     body label { color: #d1d5db !important; font-weight: 600 !important; font-size: 0.95rem !important; margin: 0 0 6px 0 !important; display: block !important; width: 100% !important; text-align: left !important;}
 
     input[type="text"], input[type="number"], input[type="email"], input[type="password"], textarea, select {
-        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; padding: 10px 15px !important; height: 45px !important; font-size: 1rem !important;
+        width: 100% !important; max-width: 100% !important; background-color: #374151 !important; color: #ffffff !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; padding: 10px 15px !important; box-sizing: border-box !important; height: 45px !important; font-size: 1rem !important;
     }
     textarea { height: auto !important; min-height: 100px !important; }
+    input:focus, textarea:focus, select:focus { border-color: #14b8a6 !important; outline: none !important; }
     .select2-container { width: 100% !important; max-width: 100% !important; }
     .select2-selection { background-color: #374151 !important; border: 1px solid #4b5563 !important; border-radius: 8px !important; display: flex !important; align-items: center !important; height: 45px !important;}
     .select2-selection__rendered { color: #ffffff !important; }
 
-    p.datetime { font-size: 0.8rem !important; color: #9ca3af !important; margin-top: 5px !important; }
-    p.datetime a { color: #14b8a6 !important; text-decoration: none !important; margin-right: 10px !important; font-weight: bold !important;}
-
-    /* Botão Adicionar Outro (Destaque e Contraste) */
     .add-row, .djn-add-item { margin: 15px 0 !important; width: 100% !important; display: block !important; }
-    .add-row a, .djn-add-item a, .djn-add-handler {
-        display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important;
-        font-size: 1rem !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.05) !important;
-    }
+    .add-row a, .djn-add-item a, .djn-add-handler { display: block !important; width: 100% !important; text-align: center !important; padding: 15px !important; font-size: 1rem !important; border: 2px dashed #14b8a6 !important; color: #14b8a6 !important; font-weight: bold !important; border-radius: 8px !important; background-color: rgba(20, 184, 166, 0.05) !important; }
 
     /* =====================================================================
-       5. BOTÕES DE SALVAR (Inferiores)
+       6. BOTÕES DE SALVAR E HISTÓRICO NO FUNDO
        ===================================================================== */
-    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 0 !important; margin-top: 30px !important; background: transparent !important; border: none !important;}
-    .custom-btn-submit, .submit-row input, .submit-row a, #jazzy-actions .btn {
+    .submit-row, #jazzy-actions { display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 0 !important; margin-top: 30px !important; background: transparent !important; border: none !important; padding-bottom: 30px !important;}
+    .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn {
         width: 100% !important; display: block !important; padding: 15px !important; font-size: 1.1rem !important; font-weight: bold !important; text-align: center !important; border-radius: 8px !important; border: none !important; color: white !important; cursor: pointer; text-decoration: none !important;
     }
     input[name="_save"] { background-color: #14b8a6 !important; }
     input[name="_addanother"], .btn-info { background-color: #3b82f6 !important; }
     input[name="_continue"] { background-color: #8b5cf6 !important; }
-    .history-btn { background-color: #4b5563 !important; }
+    .history-btn { background-color: #4b5563 !important; border: 1px solid #6b7280 !important;}
     #change_form .col-md-3 { display: none !important; }
 
     /* =====================================================================
-       6. TABELAS DESKTOP (Com Cabeçalho Escuro Restaurado)
+       7. TABELAS E COMPORTAMENTO DESKTOP
        ===================================================================== */
     @media (min-width: 769px) {
         body nav.main-header { display: none !important; }
         .user-panel { border-top: none !important; border-bottom: 1px solid #374151 !important; height: 65px !important; display: flex !important; align-items: center !important; justify-content: flex-start !important; padding: 0 20px !important; margin: 0 !important; }
-        .user-panel .info { width: 100% !important; text-align: left !important; padding: 0 !important; display: block !important;}
-        .user-panel .info a { display: block !important; font-weight: bold !important; color: #d1d5db !important; }
 
         #changelist table { width: 100% !important; background-color: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px !important; overflow: hidden !important; border-collapse: separate !important;}
         #changelist table th { background-color: #111827 !important; color: #9ca3af !important; border-bottom: 2px solid #374151 !important; padding: 15px !important; }
         #changelist table td { padding: 15px !important; border-bottom: 1px solid #374151 !important; color: #f3f4f6 !important; }
 
-        .submit-row, #jazzy-actions { flex-direction: row !important; justify-content: flex-end !important; background: #1f2937 !important; padding: 20px !important; border: 1px solid #374151 !important; border-radius: 8px !important;}
-        .custom-btn-submit, .submit-row input, .submit-row a, #jazzy-actions .btn { width: auto !important; }
+        /* Barras de pesquisa e ir limitadas de tamanho no PC */
+        .my-group.search-group { max-width: 500px !important; margin-bottom: 30px !important;}
+        .my-group.actions-group { max-width: 500px !important; margin-top: 30px !important;}
 
-        .inline-action-bar { max-width: 500px !important; }
+        .submit-row { flex-direction: row !important; justify-content: flex-end !important; background: #1f2937 !important; padding: 20px !important; border: 1px solid #374151 !important; border-radius: 8px !important;}
+        .custom-btn-bottom, .submit-row input, .submit-row a, #jazzy-actions .btn { width: auto !important; }
     }
 
     /* =====================================================================
-       7. TABELAS E ALINHAMENTOS MOBILE (Card View Perfeito)
+       8. MOBILE PERFEITO (Limpo, Card View, Alinhado)
        ===================================================================== */
     @media (max-width: 768px) {
-        #content-main, .content-wrapper, .container-fluid, .content { padding: 15px 10px !important; }
+        html, body { width: 100% !important; max-width: 100vw !important; overflow-x: hidden !important; margin: 0 !important; padding: 0 !important; }
+        #content-main, .content-wrapper, .container-fluid, .content { width: 100% !important; padding: 15px 10px !important; margin: 0 !important; box-sizing: border-box !important; }
+
         body nav.main-header { display: flex !important; min-height: 55px !important; background-color: #1f2937 !important; border-bottom: 1px solid #374151 !important; }
-        body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.8rem !important; }
-        .user-panel { padding-left: 20px !important; height: 60px !important; border-bottom: 1px solid #374151 !important;}
+        body nav.main-header .nav-link i.fa-bars { color: #14b8a6 !important; font-size: 1.5rem !important; opacity: 1 !important;}
+        .breadcrumb { display: none !important; }
+        .user-panel { justify-content: flex-start !important; padding-left: 20px !important; height: 60px !important;}
 
-        .content-header { padding: 0 !important; margin-bottom: 20px !important; }
+        .content-header { height: auto !important; padding: 0 5px 10px 5px !important; margin: 0 0 20px 0 !important; border-bottom: none !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; }
+        .content-header h1 { font-size: 1.5rem !important; flex: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; border: none !important; }
 
-        /* CARD VIEW */
+        .row, .form-row, .form-group, .aligned .form-row { display: flex !important; flex-direction: column !important; width: 100% !important; margin: 0 0 15px 0 !important; padding: 0 !important; }
+        div[class^="col-"], div[class*=" col-"], .fieldBox, .aligned label { width: 100% !important; max-width: 100% !important; flex: 100% !important; padding: 0 !important; margin: 0 !important;}
+
+        /* TABELAS (CARD VIEW SEM FUNDO ESCURO NO TÍTULO) */
         #changelist table { display: block !important; width: 100% !important; border: none !important; background: transparent !important;}
         #changelist table thead { display: none !important; }
         #changelist table tbody { display: block !important; width: 100% !important; }
@@ -382,12 +380,26 @@
         #changelist table tbody td, #changelist table tbody th { display: flex !important; flex-direction: column !important; padding: 8px 0 !important; border-bottom: 1px solid #374151 !important; width: 100% !important; align-items: flex-start !important; background: transparent !important; }
         #changelist table tbody td:last-child { border-bottom: none !important; padding-bottom: 0 !important;}
         #changelist table tbody td::before, #changelist table tbody th::before {
-            content: attr(data-label) !important; font-weight: bold !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important; background: transparent !important; border: none !important;
+            content: attr(data-label) !important; font-weight: bold !important; color: #9ca3af !important; font-size: 0.75rem !important; text-transform: uppercase !important; margin-bottom: 5px !important; display: block !important; background: transparent !important; padding: 0 !important; border: none !important;
         }
 
-        /* Botões de Ação na Tabela (Lado a Lado no Fundo) */
         .mobile-actions-container { display: flex !important; flex-direction: row !important; gap: 10px !important; width: 100% !important; justify-content: flex-end !important; margin-top: 10px !important; padding-top: 10px !important; border-top: 1px solid #374151 !important;}
         .btn-table-icon { display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 45px !important; height: 45px !important; border-radius: 8px !important; color: white !important; font-size: 1.2rem !important; text-decoration: none !important;}
+
+        /* INLINES LIMPOS E LIXEIRAS NO CANTO */
+        .inline-group, .djn-group { width: 100% !important; padding: 0 !important; margin: 0 0 20px 0 !important; }
+        .inline-related, .djn-item { width: 100% !important; margin: 0 0 15px 0 !important; padding: 15px !important; border-radius: 8px !important; border: 1px solid #374151 !important; position: relative !important; background-color: #1f2937 !important; }
+        fieldset.module { margin-left: 0 !important; margin-right: 0 !important; padding: 15px !important; width: 100% !important; border: 1px solid #374151 !important; border-radius: 8px !important; background-color: #1f2937 !important;}
+
+        span.delete, div.delete, a.inline-deletelink, a.djn-remove-handler { top: 15px !important; right: 15px !important; }
+        .inline-related > .form-row:first-child label, .djn-item > .form-row:first-child label { margin-top: 25px !important; }
+
+        input[type="text"]:not(.custom-input), input[type="number"], input[type="email"], input[type="password"], select, textarea, .vTextField {
+            width: 100% !important; max-width: 100% !important; height: 50px !important; padding: 10px 15px !important; font-size: 1rem !important; display: block !important;
+        }
+        .select2-container { width: 100% !important; max-width: 100% !important; }
+        .select2-selection { height: 50px !important; border-radius: 8px !important; display: flex !important; align-items: center !important; width: 100% !important; }
+        textarea { height: auto !important; min-height: 120px !important; }
     }
 </style>
 {% endblock %}
