@@ -13,7 +13,7 @@
                             <span class="block text-sm opacity-90">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</span>
                         </div>
                     </div>
-                    <a href="/narrativas/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Reativar Agora</a>
+                    <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Reativar Agora</a>
                 </div>
             {% else %}
                 {% with plano=request.user.clinica.plano_atual %}
@@ -24,10 +24,10 @@
                                     <i class="fas fa-rocket text-2xl"></i>
                                     <div>
                                         <span class="block font-extrabold text-base">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                        <span class="block text-sm opacity-90">Faça upgrade do seu plano agora para poder criar novos conteúdos.</span>
+                                        <span class="block text-sm opacity-90">Faça upgrade do seu plano agora para criar novos conteúdos.</span>
                                     </div>
                                 </div>
-                                <a href="/narrativas/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Fazer Upgrade</a>
+                                <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Fazer Upgrade</a>
                             </div>
                         {% endif %}
                     {% endif %}
@@ -35,4 +35,67 @@
             {% endif %}
         </div>
     {% endif %}
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    /* =========================================================
+       DOMANDO O NESTED ADMIN (Fim do ecrã confuso de Questionários)
+       ========================================================= */
+    .djn-group {
+        border: 1px solid #374151 !important; border-radius: 0.75rem !important;
+        margin-bottom: 1.5rem !important; background: #1f2937 !important; padding: 1.5rem !important;
+    }
+    .djn-group h2, .djn-group h3 {
+        font-size: 1.1rem !important; font-weight: bold !important; color: #f3f4f6 !important;
+        margin-bottom: 1rem !important; border-bottom: 1px solid #374151 !important; padding-bottom: 0.5rem !important;
+    }
+    .djn-item {
+        border-bottom: 1px dashed #4b5563 !important; padding-bottom: 1.5rem !important;
+        margin-bottom: 1.5rem !important; position: relative !important; background: transparent !important;
+    }
+    .djn-item:last-child { border-bottom: none !important; margin-bottom: 0 !important; padding-bottom: 0 !important; }
+
+    /* Morte aos textos e ícones inúteis do Django */
+    .related-widget-wrapper-link { display: none !important; }
+    .inline_label { display: none !important; }
+    .datetimeshortcuts { display: none !important; }
+
+    /* Estilo Premium para o Botão "Adicionar Outra Opção" */
+    .djn-add-handler, .add-row a {
+        background: rgba(20, 184, 166, 0.1) !important; color: #14b8a6 !important;
+        padding: 0.75rem 1.5rem !important; border-radius: 0.5rem !important; border: 2px dashed #14b8a6 !important;
+        text-decoration: none !important; display: block !important; text-align: center !important; font-weight: bold !important;
+        margin-top: 1rem !important; transition: 0.2s !important;
+    }
+    .djn-add-handler:hover { background: #14b8a6 !important; color: white !important; }
+
+    /* Evitar Vãos Gigantes na Tabela (Fim do flex-grow excessivo) */
+    main > div > div.flex.flex-col.flex-grow { flex-grow: 0 !important; margin-bottom: 2rem !important; }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // TRADUZIR O TOMSELECT (O tal do "Select value")
+        setTimeout(() => {
+            document.querySelectorAll('.ts-control input').forEach(input => {
+                if (input.placeholder === 'Select value' || input.placeholder === 'Select...') {
+                    input.placeholder = 'Selecione uma opção...';
+                }
+            });
+            document.querySelectorAll('.ts-dropdown-content .no-results').forEach(el => {
+                el.innerText = 'Nenhum resultado encontrado';
+            });
+        }, 500);
+
+        // FORÇAR DARK MODE SE O BROWSER AINDA NÃO ESTIVER
+        if (!document.documentElement.classList.contains('dark')) {
+            document.documentElement.classList.add('dark');
+        }
+    });
+</script>
 {% endblock %}

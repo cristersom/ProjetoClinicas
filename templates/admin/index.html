@@ -14,28 +14,28 @@
                     <div class="p-3 rounded-lg bg-blue-500 text-white"><i class="fas fa-users text-2xl"></i></div>
                     <div>
                         <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Acessos Totais</p>
-                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_sessoes }}</h2>
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_sessoes|default:"0" }}</h2>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4 shadow-sm">
                     <div class="p-3 rounded-lg bg-teal-500 text-white"><i class="fas fa-eye text-2xl"></i></div>
                     <div>
                         <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Visualizações</p>
-                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_sessoes|add:15 }}</h2>
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_sessoes|add:15|default:"0" }}</h2>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4 shadow-sm">
                     <div class="p-3 rounded-lg bg-purple-500 text-white"><i class="fas fa-book text-2xl"></i></div>
                     <div>
                         <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Narrativas</p>
-                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_narrativas }}</h2>
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_narrativas|default:"0" }}</h2>
                     </div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 flex items-center space-x-4 shadow-sm">
                     <div class="p-3 rounded-lg bg-orange-500 text-white"><i class="fas fa-database text-2xl"></i></div>
                     <div>
                         <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Respostas</p>
-                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_respostas }}</h2>
+                        <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white mt-1">{{ kpi_respostas|default:"0" }}</h2>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                         <span class="px-2.5 py-1 text-xs font-bold bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-md uppercase border border-red-200">Suspensa</span>
                     {% endif %}
                 </div>
-                <a href="/narrativas/planos/?gerenciar=1" class="w-full text-center inline-block bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-200 shadow-sm">Gerenciar Assinatura</a>
+                <a href="/planos/?gerenciar=1" class="w-full text-center inline-block bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-200">Gerenciar Assinatura</a>
             </div>
 
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">

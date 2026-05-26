@@ -1,4 +1,4 @@
-from django.contrib import admin, messages
+from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
 
@@ -23,8 +23,7 @@ from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
 
 class SuperUserOnlyMixin:
-    def has_module_permission(self, request):
-        return request.user.is_superuser
+    def has_module_permission(self, request): return request.user.is_superuser
 
 @admin.register(Plano)
 class PlanoAdmin(ModelAdmin):
@@ -52,36 +51,26 @@ class PagamentoPendenteAdmin(SuperUserOnlyMixin, ModelAdmin):
 # ==========================================
 class TenantPermissionsMixin:
     def get_clinica_atualizada(self, request):
-        if hasattr(request, 'clinica_realtime') and request.clinica_realtime:
-            return request.clinica_realtime
-        if hasattr(request.user, 'clinica') and request.user.clinica:
-            return Clinica.objects.get(id=request.user.clinica.id)
+        if hasattr(request, 'clinica_realtime') and request.clinica_realtime: return request.clinica_realtime
+        if hasattr(request.user, 'clinica') and request.user.clinica: return Clinica.objects.get(id=request.user.clinica.id)
         return None
-
     def has_module_permission(self, request): return True
     def has_view_permission(self, request, obj=None): return True
-
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
-
+        return False if c and not c.assinatura_ativa else True
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
-
+        return False if c and not c.assinatura_ativa else True
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
-
+        return False if c and not c.assinatura_ativa else True
 
 # ==========================================
-# INLINES ESTRUTURADOS
+# INLINES
 # ==========================================
 class EscolhaInline(TenantPermissionsMixin, StackedInline):
     model = Escolha
@@ -121,7 +110,8 @@ class CenaAdmin(TenantPermissionsMixin, ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
+        # FORÇANDO CORES COM INLINE STYLE PARA DRIBLAR O TAILWIND PURGE
+        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
 
@@ -135,54 +125,42 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
         if c:
-            if not c.assinatura_ativa:
-                return False
+            if not c.assinatura_ativa: return False
             try:
                 limite = int(c.plano_atual.limite_narrativas) if c.plano_atual and c.plano_atual.limite_narrativas else 0
-                qtd_atual = Narrativa.objects.filter(clinica=c).count()
-                if qtd_atual >= limite:
-                    return False
-            except Exception:
-                pass
+                if Narrativa.objects.filter(clinica=c).count() >= limite: return False
+            except Exception: pass
         return super().has_add_permission(request, *args, **kwargs)
 
     def get_exclude(self, request, obj=None):
-        if request.user.is_superuser: return ('visualizacoes',)
-        return ('clinica', 'visualizacoes')
+        return ('visualizacoes',) if request.user.is_superuser else ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser: return qs
-        if hasattr(request.user, 'clinica') and request.user.clinica:
-            return qs.filter(clinica=request.user.clinica)
+        if hasattr(request.user, 'clinica') and request.user.clinica: return qs.filter(clinica=request.user.clinica)
         return qs.none()
 
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser and hasattr(request.user, 'clinica'):
-            obj.clinica = request.user.clinica
+        if not request.user.is_superuser and hasattr(request.user, 'clinica'): obj.clinica = request.user.clinica
         super().save_model(request, obj, form, change)
 
     def get_urls(self):
         urls = super().get_urls()
-        custom_urls = [
-            path('<path:object_id>/relatorio_percurso/', self.admin_site.admin_view(self.relatorio_percurso_view), name='narrativa_narrativa_percurso'),
-        ]
-        return custom_urls + urls
+        return [path('<path:object_id>/relatorio_percurso/', self.admin_site.admin_view(self.relatorio_percurso_view), name='narrativa_narrativa_percurso')] + urls
 
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
-        return format_html(
-            '<a class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line mr-1"></i> Relatório</a>',
-            url_percurso
-        )
+        return format_html('<a style="background-color: #14b8a6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>', url_percurso)
     links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
+        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
+        # [MANTIDO CÓDIGO ORIGINAL DO RELATÓRIO...]
         narrativa_atual = self.get_object(request, object_id)
         if not request.user.is_superuser and narrativa_atual.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         todos_os_perfis = Narrativa.objects.filter(clinica=narrativa_atual.clinica) if narrativa_atual.clinica else Narrativa.objects.none()
@@ -203,7 +181,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         mapa_visitas_totais = {item['cena_visitada']: item['total_visitas'] for item in visitas_totais}
 
         visitantes_unicos = visitas_base.values('cena_visitada').annotate(visitantes_unicos=Coalesce(Count('session_key', distinct=True), Value(0))).order_by('cena_visitada')
-        mapa_visitantes_unicos = {item['cena_visitada']: item['visitantes_unicos'] for item in visitors_unicos}
+        mapa_visitantes_unicos = {item['cena_visitada']: item['visitantes_unicos'] for item in visitantes_unicos}
 
         dados_agregados_cenas, labels_grafico, data_visitas_totais, data_visitantes_unicos = [], [], [], []
         for cena in cenas_da_narrativa:
@@ -240,6 +218,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
             'perfis_selecionados_ids': perfis_selecionados_ids,
         })
 
+
 @admin.register(Questionario)
 class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios', 'botao_excluir')
@@ -269,9 +248,9 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<div class="flex space-x-2">'
-            '<a class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2.5 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Respostas Detalhadas"><i class="fas fa-list mr-1"></i> Detalhes</a>'
-            '<a class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-2.5 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie mr-1"></i> Resumo</a>'
+            '<div style="display: flex; gap: 8px;">'
+            '<a style="background-color: #3b82f6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
+            '<a style="background-color: #8b5cf6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
             '</div>',
             url_detalhe, url_resumo
         )
@@ -279,7 +258,7 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_questionario_delete', args=[obj.pk])
-        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
+        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
