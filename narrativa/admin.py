@@ -4,7 +4,8 @@ import nested_admin
 
 # --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
-from unfold.contrib.import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportModelAdmin
+from unfold.contrib.import_export.forms import ExportForm, ImportForm
 
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
@@ -87,7 +88,6 @@ class EscolhaInline(TenantPermissionsMixin, StackedInline):
     fk_name = 'cena_origem'
     extra = 0
 
-# Mantemos o nested_admin para a lógica de 3 níveis não quebrar (Questionário > Pergunta > Opção)
 class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = OpcaoResposta
     extra = 0
@@ -121,7 +121,7 @@ class CenaAdmin(TenantPermissionsMixin, ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
 
@@ -172,14 +172,14 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
         return format_html(
-            '<a style="background-color:#14b8a6; color:white; border:none; display:inline-flex; align-items:center; gap:6px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>',
+            '<a class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line mr-1"></i> Relatório</a>',
             url_percurso
         )
     links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
@@ -203,7 +203,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         mapa_visitas_totais = {item['cena_visitada']: item['total_visitas'] for item in visitas_totais}
 
         visitantes_unicos = visitas_base.values('cena_visitada').annotate(visitantes_unicos=Coalesce(Count('session_key', distinct=True), Value(0))).order_by('cena_visitada')
-        mapa_visitantes_unicos = {item['cena_visitada']: item['visitantes_unicos'] for item in visitantes_unicos}
+        mapa_visitantes_unicos = {item['cena_visitada']: item['visitantes_unicos'] for item in visitors_unicos}
 
         dados_agregados_cenas, labels_grafico, data_visitas_totais, data_visitantes_unicos = [], [], [], []
         for cena in cenas_da_narrativa:
@@ -269,9 +269,9 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<div style="display:flex; gap:10px;">'
-            '<a style="background-color:#3b82f6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
-            '<a style="background-color:#8b5cf6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
+            '<div class="flex space-x-2">'
+            '<a class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-2.5 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Respostas Detalhadas"><i class="fas fa-list mr-1"></i> Detalhes</a>'
+            '<a class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-1 px-2.5 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie mr-1"></i> Resumo</a>'
             '</div>',
             url_detalhe, url_resumo
         )
@@ -279,7 +279,7 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_questionario_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a class="bg-red-600 hover:bg-red-700 text-white font-bold py-1.5 px-3 rounded-lg inline-flex items-center text-xs transition duration-200" href="{}" title="Excluir"><i class="fas fa-trash mr-1"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
@@ -384,8 +384,10 @@ class RespostaResource(resources.ModelResource):
         export_order = fields
 
 @admin.register(Resposta)
-class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
+class RespostaAdmin(TenantPermissionsMixin, ModelAdmin, ImportExportModelAdmin):
     resource_class = RespostaResource
+    import_form_class = ImportForm
+    export_form_class = ExportForm
     list_display = ('id', 'pergunta', 'session_key', 'texto_resposta', 'data_resposta')
     list_filter = ('pergunta__questionario', 'data_resposta',)
     search_fields = ('session_key', 'texto_resposta')

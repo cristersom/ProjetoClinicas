@@ -14,8 +14,7 @@ CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-
-# --- UNFOLD ADMIN (Substitui o Jazzmin) ---
+# --- UNFOLD CONFIGURAÇÃO ---
 UNFOLD = {
     "SITE_TITLE": "Narrativas Clínicas",
     "SITE_HEADER": "Narrativas Clínicas",
@@ -27,7 +26,7 @@ UNFOLD = {
             "200": "153 246 228",
             "300": "94 234 212",
             "400": "45 212 191",
-            "500": "20 184 166",  # Cor Verde Água (#14b8a6)
+            "500": "20 184 166",  # Verde Água Nativo (#14b8a6)
             "600": "13 148 136",
             "700": "15 118 110",
             "800": "17 94 89",
@@ -98,11 +97,10 @@ UNFOLD = {
     },
 }
 
-
 # --- APPS ---
 INSTALLED_APPS = [
-    'unfold',  # Unfold SEMPRE no topo antes do admin
-    'unfold.contrib.import_export',  # Integração do Unfold com o import_export
+    'unfold',
+    'unfold.contrib.import_export',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
