@@ -1,11 +1,15 @@
 from django.contrib import admin, messages
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
+
+# --- IMPORTAÇÕES DO UNFOLD ---
+from unfold.admin import ModelAdmin, StackedInline
+from unfold.contrib.import_export.admin import ImportExportModelAdmin
+
 from .models import (
     Narrativa, Cena, Escolha, Questionario, Pergunta, Usuario, Resposta,
     SessaoPaciente, OpcaoResposta, LogVisitaCena, Categoria, Plano, Clinica, PagamentoPendente
 )
-from import_export.admin import ImportExportModelAdmin
 from import_export import resources
 from django.urls import path, reverse
 from django.http import HttpResponse
@@ -22,24 +26,24 @@ class SuperUserOnlyMixin:
         return request.user.is_superuser
 
 @admin.register(Plano)
-class PlanoAdmin(admin.ModelAdmin):
+class PlanoAdmin(ModelAdmin):
     list_display = ('nome', 'preco', 'limite_narrativas', 'limite_pacientes', 'destaque', 'stripe_price_id')
     list_editable = ('preco', 'limite_narrativas', 'limite_pacientes', 'destaque')
 
 @admin.register(Clinica)
-class ClinicaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
+class ClinicaAdmin(SuperUserOnlyMixin, ModelAdmin):
     list_display = ('nome', 'plano_atual', 'assinatura_ativa')
 
 @admin.register(Usuario)
-class CustomUserAdmin(SuperUserOnlyMixin, UserAdmin):
+class CustomUserAdmin(SuperUserOnlyMixin, BaseUserAdmin, ModelAdmin):
     list_display = ('username', 'email', 'clinica', 'is_staff')
 
 @admin.register(Categoria)
-class CategoriaAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
+class CategoriaAdmin(SuperUserOnlyMixin, ModelAdmin):
     list_display = ('titulo',)
 
 @admin.register(PagamentoPendente)
-class PagamentoPendenteAdmin(SuperUserOnlyMixin, admin.ModelAdmin):
+class PagamentoPendenteAdmin(SuperUserOnlyMixin, ModelAdmin):
     list_display = ('email', 'plano', 'data_pagamento', 'utilizado')
 
 # ==========================================
@@ -76,13 +80,14 @@ class TenantPermissionsMixin:
 
 
 # ==========================================
-# INLINES ESTRUTURADOS EM BLOCO (STACKED) PARA MELHOR UX
+# INLINES ESTRUTURADOS
 # ==========================================
-class EscolhaInline(TenantPermissionsMixin, admin.StackedInline):
+class EscolhaInline(TenantPermissionsMixin, StackedInline):
     model = Escolha
     fk_name = 'cena_origem'
     extra = 0
 
+# Mantemos o nested_admin para a lógica de 3 níveis não quebrar (Questionário > Pergunta > Opção)
 class OpcaoRespostaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
     model = OpcaoResposta
     extra = 0
@@ -96,7 +101,7 @@ class PerguntaInline(TenantPermissionsMixin, nested_admin.NestedStackedInline):
 
 
 @admin.register(Cena)
-class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
+class CenaAdmin(TenantPermissionsMixin, ModelAdmin):
     list_display = ('titulo', 'narrativa', 'botao_excluir')
     list_filter = ('narrativa',)
     search_fields = ('titulo', 'narrativa__titulo')
@@ -116,12 +121,12 @@ class CenaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
     botao_excluir.short_description = 'Ação'
 
 
 @admin.register(Narrativa)
-class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
+class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
     list_display = ('titulo', 'categoria', 'data_criacao', 'cena_inicial', 'links_relatorios', 'botao_excluir')
     list_filter = ('categoria',)
     search_fields = ('titulo',)
@@ -167,14 +172,14 @@ class NarrativaAdmin(TenantPermissionsMixin, admin.ModelAdmin):
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
         return format_html(
-            '<a style="background-color:#14b8a6 !important; color:white !important; border:none; display:inline-flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>',
+            '<a style="background-color:#14b8a6; color:white; border:none; display:inline-flex; align-items:center; gap:6px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>',
             url_percurso
         )
     links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
@@ -265,8 +270,8 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
             '<div style="display:flex; gap:10px;">'
-            '<a style="background-color:#3b82f6 !important; color:white !important; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
-            '<a style="background-color:#8b5cf6 !important; color:white !important; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
+            '<a style="background-color:#3b82f6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
+            '<a style="background-color:#8b5cf6; color:white; border:none; display:flex; align-items:center; gap:5px; padding:8px 15px; font-weight:bold; border-radius:6px; text-decoration:none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
             '</div>',
             url_detalhe, url_resumo
         )
@@ -274,7 +279,7 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_questionario_delete', args=[obj.pk])
-        return format_html('<a style="background-color:#ef4444 !important; color:white !important; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" href="{}" title="Excluir"><i class="fas fa-trash"></i></a>', url)
     botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
@@ -396,7 +401,7 @@ class RespostaAdmin(TenantPermissionsMixin, ImportExportModelAdmin):
 
 
 @admin.register(SessaoPaciente)
-class SessaoPacienteAdmin(TenantPermissionsMixin, admin.ModelAdmin):
+class SessaoPacienteAdmin(TenantPermissionsMixin, ModelAdmin):
     list_display = ('session_key', 'narrativa_perfil', 'data_criacao')
     search_fields = ('session_key', 'narrativa_perfil__titulo')
 

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import dj_database_url
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -8,66 +9,100 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-chave-temporaria-de-seguranca')
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost',
-                 '127.0.0.1']
+ALLOWED_HOSTS = ['narrativasclinicas.com.br', 'narrativas-clinicas-0108a6c374ea.herokuapp.com', 'localhost', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = ['https://narrativasclinicas.com.br', 'https://narrativas-clinicas-0108a6c374ea.herokuapp.com']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-# --- JAZZMIN CONFIGURAÇÕES VISUAIS E ÍCONES ---
-JAZZMIN_SETTINGS = {
-    "site_title": "Narrativas Clínicas",
-    "site_header": "Narrativas Clínicas",
-    "site_brand": "Administração",
-    "welcome_sign": "Bem-vindo ao Painel da Clínica",
-    "copyright": "Narrativas Clínicas",
 
-    # 1. Pesquisa global removida para o topo sumir de vez.
-
-    # 2. Topo vazio
-    "topmenu_links": [],
-
-    # 3. Injetamos o "Ver Site" e o "Manual do Sistema" na barra lateral esquerda
-    "custom_links": {
-        "narrativa": [
+# --- UNFOLD ADMIN (Substitui o Jazzmin) ---
+UNFOLD = {
+    "SITE_TITLE": "Narrativas Clínicas",
+    "SITE_HEADER": "Narrativas Clínicas",
+    "SITE_URL": "/",
+    "COLORS": {
+        "primary": {
+            "50": "240 253 250",
+            "100": "204 251 241",
+            "200": "153 246 228",
+            "300": "94 234 212",
+            "400": "45 212 191",
+            "500": "20 184 166",  # Cor Verde Água (#14b8a6)
+            "600": "13 148 136",
+            "700": "15 118 110",
+            "800": "17 94 89",
+            "900": "19 78 74",
+            "950": "4 41 42",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": False,
+        "show_all_applications": False,
+        "navigation": [
             {
-                "name": "Ver Site",
-                "url": "/",
-                "icon": "fas fa-globe",
-                "new_window": True,
+                "title": "Principal",
+                "items": [
+                    {
+                        "icon": "dashboard",
+                        "title": "Dashboard",
+                        "link": reverse_lazy("admin:index"),
+                    },
+                ],
             },
             {
-                "name": "Manual do Sistema",
-                "url": "narrativa:faq",
-                "icon": "fas fa-book",
+                "title": "Narrativa",
+                "items": [
+                    {
+                        "icon": "auto_stories",
+                        "title": "Narrativas",
+                        "link": reverse_lazy("admin:narrativa_narrativa_changelist"),
+                    },
+                    {
+                        "icon": "desktop_windows",
+                        "title": "Cenas",
+                        "link": reverse_lazy("admin:narrativa_cena_changelist"),
+                    },
+                    {
+                        "icon": "assignment",
+                        "title": "Questionários",
+                        "link": reverse_lazy("admin:narrativa_questionario_changelist"),
+                    },
+                    {
+                        "icon": "forum",
+                        "title": "Respostas",
+                        "link": reverse_lazy("admin:narrativa_resposta_changelist"),
+                    },
+                    {
+                        "icon": "people",
+                        "title": "Sessão Pacientes",
+                        "link": reverse_lazy("admin:narrativa_sessaopaciente_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Atalhos",
+                "items": [
+                    {
+                        "icon": "language",
+                        "title": "Ver Site",
+                        "link": "/",
+                    },
+                    {
+                        "icon": "menu_book",
+                        "title": "Manual do Sistema",
+                        "link": reverse_lazy("narrativa:faq"),
+                    },
+                ]
             }
-        ]
+        ],
     },
-
-    "icons": {
-        "auth": "fas fa-users-cog",
-        "auth.user": "fas fa-user",
-        "auth.Group": "fas fa-users",
-        "narrativa.Plano": "fas fa-star",
-        "narrativa.Clinica": "fas fa-hospital",
-        "narrativa.Usuario": "fas fa-user-md",
-        "narrativa.Categoria": "fas fa-tags",
-        "narrativa.Narrativa": "fas fa-book-medical",
-        "narrativa.Cena": "fas fa-desktop",
-        "narrativa.Questionario": "fas fa-clipboard-list",
-        "narrativa.Resposta": "fas fa-comments",
-    },
-    "default_icon_parents": "fas fa-chevron-circle-right",
-    "default_icon_children": "fas fa-circle",
-    "show_sidebar": True,
-    "navigation_expanded": True,
-    "order_with_respect_to": ["narrativa", "narrativa.Narrativa", "narrativa.Cena", "narrativa.Questionario"],
 }
-JAZZMIN_UI_TWEAKS = {"theme": "pulse", "dark_mode_theme": "darkly"}
+
 
 # --- APPS ---
 INSTALLED_APPS = [
-    'jazzmin',
+    'unfold',  # Unfold SEMPRE no topo antes do admin
+    'unfold.contrib.import_export',  # Integração do Unfold com o import_export
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
