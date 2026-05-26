@@ -1,4 +1,4 @@
-{% extends 'unfold/layouts/base_simple.html' %}
+{% extends 'unfold/layouts/base.html' %}
 {% load i18n unfold %}
 
 {% block content %}
@@ -7,71 +7,64 @@
         <h1 class="text-2xl font-extrabold text-gray-900 dark:text-white">Dashboard</h1>
     </div>
 
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col items-center justify-center text-center shadow-sm">
+            <div class="p-3 rounded-full bg-blue-600/20 text-blue-500 mb-3"><i class="fas fa-users text-xl"></i></div>
+            <h2 class="text-3xl font-extrabold text-white">{{ kpi_sessoes|default:"0" }}</h2>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Acessos Totais</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col items-center justify-center text-center shadow-sm">
+            <div class="p-3 rounded-full bg-teal-600/20 text-teal-500 mb-3"><i class="fas fa-eye text-xl"></i></div>
+            <h2 class="text-3xl font-extrabold text-white">{{ kpi_sessoes|add:15|default:"0" }}</h2>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Visualizações</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col items-center justify-center text-center shadow-sm">
+            <div class="p-3 rounded-full bg-purple-600/20 text-purple-500 mb-3"><i class="fas fa-book text-xl"></i></div>
+            <h2 class="text-3xl font-extrabold text-white">{{ kpi_narrativas|default:"0" }}</h2>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Narrativas</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex flex-col items-center justify-center text-center shadow-sm">
+            <div class="p-3 rounded-full bg-orange-600/20 text-orange-500 mb-3"><i class="fas fa-database text-xl"></i></div>
+            <h2 class="text-3xl font-extrabold text-white">{{ kpi_respostas|default:"0" }}</h2>
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Respostas</p>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div class="lg:col-span-2 space-y-6">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex items-center space-x-4 shadow-sm">
-                    <div class="p-3 rounded-lg bg-blue-600 text-white"><i class="fas fa-users text-2xl"></i></div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Acessos Totais</p>
-                        <h2 class="text-2xl font-extrabold text-white mt-1">{{ kpi_sessoes|default:"0" }}</h2>
-                    </div>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex items-center space-x-4 shadow-sm">
-                    <div class="p-3 rounded-lg bg-teal-600 text-white"><i class="fas fa-eye text-2xl"></i></div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Visualizações</p>
-                        <h2 class="text-2xl font-extrabold text-white mt-1">{{ kpi_sessoes|add:15|default:"0" }}</h2>
-                    </div>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex items-center space-x-4 shadow-sm">
-                    <div class="p-3 rounded-lg bg-purple-600 text-white"><i class="fas fa-book text-2xl"></i></div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Narrativas</p>
-                        <h2 class="text-2xl font-extrabold text-white mt-1">{{ kpi_narrativas|default:"0" }}</h2>
-                    </div>
-                </div>
-                <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 flex items-center space-x-4 shadow-sm">
-                    <div class="p-3 rounded-lg bg-orange-600 text-white"><i class="fas fa-database text-2xl"></i></div>
-                    <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Respostas</p>
-                        <h2 class="text-2xl font-extrabold text-white mt-1">{{ kpi_respostas|default:"0" }}</h2>
-                    </div>
-                </div>
-            </div>
-
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm">
                 <h3 class="text-lg font-bold text-white mb-4">Acessos nos últimos 30 dias</h3>
-                <div class="relative h-64 w-full">
+                <div class="relative h-72 w-full">
                     <canvas id="acessosChart"></canvas>
                 </div>
             </div>
         </div>
 
         <div class="space-y-6">
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-blue-500"></div>
                 <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Plano e Cobrança</h3>
-                <div class="flex justify-between items-center mb-4 py-2 border-b border-dashed border-gray-700">
+                <div class="flex justify-between items-center mb-6 py-2">
                     <span class="text-sm font-medium text-gray-400">Status</span>
                     {% if request.user.clinica.assinatura_ativa %}
-                        <span class="px-2.5 py-1 text-[10px] font-bold bg-green-900 text-green-200 rounded-md uppercase border border-green-700">Ativa</span>
+                        <span class="px-3 py-1 text-[11px] font-bold bg-green-900/50 text-green-400 rounded-md uppercase border border-green-700/50">Ativa</span>
                     {% else %}
-                        <span class="px-2.5 py-1 text-[10px] font-bold bg-red-900 text-red-200 rounded-md uppercase border border-red-700">Suspensa</span>
+                        <span class="px-3 py-1 text-[11px] font-bold bg-red-900/50 text-red-400 rounded-md uppercase border border-red-700/50">Suspensa</span>
                     {% endif %}
                 </div>
-                <a href="/planos/?gerenciar=1" class="w-full text-center inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-200 shadow-sm">Gerenciar Assinatura</a>
+                <a href="/planos/?gerenciar=1" class="w-full text-center inline-block bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-extrabold py-3 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-300 shadow-lg transform hover:-translate-y-0.5">
+                    <i class="fas fa-star mr-2"></i> Gerenciar Assinatura
+                </a>
             </div>
 
             <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm">
                 <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Ações Rápidas</h3>
                 <div class="space-y-3">
                     <a href="/admin/narrativa/narrativa/add/" class="flex items-center space-x-3 p-3 bg-gray-900 hover:bg-gray-700 rounded-lg text-sm font-semibold text-white transition duration-200 border border-gray-700">
-                        <i class="fas fa-plus-circle text-blue-500 text-lg"></i>
-                        <span>Nova Jornada</span>
+                        <i class="fas fa-plus-circle text-blue-500 text-lg"></i><span>Nova Jornada</span>
                     </a>
                     <a href="/admin/narrativa/cena/add/" class="flex items-center space-x-3 p-3 bg-gray-900 hover:bg-gray-700 rounded-lg text-sm font-semibold text-white transition duration-200 border border-gray-700">
-                        <i class="fas fa-desktop text-teal-500 text-lg"></i>
-                        <span>Criar Cena</span>
+                        <i class="fas fa-desktop text-teal-500 text-lg"></i><span>Criar Cena</span>
                     </a>
                 </div>
             </div>
@@ -92,11 +85,18 @@
                         label: 'Acessos',
                         data: {{ chart_dias_data|safe|default:"[]" }},
                         borderColor: '#14b8a6',
-                        backgroundColor: 'rgba(20, 184, 166, 0.05)',
+                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
                         borderWidth: 3, fill: true, tension: 0.4
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#374151' }, ticks: { color: '#9ca3af' } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                    }
+                }
             });
         }
     });

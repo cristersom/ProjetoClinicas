@@ -1,192 +1,96 @@
-{% extends "admin/base_site.html" %}
-{% block title %} {{ title }} {% endblock %}
-
-{% block extrahead %}
-{{ block.super }}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
-    /* Estilos copiados de relatorio_resumo_global.html */
-    .chart-container {
-        width: 80%;
-        max-width: 900px;
-        margin: 30px auto;
-        padding: 20px;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        background: #fff;
-    }
-    .results table {
-      width: 100%;
-    }
-    .filter-form fieldset { /* */
-        border: 1px solid #ccc;
-        padding: 15px;
-        border-radius: 4px;
-        margin-bottom: 10px;
-    }
-    .filter-form legend { /* */
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-    .filter-form .checkbox-grid { /* */
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 10px;
-    }
-    .filter-form label { /* */
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-    }
-    /* Para alinhar os botões de filtro e exportação */
-    .filter-buttons {
-        display: flex;
-        flex-wrap: wrap; /* Permite quebrar a linha em telas menores */
-        gap: 10px;
-        align-items: center;
-        margin-top: 15px;
-    }
-</style>
-{% endblock %}
-
+{% extends "unfold/layouts/base.html" %}
+{% load i18n unfold %}
 
 {% block content %}
-<div id="content-main">
-  <h1>{{ title }}</h1>
-
-  <div class="module filter-form">
-    <form method="GET" action="" id="profile-filter-form">
-      <fieldset>
-        <legend>Filtrar por Perfil do Paciente (definido na 1ª jornada)</legend>
-        <div class="checkbox-grid">
-            <label>
-                <input type="checkbox" name="narrativa_perfil_id" value="all"
-                       {% if 'all' in perfis_selecionados_ids %}checked{% endif %}
-                       id="check-all-profiles">
-                <strong>Todos os Perfis</strong>
-            </label>
-            {% for perfil in todos_os_perfis %}
-            <label>
-                <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}"
-                       class="profile-check"
-                       {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
-                {{ perfil.titulo }} (Perfil)
-            </label>
-            {% endfor %}
-        </div>
-
-        <div class="filter-buttons">
-            <input type="submit" value="Filtrar Relatório" class="button default">
-            {# O 'request.GET.urlencode' preserva os filtros atuais no link de exportação #}
-            <a href="?{{ request.GET.urlencode }}&export=xlsx" class="button">Exportar XLSX</a>
-            <a href="?{{ request.GET.urlencode }}&export=csv" class="button">Exportar CSV</a>
-            <a href="?{{ request.GET.urlencode }}&export=json" class="button">Exportar JSON</a>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-  {% if dados_agregados_cenas %}
-
-  <div class="module">
-    <h2>Visão Geral das Visitas por Cena (Filtrado por Perfil)</h2>
-    <div class="chart-container">
-        <canvas id="graficoVisitasCena"></canvas>
+<div class="px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mb-8">
+        <h1 class="text-2xl font-extrabold text-white">Percurso: {{ title|slice:"10:" }}</h1>
     </div>
-  </div>
 
-  <div class="module">
-    <h2>Dados Detalhados por Cena (Filtrado por Perfil)</h2>
-    <div class="results">
-        <table id="result_list">
-            <thead>
-              <tr>
-                <th class="sortable column-cena">
-                  <div class="text"><a>Cena</a></div>
-                </th>
-                <th class="sortable column-visitas-totais num">
-                  <div class="text"><a>Total de Visitas</a></div>
-                </th>
-                <th class="sortable column-visitantes-unicos num">
-                  <div class="text"><a>Visitantes Únicos</a></div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-                {% for dados_cena in dados_agregados_cenas %}
-                <tr class="{% cycle 'row1' 'row2' %}">
-                    <th class="field-cena">{{ dados_cena.cena_titulo }}</th>
-                    <td class="field-visitas-totais num">{{ dados_cena.total_visitas }}</td>
-                    <td class="field-visitantes-unicos num">{{ dados_cena.visitantes_unicos }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm mb-6">
+        <form method="GET" class="flex flex-col sm:flex-row items-center gap-4">
+            <div class="flex-1 w-full flex flex-wrap gap-4">
+                <label class="flex items-center space-x-2 cursor-pointer text-white">
+                    <input type="checkbox" name="narrativa_perfil_id" value="all" class="form-checkbox h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 rounded focus:ring-teal-500" {% if 'all' in perfis_selecionados_ids %}checked{% endif %}>
+                    <span class="text-sm font-medium">Todos os Perfis</span>
+                </label>
+                {% for perfil in todos_os_perfis %}
+                <label class="flex items-center space-x-2 cursor-pointer text-white">
+                    <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}" class="form-checkbox h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 rounded focus:ring-teal-500" {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
+                    <span class="text-sm font-medium">{{ perfil.titulo }}</span>
+                </label>
+                {% endendfor %}
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition">Filtrar Relatório</button>
+            </div>
+        </form>
     </div>
-  </div>
 
-  {% else %}
-    <p>Ainda não há registros de visitas para as cenas desta narrativa OU para os perfis selecionados.</p>
-  {% endif %}
+    <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm mb-6">
+        <h3 class="text-lg font-bold text-white mb-4">Visão Geral das Visitas por Cena</h3>
+        <div class="relative h-96 w-full">
+            <canvas id="percursoChart"></canvas>
+        </div>
+    </div>
 
+    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-sm overflow-hidden">
+        <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+            <h3 class="text-lg font-bold text-white">Dados Detalhados</h3>
+            <div class="flex gap-2">
+                <a href="?export=xlsx&{% for id in perfis_selecionados_ids %}narrativa_perfil_id={{ id }}&{% endfor %}" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition"><i class="fas fa-file-excel text-green-400 mr-1"></i> XLSX</a>
+                <a href="?export=csv&{% for id in perfis_selecionados_ids %}narrativa_perfil_id={{ id }}&{% endfor %}" class="bg-gray-700 hover:bg-gray-600 text-white text-xs font-bold py-1.5 px-3 rounded-lg transition"><i class="fas fa-file-csv text-blue-400 mr-1"></i> CSV</a>
+            </div>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-700">
+                <thead class="bg-gray-900/50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Cena</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Total de Visitas</th>
+                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-400 uppercase tracking-wider">Visitantes Únicos</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700 bg-gray-800">
+                    {% for dado in dados_agregados_cenas %}
+                    <tr class="hover:bg-gray-700 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{{ dado.cena_titulo }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-300 font-bold">{{ dado.total_visitas }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-teal-400 font-bold">{{ dado.visitantes_unicos }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum dado encontrado para os filtros selecionados.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', (event) => {
-    // Lógica do Gráfico (como antes)
-    const ctx = document.getElementById('graficoVisitasCena');
-    if (ctx) {
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: {{ labels_grafico|safe }},
-                datasets: [
-                {
-                    label: 'Total de Visitas',
-                    data: {{ data_visitas_totais|safe }},
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('percursoChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {{ labels_grafico|safe }},
+                    datasets: [
+                        { label: 'Total de Visitas', data: {{ data_visitas_totais|safe }}, backgroundColor: 'rgba(59, 130, 246, 0.8)', borderRadius: 4 },
+                        { label: 'Visitantes Únicos', data: {{ data_visitantes_unicos|safe }}, backgroundColor: 'rgba(20, 184, 166, 0.8)', borderRadius: 4 }
+                    ]
                 },
-                {
-                    label: 'Visitantes Únicos',
-                    data: {{ data_visitantes_unicos|safe }},
-                    backgroundColor: 'rgba(255, 99, 132, 0.7)',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    borderWidth: 1
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#374151' }, ticks: { color: '#9ca3af', precision: 0 } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                    },
+                    plugins: { legend: { labels: { color: '#fff' } } }
                 }
-            ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: { position: 'top', },
-                    title: { display: true, text: 'Visitas Totais vs. Visitantes Únicos por Cena' }
-                },
-                scales: {
-                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                }
-            }
-        });
-    }
-
-    // Lógica para os checkboxes de Perfil (similar a outros relatórios)
-    const checkAllProfiles = document.getElementById('check-all-profiles');
-    const profileChecks = document.querySelectorAll('.profile-check');
-
-    checkAllProfiles.addEventListener('change', function() {
-        if (this.checked) {
-            profileChecks.forEach(check => { check.checked = false; });
+            });
         }
     });
-    profileChecks.forEach(check => {
-        check.addEventListener('change', function() {
-            if (this.checked) {
-                checkAllProfiles.checked = false;
-            }
-        });
-    });
-});
 </script>
-
 {% endblock %}

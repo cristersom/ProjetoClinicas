@@ -1,111 +1,63 @@
 {% extends 'unfold/layouts/base.html' %}
 
-{% block messages %}
-    {{ block.super }}
-    {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
-        <div class="px-4 pt-4 sm:px-6 lg:px-8 space-y-4">
-            {% if not request.user.clinica.assinatura_ativa %}
-                <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-red-900 to-red-700 border border-red-500 text-white shadow-lg">
-                    <div class="flex items-center space-x-4">
-                        <i class="fas fa-hand-holding-usd text-2xl"></i>
-                        <div>
-                            <span class="block font-extrabold text-base">Assinatura Suspensa</span>
-                            <span class="block text-sm opacity-90">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</span>
-                        </div>
-                    </div>
-                    <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Reativar Agora</a>
-                </div>
-            {% else %}
-                {% with plano=request.user.clinica.plano_atual %}
-                    {% if plano and plano.limite_narrativas %}
-                        {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
-                            <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-orange-900 to-orange-700 border border-orange-500 text-white shadow-lg">
-                                <div class="flex items-center space-x-4">
-                                    <i class="fas fa-rocket text-2xl"></i>
-                                    <div>
-                                        <span class="block font-extrabold text-base">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                        <span class="block text-sm opacity-90">Faça upgrade do seu plano agora para criar novos conteúdos.</span>
-                                    </div>
-                                </div>
-                                <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Fazer Upgrade</a>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block extrahead %}
 {{ block.super }}
+<title>Administração | Narrativas Clínicas</title>
+<link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+
 <style>
-    /* Força Dark Mode e Alinhamentos do Nested Admin */
-    html.dark body { background-color: #111827 !important; color: #f3f4f6 !important; }
+    /* Força Dark Mode Absoluto */
+    html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
 
-    .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
-    .djn-item { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px dashed #374151; position: relative;}
+    /* Tabelas Clicáveis Hover */
+    #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
+    #changelist table tbody tr:hover { background-color: #374151 !important; }
 
-    /* Inputs Padrão */
-    .djn-item input[type="text"], .djn-item select { background-color: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px; padding: 10px; width: 100%; }
+    /* =========================================================
+       DOMANDO O QUESTIONÁRIO (NESTED ADMIN)
+       ========================================================= */
+    .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; }
+    .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; }
 
-    /* Remove labels e elementos indesejados */
-    .inline_label, legend, .related-widget-wrapper-link, .datetimeshortcuts { display: none !important; }
+    .djn-item h3 { color: #fff !important; font-size: 1.1rem !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-weight: bold !important;}
 
-    /* Organização de Lixeiras no Topo à Direita */
-    .delete { position: absolute; top: 0; right: 0; }
-    .delete input[type="checkbox"] { display: none; }
-    .delete label { background: #ef4444; color: transparent; width: 35px; height: 35px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-    .delete label::after { content: "\f2ed"; font-family: "Font Awesome 5 Free"; font-weight: 900; font-size: 14px; color: white; }
+    /* Limpeza de rótulos do Django */
+    .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
 
-    /* Barra de Pesquisa */
-    .search-bar-inline { display: flex; gap: 10px; width: 100%; margin-bottom: 20px; }
-    .search-bar-inline input { flex: 1; background: #374151; color: white; border: 1px solid #4b5563; padding: 10px; border-radius: 6px; }
-    .search-bar-inline button { background: #6b21a8; color: white; width: 45px; border-radius: 6px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    /* A Lixeira (Fim dos quadrados vermelhos sem ícone) */
+    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; }
+    .djn-item > .delete label { display: none !important; }
+    a.inline-deletelink {
+        background: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 6px !important;
+        display: flex !important; align-items: center !important; justify-content: center !important; color: transparent !important; overflow: hidden !important; text-decoration: none !important;
+    }
+    a.inline-deletelink::after { content: "\f2ed"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: white; font-size: 14px; position: absolute; }
+    a.inline-deletelink:hover { background: #dc2626 !important; }
+
+    /* Inputs padronizados */
+    .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 40px !important; width: 100% !important; padding: 0 10px !important; }
 </style>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // 1. Forçar Dark Mode
         document.documentElement.classList.add('dark');
 
-        // 2. Tradução de TomSelect e Textos
-        setTimeout(() => {
-            document.querySelectorAll('input, select').forEach(el => {
-                if (el.placeholder === 'Select value') el.placeholder = 'Selecione uma opção...';
+        // Tradução forçada (vigia o DOM continuamente)
+        setInterval(() => {
+            document.querySelectorAll('input.ts-control').forEach(el => {
+                if (el.placeholder.includes('Select')) el.placeholder = 'Selecione...';
             });
-            document.querySelectorAll('label').forEach(lbl => {
-                if (lbl.innerText.includes('Novo Escolha') || lbl.innerText.includes('Opcao respostas')) lbl.style.display = 'none';
-            });
-        }, 500);
+        }, 1000);
 
-        // 3. Pesquisa em Linha
-        const searchInput = document.querySelector('#changelist-search input[name="q"]');
-        const searchForm = document.querySelector('#changelist-search form');
-        if (searchInput && searchForm) {
-            const container = document.createElement('div');
-            container.className = 'search-bar-inline';
+        // Tornar linhas da tabela clicáveis
+        document.querySelectorAll('#changelist tbody tr').forEach(tr => {
+            tr.addEventListener('click', function(e) {
+                // Impede clique duplo se clicar num link, botão ou checkbox da linha
+                if(['a', 'input', 'button', 'svg', 'path'].includes(e.target.tagName.toLowerCase())) return;
+                if(e.target.closest('a') || e.target.closest('button')) return;
 
-            const input = searchInput.cloneNode(true);
-            input.placeholder = 'Pesquisar...';
-
-            const btn = document.createElement('button');
-            btn.innerHTML = '<i class="fas fa-search"></i>';
-            btn.type = 'submit';
-
-            searchForm.innerHTML = '';
-            searchForm.appendChild(container);
-            container.appendChild(input);
-            container.appendChild(btn);
-        }
-
-        // 4. Confirmação na Lixeira Inlines
-        document.querySelectorAll('.delete label, a.inline-deletelink').forEach(lbl => {
-            lbl.addEventListener('click', (e) => {
-                if(!confirm('Tem certeza que deseja remover este item?')) {
-                    e.preventDefault(); e.stopPropagation(); return false;
-                }
-                const inlineCard = lbl.closest('.djn-item') || lbl.closest('.inline-related');
-                if(inlineCard) inlineCard.style.display = 'none';
+                let link = this.querySelector('th a') || this.querySelector('td.field-titulo a');
+                if(link) window.location.href = link.href;
             });
         });
     });
