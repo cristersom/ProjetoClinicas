@@ -19,6 +19,7 @@ UNFOLD = {
     "SITE_TITLE": "Narrativas Clínicas",
     "SITE_HEADER": "Narrativas Clínicas",
     "SITE_URL": "/",
+    "THEME": "dark",
     "COLORS": {
         "primary": {
             "50": "240 253 250",
@@ -26,7 +27,7 @@ UNFOLD = {
             "200": "153 246 228",
             "300": "94 234 212",
             "400": "45 212 191",
-            "500": "20 184 166",  # Verde Água Nativo (#14b8a6)
+            "500": "20 184 166",  # Verde Água (#14b8a6)
             "600": "13 148 136",
             "700": "15 118 110",
             "800": "17 94 89",

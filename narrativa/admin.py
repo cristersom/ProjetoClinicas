@@ -1,8 +1,7 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
 
-# --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
@@ -23,7 +22,8 @@ from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
 
 class SuperUserOnlyMixin:
-    def has_module_permission(self, request): return request.user.is_superuser
+    def has_module_permission(self, request):
+        return request.user.is_superuser
 
 @admin.register(Plano)
 class PlanoAdmin(ModelAdmin):
@@ -46,32 +46,34 @@ class CategoriaAdmin(SuperUserOnlyMixin, ModelAdmin):
 class PagamentoPendenteAdmin(SuperUserOnlyMixin, ModelAdmin):
     list_display = ('email', 'plano', 'data_pagamento', 'utilizado')
 
-# ==========================================
-# ISOLAMENTO MULTI-TENANT E BLINDAGEM ABSOLUTA
-# ==========================================
 class TenantPermissionsMixin:
     def get_clinica_atualizada(self, request):
         if hasattr(request, 'clinica_realtime') and request.clinica_realtime: return request.clinica_realtime
         if hasattr(request.user, 'clinica') and request.user.clinica: return Clinica.objects.get(id=request.user.clinica.id)
         return None
+
     def has_module_permission(self, request): return True
     def has_view_permission(self, request, obj=None): return True
+
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
+
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
+
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
 
-# ==========================================
-# INLINES
-# ==========================================
+# --- INLINES ---
 class EscolhaInline(TenantPermissionsMixin, StackedInline):
     model = Escolha
     fk_name = 'cena_origem'
@@ -110,8 +112,7 @@ class CenaAdmin(TenantPermissionsMixin, ModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_cena_delete', args=[obj.pk])
-        # FORÇANDO CORES COM INLINE STYLE PARA DRIBLAR O TAILWIND PURGE
-        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
 
@@ -133,12 +134,14 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         return super().has_add_permission(request, *args, **kwargs)
 
     def get_exclude(self, request, obj=None):
-        return ('visualizacoes',) if request.user.is_superuser else ('clinica', 'visualizacoes')
+        if request.user.is_superuser: return ('visualizacoes',)
+        return ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser: return qs
-        if hasattr(request.user, 'clinica') and request.user.clinica: return qs.filter(clinica=request.user.clinica)
+        if hasattr(request.user, 'clinica') and request.user.clinica:
+            return qs.filter(clinica=request.user.clinica)
         return qs.none()
 
     def save_model(self, request, obj, form, change):
@@ -151,16 +154,16 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
 
     def links_relatorios(self, obj):
         url_percurso = reverse('admin:narrativa_narrativa_percurso', args=[obj.pk])
-        return format_html('<a style="background-color: #14b8a6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>', url_percurso)
+        return format_html('<a style="background-color:#14b8a6; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Relatório de Percurso"><i class="fas fa-chart-line"></i> Relatório</a>', url_percurso)
     links_relatorios.short_description = 'Relatório'
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_narrativa_delete', args=[obj.pk])
-        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
-        # [MANTIDO CÓDIGO ORIGINAL DO RELATÓRIO...]
+        # [Código do relatório percurso mantido inalterado]
         narrativa_atual = self.get_object(request, object_id)
         if not request.user.is_superuser and narrativa_atual.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         todos_os_perfis = Narrativa.objects.filter(clinica=narrativa_atual.clinica) if narrativa_atual.clinica else Narrativa.objects.none()
@@ -218,7 +221,6 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
             'perfis_selecionados_ids': perfis_selecionados_ids,
         })
 
-
 @admin.register(Questionario)
 class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios', 'botao_excluir')
@@ -248,9 +250,9 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         url_detalhe = reverse('admin:narrativa_questionario_relatorio_detalhe', args=[obj.pk])
         url_resumo = reverse('admin:narrativa_questionario_resumo_agregado', args=[obj.pk])
         return format_html(
-            '<div style="display: flex; gap: 8px;">'
-            '<a style="background-color: #3b82f6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none;" href="{}" title="Respostas Detalhadas"><i class="fas fa-list"></i> Detalhes</a>'
-            '<a style="background-color: #8b5cf6; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none;" href="{}" title="Resumo Gráfico"><i class="fas fa-chart-pie"></i> Resumo</a>'
+            '<div style="display:flex; gap:8px;">'
+            '<a style="background-color:#3b82f6; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Detalhes"><i class="fas fa-list"></i> Detalhes</a>'
+            '<a style="background-color:#8b5cf6; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Resumo"><i class="fas fa-chart-pie"></i> Resumo</a>'
             '</div>',
             url_detalhe, url_resumo
         )
@@ -258,10 +260,11 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
 
     def botao_excluir(self, obj):
         url = reverse('admin:narrativa_questionario_delete', args=[obj.pk])
-        return format_html('<a style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; display: inline-block;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
+        return format_html('<a style="background-color:#ef4444; color:white; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none;" href="{}" title="Excluir"><i class="fas fa-trash"></i> Excluir</a>', url)
     botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
+        # [Código relatorio mantido inalterado]
         questionario = self.get_object(request, object_id)
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         todos_os_perfis = Narrativa.objects.filter(clinica=request.user.clinica) if hasattr(request.user, 'clinica') else Narrativa.objects.all()
@@ -288,13 +291,9 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                 k = resp.session_key
                 if k not in dados_sessao: dados_sessao[k] = {'perfil': mapa_perfis.get(k, "Visitante"), 'data': resp.data_resposta.strftime('%d/%m/%Y'), 'r': {}}
                 dados_sessao[k]['r'][resp.pergunta.id] = resp.texto_resposta
-
             dataset = Dataset()
-            headers = ["Sessão", "Perfil", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
-            dataset.headers = headers
-
+            dataset.headers = ["Sessão", "Perfil", "Data"] + [p.texto_pergunta for p in perguntas_ordenadas]
             for k, d in dados_sessao.items(): dataset.append([k[:8], d['perfil'], d['data']] + [d['r'].get(p.id, "") for p in perguntas_ordenadas])
-
             if export_format == 'xlsx':
                 file_data, content_type = dataset.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             elif export_format == 'json':
@@ -320,15 +319,14 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                     else:
                         c.update(list(rp.values_list('texto_resposta', flat=True)))
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({'perfil_titulo': pf['titulo'], 'total_respostas': rp.count(), 'dados_grafico': {'labels': json.dumps(list(c.keys())), 'data': json.dumps(list(c.values())), 'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'} })
-
         return render(request, 'admin/relatorio_questionario_agregado.html', {**self.admin_site.each_context(request), 'questionario': questionario, 'dados_comparativos': dados_comparativos, 'todos_os_perfis': todos_os_perfis})
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
+        # [Código relatorio mantido inalterado]
         questionario = self.get_object(request, object_id)
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')
         dados = {}
-
         export_format = request.GET.get('export')
         if export_format in ['xlsx', 'csv', 'json']:
             perguntas_ordenadas = questionario.perguntas.all().order_by('id')
@@ -339,7 +337,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                 if r.session_key not in dados_exportacao: dados_exportacao[r.session_key] = {'data': r.data_resposta.strftime('%d/%m/%Y %H:%M'), 'respostas': {}}
                 dados_exportacao[r.session_key]['respostas'][r.pergunta.id] = r.texto_resposta
             for session_key, d in dados_exportacao.items(): dataset.append([session_key[:8], d['data']] + [d['respostas'].get(p.id, "") for p in perguntas_ordenadas])
-
             if export_format == 'xlsx':
                 file_data, content_type = dataset.xlsx, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             elif export_format == 'json':
@@ -349,7 +346,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
             response = HttpResponse(file_data, content_type=content_type)
             response['Content-Disposition'] = f'attachment; filename="respostas_detalhadas_{questionario.id}.{export_format}"'
             return response
-
         for r in respostas:
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
