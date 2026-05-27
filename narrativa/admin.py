@@ -2,6 +2,7 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
 
+# --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
@@ -22,8 +23,7 @@ from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
 
 class SuperUserOnlyMixin:
-    def has_module_permission(self, request):
-        return request.user.is_superuser
+    def has_module_permission(self, request): return request.user.is_superuser
 
 @admin.register(Plano)
 class PlanoAdmin(ModelAdmin):
@@ -58,20 +58,27 @@ class TenantPermissionsMixin:
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
+        return False if c and not c.assinatura_ativa else True
 
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
+        return False if c and not c.assinatura_ativa else True
 
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        if c and not c.assinatura_ativa: return False
-        return True
+        return False if c and not c.assinatura_ativa else True
+
+    # TRADUÇÃO FORÇADA NO BACKEND PARA SELECTS
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
+        if formfield:
+            if hasattr(formfield, 'empty_label') and formfield.empty_label in ['---------', 'Select value', '']:
+                formfield.empty_label = 'Selecione uma opção...'
+            if hasattr(formfield.widget, 'attrs'):
+                formfield.widget.attrs['placeholder'] = 'Selecione uma opção...'
+        return formfield
 
 # --- INLINES ---
 class EscolhaInline(TenantPermissionsMixin, StackedInline):
@@ -134,14 +141,12 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         return super().has_add_permission(request, *args, **kwargs)
 
     def get_exclude(self, request, obj=None):
-        if request.user.is_superuser: return ('visualizacoes',)
-        return ('clinica', 'visualizacoes')
+        return ('visualizacoes',) if request.user.is_superuser else ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser: return qs
-        if hasattr(request.user, 'clinica') and request.user.clinica:
-            return qs.filter(clinica=request.user.clinica)
+        if hasattr(request.user, 'clinica') and request.user.clinica: return qs.filter(clinica=request.user.clinica)
         return qs.none()
 
     def save_model(self, request, obj, form, change):
@@ -163,7 +168,6 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
     botao_excluir.short_description = 'Ação'
 
     def relatorio_percurso_view(self, request, object_id, *args, **kwargs):
-        # [Código do relatório percurso mantido inalterado]
         narrativa_atual = self.get_object(request, object_id)
         if not request.user.is_superuser and narrativa_atual.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         todos_os_perfis = Narrativa.objects.filter(clinica=narrativa_atual.clinica) if narrativa_atual.clinica else Narrativa.objects.none()
@@ -221,6 +225,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
             'perfis_selecionados_ids': perfis_selecionados_ids,
         })
 
+
 @admin.register(Questionario)
 class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios', 'botao_excluir')
@@ -264,7 +269,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
     botao_excluir.short_description = 'Ação'
 
     def resumo_agregado_view(self, request, object_id, *args, **kwargs):
-        # [Código relatorio mantido inalterado]
         questionario = self.get_object(request, object_id)
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         todos_os_perfis = Narrativa.objects.filter(clinica=request.user.clinica) if hasattr(request.user, 'clinica') else Narrativa.objects.all()
@@ -322,7 +326,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         return render(request, 'admin/relatorio_questionario_agregado.html', {**self.admin_site.each_context(request), 'questionario': questionario, 'dados_comparativos': dados_comparativos, 'todos_os_perfis': todos_os_perfis})
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
-        # [Código relatorio mantido inalterado]
         questionario = self.get_object(request, object_id)
         if not request.user.is_superuser and questionario.cena_associada and questionario.cena_associada.narrativa.clinica != request.user.clinica: return HttpResponse("Acesso negado.", status=403)
         respostas = Resposta.objects.filter(pergunta__questionario=questionario).order_by('session_key', 'pergunta__id')

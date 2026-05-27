@@ -42,40 +42,44 @@
 {{ block.super }}
 <title>Administração | Narrativas Clínicas</title>
 <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
+    /* Força Dark Mode Absoluto */
     html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
 
     #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
 
     /* =========================================================
-       DOMANDO O QUESTIONÁRIO (NESTED ADMIN)
+       DOMANDO O QUESTIONÁRIO E OPÇÕES (FIM DA CONFUSÃO)
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; }
-    .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; }
 
-    .djn-item h3 { color: #fff !important; font-size: 1.1rem !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-weight: bold !important;}
+    /* Espaçamento mais apertado e limpo nas Opções de Resposta */
+    .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 15px 20px !important; margin-bottom: 10px !important; position: relative !important; }
+    .djn-item h3 { color: #fff !important; font-size: 1.05rem !important; margin-bottom: 10px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 8px !important; font-weight: bold !important;}
 
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
 
-    /* LIXEIRA CORRIGIDA */
-    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; }
+    /* LIXEIRA CORRIGIDA COM FONT AWESOME */
+    .djn-item > .delete { position: absolute !important; top: 12px !important; right: 15px !important; z-index: 10; }
     .djn-item > .delete label { display: none !important; }
     a.inline-deletelink {
-        background: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 6px !important;
+        background: #ef4444 !important; width: 32px !important; height: 32px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important; color: transparent !important; overflow: hidden !important; text-decoration: none !important;
     }
     a.inline-deletelink::after {
-        content: "delete";
-        font-family: "Material Symbols Outlined", sans-serif;
-        font-weight: 400;
+        content: "\f2ed"; /* Código do ícone da Lixeira no FontAwesome */
+        font-family: "Font Awesome 5 Free", "Font Awesome 6 Free";
+        font-weight: 900;
         color: white;
-        font-size: 20px;
+        font-size: 14px;
         position: absolute;
     }
     a.inline-deletelink:hover { background: #dc2626 !important; }
 
+    /* Inputs padronizados */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 40px !important; width: 100% !important; padding: 0 10px !important; }
 </style>
 
@@ -83,39 +87,55 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUTOR EM TEMPO REAL E IMPLACÁVEL
-        setInterval(() => {
-            // Dropdowns (TomSelect)
-            document.querySelectorAll('.ts-control input, input.ts-control').forEach(el => {
-                if (el.placeholder.includes('Select') || el.placeholder === 'Select value') {
-                    el.placeholder = 'Selecione uma opção...';
-                    el.setAttribute('placeholder', 'Selecione uma opção...');
+        // DICIONÁRIO MANUAL DE TRADUÇÃO (Você pode alterar o que quiser aqui)
+        const dicionario = {
+            'Select value': 'Selecione uma opção...',
+            'Select...': 'Selecione...',
+            'Choose file to upload': 'Escolher arquivo',
+            'No file chosen': 'Nenhum arquivo',
+            'Welcome': 'Olá,',
+            'Add another': 'Adicionar outro(a)'
+        };
+
+        const aplicarTraducoes = () => {
+            // 1. Traduz placeholders de Inputs e Selects
+            document.querySelectorAll('input').forEach(el => {
+                if (el.placeholder === 'Select value' || el.placeholder === 'Select...') {
+                    el.placeholder = dicionario['Select value'];
                 }
-            });
-            document.querySelectorAll('.no-results').forEach(el => {
-                if (el.innerText.includes('No results')) el.innerText = 'Nenhum resultado';
             });
 
-            // "Choose file", "Welcome" e botões nativos
-            document.querySelectorAll('span, p, h1, div, label').forEach(el => {
-                if (el.childNodes.length > 0) {
-                    let text = el.textContent.trim();
-                    if (text === 'Choose file to upload' || text === 'Choose file') {
-                        el.textContent = 'Escolher arquivo';
-                    }
-                    if (text.startsWith('Welcome ')) {
-                        el.textContent = text.replace('Welcome ', 'Bem-vindo(a), ');
+            // 2. Traduz textos soltos na tela (varre o HTML)
+            const walkDOM = (node) => {
+                if (node.nodeType === 3) { // Se for um nó de texto
+                    let text = node.nodeValue;
+                    let mudou = false;
+
+                    if (text.includes('Choose file to upload')) { text = text.replace('Choose file to upload', dicionario['Choose file to upload']); mudou = true; }
+                    if (text.includes('No file chosen')) { text = text.replace('No file chosen', dicionario['No file chosen']); mudou = true; }
+                    if (text.includes('Select value')) { text = text.replace('Select value', dicionario['Select value']); mudou = true; }
+                    if (text.includes('Welcome')) { text = text.replace('Welcome', dicionario['Welcome']); mudou = true; }
+
+                    if (mudou) node.nodeValue = text;
+                } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        walkDOM(node.childNodes[i]);
                     }
                 }
-            });
-        }, 500);
+            };
+            walkDOM(document.body);
+        };
+
+        // Aplica traduções na hora e sempre que clicar em "Adicionar Pergunta/Opção"
+        aplicarTraducoes();
+        const observer = new MutationObserver(aplicarTraducoes);
+        observer.observe(document.body, { childList: true, subtree: true });
 
         // Tornar linhas da tabela clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
             tr.addEventListener('click', function(e) {
                 if(['a', 'input', 'button', 'svg', 'path', 'span'].includes(e.target.tagName.toLowerCase())) return;
                 if(e.target.closest('a') || e.target.closest('button')) return;
-
                 let link = this.querySelector('th a') || this.querySelector('td.field-titulo a');
                 if(link) window.location.href = link.href;
             });
