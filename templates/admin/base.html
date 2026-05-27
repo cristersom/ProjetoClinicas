@@ -59,7 +59,7 @@
 
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
 
-    /* LIXEIRA CORRIGIDA (Material Symbols Nativo do Unfold) */
+    /* LIXEIRA CORRIGIDA */
     .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; }
     .djn-item > .delete label { display: none !important; }
     a.inline-deletelink {
@@ -67,7 +67,7 @@
         display: flex !important; align-items: center !important; justify-content: center !important; color: transparent !important; overflow: hidden !important; text-decoration: none !important;
     }
     a.inline-deletelink::after {
-        content: "delete"; /* Usando o ícone do Google Material */
+        content: "delete";
         font-family: "Material Symbols Outlined", sans-serif;
         font-weight: 400;
         color: white;
@@ -83,16 +83,30 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // Tradução forçada robusta
+        // TRADUTOR EM TEMPO REAL E IMPLACÁVEL
         setInterval(() => {
+            // Dropdowns (TomSelect)
             document.querySelectorAll('.ts-control input, input.ts-control').forEach(el => {
                 if (el.placeholder.includes('Select') || el.placeholder === 'Select value') {
-                    el.placeholder = 'Selecione...';
-                    el.setAttribute('placeholder', 'Selecione...');
+                    el.placeholder = 'Selecione uma opção...';
+                    el.setAttribute('placeholder', 'Selecione uma opção...');
                 }
             });
             document.querySelectorAll('.no-results').forEach(el => {
                 if (el.innerText.includes('No results')) el.innerText = 'Nenhum resultado';
+            });
+
+            // "Choose file", "Welcome" e botões nativos
+            document.querySelectorAll('span, p, h1, div, label').forEach(el => {
+                if (el.childNodes.length > 0) {
+                    let text = el.textContent.trim();
+                    if (text === 'Choose file to upload' || text === 'Choose file') {
+                        el.textContent = 'Escolher arquivo';
+                    }
+                    if (text.startsWith('Welcome ')) {
+                        el.textContent = text.replace('Welcome ', 'Bem-vindo(a), ');
+                    }
+                }
             });
         }, 500);
 
