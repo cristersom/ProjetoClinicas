@@ -44,10 +44,8 @@
 <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
 
 <style>
-    /* Força Dark Mode Absoluto */
     html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
 
-    /* Tabelas Clicáveis Hover */
     #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
 
@@ -59,20 +57,25 @@
 
     .djn-item h3 { color: #fff !important; font-size: 1.1rem !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-weight: bold !important;}
 
-    /* Limpeza de rótulos do Django */
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
 
-    /* A Lixeira (Fim dos quadrados vermelhos sem ícone) */
+    /* LIXEIRA CORRIGIDA (Material Symbols Nativo do Unfold) */
     .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; }
     .djn-item > .delete label { display: none !important; }
     a.inline-deletelink {
         background: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important; color: transparent !important; overflow: hidden !important; text-decoration: none !important;
     }
-    a.inline-deletelink::after { content: "\f2ed"; font-family: "Font Awesome 5 Free"; font-weight: 900; color: white; font-size: 14px; position: absolute; }
+    a.inline-deletelink::after {
+        content: "delete"; /* Usando o ícone do Google Material */
+        font-family: "Material Symbols Outlined", sans-serif;
+        font-weight: 400;
+        color: white;
+        font-size: 20px;
+        position: absolute;
+    }
     a.inline-deletelink:hover { background: #dc2626 !important; }
 
-    /* Inputs padronizados */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 40px !important; width: 100% !important; padding: 0 10px !important; }
 </style>
 
@@ -80,18 +83,23 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // Tradução forçada (vigia o DOM continuamente)
+        // Tradução forçada robusta
         setInterval(() => {
-            document.querySelectorAll('input.ts-control').forEach(el => {
-                if (el.placeholder.includes('Select')) el.placeholder = 'Selecione...';
+            document.querySelectorAll('.ts-control input, input.ts-control').forEach(el => {
+                if (el.placeholder.includes('Select') || el.placeholder === 'Select value') {
+                    el.placeholder = 'Selecione...';
+                    el.setAttribute('placeholder', 'Selecione...');
+                }
             });
-        }, 1000);
+            document.querySelectorAll('.no-results').forEach(el => {
+                if (el.innerText.includes('No results')) el.innerText = 'Nenhum resultado';
+            });
+        }, 500);
 
         // Tornar linhas da tabela clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
             tr.addEventListener('click', function(e) {
-                // Impede clique duplo se clicar num link, botão ou checkbox da linha
-                if(['a', 'input', 'button', 'svg', 'path'].includes(e.target.tagName.toLowerCase())) return;
+                if(['a', 'input', 'button', 'svg', 'path', 'span'].includes(e.target.tagName.toLowerCase())) return;
                 if(e.target.closest('a') || e.target.closest('button')) return;
 
                 let link = this.querySelector('th a') || this.querySelector('td.field-titulo a');

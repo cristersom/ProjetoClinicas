@@ -19,7 +19,7 @@
                     <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}" class="form-checkbox h-4 w-4 text-teal-500 bg-gray-700 border-gray-600 rounded focus:ring-teal-500" {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
                     <span class="text-sm font-medium">{{ perfil.titulo }}</span>
                 </label>
-                {% endendfor %}
+                {% endfor %}
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
                 <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition">Filtrar Relatório</button>
