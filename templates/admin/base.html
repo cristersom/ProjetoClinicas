@@ -59,27 +59,28 @@
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
 
     /* =========================================================
-       NESTED ADMIN (PERGUNTAS E OPÇÕES) - ESPAÇADO E LIMPO
+       NESTED ADMIN (PERGUNTAS E OPÇÕES) - LIXEIRAS NATIVAS
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
 
     .djn-item .djn-group { margin-top: 30px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 25px 0 0 0 !important; }
 
+    /* Oculta os checkboxes de delete originais e labels inúteis */
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link, .djn-item > h3 { display: none !important; }
-    .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
+    .djn-item > .delete input[type="checkbox"], .djn-item > .delete > label { display: none !important; }
 
-    /* A LIXEIRA VERMELHA */
-    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
-    .djn-item > .delete label, a.inline-deletelink {
+    /* Estiliza o botão "Remover" que vem com o nested_admin para que a exclusão funcione nativamente */
+    .djn-delete-handler, .inline-deletelink {
         background: #ef4444 !important; width: 36px !important; height: 36px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
+        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important;
     }
-    .djn-item > .delete label::before, a.inline-deletelink::before {
+    .djn-delete-handler::before, .inline-deletelink::before {
         content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free"; font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
     }
-    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
+    .djn-delete-handler:hover, .inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
 
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; }
 </style>
@@ -90,21 +91,29 @@
 
         // TRADUÇÃO VIGILANTE
         setInterval(() => {
-            // Inputs e placeholders
+            // Inputs fakes do Unfold (Upload de Arquivo escondido por baixo)
+            document.querySelectorAll('input[type="text"][value="Choose file to upload"]').forEach(el => {
+                el.value = 'Escolher Arquivo';
+            });
             document.querySelectorAll('input, select, textarea').forEach(el => {
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Vasculha Textos Livres no DOM (incluindo "Choose file to upload" e "Welcome")
+            // Vasculha Textos Livres no DOM
             const walkDOM = (node) => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     let text = node.textContent;
-                    if (text.includes('Choose file to upload')) { node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...'); }
-                    if (text.includes('Type to search')) { node.textContent = text.replace('Type to search', 'Pesquisar...'); }
-                    if (text.includes('Welcome')) { node.textContent = text.replace('Welcome', 'Olá,'); }
-                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE'].includes(node.nodeName)) {
+                    if (text.includes('Choose file to upload')) node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...');
+                    if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
+                    if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
+                    if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
+
+                    // Empty states (listas vazias)
+                    if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
+                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.';
+                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
                     node.childNodes.forEach(walkDOM);
                 }
             };
@@ -118,20 +127,6 @@
                 }
             });
         }, 500);
-
-        // Ação da Lixeira com Confirmação
-        document.body.addEventListener('click', function(e) {
-            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
-            if (deleteBtn) {
-                e.preventDefault();
-                if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
-                    let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
-                    if(checkbox) checkbox.checked = true;
-                    let djnItem = deleteBtn.closest('.djn-item');
-                    if(djnItem) djnItem.style.display = 'none';
-                }
-            }
-        });
 
         // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
