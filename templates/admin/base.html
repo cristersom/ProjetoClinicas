@@ -55,7 +55,7 @@
     .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
     .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
-    /* UX: Esconde o Welcome solto do Unfold e os avisos feios do Django */
+    /* UX: Esconde o Welcome e os avisos gerais feios do Django */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
     .errornote, ul.errorlist:not(.custom-error-list) { display: none !important; }
 
@@ -66,21 +66,21 @@
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item .djn-group { margin-top: 30px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 25px 0 0 0 !important; }
 
-    /* Remove lixo nativo do Django */
+    /* Oculta controlos não visuais do Django */
     .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
     .djn-item input[type="checkbox"][name*="DELETE"] { display: none !important; }
 
-    /* Títulos fantasmas silenciados SEM ocultar as lixeiras */
+    /* Títulos fantasmas silenciados, mantendo o container para os botões e lixeiras */
     .djn-item > h3 { font-size: 0 !important; color: transparent !important; border: none !important; background: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; overflow: visible !important; }
     .djn-item > h3 > b, .djn-item > h3 > .inline_label, .djn-item > h3 > span:not(:has(a)) { display: none !important; }
 
     /* =========================================================
-       A LIXEIRA VERMELHA UNIVERSAL (Pergunta e Opções)
+       A LIXEIRA VERMELHA UNIVERSAL (Funciona nativamente)
        ========================================================= */
     .djn-item .delete label,
     .djn-item a.inline-deletelink,
     .djn-item a.djn-remove-handler {
-        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 99 !important;
+        position: absolute !important; top: 12px !important; right: 12px !important; z-index: 99 !important;
         background: #ef4444 !important; width: 34px !important; height: 34px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
@@ -96,7 +96,7 @@
     .djn-item a.djn-remove-handler:hover { background: #dc2626 !important; transform: scale(1.05); }
 
     /* =========================================================
-       ESTÉTICA DE ERRO E INPUTS
+       ESTÉTICA DE INPUTS E UX DE ERRO
        ========================================================= */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #450a0a !important; }
@@ -107,42 +107,54 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE
-        setInterval(() => {
-            // Traduz placeholders de inputs
-            document.querySelectorAll('input').forEach(el => {
+        // FUNÇÃO DE TRADUÇÃO CIRÚRGICA (Sem loops infinitos destrutivos)
+        function aplicarTraducoes(root) {
+            root.querySelectorAll('input').forEach(el => {
                 if (el.value === 'Choose file to upload' || el.value === 'Choose file') el.value = 'Escolher Arquivo...';
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
-            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Vasculha Textos Soltos no DOM
-            const walkDOM = (node) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    let text = node.textContent;
-                    if (!text || text.trim() === '') return;
+            root.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
+            root.querySelectorAll('h2').forEach(el => { if (el.innerText.trim() === 'No results found') el.innerText = 'Nenhum resultado encontrado'; });
+            root.querySelectorAll('p').forEach(el => { if (el.innerText.includes('This page yielded into no results')) el.innerText = 'Nenhum item cadastrado aqui. Adicione um novo para começar.'; });
 
-                    if (text.includes('Choose file to upload')) node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...');
-                    if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
-                    if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
-                    if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
-                    if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
-                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Adicione um novo para começar.';
-                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
-                    node.childNodes.forEach(walkDOM);
+            // Traduz erros nativos que o Django tenta colocar debaixo dos inputs
+            root.querySelectorAll('ul.errorlist li').forEach(el => {
+                let text = el.innerText;
+                if (text.includes('ManagementForm') || text.includes('adulterados') || text.includes('TOTAL_FORMS')) {
+                    el.innerText = '👆 Exclua este bloco vazio clicando na lixeira ao lado.';
                 }
-            };
-            walkDOM(document.body);
-
-            // Elimina redundância do Breadcrumb
-            document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
-                if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
-                    el.style.display = 'none';
-                    if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
+                if (text.includes('This field is required') || text.includes('obrigatório')) {
+                    el.innerText = '⚠️ Este campo é obrigatório.';
                 }
             });
-        }, 500);
+        }
+
+        // Aplica na inicialização
+        aplicarTraducoes(document);
+
+        // Limpa breadcrumbs redundantes uma vez
+        document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
+            if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
+                el.style.display = 'none';
+                if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
+            }
+        });
+
+        // Aplica nas novas linhas criadas pelo clique de "+ Adicionar"
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.addedNodes.length) {
+                    mutation.addedNodes.forEach((node) => {
+                        if (node.nodeType === Node.ELEMENT_NODE) {
+                            aplicarTraducoes(node);
+                        }
+                    });
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
 
         // =====================================================
         // UX PROFISSIONAL: VALIDAÇÃO DE CAMPOS ANTES DE ENVIAR
@@ -154,19 +166,16 @@
 
                 // Varre TODOS os blocos visíveis
                 document.querySelectorAll('.djn-item:not(.djn-empty-form)').forEach(item => {
-                    if (item.style.display === 'none') return; // Ignora se foi apagado visualmente
+                    if (item.style.display === 'none' || item.classList.contains('lixeira-aplicada')) return;
 
                     item.querySelectorAll('input[type="text"], select').forEach(input => {
                         if (input.closest('.djn-empty-form')) return;
 
-                        // Deteta se o campo é obrigatório
                         let isRequired = input.hasAttribute('required');
                         let id = input.getAttribute('id');
                         if (id) {
                             let label = document.querySelector(`label[for="${id}"]`);
-                            if (label && (label.classList.contains('required') || label.innerHTML.includes('*'))) {
-                                isRequired = true;
-                            }
+                            if (label && (label.classList.contains('required') || label.innerHTML.includes('*'))) isRequired = true;
                         }
 
                         if (isRequired) {
@@ -176,7 +185,6 @@
                                 targetToPaint = input.nextElementSibling;
                             }
 
-                            // SE ESTIVER VAZIO, CRIA O ERRO INDIVIDUAL E IMPEDE SUBMIT
                             if (!valor || valor.trim() === '') {
                                 targetToPaint.classList.add('input-error');
                                 let container = targetToPaint.parentElement;
@@ -204,6 +212,25 @@
                 }
             });
         }
+
+        // =====================================================
+        // MELHORIA DE UX PARA LIXEIRA DE ITENS JÁ SALVOS
+        // (Itens novos são apagados na perfeição pela biblioteca)
+        // =====================================================
+        document.body.addEventListener('click', function(e) {
+            let deleteLabel = e.target.closest('.delete label');
+            if (deleteLabel) {
+                // Deixa o clique passar para selecionar a checkbox nativa invisível
+                // Apenas oculta o bloco visualmente para não atrapalhar
+                let djnItem = deleteLabel.closest('.djn-item');
+                if (djnItem) {
+                    setTimeout(() => {
+                        djnItem.style.display = 'none';
+                        djnItem.classList.add('lixeira-aplicada'); // Remove do radar do validador JS
+                    }, 50);
+                }
+            }
+        });
 
         // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
