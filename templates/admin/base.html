@@ -4,116 +4,152 @@
 {% block messages %}
     {{ block.super }}
     {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
-        {% endif %}
+        <div class="px-4 pt-4 sm:px-6 lg:px-8 space-y-4">
+            {% if not request.user.clinica.assinatura_ativa %}
+                <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-red-900 to-red-700 border border-red-500 text-white shadow-lg">
+                    <div class="flex items-center space-x-4">
+                        <i class="fas fa-hand-holding-usd text-2xl"></i>
+                        <div>
+                            <span class="block font-extrabold text-base">Assinatura Suspensa</span>
+                            <span class="block text-sm opacity-90">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</span>
+                        </div>
+                    </div>
+                    <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Reativar Agora</a>
+                </div>
+            {% else %}
+                {% with plano=request.user.clinica.plano_atual %}
+                    {% if plano and plano.limite_narrativas %}
+                        {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
+                            <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-orange-900 to-orange-700 border border-orange-500 text-white shadow-lg">
+                                <div class="flex items-center space-x-4">
+                                    <i class="fas fa-rocket text-2xl"></i>
+                                    <div>
+                                        <span class="block font-extrabold text-base">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
+                                        <span class="block text-sm opacity-90">Faça upgrade do seu plano agora para criar novos conteúdos.</span>
+                                    </div>
+                                </div>
+                                <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Fazer Upgrade</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endwith %}
+            {% endif %}
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <title>Administração | Narrativas Clínicas</title>
 <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
+    /* 1. FORÇA DARK MODE BASE */
     html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
-
     #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
 
-    /* =========================================================
-       DOMANDO O QUESTIONÁRIO (NESTED ADMIN)
-       Larguras 100% bloqueiam os bugs ao adicionar novas perguntas
-       ========================================================= */
+    /* 2. CORREÇÃO DOS DROPDOWNS (Leitura Perfeita) */
+    .ts-control, .ts-wrapper.single .ts-control, input.ts-control { background-color: #374151 !important; color: #fff !important; border: 1px solid #4b5563 !important; }
+    .ts-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; color: #fff !important; }
+    .ts-dropdown .option { color: #d1d5db !important; padding: 10px !important; }
+    .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #fff !important; }
+
+    /* 3. ESTRUTURA NESTED ADMIN (Sem bugar largura e 100% organizado) */
     .djn-group {
         background: #1f2937 !important; border: 1px solid #374151 !important;
         border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important;
-        width: 100% !important; box-sizing: border-box !important;
+        width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; overflow: hidden !important;
     }
     .djn-item {
         background: #111827 !important; border: 1px solid #374151 !important;
-        border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important;
+        border-radius: 8px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 15px !important;
         position: relative !important; width: 100% !important; box-sizing: border-box !important;
     }
 
-    .djn-item h3 { color: #fff !important; font-size: 1.1rem !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; font-weight: bold !important;}
-
-    /* Esconde textos desnecessários e ícones do Django nativo */
+    /* Remove os textos nativos sujos do Django ("Pergunta:", "Opcao resposta:", etc) */
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
+    .djn-item > h3 { font-size: 0 !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; }
 
-    /* =========================================================
-       LIXEIRA PERFEITA: Um único ícone vermelho
-       ========================================================= */
-    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; }
-
-    /* Esconde a caixa de seleção e transforma a Label num Botão */
+    /* 4. A LIXEIRA INTELIGENTE (Substitui checkbox e a palavra "Remover" por ícone) */
+    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
     .djn-item > .delete input[type="checkbox"] { display: none !important; }
-
-    .djn-item > .delete label, a.inline-deletelink {
+    .djn-item > .delete label {
         background: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
-        color: transparent !important; overflow: hidden !important; text-decoration: none !important; cursor: pointer;
+        color: transparent !important; cursor: pointer !important; transition: 0.2s;
     }
-
-    .djn-item > .delete label::after, a.inline-deletelink::after {
-        content: "delete";
-        font-family: "Material Symbols Outlined", sans-serif;
-        font-weight: 400; color: white; font-size: 20px; position: absolute;
+    .djn-item > .delete label::before {
+        content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free";
+        font-weight: 900; color: white !important; font-size: 14px !important; position: absolute;
     }
+    .djn-item > .delete label:hover { background: #dc2626 !important; transform: scale(1.05); }
 
-    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; }
-
-    /* Inputs padronizados e contidos na caixa */
+    /* Estilo dos inputs dentro do formulário */
     .djn-item input[type="text"], .djn-item select {
         background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important;
         border-radius: 6px !important; height: 40px !important; width: 100% !important; padding: 0 10px !important;
-        box-sizing: border-box !important;
     }
+
+    /* Oculta texto nativo do input file */
+    input[type="file"] { color: transparent !important; }
+    input[type="file"]::file-selector-button { background-color: #374151; color: white; padding: 8px 12px; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUTOR ABSOLUTO
-        setInterval(() => {
-            // Inputs e Dropdowns
-            document.querySelectorAll('input').forEach(el => {
-                if (el.placeholder.includes('Select') || el.placeholder === 'Select value') el.placeholder = 'Selecione uma opção...';
-                if (el.placeholder === 'Type to search') el.placeholder = 'Pesquisar...';
+        // TRADUTOR AGRESSIVO E DIRETO (Varre a tela toda)
+        const traduzirTextos = () => {
+            // Dropdowns (Placeholders e opções vazias)
+            document.querySelectorAll('input.ts-control').forEach(el => {
+                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
             });
+            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Textos Soltos (Choose File)
-            document.querySelectorAll('span, label, div, a').forEach(el => {
-                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === 3) {
-                    let text = el.textContent.trim();
-                    if (text === 'Choose file to upload' || text === 'Choose file') {
-                        el.textContent = 'Escolher imagem';
-                    }
+            // Textos profundos no HTML (Welcome e Choose file)
+            const walkDOM = (node) => {
+                if (node.nodeType === 3) {
+                    let text = node.nodeValue;
+                    let modificado = false;
+
+                    if (text.includes('Choose file to upload')) { text = text.replace('Choose file to upload', 'Escolher arquivo'); modificado = true; }
+                    if (text.includes('No file chosen')) { text = text.replace('No file chosen', 'Nenhum arquivo'); modificado = true; }
+                    if (text.includes('Welcome')) { text = text.replace('Welcome', 'Olá,'); modificado = true; }
+
+                    if (modificado) node.nodeValue = text;
+                } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
+                    node.childNodes.forEach(walkDOM);
                 }
-            });
+            };
+            walkDOM(document.body);
+        };
 
-            // Limpa as inline_labels que o Django injeta (ex: "Opcao resposta:")
-            document.querySelectorAll('.inline_label').forEach(el => el.style.display = 'none');
-        }, 500);
+        // Roda a tradução na inicialização e sempre que adicionar novos campos
+        setInterval(traduzirTextos, 500);
 
-        // AÇÃO DA LIXEIRA COM CONFIRMAÇÃO NATIVA
+        // AÇÃO DA LIXEIRA (Clique interceptado com confirmação e marcação invisível)
         document.body.addEventListener('click', function(e) {
-            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
-            if (deleteBtn) {
-                if(!confirm('Tem certeza que deseja remover este item permanentemente?')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                } else {
-                    // Oculta visualmente de imediato
-                    let container = deleteBtn.closest('.djn-item');
-                    if(container) container.style.display = 'none';
+            let deleteLabel = e.target.closest('.delete label');
+            if (deleteLabel) {
+                e.preventDefault(); // Impede o clique direto
+                if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
+                    // Marca o checkbox escondido como TRUE
+                    let checkbox = deleteLabel.parentElement.querySelector('input[type="checkbox"]');
+                    if(checkbox) checkbox.checked = true;
+                    // Esconde a caixa da tela imediatamente
+                    let djnItem = deleteLabel.closest('.djn-item');
+                    if(djnItem) djnItem.style.display = 'none';
                 }
             }
         });
 
-        // Tornar linhas da tabela clicáveis
+        // Tabela clicável
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
             tr.addEventListener('click', function(e) {
                 if(['a', 'input', 'button', 'svg', 'path', 'span'].includes(e.target.tagName.toLowerCase())) return;
-                if(e.target.closest('a') || e.target.closest('button')) return;
                 let link = this.querySelector('th a') || this.querySelector('td.field-titulo a');
                 if(link) window.location.href = link.href;
             });
