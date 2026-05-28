@@ -31,44 +31,44 @@
         </div>
     </div>
 
-    <!-- ESTRUTURA PARA EMPATAR ALTURAS -->
+    <!-- ESTRUTURA FLEX PARA IGUALAR ALTURAS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
 
         <!-- Coluna Esquerda: Gráfico (Ocupa 2/3 e cresce) -->
-        <div class="lg:col-span-2 bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex flex-col">
-            <h3 class="text-lg font-bold text-white mb-4">Acessos nos últimos 30 dias</h3>
-            <div class="relative w-full flex-grow" style="min-height: 320px;">
-                <canvas id="acessosChart"></canvas>
+        <div class="lg:col-span-2 flex flex-col">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col">
+                <h3 class="text-lg font-bold text-white mb-4">Acessos nos últimos 30 dias</h3>
+                <div class="relative w-full flex-grow" style="min-height: 320px;">
+                    <canvas id="acessosChart"></canvas>
+                </div>
             </div>
         </div>
 
         <!-- Coluna Direita: Caixas (Ocupa 1/3 e divide o espaço verticalmente) -->
         <div class="flex flex-col gap-6">
 
-            <!-- Plano e Cobrança -->
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col justify-between">
-                <div>
-                    <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Plano e Cobrança</h3>
-                    <div class="flex justify-between items-center mb-6 py-2">
-                        <span class="text-sm font-medium text-gray-400">Status</span>
-                        {% if request.user.clinica.assinatura_ativa %}
-                            <span class="px-3 py-1 text-[11px] font-bold text-green-400 rounded-md uppercase border border-green-700/50 bg-green-900/50">Ativa</span>
-                        {% else %}
-                            <span class="px-3 py-1 text-[11px] font-bold text-red-400 rounded-md uppercase border border-red-700/50 bg-red-900/50">Suspensa</span>
-                        {% endif %}
-                    </div>
+            <!-- Plano e Cobrança (Removido o topo azul) -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col justify-center">
+                <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Plano e Cobrança</h3>
+                <div class="flex justify-between items-center mb-6 py-2">
+                    <span class="text-sm font-medium text-gray-400">Status</span>
+                    {% if request.user.clinica.assinatura_ativa %}
+                        <span class="px-3 py-1 text-[11px] font-bold text-green-400 rounded-md uppercase border border-green-700/50 bg-green-900/50">Ativa</span>
+                    {% else %}
+                        <span class="px-3 py-1 text-[11px] font-bold text-red-400 rounded-md uppercase border border-red-700/50 bg-red-900/50">Suspensa</span>
+                    {% endif %}
                 </div>
                 <a href="/planos/?gerenciar=1" class="w-full text-center text-white font-extrabold py-3 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-300 shadow-lg hover:-translate-y-0.5" style="background: linear-gradient(to right, #14b8a6, #2563eb);">
                     <i class="fas fa-star mr-2"></i> Gerenciar Assinatura
                 </a>
             </div>
 
-            <!-- Ações Rápidas (Espaçadas) -->
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col justify-between">
+            <!-- Ações Rápidas (Espaçadas entre si com gap-5) -->
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col justify-center">
                 <div>
                     <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Ações Rápidas</h3>
                 </div>
-                <div class="flex flex-col gap-4 mt-auto">
+                <div class="flex flex-col gap-5 mt-auto">
                     <a href="/admin/narrativa/narrativa/add/" class="flex items-center justify-center gap-3 p-3 rounded-lg text-sm font-bold text-white transition duration-200 shadow-md hover:-translate-y-0.5" style="background: linear-gradient(to right, #9333ea, #4f46e5);">
                         <i class="fas fa-plus-circle text-lg"></i><span>Nova Jornada</span>
                     </a>
