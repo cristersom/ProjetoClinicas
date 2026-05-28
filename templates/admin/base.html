@@ -89,37 +89,45 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE
+        // TRADUÇÃO VIGILANTE E CIRÚRGICA
         setInterval(() => {
-            // Inputs fakes do Unfold (Upload de Arquivo escondido por baixo)
-            document.querySelectorAll('input[type="text"][value="Choose file to upload"]').forEach(el => {
-                el.value = 'Escolher Arquivo';
-            });
+            // 1. Inputs e placeholders
             document.querySelectorAll('input, select, textarea').forEach(el => {
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Vasculha Textos Livres no DOM
-            const walkDOM = (node) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    let text = node.textContent;
-                    if (text.includes('Choose file to upload')) node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...');
-                    if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
-                    if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
-                    if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
+            // 2. Oculta textos originais de File Upload falsos
+            document.querySelectorAll('input[type="text"][value="Choose file to upload"]').forEach(el => {
+                el.value = 'Escolher Arquivo';
+            });
 
-                    // Empty states (listas vazias)
-                    if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
-                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.';
-                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
-                    node.childNodes.forEach(walkDOM);
+            // 3. Vasculha elementos de texto na tela (Avisos de vazio, Welcome, Uploads)
+            document.querySelectorAll('h2, p, span, div, a').forEach(el => {
+                // Foca apenas em elementos que contêm texto direto (evita quebrar ícones e layouts)
+                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === Node.TEXT_NODE) {
+                    let text = el.textContent;
+
+                    if (text.includes('No results found')) {
+                        el.textContent = 'Nenhum resultado encontrado';
+                    }
+                    if (text.includes('This page yielded into no results')) {
+                        el.textContent = 'Nenhum item cadastrado aqui. Crie um novo ou limpe os filtros.';
+                    }
+                    if (text.includes('Choose file to upload') || text.includes('Choose File')) {
+                        el.textContent = text.replace(/Choose [fF]ile( to upload)?/, 'Escolher Imagem');
+                    }
+                    if (text.includes('No file chosen')) {
+                        el.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
+                    }
+                    if (text.includes('Welcome')) {
+                        el.textContent = text.replace('Welcome', 'Olá,');
+                    }
                 }
-            };
-            walkDOM(document.body);
+            });
 
-            // Elimina redundância do Breadcrumb (Narrativa > Narrativas)
+            // 4. Elimina redundância do Breadcrumb (Ex: Narrativa > Narrativas)
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
                     el.style.display = 'none';
@@ -127,6 +135,20 @@
                 }
             });
         }, 500);
+
+        // AÇÃO DA LIXEIRA COM CONFIRMAÇÃO
+        document.body.addEventListener('click', function(e) {
+            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
+            if (deleteBtn) {
+                e.preventDefault();
+                if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
+                    let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
+                    if(checkbox) checkbox.checked = true;
+                    let djnItem = deleteBtn.closest('.djn-item');
+                    if(djnItem) djnItem.style.display = 'none';
+                }
+            }
+        });
 
         // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
