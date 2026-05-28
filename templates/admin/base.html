@@ -58,6 +58,10 @@
     /* Esconde o Welcome solto do Unfold */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
 
+    /* Estilização das mensagens de erro padrão do Django */
+    ul.errorlist { list-style: none !important; padding: 0 !important; margin-bottom: 10px !important; }
+    ul.errorlist li { color: #ef4444 !important; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
+
     /* =========================================================
        NESTED ADMIN (PERGUNTAS E OPÇÕES) - ESPAÇADO E LIMPO
        ========================================================= */
@@ -88,46 +92,41 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE
+        // TRADUÇÃO VIGILANTE E TRATAMENTO DE ERROS
         setInterval(() => {
             // Inputs e placeholders
             document.querySelectorAll('input, select, textarea').forEach(el => {
-                // Tira placeholders indevidos dos campos de texto (se sobrarem) e traduz os selects
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Vasculha Textos Livres no DOM
-            const walkDOM = (node) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    let text = node.textContent;
-                    if (!text || text.trim() === '') return;
+            // Substituição de avisos feios do Django
+            document.querySelectorAll('.errorlist li, .errornote, p, span, div, h2').forEach(el => {
+                let text = el.innerHTML;
+                if (!text || text.trim() === '') return;
 
-                    if (text.includes('Choose file to upload')) { node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...'); }
-                    if (text.includes('No file chosen')) { node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado'); }
-                    if (text.includes('Type to search')) { node.textContent = text.replace('Type to search', 'Pesquisar...'); }
-                    if (text.includes('Welcome')) { node.textContent = text.replace('Welcome', 'Olá,'); }
+                let mudou = false;
 
-                    // Avisos de Tela Vazia
-                    if (text.includes('No results found')) { node.textContent = text.replace('No results found', 'Nenhum resultado encontrado'); }
-                    if (text.includes('This page yielded into no results')) { node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.'; }
-
-                    // AVISO DO MANAGEMENT FORM (O SEGREDO ESTÁ AQUI)
-                    if (text.includes('ManagementForm') || text.includes('ManagementForm estão faltando')) {
-                        node.textContent = '⚠️ Erro estrutural: Você tentou salvar opções vazias. Por favor, preencha todos os campos corretamente ou clique na LIXEIRA para remover as opções não utilizadas.';
-                        if (node.parentElement) {
-                            node.parentElement.style.color = '#ef4444'; // Cor vermelha de erro
-                            node.parentElement.style.fontWeight = 'bold';
-                            node.parentElement.style.fontSize = '14px';
-                        }
-                    }
-
-                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
-                    node.childNodes.forEach(walkDOM);
+                // Transforma o erro técnico num aviso claro
+                if (text.includes('ManagementForm') || text.includes('ManagementForm estão faltando')) {
+                    el.innerHTML = '⚠️ <b>Aviso:</b> Blocos em branco detectados. Clique na LIXEIRA VERMELHA para remover as Perguntas ou Opções que não preencheu antes de salvar.';
+                    el.style.color = '#ef4444';
+                    mudou = true;
                 }
-            };
-            walkDOM(document.body);
+                if (text.includes('Por favor corrija o erro abaixo')) {
+                    el.innerHTML = text.replace('Por favor corrija o erro abaixo', 'Foram encontrados campos vazios ou blocos não preenchidos. Verifique abaixo.');
+                    mudou = true;
+                }
+
+                // Traduções de interface
+                if (text.includes('Choose file to upload')) { el.innerHTML = text.replace('Choose file to upload', 'Escolher arquivo...'); mudou = true; }
+                if (text.includes('No file chosen')) { el.innerHTML = text.replace('No file chosen', 'Nenhum arquivo selecionado'); mudou = true; }
+                if (text.includes('Type to search')) { el.innerHTML = text.replace('Type to search', 'Pesquisar...'); mudou = true; }
+                if (text.includes('Welcome')) { el.innerHTML = text.replace('Welcome', 'Olá,'); mudou = true; }
+                if (text.includes('No results found')) { el.innerHTML = text.replace('No results found', 'Nenhum resultado encontrado'); mudou = true; }
+                if (text.includes('This page yielded into no results')) { el.innerHTML = text.replace('This page yielded into no results. Create a new item or reset your filters.', 'Nenhum item cadastrado aqui. Crie um novo item para começar.'); mudou = true; }
+            });
 
             // Elimina redundância do Breadcrumb (Narrativa > Narrativas)
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
@@ -138,19 +137,33 @@
             });
         }, 500);
 
-        // Ação da Lixeira com Confirmação
+        // AÇÃO DA LIXEIRA CORRIGIDA
+        // O uso do "true" no final faz isto capturar o clique antes do nested_admin agir
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
+
             if (deleteBtn) {
-                e.preventDefault();
-                if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
-                    let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
-                    if(checkbox) checkbox.checked = true;
-                    let djnItem = deleteBtn.closest('.djn-item');
-                    if(djnItem) djnItem.style.display = 'none';
+                if(!confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
+                    // Se cancelar, paramos o clique para a linha não ser removida
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else {
+                    // Se ACEITAR:
+                    // Caso 1: Item antigo salvo na DB (usa o checkbox oculto gerado pelo Django)
+                    if (deleteBtn.tagName.toLowerCase() === 'label') {
+                        let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
+                        if(checkbox) checkbox.checked = true;
+                        let djnItem = deleteBtn.closest('.djn-item');
+                        if(djnItem) djnItem.style.display = 'none';
+                        e.preventDefault(); // Impede evento duplicado no label
+                    }
+                    // Caso 2: Novo item em branco (usa a classe nativa do nested_admin 'a.inline-deletelink')
+                    // Deixamos a ação passar livremente sem e.preventDefault(),
+                    // assim o nested_admin remove a linha do HTML e corrige as contas de TOTAL_FORMS,
+                    // evitando o erro chato do ManagementForm!
                 }
             }
-        });
+        }, true);
 
         // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
