@@ -1,0 +1,103 @@
+{% extends 'unfold/layouts/base_simple.html' %}
+{% load static %}
+
+{% block content %}
+<div class="px-4 py-8 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+    
+    <div class="mb-10 border-b border-gray-700 pb-6">
+        <h1 class="text-3xl font-extrabold text-white mb-2">Manual do Sistema</h1>
+        <p class="text-gray-400">Guia de referência para a criação de Jornadas e Cenas Clínicas.</p>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-sm mb-10 overflow-hidden">
+        <div class="p-6">
+            <h2 class="text-xl font-bold text-teal-400 mb-4 border-b border-gray-700 pb-2">Índice Rápido</h2>
+            <ul class="space-y-3 text-gray-300">
+                <li><a href="#conceitos" class="hover:text-teal-400 transition">1. Entendendo os Conceitos Base</a></li>
+                <li><a href="#fluxo" class="hover:text-teal-400 transition">2. Fluxo de Criação: O Passo a Passo</a></li>
+                <li><a href="#questionarios" class="hover:text-teal-400 transition">3. Gestão de Questionários</a></li>
+                <li><a href="#relatorios" class="hover:text-teal-400 transition">4. Relatórios e Acompanhamento</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="conceitos" class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-sm mb-8">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-book text-teal-500 mr-3"></i> 1. Entendendo os Conceitos Base</h2>
+        
+        <div class="space-y-6">
+            <div>
+                <h3 class="text-lg font-bold text-indigo-400 mb-1">O que é uma Narrativa (Jornada)?</h3>
+                <p class="text-gray-300 leading-relaxed">A Narrativa é o "guarda-chuva" de todo o seu conteúdo. Ela representa a jornada completa que o paciente vai percorrer. Uma narrativa é composta por várias etapas, que nós chamamos de <strong>Cenas</strong>.</p>
+            </div>
+            
+            <div>
+                <h3 class="text-lg font-bold text-indigo-400 mb-1">O que é uma Cena?</h3>
+                <p class="text-gray-300 leading-relaxed">Uma Cena é uma única "página" ou "etapa" dentro da sua Narrativa. Ela pode conter um texto explicativo, uma imagem ou um vídeo de apoio. No final de cada cena, você pode adicionar <strong>Escolhas</strong>, que são botões que guiam o paciente para a próxima cena.</p>
+            </div>
+            
+            <div class="bg-gray-900/50 p-4 border-l-4 border-teal-500 rounded-r-lg">
+                <p class="text-sm text-gray-400 italic"><strong>Exemplo:</strong> A Narrativa pode chamar-se "Jornada de Redução de Ansiedade". A Cena #1 seria a introdução, com um botão que leva à Cena #2 (Exercício de Respiração).</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="fluxo" class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-sm mb-8">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-project-diagram text-blue-500 mr-3"></i> 2. Fluxo de Criação: O Passo a Passo</h2>
+        
+        <ol class="space-y-6 text-gray-300 list-decimal list-inside">
+            <li class="pl-2">
+                <strong class="text-white">Crie a Narrativa Principal:</strong>
+                <p class="pl-6 mt-1 text-sm">Vá a "Narrativas", clique em "Nova Jornada" e preencha o Título e a Descrição. Salve.</p>
+            </li>
+            <li class="pl-2">
+                <strong class="text-white">Crie as suas Cenas Soltas:</strong>
+                <p class="pl-6 mt-1 text-sm">Vá a "Cenas" e crie todas as etapas da sua jornada. Vincule cada cena à Narrativa que criou no passo 1. <em>(Ainda não precisa ligar os botões de uma para a outra).</em></p>
+            </li>
+            <li class="pl-2">
+                <strong class="text-white">Ligue os Pontos (As Escolhas):</strong>
+                <p class="pl-6 mt-1 text-sm">Volte à edição da sua primeira Cena. Desça até à área de "Escolhas". Adicione o texto do botão (ex: "Avançar") e selecione qual é a "Cena de Destino" que esse botão deve abrir.</p>
+            </li>
+            <li class="pl-2">
+                <strong class="text-white">Defina a Cena Inicial:</strong>
+                <p class="pl-6 mt-1 text-sm">Vá até à sua Narrativa e selecione no campo "Cena Inicial" qual é a primeira cena que o paciente deve ver quando iniciar a jornada.</p>
+            </li>
+        </ol>
+    </div>
+
+    <div id="questionarios" class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-sm mb-8">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-clipboard-list text-purple-500 mr-3"></i> 3. Gestão de Questionários</h2>
+        <p class="text-gray-300 leading-relaxed mb-4">Os questionários são ferramentas excelentes para coletar dados, feedback ou sintomas dos seus pacientes durante a jornada.</p>
+        
+        <ul class="space-y-4 text-gray-300">
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-teal-500 mt-1 mr-3"></i>
+                <span><strong>Cena Associada:</strong> O questionário vai aparecer automaticamente no final desta cena, logo abaixo do conteúdo.</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-teal-500 mt-1 mr-3"></i>
+                <span><strong>Cena de Destino:</strong> Depois de o paciente responder e enviar o questionário, ele será redirecionado para esta cena.</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-check-circle text-teal-500 mt-1 mr-3"></i>
+                <span><strong>Múltipla Escolha vs Texto:</strong> Se escolher múltipla escolha, utilize a opção "Adicionar Opção de Resposta" para criar os botões que o paciente poderá clicar.</span>
+            </li>
+        </ul>
+    </div>
+
+    <div id="relatorios" class="bg-gray-800 p-8 rounded-xl border border-gray-700 shadow-sm">
+        <h2 class="text-2xl font-bold text-white mb-6 flex items-center"><i class="fas fa-chart-pie text-orange-500 mr-3"></i> 4. Relatórios e Acompanhamento</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-lg font-bold text-white mb-2"><i class="fas fa-chart-line text-teal-400 mr-2"></i> Relatório de Percurso</h3>
+                <p class="text-sm text-gray-400">Disponível ao lado de cada Narrativa. Mostra o volume de pacientes que passou por cada cena, ajudando a identificar onde ocorre abandono da leitura.</p>
+            </div>
+            <div class="bg-gray-900/50 p-6 rounded-lg border border-gray-700">
+                <h3 class="text-lg font-bold text-white mb-2"><i class="fas fa-comments text-purple-400 mr-2"></i> Resumo de Respostas</h3>
+                <p class="text-sm text-gray-400">Disponível ao lado de cada Questionário. Gera gráficos automáticos tipo "Pizza" ou "Barras" com a agregação de todas as respostas dos seus pacientes.</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
