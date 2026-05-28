@@ -5,24 +5,40 @@ import nested_admin
 from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
-# MONKEY PATCH COMPLETO E BLINDADO PARA O NESTED_ADMIN NO DJANGO 5.x
+# MONKEY PATCH BLINDADO (VERSÃO DEFINITIVA): NESTED_ADMIN + DJANGO 5.x
+# Resolve qualquer atributo ausente durante a validação de formulários
 # =====================================================================
-for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
-    if not hasattr(formset_class, 'initial_forms'):
-        formset_class.initial_forms = property(lambda self: getattr(self.formset, 'initial_forms', []))
-    if not hasattr(formset_class, 'get_queryset'):
-        formset_class.get_queryset = lambda self: getattr(self.formset, 'get_queryset', lambda: [])()
-    if not hasattr(formset_class, 'extra_forms'):
-        formset_class.extra_forms = property(lambda self: getattr(self.formset, 'extra_forms', []))
-    if not hasattr(formset_class, 'empty_form'):
-        formset_class.empty_form = property(lambda self: getattr(self.formset, 'empty_form', None))
-    # Added properties to fix the validation crash on empty saves
-    if not hasattr(formset_class, 'errors'):
-        formset_class.errors = property(lambda self: getattr(self.formset, 'errors', []))
-    if not hasattr(formset_class, 'total_error_count'):
-        formset_class.total_error_count = property(lambda self: getattr(self.formset, 'total_error_count', lambda: 0)())
-    if not hasattr(formset_class, 'non_form_errors'):
-        formset_class.non_form_errors = property(lambda self: getattr(self.formset, 'non_form_errors', lambda: [])())
+class NestedAdminDjango5Patch:
+    def __init__(self, attr_name, default_val):
+        self.attr_name = attr_name
+        self.default_val = default_val
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        formset = getattr(instance, 'formset', None)
+        # Se não houver formset base, ou for ele mesmo, devolve o valor padrão seguro
+        if formset is None or formset is instance:
+            return self.default_val
+        # Puxa o atributo correto do formset original do Django
+        return getattr(formset, self.attr_name, self.default_val)
+
+# Mapeamento de todas as propriedades exigidas pelo Django 5.x
+patch_attrs = {
+    'initial_forms': [],
+    'extra_forms': [],
+    'empty_form': None,
+    'errors': [],
+    'non_form_errors': [],
+    'prefix': '',
+    'total_error_count': 0,
+    'get_queryset': lambda: [],
+}
+
+for cls in (InlineAdminFormSet, NestedInlineAdminFormset):
+    for attr, default in patch_attrs.items():
+        if not hasattr(cls, attr):
+            setattr(cls, attr, NestedAdminDjango5Patch(attr, default))
 # =====================================================================
 
 # --- IMPORTAÇÕES DO UNFOLD ---
