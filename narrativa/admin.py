@@ -6,8 +6,11 @@ from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
 # MONKEY PATCH BLINDADO (VERSÃO DEFINITIVA): NESTED_ADMIN + DJANGO 5.x
-# Resolve qualquer atributo ausente durante a validação de formulários
+# Resolve QUALQUER atributo ausente durante a validação de formulários
 # =====================================================================
+class DummyPKField:
+    name = 'id'  # Engana o template do Django para não travar na busca do ID
+
 class NestedAdminDjango5Patch:
     def __init__(self, attr_name, default_val):
         self.attr_name = attr_name
@@ -17,13 +20,11 @@ class NestedAdminDjango5Patch:
         if instance is None:
             return self
         formset = getattr(instance, 'formset', None)
-        # Se não houver formset base, ou for ele mesmo, devolve o valor padrão seguro
         if formset is None or formset is instance:
             return self.default_val
-        # Puxa o atributo correto do formset original do Django
         return getattr(formset, self.attr_name, self.default_val)
 
-# Mapeamento de todas as propriedades exigidas pelo Django 5.x
+# Mapeamento absoluto de todas as propriedades exigidas pelo Django 5.x
 patch_attrs = {
     'initial_forms': [],
     'extra_forms': [],
@@ -33,6 +34,8 @@ patch_attrs = {
     'prefix': '',
     'total_error_count': 0,
     'get_queryset': lambda: [],
+    '_pk_field': DummyPKField(),
+    'is_bound': False,
 }
 
 for cls in (InlineAdminFormSet, NestedInlineAdminFormset):
