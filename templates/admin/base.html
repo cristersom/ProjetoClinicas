@@ -58,12 +58,24 @@
     /* Esconde o Welcome solto do Unfold */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
 
-    /* Estilização das mensagens de erro padrão do Django */
-    ul.errorlist { list-style: none !important; padding: 0 !important; margin-bottom: 10px !important; }
-    ul.errorlist li { color: #ef4444 !important; font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
+    /* ESTILIZAÇÃO DO ALERTA DE ERRO PARA PARECER MODERNO */
+    .errornote {
+        background-color: #7f1d1d !important;
+        color: #fca5a5 !important;
+        border: 1px solid #ef4444 !important;
+        padding: 16px !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        margin-bottom: 20px !important;
+    }
+    ul.errorlist li {
+        color: #ef4444 !important;
+        font-weight: bold !important;
+        font-size: 0.85rem !important;
+    }
 
     /* =========================================================
-       NESTED ADMIN (PERGUNTAS E OPÇÕES) - ESPAÇADO E LIMPO
+       NESTED ADMIN (PERGUNTAS E OPÇÕES)
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
@@ -92,75 +104,80 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE E TRATAMENTO DE ERROS
         setInterval(() => {
-            // Inputs e placeholders
-            document.querySelectorAll('input, select, textarea').forEach(el => {
-                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
-                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
+            // 1. TRATAMENTO INTELIGENTE DOS ERROS (O Fim do Chingamento)
+            document.querySelectorAll('.errornote').forEach(el => {
+                let text = el.innerText;
+                if (text.includes('ManagementForm') || text.includes('adulterados') || text.includes('corrija')) {
+                    el.innerText = '⚠️ Aviso: O formulário contém blocos em branco. Por favor, preencha todos os campos obrigatórios (*) ou clique na lixeira vermelha para remover as opções que não vai utilizar.';
+                }
             });
+
+            document.querySelectorAll('.errorlist li').forEach(el => {
+                if (el.innerText.includes('ManagementForm') || el.innerText.includes('adulterados')) {
+                    el.innerText = '⚠️ Preencha os campos deste bloco ou remova-o clicando na lixeira.';
+                }
+            });
+
+            // 2. Falsos Inputs de Upload do Unfold
+            document.querySelectorAll('input').forEach(el => {
+                if (el.value === 'Choose file to upload' || el.value === 'Choose file') {
+                    el.value = 'Escolher Arquivo...';
+                }
+                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) {
+                    el.placeholder = 'Selecione uma opção...';
+                }
+                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) {
+                    el.placeholder = 'Pesquisar...';
+                }
+            });
+
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Substituição de avisos feios do Django
-            document.querySelectorAll('.errorlist li, .errornote, p, span, div, h2').forEach(el => {
-                let text = el.innerHTML;
-                if (!text || text.trim() === '') return;
+            // 3. Textos do DOM (Welcome, Listas Vazias, etc)
+            const walkDOM = (node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    let text = node.textContent;
+                    if (!text || text.trim() === '') return;
 
-                let mudou = false;
-
-                // Transforma o erro técnico num aviso claro
-                if (text.includes('ManagementForm') || text.includes('ManagementForm estão faltando')) {
-                    el.innerHTML = '⚠️ <b>Aviso:</b> Blocos em branco detectados. Clique na LIXEIRA VERMELHA para remover as Perguntas ou Opções que não preencheu antes de salvar.';
-                    el.style.color = '#ef4444';
-                    mudou = true;
+                    if (text.includes('Choose file to upload')) node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...');
+                    if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
+                    if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
+                    if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
+                    if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
+                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.';
+                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
+                    node.childNodes.forEach(walkDOM);
                 }
-                if (text.includes('Por favor corrija o erro abaixo')) {
-                    el.innerHTML = text.replace('Por favor corrija o erro abaixo', 'Foram encontrados campos vazios ou blocos não preenchidos. Verifique abaixo.');
-                    mudou = true;
-                }
+            };
+            walkDOM(document.body);
 
-                // Traduções de interface
-                if (text.includes('Choose file to upload')) { el.innerHTML = text.replace('Choose file to upload', 'Escolher arquivo...'); mudou = true; }
-                if (text.includes('No file chosen')) { el.innerHTML = text.replace('No file chosen', 'Nenhum arquivo selecionado'); mudou = true; }
-                if (text.includes('Type to search')) { el.innerHTML = text.replace('Type to search', 'Pesquisar...'); mudou = true; }
-                if (text.includes('Welcome')) { el.innerHTML = text.replace('Welcome', 'Olá,'); mudou = true; }
-                if (text.includes('No results found')) { el.innerHTML = text.replace('No results found', 'Nenhum resultado encontrado'); mudou = true; }
-                if (text.includes('This page yielded into no results')) { el.innerHTML = text.replace('This page yielded into no results. Create a new item or reset your filters.', 'Nenhum item cadastrado aqui. Crie um novo item para começar.'); mudou = true; }
-            });
-
-            // Elimina redundância do Breadcrumb (Narrativa > Narrativas)
+            // 4. Breadcrumbs Redundantes
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
                     el.style.display = 'none';
-                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = '';
+                    if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
                 }
             });
-        }, 500);
 
-        // AÇÃO DA LIXEIRA CORRIGIDA
-        // O uso do "true" no final faz isto capturar o clique antes do nested_admin agir
+        }, 300);
+
+        // AÇÃO DA LIXEIRA (Com Confirmação que não bloqueia o nested_admin)
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
-
             if (deleteBtn) {
                 if(!confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
-                    // Se cancelar, paramos o clique para a linha não ser removida
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // Se ACEITAR:
-                    // Caso 1: Item antigo salvo na DB (usa o checkbox oculto gerado pelo Django)
+                    // Apenas escondemos o item se for uma label nativa (itens já salvos)
                     if (deleteBtn.tagName.toLowerCase() === 'label') {
                         let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
                         if(checkbox) checkbox.checked = true;
                         let djnItem = deleteBtn.closest('.djn-item');
                         if(djnItem) djnItem.style.display = 'none';
-                        e.preventDefault(); // Impede evento duplicado no label
+                        e.preventDefault();
                     }
-                    // Caso 2: Novo item em branco (usa a classe nativa do nested_admin 'a.inline-deletelink')
-                    // Deixamos a ação passar livremente sem e.preventDefault(),
-                    // assim o nested_admin remove a linha do HTML e corrige as contas de TOTAL_FORMS,
-                    // evitando o erro chato do ManagementForm!
                 }
             }
         }, true);
