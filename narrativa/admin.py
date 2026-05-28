@@ -5,7 +5,7 @@ import nested_admin
 from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
-# MONKEY PATCH COMPLETO: CURA DEFINITIVA PARA O NESTED_ADMIN NO DJANGO 5.x
+# MONKEY PATCH COMPLETO E BLINDADO PARA O NESTED_ADMIN NO DJANGO 5.x
 # =====================================================================
 for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
     if not hasattr(formset_class, 'initial_forms'):
@@ -16,9 +16,13 @@ for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
         formset_class.extra_forms = property(lambda self: getattr(self.formset, 'extra_forms', []))
     if not hasattr(formset_class, 'empty_form'):
         formset_class.empty_form = property(lambda self: getattr(self.formset, 'empty_form', None))
-    # ADDED: Fix for the missing 'prefix' attribute
-    if not hasattr(formset_class, 'prefix'):
-        formset_class.prefix = property(lambda self: getattr(self.formset, 'prefix', ''))
+    # Added properties to fix the validation crash on empty saves
+    if not hasattr(formset_class, 'errors'):
+        formset_class.errors = property(lambda self: getattr(self.formset, 'errors', []))
+    if not hasattr(formset_class, 'total_error_count'):
+        formset_class.total_error_count = property(lambda self: getattr(self.formset, 'total_error_count', lambda: 0)())
+    if not hasattr(formset_class, 'non_form_errors'):
+        formset_class.non_form_errors = property(lambda self: getattr(self.formset, 'non_form_errors', lambda: [])())
 # =====================================================================
 
 # --- IMPORTAÇÕES DO UNFOLD ---
