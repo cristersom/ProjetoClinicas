@@ -5,11 +5,11 @@ import nested_admin
 from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
-# MONKEY PATCH BLINDADO (VERSÃO DEFINITIVA): NESTED_ADMIN + DJANGO 5.x
-# Resolve QUALQUER atributo ausente durante a validação de formulários
+# MONKEY PATCH BLINDADO: NESTED_ADMIN + DJANGO 5.x
+# Percorre a árvore da biblioteca para não perder IDs e prefixos!
 # =====================================================================
 class DummyPKField:
-    name = 'id'  # Engana o template do Django para não travar na busca do ID
+    name = 'id'
 
 class NestedAdminDjango5Patch:
     def __init__(self, attr_name, default_val):
@@ -17,12 +17,15 @@ class NestedAdminDjango5Patch:
         self.default_val = default_val
 
     def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        formset = getattr(instance, 'formset', None)
-        if formset is None or formset is instance:
-            return self.default_val
-        return getattr(formset, self.attr_name, self.default_val)
+        if instance is None: return self
+        obj = instance
+        # Mergulha nos wrappers do nested_admin até encontrar o formset real
+        while hasattr(obj, 'formset') and obj.formset is not None:
+            obj = obj.formset
+            if hasattr(obj, self.attr_name):
+                val = getattr(obj, self.attr_name)
+                if val is not None: return val
+        return self.default_val
 
 patch_attrs = {
     'initial_forms': [],
@@ -32,7 +35,6 @@ patch_attrs = {
     'non_form_errors': [],
     'prefix': '',
     'total_error_count': 0,
-    'get_queryset': lambda: [],
     '_pk_field': DummyPKField(),
     'is_bound': False,
 }
@@ -121,7 +123,6 @@ class TenantPermissionsMixin:
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
-        # Aplica o placeholder APENAS se for um campo com empty_label (Selects)
         if formfield and hasattr(formfield, 'empty_label') and formfield.empty_label in ['---------', 'Select value', '']:
             formfield.empty_label = 'Selecione uma opção...'
         return formfield

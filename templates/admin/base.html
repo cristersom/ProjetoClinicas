@@ -55,9 +55,9 @@
     .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
     .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
-    /* UX: Esconde o Welcome solto do Unfold e os avisos feios do Django */
+    /* Removemos o Banner Feio do Django, focamos na interface de campo a campo */
+    .errornote { display: none !important; }
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
-    .errornote, ul.errorlist:not(.custom-error-list) { display: none !important; }
 
     /* =========================================================
        NESTED ADMIN - ESTRUTURA DOS BLOCOS
@@ -66,21 +66,21 @@
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item .djn-group { margin-top: 30px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 25px 0 0 0 !important; }
 
-    /* Remove lixo nativo do Django */
+    /* Remove coisas feias e inúteis do Django */
     .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
     .djn-item input[type="checkbox"][name*="DELETE"] { display: none !important; }
 
-    /* Títulos fantasmas silenciados SEM ocultar as lixeiras */
+    /* ESCONDE TÍTULOS MANTENDO AS LIXEIRAS INTACTAS */
     .djn-item > h3 { font-size: 0 !important; color: transparent !important; border: none !important; background: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; overflow: visible !important; }
     .djn-item > h3 > b, .djn-item > h3 > .inline_label, .djn-item > h3 > span:not(:has(a)) { display: none !important; }
 
     /* =========================================================
-       A LIXEIRA VERMELHA UNIVERSAL (Perguntas e Opções)
+       A LIXEIRA VERMELHA UNIVERSAL (Pergunta e Opções)
        ========================================================= */
     .djn-item .delete label,
     .djn-item a.inline-deletelink,
     .djn-item a.djn-remove-handler {
-        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 9999 !important;
+        position: absolute !important; top: 12px !important; right: 12px !important; z-index: 9999 !important;
         background: #ef4444 !important; width: 34px !important; height: 34px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
@@ -96,7 +96,7 @@
     .djn-item a.djn-remove-handler:hover { background: #dc2626 !important; transform: scale(1.05); }
 
     /* =========================================================
-       ESTÉTICA DE ERRO E INPUTS
+       ESTÉTICA DE INPUTS E UX DE ERRO
        ========================================================= */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
     .input-error { border: 2px solid #ef4444 !important; background-color: #450a0a !important; }
@@ -107,69 +107,52 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE
-        setInterval(() => {
-            // Inputs nativos
-            document.querySelectorAll('input').forEach(el => {
+        // =====================================================
+        // TRADUÇÃO DE INTERFACE (Apenas na inicialização e adições)
+        // =====================================================
+        function traduzirDOM(container = document) {
+            container.querySelectorAll('input').forEach(el => {
                 if (el.value === 'Choose file to upload' || el.value === 'Choose file') el.value = 'Escolher Arquivo...';
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
-            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
+            container.querySelectorAll('h2').forEach(el => {
+                if (el.innerText.trim() === 'No results found') el.innerText = 'Nenhum resultado encontrado';
+            });
+            container.querySelectorAll('p').forEach(el => {
+                if (el.innerText.includes('This page yielded into no results')) el.innerText = 'Nenhum item cadastrado aqui. Adicione um novo para começar.';
+            });
+        }
+        traduzirDOM(); // Executa ao abrir a tela
 
-            // Tradução Direta das Páginas de Lista Vazias ("No results found")
-            document.querySelectorAll('h2').forEach(el => {
-                if (el.innerText.trim() === 'No results found') {
-                    el.innerText = 'Nenhum resultado encontrado';
+        // Garante que a tradução de "Pesquisar..." etc aparece sempre que adiciona uma nova Pergunta
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach(mutation => {
+                if(mutation.addedNodes && mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE) traduzirDOM(node);
+                    });
                 }
             });
-            document.querySelectorAll('p').forEach(el => {
-                if (el.innerText.includes('This page yielded into no results')) {
-                    el.innerText = 'Nenhum item cadastrado aqui. Crie um novo para começar.';
-                }
-            });
-
-            // Textos Soltos no DOM
-            const walkDOM = (node) => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    let text = node.textContent;
-                    if (!text || text.trim() === '') return;
-
-                    if (text.includes('Choose file to upload')) node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...');
-                    if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
-                    if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
-                    if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
-                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
-                    node.childNodes.forEach(walkDOM);
-                }
-            };
-            walkDOM(document.body);
-
-            // Elimina redundância do Breadcrumb
-            document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
-                if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
-                    el.style.display = 'none';
-                    if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
-                }
-            });
-        }, 500);
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
 
         // =====================================================
-        // A UX DE VALIDAÇÃO REQUISITADA (IMPEDE MANAGEMENTFORM)
+        // VALIDAÇÃO LOCAL PARA EXPERIÊNCIA DO UTILIZADOR
         // =====================================================
         const mainForm = document.querySelector('#content-main form');
         if (mainForm) {
             mainForm.addEventListener('submit', function(e) {
                 let formTemErro = false;
 
-                // Varre TODOS os blocos visíveis
+                // Analisamos todos os blocos no ecrã (Perguntas e Opções)
                 document.querySelectorAll('.djn-item:not(.djn-empty-form)').forEach(item => {
-                    if (item.style.display === 'none') return; // Ignora se foi apagado
+                    if (item.style.display === 'none') return;
 
                     item.querySelectorAll('input[type="text"], select').forEach(input => {
-                        if (input.closest('.djn-empty-form')) return; // Ignora templates vazios do JS
+                        if (input.closest('.djn-empty-form')) return; // Descarta templates escondidos
 
-                        // Deteta se o campo é obrigatório
+                        // Verifica obrigatoriedade (Django define label.required ou tem um asterisco)
                         let isRequired = input.hasAttribute('required');
                         let id = input.getAttribute('id');
                         if (id) {
@@ -186,7 +169,7 @@
                                 targetToPaint = input.nextElementSibling;
                             }
 
-                            // SE ESTIVER VAZIO, CRIA O ERRO INDIVIDUAL E IMPEDE SUBMIT
+                            // SE VAZIO: IMPEDE ENVIO E AVISA
                             if (!valor || valor.trim() === '') {
                                 targetToPaint.classList.add('input-error');
                                 let container = targetToPaint.parentElement;
@@ -194,7 +177,7 @@
                                 if (!container.querySelector('.custom-field-error')) {
                                     let err = document.createElement('span');
                                     err.className = 'custom-field-error block mt-2 text-sm font-bold text-red-500';
-                                    err.innerText = '⚠️ Este campo é obrigatório. Preencha-o ou remova este bloco na lixeira.';
+                                    err.innerText = '⚠️ Este campo é obrigatório. Preencha-o ou exclua este bloco na lixeira.';
                                     container.appendChild(err);
                                 }
                                 formTemErro = true;
@@ -208,7 +191,7 @@
                 });
 
                 if (formTemErro) {
-                    e.preventDefault(); // <-- ISTO BLOQUEIA O ERRO DO MANAGEMENT FORM NO BACKEND
+                    e.preventDefault(); // Impede o envio para o servidor
                     let firstError = document.querySelector('.custom-field-error');
                     if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
@@ -216,17 +199,18 @@
         }
 
         // =====================================================
-        // AÇÃO DA LIXEIRA CORRIGIDA
+        // LIXEIRA CORRIGIDA (Amigável a novos blocos e blocos velhos)
         // =====================================================
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink') || e.target.closest('a.djn-remove-handler');
 
             if (deleteBtn) {
-                if(!confirm('Tem certeza que deseja excluir esta opção?')) {
+                if(!confirm('Tem certeza que deseja excluir este bloco?')) {
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // Itens antigos da BD -> Seleciona checkbox oculto e oculta a Div
+                    // Para blocos que já vieram do servidor, marcamos o input e ocultamos.
+                    // Os blocos recém-adicionados (que não foram salvos) serão apagados pela biblioteca normalmente.
                     if (deleteBtn.tagName.toLowerCase() === 'label') {
                         let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
                         if(checkbox) checkbox.checked = true;
@@ -239,18 +223,16 @@
                         }
                         e.preventDefault();
                     }
-                    // Itens novos inseridos pelo "+" -> O JS do Nested Admin limpa o HTML nativamente.
                 }
             }
         }, true);
 
-        // Tabelas Clicáveis
-        document.querySelectorAll('#changelist tbody tr').forEach(tr => {
-            tr.addEventListener('click', function(e) {
-                if(['a', 'input', 'button', 'svg', 'path', 'span'].includes(e.target.tagName.toLowerCase())) return;
-                let link = this.querySelector('th a') || this.querySelector('td.field-titulo a') || this.querySelector('td.field-id a');
-                if(link) window.location.href = link.href;
-            });
+        // Remove a redundância "Narrativa > Narrativas" no topo
+        document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
+            if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
+                el.style.display = 'none';
+                if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
+            }
         });
     });
 </script>
