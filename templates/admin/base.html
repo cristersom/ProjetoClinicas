@@ -1,111 +1,8 @@
-{% extends 'unfold/layouts/base.html' %}
-{% load static %}
-
-{% block messages %}
-    {{ block.super }}
-    {% if request.user.is_authenticated and not request.user.is_superuser and request.user.clinica %}
-        <div class="px-4 pt-4 sm:px-6 lg:px-8 space-y-4">
-            {% if not request.user.clinica.assinatura_ativa %}
-                <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-red-900 to-red-700 border border-red-500 text-white shadow-lg">
-                    <div class="flex items-center space-x-4">
-                        <i class="fas fa-hand-holding-usd text-2xl"></i>
-                        <div>
-                            <span class="block font-extrabold text-base">Assinatura Suspensa</span>
-                            <span class="block text-sm opacity-90">O seu plano foi cancelado ou o pagamento falhou. O acesso de edição está bloqueado.</span>
-                        </div>
-                    </div>
-                    <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Reativar Agora</a>
-                </div>
-            {% else %}
-                {% with plano=request.user.clinica.plano_atual %}
-                    {% if plano and plano.limite_narrativas %}
-                        {% if request.user.clinica.narrativa_set.count >= plano.limite_narrativas %}
-                            <div class="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-orange-900 to-orange-700 border border-orange-500 text-white shadow-lg">
-                                <div class="flex items-center space-x-4">
-                                    <i class="fas fa-rocket text-2xl"></i>
-                                    <div>
-                                        <span class="block font-extrabold text-base">Limite de Narrativas Atingido ({{ request.user.clinica.narrativa_set.count }}/{{ plano.limite_narrativas }})</span>
-                                        <span class="block text-sm opacity-90">Faça upgrade do seu plano agora para criar novos conteúdos.</span>
-                                    </div>
-                                </div>
-                                <a href="/planos/?gerenciar=1" class="bg-white hover:bg-gray-100 text-gray-900 font-extrabold px-4 py-2 rounded-lg text-xs uppercase tracking-wider transition duration-200 whitespace-nowrap shadow-md">Fazer Upgrade</a>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
-
-{% block extrahead %}
-{{ block.super }}
-<title>Administração | Narrativas Clínicas</title>
-<link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
-<style>
-    html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
-
-    #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
-    #changelist table tbody tr:hover { background-color: #374151 !important; }
-
-    /* =========================================================
-       CORREÇÃO DE LEITURA DOS DROPDOWNS (TOMSELECT)
-       ========================================================= */
-    .ts-dropdown, .ts-dropdown .option { background-color: #1f2937 !important; color: #f3f4f6 !important; }
-    .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
-    .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
-
-    /* =========================================================
-       DOMANDO O NESTED ADMIN (Perguntas e Opções)
-       ========================================================= */
-    .djn-group {
-        background: #1f2937 !important; border: 1px solid #374151 !important;
-        border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important;
-        width: 100% !important; box-sizing: border-box !important;
-    }
-
-    .djn-item {
-        background: #111827 !important; border: 1px solid #374151 !important;
-        border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important;
-        position: relative !important; width: 100% !important; box-sizing: border-box !important;
-    }
-
-    /* Espaçamento entre Pergunta e a caixa de Opções */
-    .djn-item .djn-group { margin-top: 25px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 20px 0 0 0 !important; }
-
-    /* Fim do Lixo Visual */
-    .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
-    .djn-item > h3 { display: none !important; }
-
-    /* MATA OS CHECKBOXES INÚTEIS */
-    .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
-
-    /* LIXEIRA: Botão Vermelho com Ícone */
-    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
-    .djn-item > .delete label, a.inline-deletelink {
-        background: #ef4444 !important; width: 36px !important; height: 36px !important; border-radius: 6px !important;
-        display: flex !important; align-items: center !important; justify-content: center !important;
-        color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
-    }
-    .djn-item > .delete label::before, a.inline-deletelink::before {
-        content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free";
-        font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
-    }
-    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
-
-    .djn-item input[type="text"], .djn-item select {
-        background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important;
-        border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important;
-    }
-</style>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUTOR E LIMPADOR AGRESSIVO
+        // TRADUTOR AGRESSIVO
         setInterval(() => {
             // Inputs e Dropdowns
             document.querySelectorAll('input').forEach(el => {
@@ -114,27 +11,27 @@
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Varredura de Textos Soltos
-            const walkDOM = (node) => {
-                if (node.nodeType === 3) {
-                    let text = node.nodeValue;
-                    let modificado = false;
-
-                    if (text.includes('Choose file to upload') || text.includes('Choose File')) { text = text.replace(/Choose [fF]ile( to upload)?/, 'Escolher Imagem'); modificado = true; }
-                    if (text.includes('No file chosen')) { text = text.replace('No file chosen', 'Nenhum arquivo'); modificado = true; }
-
-                    if (modificado) node.nodeValue = text;
-                } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
-                    node.childNodes.forEach(walkDOM);
+            // Traduzir o Choose file to upload
+            document.querySelectorAll('*').forEach(el => {
+                if (el.childNodes.length > 0) {
+                    el.childNodes.forEach(node => {
+                        if (node.nodeType === 3) { // Se for um texto solto
+                            if (node.nodeValue.includes('Choose file to upload') || node.nodeValue.includes('Choose File')) {
+                                node.nodeValue = 'Escolher Imagem';
+                            }
+                            if (node.nodeValue.includes('No file chosen')) {
+                                node.nodeValue = 'Nenhum arquivo';
+                            }
+                        }
+                    });
                 }
-            };
-            walkDOM(document.body);
+            });
 
-            // Elimina redundância do Breadcrumb (Ex: "Narrativa > Narrativas > João")
+            // Elimina redundância do Breadcrumb
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li, .breadcrumbs span, .breadcrumbs a').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
-                    el.style.display = 'none'; // Esconde o "Narrativa" pai
-                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = ''; // Esconde a setinha
+                    el.style.display = 'none'; 
+                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = ''; 
                 }
             });
         }, 500);
@@ -143,7 +40,7 @@
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
             if (deleteBtn) {
-                e.preventDefault();
+                e.preventDefault(); 
                 if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
                     let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
                     if(checkbox) checkbox.checked = true;
@@ -163,4 +60,3 @@
         });
     });
 </script>
-{% endblock %}

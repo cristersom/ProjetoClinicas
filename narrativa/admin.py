@@ -237,7 +237,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
 
 
 @admin.register(Questionario)
-class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
+class QuestionarioAdmin(TenantPermissionsMixin, ModelAdmin, nested_admin.NestedModelAdmin):
     list_display = ('titulo', 'cena_associada', 'links_relatorios', 'botao_excluir')
     search_fields = ('titulo', 'cena_associada__titulo', 'cena_destino__titulo')
     inlines = [PerguntaInline]

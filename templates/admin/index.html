@@ -30,44 +30,49 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        <div class="lg:col-span-2 space-y-6">
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+
+        <div class="lg:col-span-2 flex flex-col h-full">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-grow flex flex-col">
                 <h3 class="text-lg font-bold text-white mb-4">Acessos nos últimos 30 dias</h3>
-                <div class="relative h-72 w-full">
+                <div class="relative w-full flex-grow" style="min-height: 300px;">
                     <canvas id="acessosChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div>
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm relative overflow-hidden mb-8">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-teal-400 to-blue-500"></div>
-                <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Plano e Cobrança</h3>
-                <div class="flex justify-between items-center mb-6 py-2">
-                    <span class="text-sm font-medium text-gray-400">Status</span>
-                    {% if request.user.clinica.assinatura_ativa %}
-                        <span class="px-3 py-1 text-[11px] font-bold bg-green-900/50 text-green-400 rounded-md uppercase border border-green-700/50">Ativa</span>
-                    {% else %}
-                        <span class="px-3 py-1 text-[11px] font-bold bg-red-900/50 text-red-400 rounded-md uppercase border border-red-700/50">Suspensa</span>
-                    {% endif %}
+        <div class="flex flex-col h-full space-y-6">
+
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm relative overflow-hidden flex-1 flex flex-col justify-between">
+                <div class="absolute top-0 left-0 w-full h-1" style="background: linear-gradient(to right, #14b8a6, #3b82f6);"></div>
+                <div>
+                    <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Plano e Cobrança</h3>
+                    <div class="flex justify-between items-center mb-6 py-2">
+                        <span class="text-sm font-medium text-gray-400">Status</span>
+                        {% if request.user.clinica.assinatura_ativa %}
+                            <span class="px-3 py-1 text-[11px] font-bold text-green-400 rounded-md uppercase border border-green-700/50 bg-green-900/50">Ativa</span>
+                        {% else %}
+                            <span class="px-3 py-1 text-[11px] font-bold text-red-400 rounded-md uppercase border border-red-700/50 bg-red-900/50">Suspensa</span>
+                        {% endif %}
+                    </div>
                 </div>
-                <a href="/planos/?gerenciar=1" class="w-full text-center inline-block bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-400 hover:to-blue-500 text-white font-extrabold py-3 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-300 shadow-lg transform hover:-translate-y-0.5">
+                <a href="/planos/?gerenciar=1" class="w-full text-center inline-block text-white font-extrabold py-3 px-4 rounded-lg text-sm uppercase tracking-wider transition duration-300 shadow-lg transform hover:-translate-y-0.5" style="background: linear-gradient(to right, #14b8a6, #2563eb);">
                     <i class="fas fa-star mr-2"></i> Gerenciar Assinatura
                 </a>
             </div>
 
-            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm flex-1 flex flex-col justify-between">
                 <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Ações Rápidas</h3>
-                <div class="space-y-3">
-                    <a href="/admin/narrativa/narrativa/add/" class="flex items-center justify-center space-x-3 p-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-lg text-sm font-bold text-white transition duration-200 shadow-md">
+                <div class="space-y-3 mt-auto">
+                    <a href="/admin/narrativa/narrativa/add/" class="flex items-center justify-center space-x-3 p-3 rounded-lg text-sm font-bold text-white transition duration-200 shadow-md" style="background: linear-gradient(to right, #9333ea, #4f46e5);">
                         <i class="fas fa-plus-circle text-lg"></i><span>Nova Jornada</span>
                     </a>
-                    <a href="/admin/narrativa/cena/add/" class="flex items-center justify-center space-x-3 p-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-lg text-sm font-bold text-white transition duration-200 shadow-md">
+                    <a href="/admin/narrativa/cena/add/" class="flex items-center justify-center space-x-3 p-3 rounded-lg text-sm font-bold text-white transition duration-200 shadow-md" style="background: linear-gradient(to right, #059669, #0d9488);">
                         <i class="fas fa-desktop text-lg"></i><span>Criar Cena</span>
                     </a>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
