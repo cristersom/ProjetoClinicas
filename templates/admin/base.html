@@ -59,28 +59,27 @@
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
 
     /* =========================================================
-       NESTED ADMIN (PERGUNTAS E OPÇÕES) - LIXEIRAS NATIVAS
+       NESTED ADMIN (PERGUNTAS E OPÇÕES)
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
 
     .djn-item .djn-group { margin-top: 30px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 25px 0 0 0 !important; }
 
-    /* Oculta os checkboxes de delete originais e labels inúteis */
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link, .djn-item > h3 { display: none !important; }
-    .djn-item > .delete input[type="checkbox"], .djn-item > .delete > label { display: none !important; }
+    .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
 
-    /* Estiliza o botão "Remover" que vem com o nested_admin para que a exclusão funcione nativamente */
-    .djn-delete-handler, .inline-deletelink {
+    /* A LIXEIRA VERMELHA */
+    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
+    .djn-item > .delete label, a.inline-deletelink {
         background: #ef4444 !important; width: 36px !important; height: 36px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
-        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important;
     }
-    .djn-delete-handler::before, .inline-deletelink::before {
+    .djn-item > .delete label::before, a.inline-deletelink::before {
         content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free"; font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
     }
-    .djn-delete-handler:hover, .inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
+    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
 
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; }
 </style>
@@ -89,54 +88,59 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO VIGILANTE E CIRÚRGICA
+        // TRADUÇÃO CIRÚRGICA E DEFINITIVA
         setInterval(() => {
-            // 1. Inputs e placeholders
-            document.querySelectorAll('input, select, textarea').forEach(el => {
-                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
-                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
-            });
-            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // 2. Oculta textos originais de File Upload falsos
-            document.querySelectorAll('input[type="text"][value="Choose file to upload"]').forEach(el => {
-                el.value = 'Escolher Arquivo';
-            });
-
-            // 3. Vasculha elementos de texto na tela (Avisos de vazio, Welcome, Uploads)
-            document.querySelectorAll('h2, p, span, div, a').forEach(el => {
-                // Foca apenas em elementos que contêm texto direto (evita quebrar ícones e layouts)
-                if (el.childNodes.length === 1 && el.childNodes[0].nodeType === Node.TEXT_NODE) {
-                    let text = el.textContent;
-
-                    if (text.includes('No results found')) {
-                        el.textContent = 'Nenhum resultado encontrado';
-                    }
-                    if (text.includes('This page yielded into no results')) {
-                        el.textContent = 'Nenhum item cadastrado aqui. Crie um novo ou limpe os filtros.';
-                    }
-                    if (text.includes('Choose file to upload') || text.includes('Choose File')) {
-                        el.textContent = text.replace(/Choose [fF]ile( to upload)?/, 'Escolher Imagem');
-                    }
-                    if (text.includes('No file chosen')) {
-                        el.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
-                    }
-                    if (text.includes('Welcome')) {
-                        el.textContent = text.replace('Welcome', 'Olá,');
-                    }
+            // 1. Falsos Inputs de Upload do Unfold (Eles usam um input text bloqueado com esse value)
+            document.querySelectorAll('input').forEach(el => {
+                if (el.value === 'Choose file to upload' || el.value === 'Choose file') {
+                    el.value = 'Escolher Arquivo...';
+                }
+                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) {
+                    el.placeholder = 'Selecione uma opção...';
+                }
+                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) {
+                    el.placeholder = 'Pesquisar...';
                 }
             });
 
-            // 4. Elimina redundância do Breadcrumb (Ex: Narrativa > Narrativas)
+            // 2. Avisos de Listas Vazias, Welcome e Nenhum Arquivo
+            document.querySelectorAll('h1, h2, h3, p, span, div').forEach(el => {
+                let text = el.innerText;
+                if (!text) return; // Ignora elementos sem texto
+                text = text.trim();
+
+                // Usamos verificação exata para ser rápido e não bugar HTML
+                if (text === 'No results found') {
+                    el.innerText = 'Nenhum resultado encontrado';
+                }
+                else if (text === 'This page yielded into no results. Create a new item or reset your filters.') {
+                    el.innerText = 'Nenhum item cadastrado aqui. Crie um novo item ou limpe os seus filtros.';
+                }
+                else if (text === 'No file chosen') {
+                    el.innerText = 'Nenhum arquivo selecionado';
+                }
+                else if (text.startsWith('Welcome ')) {
+                    el.innerText = text.replace('Welcome ', 'Olá, ');
+                }
+            });
+
+            // 3. Dropdowns Vazios
+            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => {
+                el.innerText = 'Nenhum resultado';
+            });
+
+            // 4. Breadcrumbs Redundantes (Narrativa > Narrativas)
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
                     el.style.display = 'none';
-                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = '';
+                    if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
                 }
             });
-        }, 500);
 
-        // AÇÃO DA LIXEIRA COM CONFIRMAÇÃO
+        }, 300); // Roda a cada 300ms, leve e impercetível
+
+        // AÇÃO DA LIXEIRA (Com Confirmação)
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
             if (deleteBtn) {
