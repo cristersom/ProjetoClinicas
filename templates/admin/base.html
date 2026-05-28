@@ -55,7 +55,9 @@
     .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
     .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
+    /* UX: Esconde o Welcome solto do Unfold e os avisos feios do Django */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
+    .errornote, ul.errorlist:not(.custom-error-list) { display: none !important; }
 
     /* =========================================================
        NESTED ADMIN - ESTRUTURA DOS BLOCOS
@@ -66,15 +68,16 @@
 
     /* Remove lixo nativo do Django */
     .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
+    .djn-item input[type="checkbox"][name*="DELETE"] { display: none !important; }
 
-    /* Esconde apenas os textos dos títulos feios, mantendo o container para os botões */
+    /* Títulos fantasmas silenciados SEM ocultar as lixeiras */
     .djn-item > h3 { font-size: 0 !important; color: transparent !important; border: none !important; background: transparent !important; margin: 0 !important; padding: 0 !important; height: 0 !important; overflow: visible !important; }
-    .djn-item > h3 > b, .djn-item > h3 > .inline_label { display: none !important; }
+    .djn-item > h3 > b, .djn-item > h3 > .inline_label, .djn-item > h3 > span:not(:has(a)) { display: none !important; }
 
     /* =========================================================
-       A LIXEIRA VERMELHA UNIVERSAL (Aparece nativamente em todos os blocos)
+       A LIXEIRA VERMELHA UNIVERSAL (Perguntas e Opções)
        ========================================================= */
-    .djn-item .delete,
+    .djn-item .delete label,
     .djn-item a.inline-deletelink,
     .djn-item a.djn-remove-handler {
         position: absolute !important; top: 15px !important; right: 15px !important; z-index: 9999 !important;
@@ -83,29 +86,30 @@
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
         font-size: 0 !important; border: none !important; opacity: 1 !important; visibility: visible !important;
     }
-
-    .djn-item .delete::before,
+    .djn-item .delete label::before,
     .djn-item a.inline-deletelink::before,
     .djn-item a.djn-remove-handler::before {
         content: "\f2ed" !important; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free" !important; font-weight: 900 !important; color: white !important; font-size: 15px !important; position: absolute;
     }
-
-    .djn-item .delete:hover,
+    .djn-item .delete label:hover,
     .djn-item a.inline-deletelink:hover,
     .djn-item a.djn-remove-handler:hover { background: #dc2626 !important; transform: scale(1.05); }
 
-    /* Estilos dos campos de texto e erro padrão do Django */
+    /* =========================================================
+       ESTÉTICA DE ERRO E INPUTS
+       ========================================================= */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
-    ul.errorlist { padding: 0 !important; margin: 4px 0 10px 0 !important; list-style: none !important; }
-    ul.errorlist li { color: #ef4444 !important; font-size: 0.85rem !important; font-weight: 700 !important; }
+    .input-error { border: 2px solid #ef4444 !important; background-color: #450a0a !important; }
+    .ts-wrapper.input-error .ts-control { border: 2px solid #ef4444 !important; background-color: #450a0a !important; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // Apenas traduções estéticas puras. Sem interferir na validação ou lixeiras.
+        // TRADUÇÃO VIGILANTE
         setInterval(() => {
+            // Inputs nativos
             document.querySelectorAll('input').forEach(el => {
                 if (el.value === 'Choose file to upload' || el.value === 'Choose file') el.value = 'Escolher Arquivo...';
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
@@ -113,6 +117,19 @@
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
+            // Tradução Direta das Páginas de Lista Vazias ("No results found")
+            document.querySelectorAll('h2').forEach(el => {
+                if (el.innerText.trim() === 'No results found') {
+                    el.innerText = 'Nenhum resultado encontrado';
+                }
+            });
+            document.querySelectorAll('p').forEach(el => {
+                if (el.innerText.includes('This page yielded into no results')) {
+                    el.innerText = 'Nenhum item cadastrado aqui. Crie um novo para começar.';
+                }
+            });
+
+            // Textos Soltos no DOM
             const walkDOM = (node) => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     let text = node.textContent;
@@ -122,8 +139,6 @@
                     if (text.includes('No file chosen')) node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado');
                     if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
                     if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
-                    if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
-                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Adicione um novo para começar.';
                 } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
                     node.childNodes.forEach(walkDOM);
                 }
@@ -138,6 +153,96 @@
                 }
             });
         }, 500);
+
+        // =====================================================
+        // A UX DE VALIDAÇÃO REQUISITADA (IMPEDE MANAGEMENTFORM)
+        // =====================================================
+        const mainForm = document.querySelector('#content-main form');
+        if (mainForm) {
+            mainForm.addEventListener('submit', function(e) {
+                let formTemErro = false;
+
+                // Varre TODOS os blocos visíveis
+                document.querySelectorAll('.djn-item:not(.djn-empty-form)').forEach(item => {
+                    if (item.style.display === 'none') return; // Ignora se foi apagado
+
+                    item.querySelectorAll('input[type="text"], select').forEach(input => {
+                        if (input.closest('.djn-empty-form')) return; // Ignora templates vazios do JS
+
+                        // Deteta se o campo é obrigatório
+                        let isRequired = input.hasAttribute('required');
+                        let id = input.getAttribute('id');
+                        if (id) {
+                            let label = document.querySelector(`label[for="${id}"]`);
+                            if (label && (label.classList.contains('required') || label.innerHTML.includes('*'))) {
+                                isRequired = true;
+                            }
+                        }
+
+                        if (isRequired) {
+                            let valor = input.value;
+                            let targetToPaint = input;
+                            if (input.tagName === 'SELECT' && input.nextElementSibling && input.nextElementSibling.classList.contains('ts-wrapper')) {
+                                targetToPaint = input.nextElementSibling;
+                            }
+
+                            // SE ESTIVER VAZIO, CRIA O ERRO INDIVIDUAL E IMPEDE SUBMIT
+                            if (!valor || valor.trim() === '') {
+                                targetToPaint.classList.add('input-error');
+                                let container = targetToPaint.parentElement;
+
+                                if (!container.querySelector('.custom-field-error')) {
+                                    let err = document.createElement('span');
+                                    err.className = 'custom-field-error block mt-2 text-sm font-bold text-red-500';
+                                    err.innerText = '⚠️ Este campo é obrigatório. Preencha-o ou remova este bloco na lixeira.';
+                                    container.appendChild(err);
+                                }
+                                formTemErro = true;
+                            } else {
+                                targetToPaint.classList.remove('input-error');
+                                let err = targetToPaint.parentElement.querySelector('.custom-field-error');
+                                if (err) err.remove();
+                            }
+                        }
+                    });
+                });
+
+                if (formTemErro) {
+                    e.preventDefault(); // <-- ISTO BLOQUEIA O ERRO DO MANAGEMENT FORM NO BACKEND
+                    let firstError = document.querySelector('.custom-field-error');
+                    if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        }
+
+        // =====================================================
+        // AÇÃO DA LIXEIRA CORRIGIDA
+        // =====================================================
+        document.body.addEventListener('click', function(e) {
+            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink') || e.target.closest('a.djn-remove-handler');
+
+            if (deleteBtn) {
+                if(!confirm('Tem certeza que deseja excluir esta opção?')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                } else {
+                    // Itens antigos da BD -> Seleciona checkbox oculto e oculta a Div
+                    if (deleteBtn.tagName.toLowerCase() === 'label') {
+                        let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
+                        if(checkbox) checkbox.checked = true;
+
+                        let djnItem = deleteBtn.closest('.djn-item');
+                        if(djnItem) {
+                            djnItem.style.display = 'none';
+                            djnItem.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+                            djnItem.querySelectorAll('.custom-field-error').forEach(el => el.remove());
+                        }
+                        e.preventDefault();
+                    }
+                    // Itens novos inseridos pelo "+" -> O JS do Nested Admin limpa o HTML nativamente.
+                }
+            }
+        }, true);
 
         // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
