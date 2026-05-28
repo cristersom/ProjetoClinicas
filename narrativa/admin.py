@@ -1,7 +1,9 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
+from nested_admin.nested import NestedInlineAdminFormset # Importado para o Patch
 
+# --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
@@ -21,11 +23,16 @@ import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
 
-# --- CORREÇÃO DO NOME "OBJECT(232)" PARA ALGO HUMANO ---
+# =====================================================================
+# MONKEY PATCH: CURA DEFINITIVA PARA O ERRO DO NESTED_ADMIN NO DJANGO 5
+# =====================================================================
+if not hasattr(NestedInlineAdminFormset, 'initial_forms'):
+    NestedInlineAdminFormset.initial_forms = property(lambda self: getattr(self.formset, 'initial_forms', []))
+
+# --- CORREÇÃO DO NOME "OBJECT" PARA ALGO HUMANO ---
 def sessao_str(self):
     return f"Sessão: {self.session_key[:8]}" if self.session_key else f"Sessão ID: {self.id}"
 SessaoPaciente.__str__ = sessao_str
-
 
 class SuperUserOnlyMixin:
     def has_module_permission(self, request): return request.user.is_superuser
@@ -372,7 +379,6 @@ class QuestionarioAdmin(TenantPermissionsMixin, ModelAdmin, nested_admin.NestedM
             'questionario': questionario,
             'dados_do_relatorio': dados
         })
-
 
 class RespostaResource(resources.ModelResource):
     class Meta:
