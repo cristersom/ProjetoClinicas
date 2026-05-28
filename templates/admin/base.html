@@ -55,86 +55,62 @@
     .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
     .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
-    /* Esconde o Welcome solto do Unfold */
+    /* Esconde o Welcome solto do Unfold e Avisos Genéricos Feios do Backend */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
-
-    /* ESTILIZAÇÃO DO ALERTA DE ERRO PARA PARECER MODERNO */
-    .errornote {
-        background-color: #7f1d1d !important;
-        color: #fca5a5 !important;
-        border: 1px solid #ef4444 !important;
-        padding: 16px !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        margin-bottom: 20px !important;
-    }
-    ul.errorlist li {
-        color: #ef4444 !important;
-        font-weight: bold !important;
-        font-size: 0.85rem !important;
-    }
+    .errornote, ul.errorlist:not(.custom-field-error) { display: none !important; }
 
     /* =========================================================
-       NESTED ADMIN (PERGUNTAS E OPÇÕES)
+       NESTED ADMIN (PERGUNTAS E OPÇÕES) - ESTRUTURA
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
-    .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
+    .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
 
+    /* Sub-blocos recuados (Opções de Resposta) */
     .djn-item .djn-group { margin-top: 30px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 25px 0 0 0 !important; }
 
-    .inline_label, .datetimeshortcuts, .related-widget-wrapper-link, .djn-item > h3 { display: none !important; }
+    /* Remove textos sujos e títulos fantasma para não quebrar o layout */
+    .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
+    .djn-item > h3 { border: none !important; margin: 0 !important; padding: 0 !important; background: transparent !important; height: 0 !important; overflow: visible !important; }
+    .djn-item > h3 > b, .djn-item > h3 > .inline_label { display: none !important; }
     .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
 
-    /* A LIXEIRA VERMELHA */
-    .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
-    .djn-item > .delete label, a.inline-deletelink {
-        background: #ef4444 !important; width: 36px !important; height: 36px !important; border-radius: 6px !important;
+    /* A LIXEIRA NATIVA FIXADA NO CANTO (Garante que Pergunta e Opção Resposta têm o botão visível) */
+    .djn-item > .delete label,
+    a.inline-deletelink {
+        position: absolute !important; top: 15px !important; right: 15px !important; z-index: 999 !important;
+        background: #ef4444 !important; width: 34px !important; height: 34px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
+        font-size: 0 !important; overflow: hidden !important;
     }
-    .djn-item > .delete label::before, a.inline-deletelink::before {
+    .djn-item > .delete label::before,
+    a.inline-deletelink::before {
         content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free"; font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
     }
-    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
+    .djn-item > .delete label:hover,
+    a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
 
-    .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; }
+    /* Campos de texto */
+    .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
+
+    /* Estilo do erro local forçado pelo JavaScript */
+    .input-error { border: 2px solid #ef4444 !important; background-color: #450a0a !important; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
+        // TRADUÇÃO VIGILANTE DE TEXTOS
         setInterval(() => {
-            // 1. TRATAMENTO INTELIGENTE DOS ERROS (O Fim do Chingamento)
-            document.querySelectorAll('.errornote').forEach(el => {
-                let text = el.innerText;
-                if (text.includes('ManagementForm') || text.includes('adulterados') || text.includes('corrija')) {
-                    el.innerText = '⚠️ Aviso: O formulário contém blocos em branco. Por favor, preencha todos os campos obrigatórios (*) ou clique na lixeira vermelha para remover as opções que não vai utilizar.';
-                }
-            });
-
-            document.querySelectorAll('.errorlist li').forEach(el => {
-                if (el.innerText.includes('ManagementForm') || el.innerText.includes('adulterados')) {
-                    el.innerText = '⚠️ Preencha os campos deste bloco ou remova-o clicando na lixeira.';
-                }
-            });
-
-            // 2. Falsos Inputs de Upload do Unfold
             document.querySelectorAll('input').forEach(el => {
-                if (el.value === 'Choose file to upload' || el.value === 'Choose file') {
-                    el.value = 'Escolher Arquivo...';
-                }
-                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) {
-                    el.placeholder = 'Selecione uma opção...';
-                }
-                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) {
-                    el.placeholder = 'Pesquisar...';
-                }
+                if (el.value === 'Choose file to upload' || el.value === 'Choose file') el.value = 'Escolher Arquivo...';
+                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
+                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
 
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // 3. Textos do DOM (Welcome, Listas Vazias, etc)
             const walkDOM = (node) => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     let text = node.textContent;
@@ -145,36 +121,92 @@
                     if (text.includes('Type to search')) node.textContent = text.replace('Type to search', 'Pesquisar...');
                     if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
                     if (text.includes('No results found')) node.textContent = text.replace('No results found', 'Nenhum resultado encontrado');
-                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.';
+                    if (text.includes('This page yielded into no results')) node.textContent = 'Nenhum item cadastrado aqui. Adicione um novo para começar.';
                 } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
                     node.childNodes.forEach(walkDOM);
                 }
             };
             walkDOM(document.body);
 
-            // 4. Breadcrumbs Redundantes
+            // Elimina redundância do Breadcrumb
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
                     el.style.display = 'none';
                     if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
                 }
             });
+        }, 500);
 
-        }, 300);
+        // =====================================================
+        // EXPERIÊNCIA DE UX: VALIDAÇÃO DE CAMPOS VAZIOS NA HORA
+        // =====================================================
+        const mainForm = document.querySelector('#content-main form');
+        if (mainForm) {
+            mainForm.addEventListener('submit', function(e) {
+                let formTemErro = false;
 
-        // AÇÃO DA LIXEIRA (Com Confirmação que não bloqueia o nested_admin)
+                // Varre apenas as labels marcadas como 'required' (obrigatórias pelo Django)
+                document.querySelectorAll('label.required').forEach(label => {
+                    let inputId = label.getAttribute('for');
+                    if (!inputId) return;
+
+                    let input = document.getElementById(inputId);
+                    if (input && input.offsetParent !== null) { // Se o input existe e está visível
+
+                        let djnItem = input.closest('.djn-item');
+                        // Ignora inputs de blocos de template vazios ou apagados pela lixeira
+                        if (djnItem && (djnItem.classList.contains('djn-empty-form') || djnItem.style.display === 'none')) {
+                            return;
+                        }
+
+                        // Se o valor estiver vazio, bloqueamos o envio e mostramos erro sob o input
+                        if (!input.value.trim()) {
+                            input.classList.add('input-error');
+
+                            // Adiciona o texto de erro individual debaixo do campo se não existir
+                            if (!input.parentElement.querySelector('.custom-field-error')) {
+                                let err = document.createElement('span');
+                                err.className = 'custom-field-error block mt-2 text-sm font-bold text-red-500';
+                                err.innerText = '⚠️ Este campo é obrigatório. Preencha-o ou remova este bloco na lixeira.';
+                                input.parentElement.appendChild(err);
+                            }
+                            formTemErro = true;
+                        } else {
+                            // Limpa os erros se estiver preenchido
+                            input.classList.remove('input-error');
+                            let err = input.parentElement.querySelector('.custom-field-error');
+                            if (err) err.remove();
+                        }
+                    }
+                });
+
+                if (formTemErro) {
+                    e.preventDefault(); // Impede o ecrã branco ou avisos feios do ManagementForm!
+                    // Desliza a tela suavemente para o primeiro erro encontrado
+                    let firstError = document.querySelector('.custom-field-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+        }
+
+        // LIXEIRA (Preserva a ação nativa do nested_admin mas com confirmação em Português)
         document.body.addEventListener('click', function(e) {
-            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
-            if (deleteBtn) {
-                if(!confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
+            let deleteLabel = e.target.closest('.delete label');
+            let deleteLink = e.target.closest('a.inline-deletelink');
+            let clickedTrash = deleteLabel || deleteLink;
+
+            if (clickedTrash) {
+                if(!confirm('Tem certeza que deseja excluir esta opção?')) {
                     e.preventDefault();
                     e.stopPropagation();
                 } else {
-                    // Apenas escondemos o item se for uma label nativa (itens já salvos)
-                    if (deleteBtn.tagName.toLowerCase() === 'label') {
-                        let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
+                    // Se for um item antigo gravado na DB, escondemos visualmente e ativamos o checkbox invisível
+                    if (deleteLabel) {
+                        let checkbox = deleteLabel.parentElement.querySelector('input[type="checkbox"]');
                         if(checkbox) checkbox.checked = true;
-                        let djnItem = deleteBtn.closest('.djn-item');
+                        let djnItem = deleteLabel.closest('.djn-item');
                         if(djnItem) djnItem.style.display = 'none';
                         e.preventDefault();
                     }
