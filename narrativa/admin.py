@@ -16,6 +16,9 @@ for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
         formset_class.extra_forms = property(lambda self: getattr(self.formset, 'extra_forms', []))
     if not hasattr(formset_class, 'empty_form'):
         formset_class.empty_form = property(lambda self: getattr(self.formset, 'empty_form', None))
+    # ADDED: Fix for the missing 'prefix' attribute
+    if not hasattr(formset_class, 'prefix'):
+        formset_class.prefix = property(lambda self: getattr(self.formset, 'prefix', ''))
 # =====================================================================
 
 # --- IMPORTAÇÕES DO UNFOLD ---
@@ -350,9 +353,9 @@ class QuestionarioAdmin(TenantPermissionsMixin, ModelAdmin, nested_admin.NestedM
                         c.update(list(rp.values_list('texto_resposta', flat=True)))
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({'perfil_titulo': pf['titulo'], 'total_respostas': rp.count(), 'dados_grafico': {'labels': json.dumps(list(c.keys())), 'data': json.dumps(list(c.values())), 'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'} })
         return render(request, 'admin/relatorio_questionario_agregado.html', {
-            **self.admin_site.each_context(request),
-            'questionario': questionario,
-            'dados_comparativos': dados_comparativos,
+            **self.admin_site.each_context(request), 
+            'questionario': questionario, 
+            'dados_comparativos': dados_comparativos, 
             'todos_os_perfis': todos_os_perfis
         })
 
@@ -384,8 +387,8 @@ class QuestionarioAdmin(TenantPermissionsMixin, ModelAdmin, nested_admin.NestedM
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
         return render(request, 'admin/relatorio_questionario_detalhe.html', {
-            **self.admin_site.each_context(request),
-            'questionario': questionario,
+            **self.admin_site.each_context(request), 
+            'questionario': questionario, 
             'dados_do_relatorio': dados
         })
 
