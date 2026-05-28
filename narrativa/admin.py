@@ -2,12 +2,23 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.admin.helpers import InlineAdminFormSet
 import nested_admin
+from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
-# MONKEY PATCH: CURA DEFINITIVA PARA O ERRO DO NESTED_ADMIN NO DJANGO 5
+# MONKEY PATCH DUPLO: CURA DEFINITIVA PARA O NESTED_ADMIN NO DJANGO 5.x
 # =====================================================================
+# Corrige o InlineAdminFormSet nativo (se afetado)
 if not hasattr(InlineAdminFormSet, 'initial_forms'):
     InlineAdminFormSet.initial_forms = property(lambda self: getattr(self.formset, 'initial_forms', []))
+if not hasattr(InlineAdminFormSet, 'get_queryset'):
+    InlineAdminFormSet.get_queryset = lambda self: getattr(self.formset, 'get_queryset', lambda: [])()
+
+# Corrige o Formset específico do nested_admin
+if not hasattr(NestedInlineAdminFormset, 'initial_forms'):
+    NestedInlineAdminFormset.initial_forms = property(lambda self: getattr(self.formset, 'initial_forms', []))
+if not hasattr(NestedInlineAdminFormset, 'get_queryset'):
+    NestedInlineAdminFormset.get_queryset = lambda self: getattr(self.formset, 'get_queryset', lambda: [])()
+# =====================================================================
 
 # --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
