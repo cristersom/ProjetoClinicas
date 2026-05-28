@@ -5,7 +5,7 @@ import nested_admin
 from nested_admin.nested import NestedInlineAdminFormset
 
 # =====================================================================
-# MONKEY PATCH TRIPLO: CURA DEFINITIVA PARA O NESTED_ADMIN NO DJANGO 5.x
+# MONKEY PATCH COMPLETO: CURA DEFINITIVA PARA O NESTED_ADMIN NO DJANGO 5.x
 # =====================================================================
 for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
     if not hasattr(formset_class, 'initial_forms'):
@@ -14,6 +14,8 @@ for formset_class in [InlineAdminFormSet, NestedInlineAdminFormset]:
         formset_class.get_queryset = lambda self: getattr(self.formset, 'get_queryset', lambda: [])()
     if not hasattr(formset_class, 'extra_forms'):
         formset_class.extra_forms = property(lambda self: getattr(self.formset, 'extra_forms', []))
+    if not hasattr(formset_class, 'empty_form'):
+        formset_class.empty_form = property(lambda self: getattr(self.formset, 'empty_form', None))
 # =====================================================================
 
 # --- IMPORTAÇÕES DO UNFOLD ---
