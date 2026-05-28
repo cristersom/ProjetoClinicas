@@ -59,7 +59,7 @@
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
 
     /* =========================================================
-       NESTED ADMIN (PERGUNTAS E OPÇÕES)
+       NESTED ADMIN (PERGUNTAS E OPÇÕES) - ESPAÇADO E LIMPO
        ========================================================= */
     .djn-group { background: #1f2937 !important; border: 1px solid #374151 !important; border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important; width: 100% !important; box-sizing: border-box !important; }
     .djn-item { background: #111827 !important; border: 1px solid #374151 !important; border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important; position: relative !important; width: 100% !important; box-sizing: border-box !important; }
@@ -88,59 +88,57 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUÇÃO CIRÚRGICA E DEFINITIVA
+        // TRADUÇÃO VIGILANTE
         setInterval(() => {
-
-            // 1. Falsos Inputs de Upload do Unfold (Eles usam um input text bloqueado com esse value)
-            document.querySelectorAll('input').forEach(el => {
-                if (el.value === 'Choose file to upload' || el.value === 'Choose file') {
-                    el.value = 'Escolher Arquivo...';
-                }
-                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) {
-                    el.placeholder = 'Selecione uma opção...';
-                }
-                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) {
-                    el.placeholder = 'Pesquisar...';
-                }
+            // Inputs e placeholders
+            document.querySelectorAll('input, select, textarea').forEach(el => {
+                // Tira placeholders indevidos dos campos de texto (se sobrarem) e traduz os selects
+                if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
+                if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
+            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // 2. Avisos de Listas Vazias, Welcome e Nenhum Arquivo
-            document.querySelectorAll('h1, h2, h3, p, span, div').forEach(el => {
-                let text = el.innerText;
-                if (!text) return; // Ignora elementos sem texto
-                text = text.trim();
+            // Vasculha Textos Livres no DOM
+            const walkDOM = (node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    let text = node.textContent;
+                    if (!text || text.trim() === '') return;
 
-                // Usamos verificação exata para ser rápido e não bugar HTML
-                if (text === 'No results found') {
-                    el.innerText = 'Nenhum resultado encontrado';
-                }
-                else if (text === 'This page yielded into no results. Create a new item or reset your filters.') {
-                    el.innerText = 'Nenhum item cadastrado aqui. Crie um novo item ou limpe os seus filtros.';
-                }
-                else if (text === 'No file chosen') {
-                    el.innerText = 'Nenhum arquivo selecionado';
-                }
-                else if (text.startsWith('Welcome ')) {
-                    el.innerText = text.replace('Welcome ', 'Olá, ');
-                }
-            });
+                    if (text.includes('Choose file to upload')) { node.textContent = text.replace('Choose file to upload', 'Escolher arquivo...'); }
+                    if (text.includes('No file chosen')) { node.textContent = text.replace('No file chosen', 'Nenhum arquivo selecionado'); }
+                    if (text.includes('Type to search')) { node.textContent = text.replace('Type to search', 'Pesquisar...'); }
+                    if (text.includes('Welcome')) { node.textContent = text.replace('Welcome', 'Olá,'); }
 
-            // 3. Dropdowns Vazios
-            document.querySelectorAll('.ts-dropdown .no-results').forEach(el => {
-                el.innerText = 'Nenhum resultado';
-            });
+                    // Avisos de Tela Vazia
+                    if (text.includes('No results found')) { node.textContent = text.replace('No results found', 'Nenhum resultado encontrado'); }
+                    if (text.includes('This page yielded into no results')) { node.textContent = 'Nenhum item cadastrado aqui. Crie um novo item para começar.'; }
 
-            // 4. Breadcrumbs Redundantes (Narrativa > Narrativas)
+                    // AVISO DO MANAGEMENT FORM (O SEGREDO ESTÁ AQUI)
+                    if (text.includes('ManagementForm') || text.includes('ManagementForm estão faltando')) {
+                        node.textContent = '⚠️ Erro estrutural: Você tentou salvar opções vazias. Por favor, preencha todos os campos corretamente ou clique na LIXEIRA para remover as opções não utilizadas.';
+                        if (node.parentElement) {
+                            node.parentElement.style.color = '#ef4444'; // Cor vermelha de erro
+                            node.parentElement.style.fontWeight = 'bold';
+                            node.parentElement.style.fontSize = '14px';
+                        }
+                    }
+
+                } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
+                    node.childNodes.forEach(walkDOM);
+                }
+            };
+            walkDOM(document.body);
+
+            // Elimina redundância do Breadcrumb (Narrativa > Narrativas)
             document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
                 if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
                     el.style.display = 'none';
-                    if(el.nextSibling && el.nextSibling.nodeType === Node.TEXT_NODE) el.nextSibling.textContent = '';
+                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = '';
                 }
             });
+        }, 500);
 
-        }, 300); // Roda a cada 300ms, leve e impercetível
-
-        // AÇÃO DA LIXEIRA (Com Confirmação)
+        // Ação da Lixeira com Confirmação
         document.body.addEventListener('click', function(e) {
             let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
             if (deleteBtn) {

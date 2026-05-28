@@ -24,7 +24,6 @@ class NestedAdminDjango5Patch:
             return self.default_val
         return getattr(formset, self.attr_name, self.default_val)
 
-# Mapeamento absoluto de todas as propriedades exigidas pelo Django 5.x
 patch_attrs = {
     'initial_forms': [],
     'extra_forms': [],
@@ -122,11 +121,9 @@ class TenantPermissionsMixin:
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if formfield:
-            if hasattr(formfield, 'empty_label') and formfield.empty_label in ['---------', 'Select value', '']:
-                formfield.empty_label = 'Selecione uma opção...'
-            if hasattr(formfield.widget, 'attrs'):
-                formfield.widget.attrs['placeholder'] = 'Selecione uma opção...'
+        # Aplica o placeholder APENAS se for um campo com empty_label (Selects)
+        if formfield and hasattr(formfield, 'empty_label') and formfield.empty_label in ['---------', 'Select value', '']:
+            formfield.empty_label = 'Selecione uma opção...'
         return formfield
 
 # --- INLINES ---
