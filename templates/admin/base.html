@@ -45,79 +45,83 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* 1. FORÇA DARK MODE BASE */
     html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
+
     #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
 
-    /* 2. CORREÇÃO DOS DROPDOWNS (Leitura Perfeita) */
-    .ts-control, .ts-wrapper.single .ts-control, input.ts-control { background-color: #374151 !important; color: #fff !important; border: 1px solid #4b5563 !important; }
-    .ts-dropdown { background-color: #1f2937 !important; border: 1px solid #4b5563 !important; color: #fff !important; }
-    .ts-dropdown .option { color: #d1d5db !important; padding: 10px !important; }
-    .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #fff !important; }
+    /* =========================================================
+       CORREÇÃO DE LEITURA DOS DROPDOWNS (TOMSELECT)
+       ========================================================= */
+    .ts-dropdown, .ts-dropdown .option { background-color: #1f2937 !important; color: #f3f4f6 !important; }
+    .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
+    .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
-    /* 3. ESTRUTURA NESTED ADMIN (Sem bugar largura e 100% organizado) */
+    /* =========================================================
+       DOMANDO O NESTED ADMIN (Perguntas e Opções)
+       ========================================================= */
     .djn-group {
         background: #1f2937 !important; border: 1px solid #374151 !important;
         border-radius: 12px !important; padding: 20px !important; margin-bottom: 20px !important;
-        width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; overflow: hidden !important;
+        width: 100% !important; box-sizing: border-box !important;
     }
+
     .djn-item {
         background: #111827 !important; border: 1px solid #374151 !important;
-        border-radius: 8px !important; padding: 25px 20px 20px 20px !important; margin-bottom: 15px !important;
+        border-radius: 8px !important; padding: 20px !important; margin-bottom: 15px !important;
         position: relative !important; width: 100% !important; box-sizing: border-box !important;
     }
 
-    /* Remove os textos nativos sujos do Django ("Pergunta:", "Opcao resposta:", etc) */
+    /* Espaçamento entre Pergunta e a caixa de Opções */
+    .djn-item .djn-group { margin-top: 25px !important; border-top: 2px dashed #4b5563 !important; border-radius: 0 0 12px 12px !important; border-left: none !important; border-right: none !important; border-bottom: none !important; background: transparent !important; padding: 20px 0 0 0 !important; }
+
+    /* Fim do Lixo Visual */
     .inline_label, .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
-    .djn-item > h3 { font-size: 0 !important; margin-bottom: 15px !important; border-bottom: 1px solid #374151 !important; padding-bottom: 10px !important; }
+    .djn-item > h3 { display: none !important; }
 
-    /* 4. A LIXEIRA INTELIGENTE (Substitui checkbox e a palavra "Remover" por ícone) */
+    /* MATA OS CHECKBOXES INÚTEIS */
+    .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
+
+    /* LIXEIRA: Botão Vermelho com Ícone */
     .djn-item > .delete { position: absolute !important; top: 15px !important; right: 15px !important; z-index: 10; font-size: 0 !important; }
-    .djn-item > .delete input[type="checkbox"] { display: none !important; }
-    .djn-item > .delete label {
-        background: #ef4444 !important; width: 35px !important; height: 35px !important; border-radius: 6px !important;
+    .djn-item > .delete label, a.inline-deletelink {
+        background: #ef4444 !important; width: 36px !important; height: 36px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
-        color: transparent !important; cursor: pointer !important; transition: 0.2s;
+        color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
     }
-    .djn-item > .delete label::before {
+    .djn-item > .delete label::before, a.inline-deletelink::before {
         content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free";
-        font-weight: 900; color: white !important; font-size: 14px !important; position: absolute;
+        font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
     }
-    .djn-item > .delete label:hover { background: #dc2626 !important; transform: scale(1.05); }
+    .djn-item > .delete label:hover, a.inline-deletelink:hover { background: #dc2626 !important; transform: scale(1.05); }
 
-    /* Estilo dos inputs dentro do formulário */
     .djn-item input[type="text"], .djn-item select {
         background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important;
-        border-radius: 6px !important; height: 40px !important; width: 100% !important; padding: 0 10px !important;
+        border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important;
     }
-
-    /* Oculta texto nativo do input file */
-    input[type="file"] { color: transparent !important; }
-    input[type="file"]::file-selector-button { background-color: #374151; color: white; padding: 8px 12px; border: 1px solid #4b5563; border-radius: 6px; cursor: pointer; }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // TRADUTOR AGRESSIVO E DIRETO (Varre a tela toda)
-        const traduzirTextos = () => {
-            // Dropdowns (Placeholders e opções vazias)
-            document.querySelectorAll('input.ts-control').forEach(el => {
+        // TRADUTOR E LIMPADOR AGRESSIVO
+        setInterval(() => {
+            // Inputs e Dropdowns
+            document.querySelectorAll('input').forEach(el => {
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
+                if (el.placeholder === 'Type to search') el.placeholder = 'Pesquisar...';
             });
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Textos profundos no HTML (Welcome e Choose file)
+            // Varredura de Textos Soltos
             const walkDOM = (node) => {
                 if (node.nodeType === 3) {
                     let text = node.nodeValue;
                     let modificado = false;
 
-                    if (text.includes('Choose file to upload')) { text = text.replace('Choose file to upload', 'Escolher arquivo'); modificado = true; }
+                    if (text.includes('Choose file to upload') || text.includes('Choose File')) { text = text.replace(/Choose [fF]ile( to upload)?/, 'Escolher Imagem'); modificado = true; }
                     if (text.includes('No file chosen')) { text = text.replace('No file chosen', 'Nenhum arquivo'); modificado = true; }
-                    if (text.includes('Welcome')) { text = text.replace('Welcome', 'Olá,'); modificado = true; }
 
                     if (modificado) node.nodeValue = text;
                 } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE') {
@@ -125,28 +129,31 @@
                 }
             };
             walkDOM(document.body);
-        };
 
-        // Roda a tradução na inicialização e sempre que adicionar novos campos
-        setInterval(traduzirTextos, 500);
+            // Elimina redundância do Breadcrumb (Ex: "Narrativa > Narrativas > João")
+            document.querySelectorAll('nav[aria-label="Breadcrumb"] li, .breadcrumbs span, .breadcrumbs a').forEach(el => {
+                if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
+                    el.style.display = 'none'; // Esconde o "Narrativa" pai
+                    if(el.nextSibling && el.nextSibling.nodeType === 3) el.nextSibling.textContent = ''; // Esconde a setinha
+                }
+            });
+        }, 500);
 
-        // AÇÃO DA LIXEIRA (Clique interceptado com confirmação e marcação invisível)
+        // LIXEIRA: Clique e Confirmação
         document.body.addEventListener('click', function(e) {
-            let deleteLabel = e.target.closest('.delete label');
-            if (deleteLabel) {
-                e.preventDefault(); // Impede o clique direto
+            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink');
+            if (deleteBtn) {
+                e.preventDefault();
                 if(confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
-                    // Marca o checkbox escondido como TRUE
-                    let checkbox = deleteLabel.parentElement.querySelector('input[type="checkbox"]');
+                    let checkbox = deleteBtn.parentElement.querySelector('input[type="checkbox"]');
                     if(checkbox) checkbox.checked = true;
-                    // Esconde a caixa da tela imediatamente
-                    let djnItem = deleteLabel.closest('.djn-item');
+                    let djnItem = deleteBtn.closest('.djn-item');
                     if(djnItem) djnItem.style.display = 'none';
                 }
             }
         });
 
-        // Tabela clicável
+        // Tabelas Clicáveis
         document.querySelectorAll('#changelist tbody tr').forEach(tr => {
             tr.addEventListener('click', function(e) {
                 if(['a', 'input', 'button', 'svg', 'path', 'span'].includes(e.target.tagName.toLowerCase())) return;
