@@ -69,25 +69,28 @@
 
     /* Remove textos sujos */
     .datetimeshortcuts, .related-widget-wrapper-link { display: none !important; }
-    .djn-item > input[type="checkbox"], .djn-item > .delete input[type="checkbox"] { display: none !important; }
-    .djn-item > h3 { border: none !important; margin: 0 !important; padding: 0 !important; background: transparent !important; height: 0 !important; overflow: visible !important; }
-    .djn-item > h3 > b, .djn-item > h3 > .inline_label, .djn-item > h3 > span:not(:has(a)) { display: none !important; }
+    .djn-item input[type="checkbox"][name*="DELETE"] { display: none !important; }
+    .djn-item h3 { border: none !important; margin: 0 !important; padding: 0 !important; background: transparent !important; height: 0 !important; overflow: visible !important; }
+    .djn-item h3 b, .djn-item h3 .inline_label { display: none !important; }
 
-    /* A LIXEIRA VERMELHA NATIVA (Extraída de todas as camadas e forçada a aparecer) */
-    .djn-item > .delete label,
-    .djn-item .djn-remove-handler {
+    /* A LIXEIRA VERMELHA NATIVA (Universal para Nível 1 e Nível 2) */
+    .djn-item .delete label,
+    .djn-item a.inline-deletelink,
+    .djn-item a.djn-remove-handler {
         position: absolute !important; top: 15px !important; right: 15px !important; z-index: 999 !important;
         background: #ef4444 !important; width: 34px !important; height: 34px !important; border-radius: 6px !important;
         display: flex !important; align-items: center !important; justify-content: center !important;
         color: transparent !important; cursor: pointer !important; text-decoration: none !important; transition: 0.2s;
         font-size: 0 !important; overflow: hidden !important; opacity: 1 !important; visibility: visible !important; border: none !important;
     }
-    .djn-item > .delete label::before,
-    .djn-item .djn-remove-handler::before {
+    .djn-item .delete label::before,
+    .djn-item a.inline-deletelink::before,
+    .djn-item a.djn-remove-handler::before {
         content: "\f2ed"; font-family: "Font Awesome 5 Free", "Font Awesome 6 Free"; font-weight: 900; color: white !important; font-size: 15px !important; position: absolute;
     }
-    .djn-item > .delete label:hover,
-    .djn-item .djn-remove-handler:hover { background: #dc2626 !important; transform: scale(1.05); }
+    .djn-item .delete label:hover,
+    .djn-item a.inline-deletelink:hover,
+    .djn-item a.djn-remove-handler:hover { background: #dc2626 !important; transform: scale(1.05); }
 
     /* Campos de texto */
     .djn-item input[type="text"], .djn-item select { background: #374151 !important; color: white !important; border: 1px solid #4b5563 !important; border-radius: 6px !important; height: 42px !important; width: 100% !important; padding: 0 12px !important; box-sizing: border-box !important; }
@@ -109,9 +112,9 @@
                 if (el.placeholder === 'Select value' || el.placeholder.includes('Select')) el.placeholder = 'Selecione uma opção...';
                 if (el.placeholder === 'Type to search' || el.placeholder.includes('search')) el.placeholder = 'Pesquisar...';
             });
+
             document.querySelectorAll('.ts-dropdown .no-results').forEach(el => el.innerText = 'Nenhum resultado');
 
-            // Textos Soltos
             const walkDOM = (node) => {
                 if (node.nodeType === Node.TEXT_NODE) {
                     let text = node.textContent;
@@ -146,19 +149,19 @@
             mainForm.addEventListener('submit', function(e) {
                 let formTemErro = false;
 
-                // Varre TODOS os blocos (Perguntas e Opções) que estão visíveis e não são "fantasmas"
+                // Varre TODOS os blocos (Perguntas e Opções) que estão visíveis
                 document.querySelectorAll('.djn-item:not(.djn-empty-form)').forEach(item => {
-                    if (item.style.display === 'none') return; // Ignora apagados
+                    if (item.style.display === 'none') return; // Ignora os apagados visualmente
 
-                    // Procura por todos os inputs de texto e selects
+                    // Procura por todos os inputs de texto e selects do bloco
                     item.querySelectorAll('input[type="text"], select').forEach(input => {
-                        // Ignora inputs do próprio formulário vazio escondido
+                        // Se o input pertencer ao formulário de template vazio, ignora
                         if (input.closest('.djn-empty-form')) return;
 
                         let valor = input.value;
                         let targetToPaint = input;
 
-                        // Se for Dropdown do TomSelect, pintamos o Wrapper
+                        // Se for Dropdown do TomSelect, pintamos o Wrapper dele
                         if (input.tagName === 'SELECT' && input.nextElementSibling && input.nextElementSibling.classList.contains('ts-wrapper')) {
                             targetToPaint = input.nextElementSibling;
                         }
@@ -168,7 +171,7 @@
                             targetToPaint.classList.add('input-error');
                             let container = targetToPaint.parentElement;
 
-                            // Adiciona mensagem debaixo do campo
+                            // Adiciona mensagem individual por baixo de CADA campo vazio
                             if (!container.querySelector('.custom-field-error')) {
                                 let err = document.createElement('span');
                                 err.className = 'custom-field-error block mt-2 text-sm font-bold text-red-500';
@@ -177,7 +180,7 @@
                             }
                             formTemErro = true;
                         } else {
-                            // Se preenchido, limpa erros
+                            // Se estiver preenchido, limpa erros do campo
                             targetToPaint.classList.remove('input-error');
                             let err = targetToPaint.parentElement.querySelector('.custom-field-error');
                             if (err) err.remove();
@@ -185,17 +188,19 @@
                     });
                 });
 
+                // Se detetou erros, impede o envio e desliza a página para o erro
                 if (formTemErro) {
-                    e.preventDefault(); // Impede o envio para o servidor
+                    e.preventDefault();
                     let firstError = document.querySelector('.custom-field-error');
                     if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             });
         }
 
-        // LIXEIRA CORRIGIDA
+        // LIXEIRA CORRIGIDA (Universal)
         document.body.addEventListener('click', function(e) {
-            let deleteBtn = e.target.closest('.delete label') || e.target.closest('.djn-remove-handler');
+            let deleteBtn = e.target.closest('.delete label') || e.target.closest('a.inline-deletelink') || e.target.closest('a.djn-remove-handler');
+
             if (deleteBtn) {
                 if(!confirm('Tem certeza que deseja excluir esta opção permanentemente?')) {
                     e.preventDefault();
@@ -209,12 +214,13 @@
                         let djnItem = deleteBtn.closest('.djn-item');
                         if(djnItem) {
                             djnItem.style.display = 'none';
+                            // Limpa os alertas deste bloco, pois já foi apagado visualmente
                             djnItem.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
                             djnItem.querySelectorAll('.custom-field-error').forEach(el => el.remove());
                         }
                         e.preventDefault();
                     }
-                    // O Nested Admin cuidará nativamente de apagar as linhas novas não salvas!
+                    // Para itens novos, o código do nested_admin atua nativamente e destrói o HTML.
                 }
             }
         }, true);
