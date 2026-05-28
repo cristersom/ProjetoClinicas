@@ -1,25 +1,37 @@
 {% extends "unfold/layouts/base.html" %}
 {% load i18n unfold %}
 
+{% block breadcrumbs %}
+<div class="px-4 sm:px-6 lg:px-8 py-4 flex items-center font-medium text-sm text-gray-500 dark:text-gray-400">
+    <a href="{% url 'admin:index' %}" class="hover:text-gray-700 dark:hover:text-gray-200">Início</a>
+    <span class="mx-2">›</span>
+    <a href="{% url 'admin:app_list' app_label='narrativa' %}" class="hover:text-gray-700 dark:hover:text-gray-200">Narrativa</a>
+    <span class="mx-2">›</span>
+    <a href="{% url 'admin:narrativa_narrativa_changelist' %}" class="hover:text-gray-700 dark:hover:text-gray-200">Narrativas</a>
+    <span class="mx-2">›</span>
+    <span class="text-gray-700 dark:text-gray-200">{{ narrativa_atual.titulo }} (Percurso)</span>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="px-4 py-6 sm:px-6 lg:px-8">
     <div class="mb-8">
-        <h1 class="text-2xl font-extrabold text-white">Percurso: {{ title|slice:"10:" }}</h1>
+        <h1 class="text-2xl font-extrabold text-white">Relatório de Percurso</h1>
     </div>
 
     <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-sm mb-6">
         <form method="GET" class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div class="flex flex-row flex-wrap items-center gap-6">
-                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider">Filtrar por Perfil:</span>
+            <div class="flex flex-row flex-wrap items-center gap-4">
+                <span class="text-sm font-bold text-gray-400 uppercase tracking-wider w-full md:w-auto">Filtrar por Perfil:</span>
 
-                <label class="flex items-center space-x-2 cursor-pointer text-white whitespace-nowrap">
-                    <input type="checkbox" name="narrativa_perfil_id" value="all" class="form-checkbox h-5 w-5 text-teal-500 bg-gray-700 border-gray-600 rounded focus:ring-teal-500" {% if 'all' in perfis_selecionados_ids %}checked{% endif %}>
+                <label class="flex items-center space-x-2 cursor-pointer text-white">
+                    <input type="checkbox" name="narrativa_perfil_id" value="all" class="form-checkbox h-5 w-5 text-teal-500 bg-gray-700 border-gray-600 rounded" {% if 'all' in perfis_selecionados_ids %}checked{% endif %}>
                     <span class="text-sm font-medium">Todos os Perfis</span>
                 </label>
 
                 {% for perfil in todos_os_perfis %}
-                <label class="flex items-center space-x-2 cursor-pointer text-white whitespace-nowrap">
-                    <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}" class="form-checkbox h-5 w-5 text-teal-500 bg-gray-700 border-gray-600 rounded focus:ring-teal-500" {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
+                <label class="flex items-center space-x-2 cursor-pointer text-white">
+                    <input type="checkbox" name="narrativa_perfil_id" value="{{ perfil.id }}" class="form-checkbox h-5 w-5 text-teal-500 bg-gray-700 border-gray-600 rounded" {% if perfil.id|stringformat:"s" in perfis_selecionados_ids %}checked{% endif %}>
                     <span class="text-sm font-medium">{{ perfil.titulo }}</span>
                 </label>
                 {% endfor %}
@@ -62,7 +74,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-center text-teal-400 font-bold">{{ dado.visitantes_unicos }}</td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum dado encontrado para os filtros selecionados.</td></tr>
+                    <tr><td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum dado.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

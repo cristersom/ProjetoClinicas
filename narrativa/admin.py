@@ -2,7 +2,6 @@ from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 import nested_admin
 
-# --- IMPORTAÇÕES DO UNFOLD ---
 from unfold.admin import ModelAdmin, StackedInline
 from import_export.admin import ImportExportModelAdmin
 from unfold.contrib.import_export.forms import ExportForm, ImportForm
@@ -21,6 +20,12 @@ from collections import Counter
 import json
 from django.db.models import Count, Value
 from django.db.models.functions import Coalesce
+
+# --- CORREÇÃO DO NOME "OBJECT(232)" PARA ALGO HUMANO ---
+def sessao_str(self):
+    return f"Sessão: {self.session_key[:8]}" if self.session_key else f"Sessão ID: {self.id}"
+SessaoPaciente.__str__ = sessao_str
+
 
 class SuperUserOnlyMixin:
     def has_module_permission(self, request): return request.user.is_superuser
@@ -58,19 +63,21 @@ class TenantPermissionsMixin:
     def has_add_permission(self, request, *args, **kwargs):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
 
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
 
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser: return True
         c = self.get_clinica_atualizada(request)
-        return False if c and not c.assinatura_ativa else True
+        if c and not c.assinatura_ativa: return False
+        return True
 
-    # TRADUÇÃO FORÇADA NO BACKEND PARA SELECTS
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
         if formfield:
@@ -141,12 +148,14 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
         return super().has_add_permission(request, *args, **kwargs)
 
     def get_exclude(self, request, obj=None):
-        return ('visualizacoes',) if request.user.is_superuser else ('clinica', 'visualizacoes')
+        if request.user.is_superuser: return ('visualizacoes',)
+        return ('clinica', 'visualizacoes')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser: return qs
-        if hasattr(request.user, 'clinica') and request.user.clinica: return qs.filter(clinica=request.user.clinica)
+        if hasattr(request.user, 'clinica') and request.user.clinica:
+            return qs.filter(clinica=request.user.clinica)
         return qs.none()
 
     def save_model(self, request, obj, form, change):
@@ -216,6 +225,7 @@ class NarrativaAdmin(TenantPermissionsMixin, ModelAdmin):
 
         return render(request, 'admin/relatorio_narrativa_percurso.html', {
             **self.admin_site.each_context(request),
+            'narrativa_atual': narrativa_atual,
             'title': f"Percurso: {narrativa_atual.titulo}",
             'dados_agregados_cenas': dados_agregados_cenas,
             'labels_grafico': json.dumps(labels_grafico),
@@ -323,7 +333,12 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
                     else:
                         c.update(list(rp.values_list('texto_resposta', flat=True)))
                     dados_comparativos[pergunta.id]['dados_por_perfil'].append({'perfil_titulo': pf['titulo'], 'total_respostas': rp.count(), 'dados_grafico': {'labels': json.dumps(list(c.keys())), 'data': json.dumps(list(c.values())), 'tipo_grafico': 'pie' if pergunta.tipo_resposta == "UNICA_ESCOLHA" else 'bar'} })
-        return render(request, 'admin/relatorio_questionario_agregado.html', {**self.admin_site.each_context(request), 'questionario': questionario, 'dados_comparativos': dados_comparativos, 'todos_os_perfis': todos_os_perfis})
+        return render(request, 'admin/relatorio_questionario_agregado.html', {
+            **self.admin_site.each_context(request),
+            'questionario': questionario,
+            'dados_comparativos': dados_comparativos,
+            'todos_os_perfis': todos_os_perfis
+        })
 
     def relatorio_detalhado_view(self, request, object_id, *args, **kwargs):
         questionario = self.get_object(request, object_id)
@@ -352,7 +367,11 @@ class QuestionarioAdmin(TenantPermissionsMixin, nested_admin.NestedModelAdmin):
         for r in respostas:
             if r.session_key not in dados: dados[r.session_key] = []
             dados[r.session_key].append(r)
-        return render(request, 'admin/relatorio_questionario_detalhe.html', {**self.admin_site.each_context(request), 'questionario': questionario, 'dados_do_relatorio': dados})
+        return render(request, 'admin/relatorio_questionario_detalhe.html', {
+            **self.admin_site.each_context(request),
+            'questionario': questionario,
+            'dados_do_relatorio': dados
+        })
 
 
 class RespostaResource(resources.ModelResource):
