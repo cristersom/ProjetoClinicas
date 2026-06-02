@@ -45,17 +45,31 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* Força Dark Mode Base */
-    html, body { background-color: #111827 !important; color: #f3f4f6 !important; }
+    /* Força Dark Mode Base & Resolve o Estouro no Mobile */
+    html, body {
+        background-color: #111827 !important; color: #f3f4f6 !important;
+        overflow-x: hidden !important; max-width: 100vw !important;
+    }
+    #main, #content-main, .overflow-auto { max-width: 100vw !important; overflow-x: hidden !important; }
+
     #changelist table tbody tr { cursor: pointer; transition: background-color 0.2s; }
     #changelist table tbody tr:hover { background-color: #374151 !important; }
+
+    /* Esconder os 3 pontinhos vazios da tabela */
+    table th:last-child:has(span.sr-only),
+    table td:last-child:has(svg) { display: none !important; }
+
+    /* Resolver Breadcrumb quebrado com reticências longas */
+    .truncate { text-overflow: clip !important; white-space: normal !important; max-width: none !important; }
+    nav[aria-label="Breadcrumb"] ol li div { max-width: none !important; overflow: visible !important; text-overflow: clip !important; }
+    nav[aria-label="Breadcrumb"] ol li a { max-width: none !important; white-space: normal !important; }
 
     /* Leitura dos Dropdowns */
     .ts-dropdown, .ts-dropdown .option { background-color: #1f2937 !important; color: #f3f4f6 !important; }
     .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: #14b8a6 !important; color: #ffffff !important; }
     .ts-control { background-color: #374151 !important; border-color: #4b5563 !important; color: white !important; }
 
-    /* UX: Esconde o Welcome e os avisos gerais feios do Django */
+    /* UX: Esconde os avisos gerais feios do Django (Mantemos os erros limpos) */
     .font-semibold.text-gray-900.dark\:text-white { display: none !important; }
     .errornote, ul.errorlist:not(.custom-error-list) { display: none !important; }
 
@@ -107,7 +121,35 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.classList.add('dark');
 
-        // FUNÇÃO DE TRADUÇÃO CIRÚRGICA (Sem loops infinitos destrutivos)
+        // Troca o ícone do menu lateral por um hambúrguer limpo
+        let sidebarMenuBtn = document.querySelector('#sidebar-menu-button svg, header button svg');
+        if (sidebarMenuBtn) {
+            sidebarMenuBtn.outerHTML = '<i class="fas fa-bars text-xl ml-2" style="color:white;"></i>';
+        }
+
+        // Transforma o Select Action num botão caso só haja uma opção de ação útil
+        let actionSelect = document.querySelector('select[name="action"]');
+        if (actionSelect && actionSelect.options.length === 2) {
+            let actionVal = actionSelect.options[1].value;
+            let actionTxt = actionSelect.options[1].text;
+
+            let btn = document.createElement('button');
+            btn.innerText = actionTxt;
+            btn.className = 'bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm font-bold ml-2 transition';
+            btn.onclick = (e) => {
+                e.preventDefault();
+                actionSelect.value = actionVal;
+                let runBtn = document.querySelector('button[title="Run the selected action"]');
+                if (runBtn) runBtn.click();
+            };
+
+            actionSelect.style.display = 'none';
+            let runBtn = document.querySelector('button[title="Run the selected action"]');
+            if (runBtn) runBtn.style.display = 'none';
+            actionSelect.parentElement.appendChild(btn);
+        }
+
+        // Função de tradução direta sem repetições
         function aplicarTraducoes(root) {
             root.querySelectorAll('input').forEach(el => {
                 if (el.value === 'Choose file to upload' || el.value === 'Choose file') el.value = 'Escolher Arquivo...';
@@ -119,7 +161,7 @@
             root.querySelectorAll('h2').forEach(el => { if (el.innerText.trim() === 'No results found') el.innerText = 'Nenhum resultado encontrado'; });
             root.querySelectorAll('p').forEach(el => { if (el.innerText.includes('This page yielded into no results')) el.innerText = 'Nenhum item cadastrado aqui. Adicione um novo para começar.'; });
 
-            // Traduz erros nativos que o Django tenta colocar debaixo dos inputs
+            // Traduz erros nativos e limpa o backend
             root.querySelectorAll('ul.errorlist li').forEach(el => {
                 let text = el.innerText;
                 if (text.includes('ManagementForm') || text.includes('adulterados') || text.includes('TOTAL_FORMS')) {
@@ -134,6 +176,23 @@
         // Aplica na inicialização
         aplicarTraducoes(document);
 
+        // Varredura de Textos Livres no DOM para traduções restantes (Inglês)
+        const walkDOM = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                let text = node.textContent;
+                if (!text || text.trim() === '') return;
+
+                if (text.includes('Select all rows')) node.textContent = text.replace('Select all rows', 'Selecionar todas as linhas');
+                if (text.includes('Select Record')) node.textContent = text.replace('Select Record', 'Selecionar Registo');
+                if (text.includes('Select action')) node.textContent = text.replace('Select action', 'Escolher ação');
+                if (text.includes('Welcome')) node.textContent = text.replace('Welcome', 'Olá,');
+
+            } else if (node.nodeType === Node.ELEMENT_NODE && !['SCRIPT', 'STYLE', 'TEXTAREA'].includes(node.nodeName)) {
+                node.childNodes.forEach(walkDOM);
+            }
+        };
+        walkDOM(document.body);
+
         // Limpa breadcrumbs redundantes uma vez
         document.querySelectorAll('nav[aria-label="Breadcrumb"] li').forEach(el => {
             if(el.innerHTML.includes('Narrativa') && el.nextElementSibling && el.nextElementSibling.innerHTML.includes('Narrativas')) {
@@ -142,7 +201,7 @@
             }
         });
 
-        // Aplica nas novas linhas criadas pelo clique de "+ Adicionar"
+        // Aplica traduções nas novas linhas criadas pelo clique de "+ Adicionar"
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.addedNodes.length) {
@@ -157,14 +216,13 @@
         observer.observe(document.body, { childList: true, subtree: true });
 
         // =====================================================
-        // UX PROFISSIONAL: VALIDAÇÃO DE CAMPOS ANTES DE ENVIAR
+        // VALIDAÇÃO LOCAL EXATA (Ecrã recusa erros do formulário em branco)
         // =====================================================
         const mainForm = document.querySelector('#content-main form');
         if (mainForm) {
             mainForm.addEventListener('submit', function(e) {
                 let formTemErro = false;
 
-                // Varre TODOS os blocos visíveis
                 document.querySelectorAll('.djn-item:not(.djn-empty-form)').forEach(item => {
                     if (item.style.display === 'none' || item.classList.contains('lixeira-aplicada')) return;
 
@@ -214,14 +272,11 @@
         }
 
         // =====================================================
-        // MELHORIA DE UX PARA LIXEIRA DE ITENS JÁ SALVOS
-        // (Itens novos são apagados na perfeição pela biblioteca)
+        // MELHORIA DE UX PARA LIXEIRA (De itens já salvos)
         // =====================================================
         document.body.addEventListener('click', function(e) {
             let deleteLabel = e.target.closest('.delete label');
             if (deleteLabel) {
-                // Deixa o clique passar para selecionar a checkbox nativa invisível
-                // Apenas oculta o bloco visualmente para não atrapalhar
                 let djnItem = deleteLabel.closest('.djn-item');
                 if (djnItem) {
                     setTimeout(() => {
